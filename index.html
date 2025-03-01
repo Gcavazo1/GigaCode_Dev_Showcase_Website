@@ -391,11 +391,23 @@
                 <div class="neon-separator"></div>
             </div>
             <div class="audio-container">
-                <canvas id="audio-canvas" class="audio-canvas"></canvas>
-                <audio id="background-audio" loop>
+                <div class="visualizer-wrapper">
+                    <canvas id="audio-canvas" class="audio-canvas"></canvas>
+                    <div class="audio-controls">
+                        <button id="play-audio" class="cyber-button medium">
+                            <i class="fas fa-play"></i>
+                            <span>Play Music</span>
+                        </button>
+                        <div class="volume-control">
+                            <i class="fas fa-volume-up"></i>
+                            <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="0.7">
+                        </div>
+                    </div>
+                </div>
+                <audio id="background-audio" preload="auto">
                     <source src="audio/cyberpunk-theme.mp3" type="audio/mp3">
+                    Your browser does not support the audio element.
                 </audio>
-                <button id="play-audio" class="cyber-button medium">Play Music</button>
             </div>
         </section>
 

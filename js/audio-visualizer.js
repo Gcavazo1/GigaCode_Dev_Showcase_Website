@@ -4,6 +4,7 @@ class AudioVisualizer {
     constructor() {
         this.audio = document.getElementById('background-audio');
         this.playButton = document.getElementById('play-audio');
+        this.volumeSlider = document.getElementById('volume-slider');
         this.canvas = document.getElementById('audio-canvas');
         this.ctx = this.canvas.getContext('2d');
         
@@ -37,12 +38,15 @@ class AudioVisualizer {
         this.source.connect(this.analyser);
         this.analyser.connect(this.audioContext.destination);
         
+        // Set initial volume
+        this.audio.volume = this.volumeSlider.value;
+        
         // Set up canvas
         this.resizeCanvas();
         window.addEventListener('resize', () => this.resizeCanvas());
         
-        // Set up play button
-        this.playButton.addEventListener('click', () => this.togglePlay());
+        // Set up controls
+        this.setupEventListeners();
         
         // Start animation
         this.animate();
@@ -64,6 +68,30 @@ class AudioVisualizer {
         this.initPlaylist();
     }
     
+    setupEventListeners() {
+        this.playButton.addEventListener('click', () => this.togglePlay());
+        
+        this.volumeSlider.addEventListener('input', (e) => {
+            this.audio.volume = e.target.value;
+        });
+        
+        this.audio.addEventListener('play', () => {
+            this.playButton.innerHTML = '<i class="fas fa-pause"></i><span>Pause</span>';
+            this.playButton.classList.add('playing');
+        });
+        
+        this.audio.addEventListener('pause', () => {
+            this.playButton.innerHTML = '<i class="fas fa-play"></i><span>Play</span>';
+            this.playButton.classList.remove('playing');
+        });
+        
+        this.audio.addEventListener('ended', () => {
+            this.isPlaying = false;
+            this.playButton.innerHTML = '<i class="fas fa-play"></i><span>Play</span>';
+            this.playButton.classList.remove('playing');
+        });
+    }
+    
     resizeCanvas() {
         this.canvas.width = this.canvas.offsetWidth;
         this.canvas.height = this.canvas.offsetHeight;
@@ -76,12 +104,8 @@ class AudioVisualizer {
         
         if (this.isPlaying) {
             this.audio.pause();
-            this.playButton.innerHTML = 'Play Music';
-            this.playButton.classList.remove('playing');
         } else {
             this.audio.play();
-            this.playButton.innerHTML = 'Pause Music';
-            this.playButton.classList.add('playing');
         }
         
         this.isPlaying = !this.isPlaying;
