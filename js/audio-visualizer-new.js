@@ -9,12 +9,29 @@ class AudioVisualizer {
         }
         audioVisualizerInstance = this;
 
+        console.log('Initializing AudioVisualizer');
+        
         // Core elements
         this.audio = document.getElementById('background-audio');
         this.playButton = document.getElementById('play-audio');
         this.volumeSlider = document.getElementById('volume-slider');
         this.canvas = document.getElementById('audio-canvas');
+        
+        if (!this.canvas) {
+            console.error('Audio canvas not found!');
+            return;
+        }
+        
+        console.log('Canvas found:', this.canvas);
+        console.log('Canvas dimensions:', this.canvas.offsetWidth, 'x', this.canvas.offsetHeight);
+        
         this.ctx = this.canvas.getContext('2d');
+        if (!this.ctx) {
+            console.error('Could not get 2D context from canvas!');
+            return;
+        }
+        
+        console.log('2D context obtained successfully');
         
         // State
         this.isPlaying = false;
@@ -619,81 +636,127 @@ class AudioVisualizer {
     }
 
     drawFallbackVisualization() {
-        if (!this.ctx || !this.analyser || !this.dataArray) return;
-        
-        // Clear canvas
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        // Draw background
-        this.ctx.fillStyle = this.colorScheme.background;
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        // Get frequency data
-        this.analyser.getByteFrequencyData(this.dataArray);
-        
-        // Draw circular visualization
-        const centerX = this.canvas.width / 2;
-        const centerY = this.canvas.height / 2;
-        const radius = Math.min(centerX, centerY) * 0.6;
-        
-        const segments = 180; // More segments for smoother circle
-        const angleStep = (Math.PI * 2) / segments;
-        
-        // Draw base circle
-        this.ctx.beginPath();
-        this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-        this.ctx.strokeStyle = 'rgba(0, 255, 255, 0.2)';
-        this.ctx.lineWidth = 1;
-        this.ctx.stroke();
-        
-        // Draw frequency bars
-        for (let i = 0; i < segments; i++) {
-            const angle = i * angleStep;
-            const dataIndex = Math.floor(i * this.dataArray.length / segments);
-            const value = this.dataArray[dataIndex] || 0;
+        try {
+            if (!this.ctx || !this.analyser || !this.dataArray) {
+                console.warn('Missing context or audio data for visualization');
+                return;
+            }
             
-            // Make the bars more responsive to audio
-            const barHeight = (value / 255) * radius * 0.8;
+            console.log('Drawing fallback visualization');
+            console.log('Canvas dimensions:', this.canvas.width, 'x', this.canvas.height);
             
-            const x1 = centerX + Math.cos(angle) * radius;
-            const y1 = centerY + Math.sin(angle) * radius;
-            const x2 = centerX + Math.cos(angle) * (radius + barHeight);
-            const y2 = centerY + Math.sin(angle) * (radius + barHeight);
+            // Clear canvas
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
             
-            // Calculate color based on frequency
-            const colorIndex = Math.floor((i / segments) * this.colorScheme.bars.length);
-            const color = this.colorScheme.bars[colorIndex];
-            const intensity = value / 255;
-            const lightness = color.lightness + (intensity * 20); // Brighter for louder sounds
+            // Draw background
+            this.ctx.fillStyle = this.colorScheme.background;
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
             
-            this.ctx.strokeStyle = `hsl(${color.hue}, ${color.saturation}%, ${lightness}%)`;
-            this.ctx.lineWidth = 2;
+            // Get frequency data
+            this.analyser.getByteFrequencyData(this.dataArray);
+            console.log('Audio data sample:', this.dataArray.slice(0, 5));
             
-            // Draw line
+            // Draw circular visualization
+            const centerX = this.canvas.width / 2;
+            const centerY = this.canvas.height / 2;
+            const radius = Math.min(centerX, centerY) * 0.6;
+            
+            console.log('Drawing circle at:', centerX, centerY, 'with radius:', radius);
+            
+            // Draw base circle
             this.ctx.beginPath();
-            this.ctx.moveTo(x1, y1);
-            this.ctx.lineTo(x2, y2);
+            this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+            this.ctx.strokeStyle = 'rgba(0, 255, 255, 0.2)';
+            this.ctx.lineWidth = 1;
             this.ctx.stroke();
             
-            // Draw glow
-            this.ctx.shadowBlur = 15;
-            this.ctx.shadowColor = `hsl(${color.hue}, ${color.saturation}%, ${lightness}%)`;
-            this.ctx.beginPath();
-            this.ctx.arc(x2, y2, 2, 0, Math.PI * 2);
-            this.ctx.fill();
-            this.ctx.shadowBlur = 0;
+            // Draw frequency bars
+            const segments = 120; // Fewer segments for better performance
+            const angleStep = (Math.PI * 2) / segments;
+            
+            console.log('Drawing', segments, 'frequency bars');
+            
+            // Try drawing with and without glow effects
+            const useGlowEffects = true;
+            console.log('Using glow effects:', useGlowEffects);
+            
+            for (let i = 0; i < segments; i++) {
+                const angle = i * angleStep;
+                const dataIndex = Math.floor(i * this.dataArray.length / segments);
+                
+                if (dataIndex >= this.dataArray.length) {
+                    console.warn('Data index out of bounds:', dataIndex, 'max:', this.dataArray.length);
+                    continue;
+                }
+                
+                const value = this.dataArray[dataIndex];
+                const barHeight = (value / 255) * radius * 0.8;
+                
+                const x1 = centerX + Math.cos(angle) * radius;
+                const y1 = centerY + Math.sin(angle) * radius;
+                const x2 = centerX + Math.cos(angle) * (radius + barHeight);
+                const y2 = centerY + Math.sin(angle) * (radius + barHeight);
+                
+                // Calculate color based on frequency
+                const colorIndex = Math.floor((i / segments) * this.colorScheme.bars.length);
+                const color = this.colorScheme.bars[colorIndex % this.colorScheme.bars.length];
+                const intensity = value / 255;
+                const lightness = color.lightness + (intensity * 20);
+                
+                // Draw line
+                this.ctx.beginPath();
+                this.ctx.moveTo(x1, y1);
+                this.ctx.lineTo(x2, y2);
+                this.ctx.strokeStyle = `hsl(${color.hue}, ${color.saturation}%, ${lightness}%)`;
+                this.ctx.lineWidth = 2;
+                
+                if (useGlowEffects) {
+                    // Add glow effect
+                    this.ctx.shadowBlur = 10;
+                    this.ctx.shadowColor = `hsl(${color.hue}, ${color.saturation}%, ${lightness}%)`;
+                }
+                
+                this.ctx.stroke();
+                
+                if (useGlowEffects) {
+                    // Draw endpoint with glow
+                    this.ctx.beginPath();
+                    this.ctx.arc(x2, y2, 2, 0, Math.PI * 2);
+                    this.ctx.fillStyle = `hsl(${color.hue}, ${color.saturation}%, ${lightness}%)`;
+                    this.ctx.fill();
+                }
+                
+                // Reset shadow for next iteration
+                if (useGlowEffects) {
+                    this.ctx.shadowBlur = 0;
+                }
+            }
+            
+            console.log('Attempting to draw particles');
+            // Try drawing particles
+            try {
+                this.drawSimpleParticles(centerX, centerY, radius);
+            } catch (particleError) {
+                console.error('Error drawing particles:', particleError);
+            }
+            
+            console.log('Attempting to draw grid');
+            // Try drawing grid
+            try {
+                this.drawSimpleGrid();
+            } catch (gridError) {
+                console.error('Error drawing grid:', gridError);
+            }
+            
+            console.log('Fallback visualization complete');
+        } catch (error) {
+            console.error('Error in fallback visualization:', error);
         }
-        
-        // Add particle effect
-        this.drawParticles(centerX, centerY, radius);
-        
-        // Add cyberpunk grid effect
-        this.drawCyberpunkGrid();
     }
 
-    // Add a method to draw particles
-    drawParticles(centerX, centerY, radius) {
-        // Get average frequency for particle intensity
+    // Simplified particle system
+    drawSimpleParticles(centerX, centerY, radius) {
+        // Calculate average frequency for intensity
         let sum = 0;
         for (let i = 0; i < this.dataArray.length; i++) {
             sum += this.dataArray[i];
@@ -701,65 +764,57 @@ class AudioVisualizer {
         const avgFrequency = sum / this.dataArray.length;
         const intensity = avgFrequency / 255;
         
-        // Number of particles based on intensity
-        const particleCount = Math.floor(50 + intensity * 100);
+        // Fewer particles for better performance
+        const particleCount = Math.floor(20 + intensity * 30);
+        console.log('Drawing', particleCount, 'particles with intensity', intensity);
         
         for (let i = 0; i < particleCount; i++) {
-            // Random angle and distance from center
             const angle = Math.random() * Math.PI * 2;
-            const distance = Math.random() * radius * 2;
+            const distance = Math.random() * radius * 1.5;
             
-            // Position
             const x = centerX + Math.cos(angle) * distance;
             const y = centerY + Math.sin(angle) * distance;
             
-            // Size based on distance and intensity
-            const size = Math.max(1, 3 * (1 - distance / (radius * 2)) * intensity);
+            const size = Math.max(1, 2 * (1 - distance / (radius * 2)) * intensity);
             
-            // Color based on position
-            const hue = (angle / (Math.PI * 2)) * 360;
-            const alpha = 0.7 * (1 - distance / (radius * 2));
+            // Use a fixed color for better performance
+            const colorIndex = i % this.colorScheme.bars.length;
+            const color = this.colorScheme.bars[colorIndex];
+            const alpha = 0.5 * (1 - distance / (radius * 2));
             
-            // Draw particle
             this.ctx.beginPath();
             this.ctx.arc(x, y, size, 0, Math.PI * 2);
-            this.ctx.fillStyle = `hsla(${hue}, 100%, 70%, ${alpha})`;
+            this.ctx.fillStyle = `hsla(${color.hue}, ${color.saturation}%, ${color.lightness}%, ${alpha})`;
             this.ctx.fill();
         }
     }
 
-    // Add a method to draw a cyberpunk grid
-    drawCyberpunkGrid() {
+    // Simplified grid for better performance
+    drawSimpleGrid() {
         const width = this.canvas.width;
         const height = this.canvas.height;
         
-        // Draw horizontal grid lines
+        console.log('Drawing grid with dimensions:', width, 'x', height);
+        
         this.ctx.strokeStyle = 'rgba(0, 255, 255, 0.1)';
         this.ctx.lineWidth = 1;
         
-        const gridSpacing = 30;
-        const perspectiveOffset = height * 0.3; // Perspective vanishing point offset
+        // Fewer grid lines for better performance
+        const gridSpacing = 50;
         
-        // Horizontal lines with perspective
-        for (let y = height - gridSpacing; y > height * 0.5; y -= gridSpacing) {
-            const perspectiveRatio = (height - y) / height;
-            
+        // Horizontal lines
+        for (let y = height; y > height * 0.6; y -= gridSpacing) {
             this.ctx.beginPath();
             this.ctx.moveTo(0, y);
             this.ctx.lineTo(width, y);
             this.ctx.stroke();
         }
         
-        // Vertical lines with perspective
-        const centerX = width / 2;
-        const vanishingY = height * 1.5; // Vanishing point below the canvas
-        
+        // Vertical lines
         for (let x = 0; x < width; x += gridSpacing) {
-            const angle = Math.atan2(vanishingY - height, x - centerX);
-            
             this.ctx.beginPath();
             this.ctx.moveTo(x, height);
-            this.ctx.lineTo(x, height * 0.7);
+            this.ctx.lineTo(x, height * 0.6);
             this.ctx.stroke();
         }
     }
@@ -803,6 +858,42 @@ class AudioVisualizer {
         this.ctx.textAlign = 'center';
         this.ctx.fillStyle = 'rgba(0, 255, 255, 0.7)';
         this.ctx.fillText('Play to visualize audio', centerX, centerY + 5);
+    }
+
+    // Add a method to draw a cyberpunk grid
+    drawCyberpunkGrid() {
+        const width = this.canvas.width;
+        const height = this.canvas.height;
+        
+        // Draw horizontal grid lines
+        this.ctx.strokeStyle = 'rgba(0, 255, 255, 0.1)';
+        this.ctx.lineWidth = 1;
+        
+        const gridSpacing = 30;
+        const perspectiveOffset = height * 0.3; // Perspective vanishing point offset
+        
+        // Horizontal lines with perspective
+        for (let y = height - gridSpacing; y > height * 0.5; y -= gridSpacing) {
+            const perspectiveRatio = (height - y) / height;
+            
+            this.ctx.beginPath();
+            this.ctx.moveTo(0, y);
+            this.ctx.lineTo(width, y);
+            this.ctx.stroke();
+        }
+        
+        // Vertical lines with perspective
+        const centerX = width / 2;
+        const vanishingY = height * 1.5; // Vanishing point below the canvas
+        
+        for (let x = 0; x < width; x += gridSpacing) {
+            const angle = Math.atan2(vanishingY - height, x - centerX);
+            
+            this.ctx.beginPath();
+            this.ctx.moveTo(x, height);
+            this.ctx.lineTo(x, height * 0.7);
+            this.ctx.stroke();
+        }
     }
 }
 
