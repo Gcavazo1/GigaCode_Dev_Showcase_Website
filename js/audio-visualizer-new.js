@@ -264,21 +264,16 @@ class AudioVisualizer {
     }
     
     animate() {
-        // If we have audio data but no visualizer yet
+        // If we have audio data, always use the fallback visualization
         if (this.analyser && this.dataArray) {
-            // Try to initialize Three.js if not already done and not already in fallback mode
-            if (!this.threeVisualizer && !this.fallbackVisualizerActive) {
-                this.initThreeVisualizer();
-            }
-            
-            // If Three.js failed or isn't available, use fallback
-            if (!this.threeVisualizer) {
-                this.fallbackVisualizerActive = true;
-                this.drawFallbackVisualization();
-            }
+            // Always draw our fallback visualization
+            this.drawFallbackVisualization();
             
             // Always animate equalizer on active track card
             this.animateEqualizer();
+        } else {
+            // Draw placeholder visualization when no audio data
+            this.drawPlaceholderVisualization();
         }
         
         // Continue animation
@@ -767,6 +762,47 @@ class AudioVisualizer {
             this.ctx.lineTo(x, height * 0.7);
             this.ctx.stroke();
         }
+    }
+
+    // Add a placeholder visualization for when no audio is playing
+    drawPlaceholderVisualization() {
+        if (!this.ctx) return;
+        
+        // Clear canvas
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Draw background
+        this.ctx.fillStyle = this.colorScheme.background;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Draw cyberpunk grid
+        this.drawCyberpunkGrid();
+        
+        // Draw pulsing circle
+        const centerX = this.canvas.width / 2;
+        const centerY = this.canvas.height / 2;
+        const baseRadius = Math.min(centerX, centerY) * 0.4;
+        
+        // Pulsing effect
+        const time = Date.now() / 1000;
+        const pulseScale = Math.sin(time) * 0.1 + 0.9;
+        const radius = baseRadius * pulseScale;
+        
+        // Draw circle with glow
+        this.ctx.beginPath();
+        this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        this.ctx.strokeStyle = 'rgba(0, 255, 255, 0.5)';
+        this.ctx.lineWidth = 2;
+        this.ctx.shadowBlur = 15;
+        this.ctx.shadowColor = 'rgba(0, 255, 255, 0.7)';
+        this.ctx.stroke();
+        this.ctx.shadowBlur = 0;
+        
+        // Draw "Play to visualize" text
+        this.ctx.font = '16px "Orbitron", sans-serif';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillStyle = 'rgba(0, 255, 255, 0.7)';
+        this.ctx.fillText('Play to visualize audio', centerX, centerY + 5);
     }
 }
 
