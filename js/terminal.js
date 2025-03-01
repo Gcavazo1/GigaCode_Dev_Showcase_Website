@@ -48,6 +48,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function initTerminalTyping() {
     const commands = document.querySelectorAll('.terminal-command');
+    const outputs = document.querySelectorAll('.terminal-output');
+    
+    // Hide all outputs initially
+    outputs.forEach(output => {
+        output.style.opacity = '0';
+        output.style.height = '0';
+        output.style.overflow = 'hidden';
+        output.style.transition = 'opacity 0.5s ease, height 0.5s ease';
+    });
     
     commands.forEach((command, index) => {
         const text = command.getAttribute('data-text') || command.textContent;
@@ -68,6 +77,13 @@ function initTerminalTyping() {
                     setTimeout(typeCommand, typeSpeed);
                 } else {
                     command.classList.remove('typing');
+                    
+                    // After command is typed, reveal its output
+                    const output = outputs[index];
+                    if (output) {
+                        output.style.height = 'auto';
+                        output.style.opacity = '1';
+                    }
                 }
             }
             
