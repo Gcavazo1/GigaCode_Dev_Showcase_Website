@@ -20,6 +20,7 @@ class AudioVisualizer {
         this.dataArray = null;
         this.source = null;
         this.audioNodesInitialized = false;
+        this.sourceCreated = false;
         
         // Initialize playlist
         this.playlist = [
@@ -112,23 +113,36 @@ class AudioVisualizer {
     
     setupAudioNodes() {
         try {
-            // Clean up existing connections
-            if (this.source) {
-                this.source.disconnect();
+            // If we've already created a source node, just reconnect it
+            if (this.sourceCreated) {
+                console.log('Source already created, reconnecting nodes');
+                
+                // Disconnect and reconnect
+                if (this.source) {
+                    this.source.disconnect();
+                    this.source.connect(this.analyser);
+                    this.analyser.connect(this.audioContext.destination);
+                }
+            } else {
+                // First time setup - create new nodes
+                console.log('Creating new audio nodes');
+                
+                // Create analyzer
+                this.analyser = this.audioContext.createAnalyser();
+                this.analyser.fftSize = 1024;
+                this.analyser.smoothingTimeConstant = 0.8;
+                
+                // Create data array for visualization
+                this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+                
+                // Create source node only once
+                this.source = this.audioContext.createMediaElementSource(this.audio);
+                this.sourceCreated = true;
+                
+                // Connect nodes
+                this.source.connect(this.analyser);
+                this.analyser.connect(this.audioContext.destination);
             }
-            
-            // Create analyzer
-            this.analyser = this.audioContext.createAnalyser();
-            this.analyser.fftSize = 1024;
-            this.analyser.smoothingTimeConstant = 0.8;
-            
-            // Create data array for visualization
-            this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
-            
-            // Connect audio element to analyzer
-            this.source = this.audioContext.createMediaElementSource(this.audio);
-            this.source.connect(this.analyser);
-            this.analyser.connect(this.audioContext.destination);
             
             // Set initial volume
             if (this.volumeSlider) {
@@ -484,7 +498,7 @@ class AudioVisualizer {
         
         console.log('Loading track:', audioPath);
         
-        // Reset audio nodes
+        // We don't need to reset audio nodes completely, just mark as not initialized
         this.audioNodesInitialized = false;
         
         // Load new track
@@ -498,23 +512,24 @@ class AudioVisualizer {
             .then(blob => {
                 const audioUrl = URL.createObjectURL(blob);
                 
-                // Disconnect old source if it exists
-                if (this.source) {
-                    this.source.disconnect();
-                }
-                
-                // Set new source
+                // Set new source without disconnecting
                 this.audio.src = audioUrl;
                 this.audio.load();
                 
-                // Set up new audio nodes
+                // Set up audio nodes after loading
                 this.audio.addEventListener('canplaythrough', () => {
+                    // Reconnect existing nodes
                     this.setupAudioNodes();
                     
                     // Play if already playing
                     if (this.isPlaying) {
                         this.audio.play().catch(e => console.error("Playback error:", e));
                     }
+                    
+                    // Update UI
+                    document.querySelectorAll('.track-button').forEach((btn, i) => {
+                        btn.classList.toggle('active', i === index);
+                    });
                     
                     this.showStatus(`Now playing: ${this.playlist[index].title}`, "success");
                 }, { once: true });
