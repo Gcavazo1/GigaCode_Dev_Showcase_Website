@@ -474,4 +474,31 @@ function initializeModelViewer(containerId, progressCallback) {
 }
 
 // Export the function to be called from main.js
-window.initializeModelViewer = initializeModelViewer; 
+window.initializeModelViewer = initializeModelViewer;
+
+function showModelPlaceholder() {
+    const container = document.querySelector('.model-viewer');
+    if (container) {
+        container.innerHTML = `
+            <div class="model-placeholder">
+                <div class="placeholder-icon"><i class="fas fa-cube"></i></div>
+                <div class="placeholder-text">3D Model Viewer Unavailable</div>
+                <div class="placeholder-subtext">Your browser may not support WebGL</div>
+            </div>
+        `;
+    }
+}
+
+// Add this check before trying to create a GLTFLoader
+function initializeModelViewer() {
+    // Check if THREE.GLTFLoader exists
+    if (typeof THREE === 'undefined' || typeof THREE.GLTFLoader !== 'function') {
+        console.error('THREE.GLTFLoader not available. Falling back to placeholder.');
+        showModelPlaceholder();
+        return;
+    }
+    
+    // Rest of the initialization code...
+    const loader = new THREE.GLTFLoader();
+    // ...
+} 
