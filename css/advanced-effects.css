@@ -1623,42 +1623,59 @@
     100% { box-shadow: 0 0 15px rgba(0, 255, 255, 0.2); }
 }
 
-/* Video game style loading sequence */
+/* Enhanced video game style loading sequence */
 .loading-sequence {
     position: relative;
     width: 100%;
     max-width: 500px;
-    height: 4px;
-    background: rgba(0, 0, 0, 0.3);
+    height: 30px;
+    background: rgba(0, 0, 0, 0.5);
     margin: 2rem auto;
     overflow: hidden;
-    border-radius: 2px;
-    box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+    border-radius: 4px;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
     opacity: 0;
     animation: fadeIn 0.5s ease-in-out forwards;
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    padding: 3px;
+}
+
+.loading-bar-container {
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    position: relative;
+    border-radius: 2px;
+    overflow: hidden;
 }
 
 .loading-bar {
     position: absolute;
     top: 0;
-    left: -100%;
-    width: 100%;
+    left: 0;
+    width: 0%;
     height: 100%;
-    background: linear-gradient(
-        90deg,
-        transparent,
-        #00ffff,
-        transparent
+    background: linear-gradient(90deg, 
+        rgba(0, 255, 255, 0.7), 
+        rgba(0, 255, 255, 1), 
+        rgba(0, 255, 255, 0.7)
     );
-    animation: loadingProgress 1.5s ease-in-out;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+    animation: progressBar 3s ease-in-out forwards;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+.loading-percentage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #00ffff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    text-shadow: 0 0 5px rgba(0, 255, 255, 0.7);
+    z-index: 2;
 }
 
-/* Loading text style */
 .loading-text {
     font-family: 'Orbitron', sans-serif;
     color: #00ffff;
@@ -1666,32 +1683,104 @@
     text-transform: uppercase;
     letter-spacing: 2px;
     text-align: center;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.8rem;
     text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
-    animation: textPulse 1.5s infinite alternate;
 }
 
-@keyframes textPulse {
-    from { opacity: 0.7; text-shadow: 0 0 5px rgba(0, 255, 255, 0.5); }
-    to { opacity: 1; text-shadow: 0 0 10px rgba(0, 255, 255, 0.8); }
+.loading-status {
+    font-family: 'Rajdhani', sans-serif;
+    color: rgba(0, 255, 255, 0.8);
+    font-size: 0.8rem;
+    text-align: center;
+    margin-top: 0.8rem;
+    height: 1.2em;
 }
 
-/* Improve home section spacing */
-#home {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    min-height: 60vh; /* Ensure enough vertical space */
-    padding-top: 2rem;
-    padding-bottom: 2rem;
+@keyframes progressBar {
+    0% { width: 0%; }
+    20% { width: 20%; }
+    40% { width: 38%; }
+    50% { width: 52%; }
+    60% { width: 65%; }
+    80% { width: 85%; }
+    95% { width: 95%; }
+    100% { width: 100%; }
 }
 
-.glitch-container {
-    margin-bottom: 1.5rem;
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
-.tagline {
+/* Add glitch effect for AI Assistant appearance */
+.ai-assistant.glitching {
+    animation: glitchEffect 0.5s ease-in-out;
+}
+
+@keyframes glitchEffect {
+    0% { transform: translate(0); filter: hue-rotate(0deg); }
+    10% { transform: translate(-5px, 2px); filter: hue-rotate(90deg); }
+    20% { transform: translate(5px, -2px); filter: hue-rotate(180deg); }
+    30% { transform: translate(-3px, -2px); filter: hue-rotate(270deg); }
+    40% { transform: translate(3px, 2px); filter: hue-rotate(360deg); }
+    50% { transform: translate(0); filter: hue-rotate(0deg); }
+    60% { transform: translate(4px, -1px); filter: hue-rotate(90deg); }
+    70% { transform: translate(-4px, 1px); filter: hue-rotate(180deg); }
+    80% { transform: translate(2px, 2px); filter: hue-rotate(270deg); }
+    90% { transform: translate(-2px, -2px); filter: hue-rotate(360deg); }
+    100% { transform: translate(0); filter: hue-rotate(0deg); }
+}
+
+/* Add animation for bio section */
+#bio {
+    opacity: 0.7;
+    transform: translateY(20px);
+    transition: all 0.8s ease-out;
+}
+
+#bio.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Adjust AI Assistant section spacing and positioning */
+#virtual-assistant.section.no-header {
+    padding-top: 0;
     margin-top: 1rem;
-    margin-bottom: 2rem;
-    min-height: 2em;
+}
+
+/* Adjust the assistant container for better positioning */
+.assistant-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Enhance the AI Assistant appearance */
+.ai-assistant.enhanced {
+    border-radius: 12px;
+    box-shadow: 
+        0 0 30px rgba(0, 255, 255, 0.2),
+        inset 0 0 20px rgba(0, 255, 255, 0.1);
+    margin-top: 1rem;
+}
+
+/* Adjust loading sequence to better align with AI Assistant */
+.loading-sequence {
+    margin-bottom: 1rem;
+}
+
+/* Improve the transition between loading and AI Assistant */
+#virtual-assistant.loaded {
+    animation: slideInFromTop 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes slideInFromTop {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 } 
