@@ -773,6 +773,50 @@ class AudioVisualizer {
         
         this.loadTrack(randomIndex);
     }
+
+    initUI() {
+        // Set up play button
+        if (this.playButton) {
+            this.playButton.addEventListener('click', () => {
+                if (!this.isPlaying) {
+                    this.initAudio();
+                    this.playAudio();
+                } else {
+                    this.pauseAudio();
+                }
+            });
+        }
+        
+        // Set up volume slider
+        if (this.volumeSlider) {
+            this.volumeSlider.addEventListener('input', () => {
+                const volume = this.volumeSlider.value / 100;
+                if (this.audio) {
+                    this.audio.volume = volume;
+                }
+            });
+            
+            // Set initial volume
+            const initialVolume = 70;
+            this.volumeSlider.value = initialVolume;
+            if (this.audio) {
+                this.audio.volume = initialVolume / 100;
+            }
+        }
+        
+        // Initialize playlist UI
+        this.initPlaylist();
+        
+        // Start animation loop
+        this.animate();
+    }
+
+    initAudio() {
+        if (!this.audioNodesInitialized) {
+            this.init();
+            this.audioNodesInitialized = true;
+        }
+    }
 }
 
 // Initialize when DOM is loaded
