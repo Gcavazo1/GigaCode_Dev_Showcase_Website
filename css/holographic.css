@@ -48,12 +48,12 @@
     grid-row: 1;
 }
 
-.timeline {
+.project-matrix {
     grid-column: 3;
     grid-row: 1;
 }
 
-.project-matrix {
+.timeline {
     grid-column: 1 / span 3;
     grid-row: 2;
 }
@@ -221,11 +221,56 @@
     to { transform: translateX(-50%); }
 }
 
+/* Update timeline to be horizontal */
+.timeline-content.horizontal {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 1rem;
+    height: calc(100% - 50px);
+    overflow-x: auto;
+    padding-bottom: 10px;
+}
+
+.timeline-content.horizontal .timeline-event {
+    flex: 1;
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    padding: 0.5rem;
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    border-radius: 8px;
+    background: rgba(0, 10, 20, 0.5);
+}
+
+.timeline-content.horizontal .event-time {
+    color: #00ffff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.timeline-content.horizontal .event-marker {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #00ffff;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+    margin-bottom: 0.5rem;
+}
+
+.timeline-content.horizontal .event-details {
+    text-align: center;
+    width: 100%;
+}
+
 /* Responsive adjustments */
 @media (max-width: 1200px) {
     .holo-grid {
         grid-template-columns: 1fr 1fr;
-        grid-template-rows: 350px 350px 200px;
+        grid-template-rows: repeat(2, auto) 200px;
     }
     
     .neural-network {
@@ -238,12 +283,12 @@
         grid-row: 1;
     }
     
-    .timeline {
+    .project-matrix {
         grid-column: 1 / span 2;
         grid-row: 2;
     }
     
-    .project-matrix {
+    .timeline {
         grid-column: 1 / span 2;
         grid-row: 3;
     }
@@ -252,13 +297,13 @@
 @media (max-width: 768px) {
     .holo-grid {
         grid-template-columns: 1fr;
-        grid-template-rows: repeat(3, 350px) 200px;
+        grid-template-rows: repeat(4, auto);
     }
     
     .neural-network,
     .system-status,
-    .timeline,
-    .project-matrix {
+    .project-matrix,
+    .timeline {
         grid-column: 1;
     }
     
@@ -270,11 +315,22 @@
         grid-row: 2;
     }
     
-    .timeline {
+    .project-matrix {
         grid-row: 3;
     }
     
-    .project-matrix {
+    .timeline {
         grid-row: 4;
+    }
+    
+    .timeline-content.horizontal {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        justify-content: flex-start;
+        padding-bottom: 10px;
+    }
+    
+    .timeline-content.horizontal .timeline-event {
+        min-width: 150px;
     }
 } 
