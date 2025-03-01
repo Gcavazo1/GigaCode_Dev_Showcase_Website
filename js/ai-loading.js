@@ -18,29 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         console.log("Starting tagline typing with text:", taglineText);
         
-        // Type the tagline character by character
-        let charIndex = 0;
-        function typeTagline() {
-            if (charIndex < taglineText.length) {
-                tagline.textContent += taglineText.charAt(charIndex);
-                tagline.classList.add('typing');
-                charIndex++;
-                setTimeout(typeTagline, 50);
-            } else {
-                tagline.classList.remove('typing');
-                console.log("Tagline typing complete, showing loading sequence");
-                // After tagline is typed, show loading sequence
-                showLoadingSequence();
-            }
-        }
-        
-        // Start typing
-        typeTagline();
-    }, 500);
-    
-    // Function to show and animate the loading sequence
-    function showLoadingSequence() {
-        // Create loading sequence element
+        // Create loading sequence element right away
         const loadingSequence = document.createElement('div');
         loadingSequence.className = 'loading-sequence';
         loadingSequence.innerHTML = `
@@ -57,59 +35,131 @@ document.addEventListener('DOMContentLoaded', function() {
         if (homeSection) {
             homeSection.appendChild(loadingSequence);
             
-            // Animate loading sequence
-            setTimeout(() => {
-                loadingSequence.style.opacity = '1';
-                
-                // Get elements
-                const percentageElement = loadingSequence.querySelector('.loading-percentage');
-                const loadingBar = loadingSequence.querySelector('.loading-bar');
-                const statusElement = loadingSequence.querySelector('.loading-status');
-                
-                // Animate progress
-                let progress = 0;
-                const progressInterval = setInterval(() => {
-                    progress += 1;
+            // Start with opacity 0
+            loadingSequence.style.opacity = '0';
+            
+            // Type the tagline character by character
+            let charIndex = 0;
+            function typeTagline() {
+                if (charIndex < taglineText.length) {
+                    tagline.textContent += taglineText.charAt(charIndex);
+                    tagline.classList.add('typing');
+                    charIndex++;
                     
-                    // Update percentage and bar width
-                    if (percentageElement) percentageElement.textContent = `${progress}%`;
-                    if (loadingBar) loadingBar.style.width = `${progress}%`;
-                    
-                    // Update status messages
-                    if (statusElement) {
-                        if (progress === 20) {
-                            statusElement.textContent = "Calibrating quantum processors...";
-                        } else if (progress === 40) {
-                            statusElement.textContent = "Loading neural pathways...";
-                        } else if (progress === 60) {
-                            statusElement.textContent = "Synchronizing AI matrices...";
-                        } else if (progress === 80) {
-                            statusElement.textContent = "Initializing consciousness core...";
-                        }
+                    // When we're halfway through typing, start fading in the loading bar
+                    if (charIndex === Math.floor(taglineText.length / 2)) {
+                        loadingSequence.style.opacity = '1';
                     }
                     
-                    // When complete
-                    if (progress === 100) {
-                        clearInterval(progressInterval);
-                        if (statusElement) statusElement.textContent = "Neural network online";
-                        
-                        // Show AI Assistant
-                        setTimeout(() => {
-                            if (aiSection) {
-                                aiSection.style.visibility = 'visible';
-                                aiSection.classList.add('loaded');
-                                console.log("AI Assistant revealed");
-                            }
-                            
-                            // Fade out loading sequence
-                            loadingSequence.style.opacity = '0';
-                            setTimeout(() => {
-                                loadingSequence.remove();
-                            }, 500);
-                        }, 800);
-                    }
-                }, 30);
-            }, 500);
+                    setTimeout(typeTagline, 50);
+                } else {
+                    tagline.classList.remove('typing');
+                    console.log("Tagline typing complete, loading sequence visible");
+                    
+                    // Start the loading bar animation
+                    animateLoadingBar(loadingSequence, aiSection);
+                }
+            }
+            
+            // Start typing
+            typeTagline();
         }
+    }, 500);
+    
+    // Function to animate the loading bar
+    function animateLoadingBar(loadingSequence, aiSection) {
+        // Get elements
+        const percentageElement = loadingSequence.querySelector('.loading-percentage');
+        const loadingBar = loadingSequence.querySelector('.loading-bar');
+        const statusElement = loadingSequence.querySelector('.loading-status');
+        
+        // Animate progress
+        let progress = 0;
+        const progressInterval = setInterval(() => {
+            progress += 1;
+            
+            // Update percentage and bar width
+            if (percentageElement) percentageElement.textContent = `${progress}%`;
+            if (loadingBar) loadingBar.style.width = `${progress}%`;
+            
+            // Update status messages
+            if (statusElement) {
+                if (progress === 20) {
+                    statusElement.textContent = "Calibrating quantum processors...";
+                } else if (progress === 40) {
+                    statusElement.textContent = "Loading neural pathways...";
+                } else if (progress === 60) {
+                    statusElement.textContent = "Synchronizing AI matrices...";
+                } else if (progress === 80) {
+                    statusElement.textContent = "Initializing consciousness core...";
+                }
+            }
+            
+            // When complete
+            if (progress === 100) {
+                clearInterval(progressInterval);
+                if (statusElement) statusElement.textContent = "Neural network online";
+                
+                // Position the AI Assistant in the same place as the loading sequence
+                positionAIAssistant(loadingSequence, aiSection);
+                
+                // Fade out loading sequence and show AI with TV effect
+                setTimeout(() => {
+                    // Fade out loading sequence
+                    loadingSequence.style.opacity = '0';
+                    
+                    // After loading sequence is gone, show AI with TV effect
+                    setTimeout(() => {
+                        loadingSequence.remove();
+                        showAIWithTVEffect(aiSection);
+                    }, 500);
+                }, 800);
+            }
+        }, 30);
+    }
+    
+    // Function to position the AI Assistant in the same place as the loading sequence
+    function positionAIAssistant(loadingSequence, aiSection) {
+        if (!aiSection || !loadingSequence) return;
+        
+        // Make AI visible but with 0 opacity
+        aiSection.style.visibility = 'visible';
+        aiSection.style.opacity = '0';
+        
+        // Position it in the same place
+        const loadingRect = loadingSequence.getBoundingClientRect();
+        const homeSection = document.querySelector('#home');
+        const homeRect = homeSection.getBoundingClientRect();
+        
+        // Calculate position relative to home section
+        const topOffset = loadingRect.top - homeRect.top;
+        
+        // Set AI position
+        aiSection.style.position = 'absolute';
+        aiSection.style.top = `${topOffset}px`;
+        aiSection.style.left = '0';
+        aiSection.style.right = '0';
+    }
+    
+    // Function to show AI with TV-like effect
+    function showAIWithTVEffect(aiSection) {
+        if (!aiSection) return;
+        
+        // Add TV effect class
+        aiSection.classList.add('tv-on-effect');
+        
+        // Make visible
+        aiSection.style.opacity = '1';
+        
+        // After effect completes, reset position to normal
+        setTimeout(() => {
+            aiSection.style.position = '';
+            aiSection.style.top = '';
+            aiSection.style.left = '';
+            aiSection.style.right = '';
+            aiSection.classList.add('loaded');
+            aiSection.classList.remove('tv-on-effect');
+            console.log("AI Assistant revealed with TV effect");
+        }, 1000);
     }
 }); 
