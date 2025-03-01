@@ -14,13 +14,11 @@
     border: 1px solid rgba(0, 255, 255, 0.3);
     box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
     opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition: opacity 1.2s ease-in-out;
 }
 
 .ai-assistant.loaded {
     opacity: 1;
-    transform: translateY(0);
 }
 
 .ai-avatar {
