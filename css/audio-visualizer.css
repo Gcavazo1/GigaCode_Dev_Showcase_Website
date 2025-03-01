@@ -11,14 +11,15 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 99999; /* Ensure it's above everything */
-    transition: opacity 0.5s ease; /* Add transition for fade out */
+    z-index: 999999; /* Extremely high z-index */
+    transition: opacity 0.5s ease;
+    pointer-events: auto; /* Ensure clicks are captured */
 }
 
 .audio-prompt {
     position: relative;
     margin: auto;
-    transform: translateY(-10%); /* Slight upward adjustment for visual balance */
+    transform: translateY(-10%);
     background: rgba(10, 15, 25, 0.95);
     border: 1px solid rgba(0, 255, 255, 0.4);
     border-radius: 10px;
@@ -27,7 +28,7 @@
     text-align: center;
     box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
     animation: promptFadeIn 0.5s ease-out forwards;
-    overflow: hidden;
+    pointer-events: auto; /* Ensure buttons are clickable */
 }
 
 .audio-prompt::before {
@@ -255,4 +256,9 @@
     background: #00ffff;
     cursor: pointer;
     border: none;
+}
+
+/* Ensure any embedded prompts are hidden */
+.audio-prompt:not(.audio-prompt-overlay .audio-prompt) {
+    display: none !important;
 } 

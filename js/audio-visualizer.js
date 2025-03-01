@@ -1,6 +1,16 @@
+// Add this at the top of the file, before the class definition
+let audioVisualizerInstance = null;
+
 // Simplified Audio Visualizer for Cyberpunk Portfolio
 class AudioVisualizer {
     constructor() {
+        // Ensure singleton pattern
+        if (audioVisualizerInstance) {
+            console.warn('AudioVisualizer already initialized');
+            return audioVisualizerInstance;
+        }
+        audioVisualizerInstance = this;
+
         // Core elements
         this.audio = document.getElementById('background-audio');
         this.playButton = document.getElementById('play-audio');
@@ -58,8 +68,8 @@ class AudioVisualizer {
         // Initialize basic components
         this.initBasic();
         
-        // Show audio prompt after a short delay to ensure DOM is ready
-        setTimeout(() => this.showAudioPrompt(), 100);
+        // Show audio prompt after ensuring no other prompts exist
+        this.showAudioPrompt();
     }
     
     // Initialize basic components without audio context
@@ -303,18 +313,18 @@ class AudioVisualizer {
     }
     
     showAudioPrompt() {
-        // Remove any existing prompts first
-        const existingPrompt = document.querySelector('.audio-prompt-overlay');
-        if (existingPrompt) {
-            document.body.removeChild(existingPrompt);
-        }
+        // Remove ALL existing prompts first (both overlay and embedded)
+        const existingPrompts = document.querySelectorAll('.audio-prompt, .audio-prompt-overlay');
+        existingPrompts.forEach(prompt => {
+            if (prompt && prompt.parentNode) {
+                prompt.parentNode.removeChild(prompt);
+            }
+        });
         
-        // Create prompt element
+        // Create new overlay
         const promptOverlay = document.createElement('div');
         promptOverlay.className = 'audio-prompt-overlay';
-        
-        // Add the prompt to the body
-        document.body.insertAdjacentElement('afterbegin', promptOverlay);
+        promptOverlay.style.opacity = '0'; // Start invisible
         
         // Set the content
         promptOverlay.innerHTML = `
@@ -322,36 +332,40 @@ class AudioVisualizer {
                 <h3>Enable Music?</h3>
                 <p>This site features an immersive cyberpunk soundtrack.</p>
                 <div class="prompt-buttons">
-                    <button class="cyber-button enable-audio">Yes, Enable Music</button>
-                    <button class="cyber-button disable-audio">No, Keep Silent</button>
+                    <button class="cyber-button enable-audio">ENABLE MUSIC</button>
+                    <button class="cyber-button disable-audio">NO, KEEP SILENT</button>
                 </div>
                 <p class="prompt-note">You can always play music later using the audio player.</p>
             </div>
         `;
-
-        // Force a reflow to ensure proper positioning
+        
+        // Add to body as first child
+        document.body.insertAdjacentElement('afterbegin', promptOverlay);
+        
+        // Force reflow and fade in
         promptOverlay.offsetHeight;
+        promptOverlay.style.opacity = '1';
         
         // Add event listeners
         promptOverlay.querySelector('.enable-audio').addEventListener('click', () => {
             this.initAudio();
             this.playAudio();
-            promptOverlay.style.opacity = '0';
-            setTimeout(() => {
-                if (document.body.contains(promptOverlay)) {
-                    document.body.removeChild(promptOverlay);
-                }
-            }, 500);
+            this.fadeOutAndRemovePrompt(promptOverlay);
         });
         
         promptOverlay.querySelector('.disable-audio').addEventListener('click', () => {
-            promptOverlay.style.opacity = '0';
-            setTimeout(() => {
-                if (document.body.contains(promptOverlay)) {
-                    document.body.removeChild(promptOverlay);
-                }
-            }, 500);
+            this.fadeOutAndRemovePrompt(promptOverlay);
         });
+    }
+
+    fadeOutAndRemovePrompt(promptOverlay) {
+        promptOverlay.style.opacity = '0';
+        promptOverlay.style.pointerEvents = 'none'; // Prevent further clicks during fade
+        setTimeout(() => {
+            if (document.body.contains(promptOverlay)) {
+                document.body.removeChild(promptOverlay);
+            }
+        }, 500);
     }
 }
 
