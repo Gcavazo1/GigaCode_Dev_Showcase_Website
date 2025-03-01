@@ -317,4 +317,36 @@ function showWelcomeMessage() {
     welcomeMessage.querySelector('.skip-music').addEventListener('click', function() {
         welcomeMessage.remove();
     });
-} 
+}
+
+// Add smooth scrolling with performance optimization
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Close mobile menu if open
+        const mobileMenu = document.querySelector('.mobile-menu-toggle');
+        if (mobileMenu && mobileMenu.classList.contains('active')) {
+            const event = new Event('click');
+            mobileMenu.dispatchEvent(event);
+        }
+        
+        const targetId = this.getAttribute('href');
+        const targetElement = document.querySelector(targetId);
+        
+        if (targetElement) {
+            // Use requestAnimationFrame for smoother scrolling
+            const scrollToElement = () => {
+                const yOffset = -80; // Adjust based on your header height
+                const y = targetElement.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                
+                window.scrollTo({
+                    top: y,
+                    behavior: 'smooth'
+                });
+            };
+            
+            requestAnimationFrame(scrollToElement);
+        }
+    });
+}); 

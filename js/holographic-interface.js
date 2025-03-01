@@ -3,6 +3,19 @@ class HolographicInterface {
         console.log('Initializing Holographic Interface...');
         this.initializeDisplays();
         this.animate();
+        
+        // Add resize handler
+        window.addEventListener('resize', this.handleResize.bind(this));
+
+        // Add this to the constructor
+        this.animationFrameId = null;
+        this.isVisible = false;
+
+        // Add this method
+        this.checkVisibility();
+
+        // Add visibility observer
+        window.addEventListener('scroll', this.checkVisibility.bind(this));
     }
 
     initializeDisplays() {
@@ -228,6 +241,72 @@ class HolographicInterface {
         // This method can be used for global animations
         // Each display has its own animation already
         requestAnimationFrame(() => this.animate());
+    }
+
+    handleResize() {
+        // Resize network canvas
+        const networkCanvas = document.getElementById('network-canvas');
+        if (networkCanvas) {
+            networkCanvas.width = networkCanvas.parentElement.clientWidth;
+            networkCanvas.height = networkCanvas.parentElement.clientHeight - 60;
+            
+            // Reinitialize network display if needed
+            if (this.networkInitialized) {
+                this.initNetworkDisplay(networkCanvas);
+            }
+        }
+        
+        // Adjust matrix content
+        const matrixContainer = document.querySelector('.matrix-content');
+        if (matrixContainer) {
+            const containerWidth = matrixContainer.clientWidth;
+            const charCount = Math.floor(containerWidth / 8); // Approximate character width
+            
+            // Update matrix lines with new width
+            const lines = matrixContainer.querySelectorAll('.matrix-line');
+            lines.forEach(line => {
+                line.innerHTML = Array(charCount)
+                    .fill(0)
+                    .map(() => Math.floor(Math.random() * 2))
+                    .join('');
+            });
+        }
+    }
+
+    checkVisibility() {
+        const section = document.querySelector('.holo-section');
+        if (!section) return false;
+        
+        const rect = section.getBoundingClientRect();
+        const isVisible = (
+            rect.top < window.innerHeight &&
+            rect.bottom > 0
+        );
+        
+        // Start or stop animations based on visibility
+        if (isVisible !== this.isVisible) {
+            this.isVisible = isVisible;
+            if (isVisible) {
+                this.startAnimations();
+            } else {
+                this.stopAnimations();
+            }
+        }
+    }
+
+    startAnimations() {
+        // Start all animations
+        console.log('Starting holographic animations');
+        // Implement specific animation starts
+    }
+
+    stopAnimations() {
+        // Stop all animations to save resources
+        console.log('Stopping holographic animations');
+        if (this.animationFrameId) {
+            cancelAnimationFrame(this.animationFrameId);
+            this.animationFrameId = null;
+        }
     }
 }
 

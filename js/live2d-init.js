@@ -13,6 +13,9 @@ class Live2DAssistant {
         
         // Initialize
         this.init();
+        
+        // Add resize handler
+        window.addEventListener('resize', this.handleResize.bind(this));
     }
     
     init() {
@@ -27,15 +30,25 @@ class Live2DAssistant {
             this.canvas.width = 400;
             this.canvas.height = 600;
             
-            // Check if Live2D is available
-            if (typeof PIXI === 'undefined' || typeof PIXI.Live2DModel === 'undefined') {
-                console.warn('Live2D libraries not loaded, using fallback');
+            // Check if required libraries are loaded
+            if (typeof PIXI === 'undefined') {
+                console.warn('PIXI library not loaded, using fallback');
                 this.useFallback();
                 return;
             }
             
-            // Setup Live2D
-            this.setupLive2D();
+            // Wait a moment to ensure all libraries are fully loaded
+            setTimeout(() => {
+                // Check again if Live2D is available
+                if (typeof PIXI.live2d === 'undefined' || typeof PIXI.live2d.Live2DModel === 'undefined') {
+                    console.warn('Live2D libraries not loaded, using fallback');
+                    this.useFallback();
+                    return;
+                }
+                
+                // Setup Live2D
+                this.setupLive2D();
+            }, 500);
             
         } catch (error) {
             console.error('Error initializing Live2D:', error);
@@ -104,6 +117,22 @@ class Live2DAssistant {
                 console.error('Error loading Live2D model:', error);
                 this.useFallback();
             });
+            
+            // Add a loading indicator
+            const loadingIndicator = document.createElement('div');
+            loadingIndicator.className = 'loading-indicator';
+            loadingIndicator.innerHTML = `
+                <div class="spinner"></div>
+                <p>Loading Virtual Assistant...</p>
+            `;
+            this.canvas.parentNode.appendChild(loadingIndicator);
+            
+            // Remove loading indicator when model loads or fails
+            const removeLoader = () => {
+                if (loadingIndicator.parentNode) {
+                    loadingIndicator.parentNode.removeChild(loadingIndicator);
+                }
+            };
             
         } catch (error) {
             console.error('Error setting up Live2D model:', error);
@@ -204,6 +233,37 @@ class Live2DAssistant {
         this.canvas.style.display = 'none';
         
         console.log('Fallback UI displayed');
+    }
+    
+    handleResize() {
+        if (!this.canvas) return;
+        
+        // Get parent container dimensions
+        const container = this.canvas.parentElement;
+        const containerWidth = container.clientWidth;
+        
+        // Set canvas dimensions
+        this.canvas.width = containerWidth;
+        this.canvas.height = Math.min(600, containerWidth * 1.5);
+        
+        // Update PIXI application size
+        if (this.app) {
+            this.app.renderer.resize(this.canvas.width, this.canvas.height);
+        }
+        
+        // Reposition and rescale model if loaded
+        if (this.model && this.isLoaded) {
+            // Center the model
+            this.model.x = this.canvas.width / 2;
+            this.model.y = this.canvas.height / 2;
+            
+            // Scale the model
+            const scale = Math.min(
+                this.canvas.width / this.model.width,
+                this.canvas.height / this.model.height
+            ) * 0.8;
+            this.model.scale.set(scale);
+        }
     }
 }
 
