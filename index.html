@@ -156,7 +156,6 @@
                                 <button class="cyber-button small" data-query="How can I contact the developer?">Contact</button>
                             </div>
                         </div>
-                        <div class="ai-scan-glitch"></div>
                     </div>
                 </div>
             </section>
@@ -422,33 +421,60 @@
         </section>
 
         <!-- Holographic Interface Section -->
-        <section class="holo-section">
-            <h2>HOLOGRAPHIC INTERFACE</h2>
+        <section id="holographic-ui" class="section holo-section">
+            <div class="section-header">
+                <h2 class="cyber-heading">Holographic Interface</h2>
+                <div class="neon-separator"></div>
+            </div>
             <div class="holo-container">
-                <!-- Top row displays -->
                 <div class="holo-top-row">
                     <div class="holo-display neural-network">
                         <h3>Neural Network</h3>
                         <canvas id="network-canvas"></canvas>
                     </div>
-                    
                     <div class="holo-display system-status">
                         <h3>System Status</h3>
                         <div class="status-bars">
-                            <!-- Status bars content -->
+                            <div class="status-bar-container">
+                                <div class="status-label">CPU</div>
+                                <div class="status-bar-wrapper">
+                                    <div class="status-bar cpu" style="width: 82%"></div>
+                                </div>
+                                <div class="status-value">82%</div>
+                            </div>
+                            <div class="status-bar-container">
+                                <div class="status-label">MEMORY</div>
+                                <div class="status-bar-wrapper">
+                                    <div class="status-bar memory" style="width: 65%"></div>
+                                </div>
+                                <div class="status-value">65%</div>
+                            </div>
+                            <div class="status-bar-container">
+                                <div class="status-label">NETWORK</div>
+                                <div class="status-bar-wrapper">
+                                    <div class="status-bar network" style="width: 93%"></div>
+                                </div>
+                                <div class="status-value">93%</div>
+                            </div>
+                            <div class="status-bar-container">
+                                <div class="status-label">POWER</div>
+                                <div class="status-bar-wrapper">
+                                    <div class="status-bar power" style="width: 47%"></div>
+                                </div>
+                                <div class="status-value">47%</div>
+                            </div>
                         </div>
                     </div>
-                    
+                </div>
+                <div class="holo-bottom-row">
                     <div class="holo-display project-matrix">
                         <h3>Project Matrix</h3>
                         <div class="matrix-content"></div>
                     </div>
-                </div>
-                
-                <!-- New bottom horizontal display -->
-                <div class="holo-display holo-timeline">
-                    <h3>System Timeline</h3>
-                    <div class="timeline-content"></div>
+                    <div class="holo-display holo-timeline">
+                        <h3>Timeline</h3>
+                        <div class="timeline-content"></div>
+                    </div>
                 </div>
             </div>
         </section>
