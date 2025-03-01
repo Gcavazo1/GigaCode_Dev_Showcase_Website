@@ -264,31 +264,133 @@ class AudioVisualizer {
         // Get frequency data
         this.analyser.getByteFrequencyData(this.dataArray);
         
-        // Calculate bar width and spacing
-        const barWidth = (this.canvas.width / this.dataArray.length) * 2.5;
-        const barSpacing = 2;
-        let x = 0;
+        // Draw cyberpunk city background
+        this.drawCyberpunkBackground();
         
-        // Draw visualization
+        // Draw main visualization
+        this.drawMainVisualization();
+        
+        // Draw reactive particles
+        this.drawParticles();
+    }
+    
+    drawCyberpunkBackground() {
+        // Create gradient background
+        const gradient = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
+        gradient.addColorStop(0, '#000B1F');
+        gradient.addColorStop(1, '#0F2043');
+        this.ctx.fillStyle = gradient;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Draw grid lines
+        this.ctx.strokeStyle = 'rgba(0, 255, 255, 0.1)';
+        this.ctx.lineWidth = 1;
+        
+        // Vertical lines
+        for (let x = 0; x < this.canvas.width; x += 30) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(x, 0);
+            this.ctx.lineTo(x, this.canvas.height);
+            this.ctx.stroke();
+        }
+        
+        // Horizontal lines
+        for (let y = 0; y < this.canvas.height; y += 30) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(0, y);
+            this.ctx.lineTo(this.canvas.width, y);
+            this.ctx.stroke();
+        }
+    }
+    
+    drawMainVisualization() {
+        const centerX = this.canvas.width / 2;
+        const centerY = this.canvas.height / 2;
+        const radius = Math.min(this.canvas.width, this.canvas.height) * 0.3;
+        
+        // Draw circular visualizer
         for (let i = 0; i < this.dataArray.length; i++) {
-            const barHeight = (this.dataArray[i] / 255) * this.canvas.height;
+            const amplitude = this.dataArray[i] / 255;
+            const angle = (i / this.dataArray.length) * Math.PI * 2;
+            const barHeight = radius * amplitude;
+            const hue = (i / this.dataArray.length) * 360;
             
-            // Create gradient
-            const gradient = this.ctx.createLinearGradient(0, this.canvas.height, 0, 0);
-            gradient.addColorStop(0, '#00ffff');
-            gradient.addColorStop(0.5, '#ff00ff');
-            gradient.addColorStop(1, '#0000ff');
+            const x1 = centerX + Math.cos(angle) * radius;
+            const y1 = centerY + Math.sin(angle) * radius;
+            const x2 = centerX + Math.cos(angle) * (radius + barHeight);
+            const y2 = centerY + Math.sin(angle) * (radius + barHeight);
             
-            // Draw bar
-            this.ctx.fillStyle = gradient;
-            this.ctx.fillRect(x, this.canvas.height - barHeight, barWidth, barHeight);
+            // Draw glowing line
+            this.ctx.beginPath();
+            this.ctx.moveTo(x1, y1);
+            this.ctx.lineTo(x2, y2);
+            this.ctx.strokeStyle = `hsla(${hue}, 100%, 50%, ${amplitude})`;
+            this.ctx.lineWidth = 3;
+            this.ctx.shadowBlur = 15;
+            this.ctx.shadowColor = `hsla(${hue}, 100%, 50%, ${amplitude})`;
+            this.ctx.stroke();
+            
+            // Draw connecting lines between bars
+            if (i > 0) {
+                const prevAngle = ((i - 1) / this.dataArray.length) * Math.PI * 2;
+                const prevAmplitude = this.dataArray[i - 1] / 255;
+                const prevX = centerX + Math.cos(prevAngle) * (radius + radius * prevAmplitude);
+                const prevY = centerY + Math.sin(prevAngle) * (radius + radius * prevAmplitude);
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(prevX, prevY);
+                this.ctx.lineTo(x2, y2);
+                this.ctx.strokeStyle = `hsla(${hue}, 100%, 50%, 0.2)`;
+                this.ctx.stroke();
+            }
+        }
+        
+        // Draw center circle
+        this.ctx.beginPath();
+        this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        this.ctx.strokeStyle = 'rgba(0, 255, 255, 0.5)';
+        this.ctx.lineWidth = 2;
+        this.ctx.stroke();
+    }
+    
+    drawParticles() {
+        // Initialize particles if they don't exist
+        if (!this.particles) {
+            this.particles = Array.from({ length: 50 }, () => ({
+                x: Math.random() * this.canvas.width,
+                y: Math.random() * this.canvas.height,
+                size: Math.random() * 3 + 1,
+                speedX: Math.random() * 2 - 1,
+                speedY: Math.random() * 2 - 1
+            }));
+        }
+        
+        // Get average frequency for particle reactivity
+        const average = this.dataArray.reduce((a, b) => a + b, 0) / this.dataArray.length;
+        const intensity = average / 255;
+        
+        // Update and draw particles
+        this.particles.forEach(particle => {
+            // Update position
+            particle.x += particle.speedX * (1 + intensity);
+            particle.y += particle.speedY * (1 + intensity);
+            
+            // Wrap around screen
+            if (particle.x < 0) particle.x = this.canvas.width;
+            if (particle.x > this.canvas.width) particle.x = 0;
+            if (particle.y < 0) particle.y = this.canvas.height;
+            if (particle.y > this.canvas.height) particle.y = 0;
+            
+            // Draw particle
+            this.ctx.beginPath();
+            this.ctx.arc(particle.x, particle.y, particle.size * (1 + intensity), 0, Math.PI * 2);
+            this.ctx.fillStyle = `rgba(0, 255, 255, ${0.3 + intensity * 0.7})`;
+            this.ctx.fill();
             
             // Add glow effect
-            this.ctx.shadowBlur = 15;
-            this.ctx.shadowColor = '#00ffff';
-            
-            x += barWidth + barSpacing;
-        }
+            this.ctx.shadowBlur = 10;
+            this.ctx.shadowColor = 'rgba(0, 255, 255, 0.5)';
+        });
     }
     
     initPlaylist() {
