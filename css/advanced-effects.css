@@ -116,29 +116,25 @@
 .neural-network {
     grid-column: 1;
     grid-row: 1;
-    background: linear-gradient(135deg, rgba(2, 8, 12, 0.9), rgba(0, 20, 40, 0.8));
-    border-color: rgba(0, 195, 255, 0.5);
+    height: 100%;
 }
 
 .system-status {
     grid-column: 2;
     grid-row: 1;
-    background: linear-gradient(135deg, rgba(2, 8, 12, 0.9), rgba(30, 0, 40, 0.8));
-    border-color: rgba(255, 0, 255, 0.5);
+    height: 100%;
 }
 
 .holo-timeline {
     grid-column: 3;
     grid-row: 1;
-    background: linear-gradient(135deg, rgba(2, 8, 12, 0.9), rgba(0, 40, 20, 0.8));
-    border-color: rgba(0, 255, 128, 0.5);
+    height: 100%;
 }
 
 .project-matrix {
     grid-column: 1 / -1;
     grid-row: 2;
-    background: linear-gradient(135deg, rgba(2, 8, 12, 0.9), rgba(30, 30, 0, 0.8));
-    border-color: rgba(255, 255, 0, 0.5);
+    height: 100%;
 }
 
 /* Responsive Layout */
@@ -2118,11 +2114,11 @@
     font-family: 'Rajdhani', sans-serif;
     font-size: 1rem;
     letter-spacing: 0.5px;
+    white-space: normal;
+    word-break: normal;
 }
 
 .terminal-output p {
     margin-bottom: 1rem;
-    white-space: normal;
-    word-break: normal;
     opacity: 0.9;
 } 

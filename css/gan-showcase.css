@@ -1,5 +1,5 @@
 /* GAN Showcase Styles */
-.gan-container {
+#gan-showcase .gan-container {
   display: flex;
   flex-direction: column;
   gap: 2rem;
@@ -7,7 +7,7 @@
   margin: 0 auto;
 }
 
-.gan-controls {
+#gan-showcase .gan-controls {
   display: flex;
   gap: 1.5rem;
   background: rgba(0, 0, 0, 0.5);
@@ -61,7 +61,7 @@
   border: none;
 }
 
-.gan-display {
+#gan-showcase .gan-display {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 2rem;
@@ -90,6 +90,8 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
+  background: #000;
+  border: 1px solid rgba(0, 255, 255, 0.2);
 }
 
 .loading-overlay {
@@ -167,17 +169,17 @@
 
 /* Responsive adjustments */
 @media (max-width: 992px) {
-  .gan-display {
+  #gan-showcase .gan-display {
     grid-template-columns: 1fr;
   }
   
-  .gan-controls {
+  #gan-showcase .gan-controls {
     flex-direction: column;
   }
 }
 
 @media (max-width: 768px) {
-  .gan-container {
+  #gan-showcase .gan-container {
     padding: 0 1rem;
   }
   
