@@ -86,10 +86,17 @@ class ModelViewer {
         const loader = new THREE.GLTFLoader();
         
         try {
+            // Set the path for the loader
+            loader.setPath('models/asusROGmodel/');
+            
             // Load the ASUS ROG monitor model
             loader.load(
-                'models/asusROGmodel/asusROGmodel.glb',
+                'asusROGmodel.glb', // Just the filename
                 (gltf) => {
+                    console.log("Model loaded successfully with setPath approach");
+                    console.log("Model scene:", gltf.scene);
+                    console.log("Model animations:", gltf.animations);
+                    
                     // Remove any existing model
                     if (this.model) {
                         this.scene.remove(this.model);
@@ -139,7 +146,9 @@ class ModelViewer {
                 },
                 // Show loading progress
                 (xhr) => {
-                    console.log(`Loading progress: ${Math.floor((xhr.loaded / xhr.total) * 100)}%`);
+                    const percent = Math.floor((xhr.loaded / xhr.total) * 100);
+                    console.log(`Loading progress: ${percent}%`);
+                    console.log(`Bytes loaded: ${xhr.loaded} / ${xhr.total}`);
                 },
                 // Handle errors
                 (error) => {
@@ -271,7 +280,12 @@ document.addEventListener('DOMContentLoaded', () => {
 // Ensure the 3D model is properly isolated in its own container
 function initializeModelViewer(containerId, progressCallback) {
     const container = document.getElementById(containerId);
-    if (!container) return;
+    if (!container) {
+        console.error("Container not found:", containerId);
+        return;
+    }
+    
+    console.log("Initializing model viewer for container:", containerId);
     
     // Create scene, camera, renderer only for this container
     const scene = new THREE.Scene();
@@ -334,9 +348,15 @@ function initializeModelViewer(containerId, progressCallback) {
     let model = null;
     let controls = null;
     
+    // Try setting the path explicitly
+    loader.setPath('models/asusROGmodel/');
+    
     loader.load(
-        'models/asusROGmodel/asusROGmodel.glb',
+        'asusROGmodel.glb', // Just the filename since we set the path
         (gltf) => {
+            console.log("Model loaded successfully:", gltf);
+            console.log("Model scene:", gltf.scene);
+            
             // Model loaded successfully
             model = gltf.scene;
             
@@ -370,6 +390,10 @@ function initializeModelViewer(containerId, progressCallback) {
         },
         // Show loading progress
         (xhr) => {
+            const percent = Math.floor((xhr.loaded / xhr.total) * 100);
+            console.log(`Loading progress: ${percent}%`);
+            console.log(`Bytes loaded: ${xhr.loaded} / ${xhr.total}`);
+            
             if (progressCallback) {
                 progressCallback(xhr.loaded / xhr.total);
             }
@@ -377,6 +401,21 @@ function initializeModelViewer(containerId, progressCallback) {
         // Handle errors
         (error) => {
             console.error('Error loading 3D model:', error);
+            console.error('Error details:', error.message);
+            console.error('Error stack:', error.stack);
+            
+            // Try to provide more specific error information
+            if (error.message.includes("404")) {
+                console.error("Model file not found. Check the path: 'models/asusROGmodel/asusROGmodel.glb'");
+                
+                // Try fallback to known working model
+                console.log("Trying fallback model...");
+                loader.setPath('https://threejs.org/examples/models/gltf/DamagedHelmet/glTF/');
+                loader.load('DamagedHelmet.gltf', handleModelLoad, handleProgress, handleError);
+            } else if (error.message.includes("Cross-Origin")) {
+                console.error("CORS issue. Try using a local server to serve your files.");
+            }
+            
             if (progressCallback) progressCallback(1.0); // Complete the progress bar even on error
             
             // Make placeholder more visible as fallback
@@ -385,6 +424,39 @@ function initializeModelViewer(containerId, progressCallback) {
             placeholder.scale.set(2, 2, 2);
         }
     );
+    
+    // Helper functions for fallback model
+    function handleModelLoad(gltf) {
+        console.log("Fallback model loaded successfully");
+        model = gltf.scene;
+        scene.remove(placeholder);
+        scene.add(model);
+        
+        // Center and position the model
+        const box = new THREE.Box3().setFromObject(model);
+        const center = box.getCenter(new THREE.Vector3());
+        model.position.sub(center);
+        model.rotation.y = Math.PI / 4;
+        
+        // Add controls
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        
+        // Final progress update
+        if (progressCallback) progressCallback(1.0);
+    }
+    
+    function handleProgress(xhr) {
+        if (progressCallback) {
+            progressCallback(xhr.loaded / xhr.total);
+        }
+    }
+    
+    function handleError(error) {
+        console.error("Even fallback model failed to load:", error);
+        if (progressCallback) progressCallback(1.0);
+    }
     
     // Set up model control buttons
     function setupModelControls(model, controls, camera) {
@@ -406,7 +478,7 @@ function initializeModelViewer(containerId, progressCallback) {
                 if (controls) {
                     controls.reset();
                 }
-                camera.position.set(0, 0, 5);
+                camera.position.set(0, 0, 7);
             });
         }
         
@@ -417,6 +489,33 @@ function initializeModelViewer(containerId, progressCallback) {
         }
     }
     
+    // Animation loop - MOVED INSIDE to access the correct variables
+    function animate() {
+        requestAnimationFrame(animate);
+        
+        // Animate placeholder if model not loaded yet
+        if (scene.children.includes(placeholder)) {
+            animatePlaceholder();
+        }
+        
+        // Update controls if they exist
+        if (controls) {
+            controls.update();
+        }
+        
+        // Animate lights
+        const time = Date.now() * 0.001;
+        if (neonLight1 && neonLight2) {
+            neonLight1.position.x = Math.sin(time) * 3;
+            neonLight1.position.z = Math.cos(time) * 3;
+            neonLight2.position.x = Math.sin(time + Math.PI) * 3;
+            neonLight2.position.z = Math.cos(time + Math.PI) * 3;
+        }
+        
+        renderer.render(scene, camera);
+    }
+    
+    // Start animation
     animate();
     
     // Handle window resize
@@ -428,30 +527,4 @@ function initializeModelViewer(containerId, progressCallback) {
 }
 
 // Export the function to be called from main.js
-window.initializeModelViewer = initializeModelViewer;
-
-// Animation loop
-function animate() {
-    requestAnimationFrame(animate);
-    
-    // Animate placeholder if model not loaded yet
-    if (scene.children.includes(placeholder)) {
-        animatePlaceholder();
-    }
-    
-    // Update controls if they exist
-    if (controls) {
-        controls.update();
-    }
-    
-    // Animate lights
-    const time = Date.now() * 0.001;
-    if (neonLight1 && neonLight2) {
-        neonLight1.position.x = Math.sin(time) * 3;
-        neonLight1.position.z = Math.cos(time) * 3;
-        neonLight2.position.x = Math.sin(time + Math.PI) * 3;
-        neonLight2.position.z = Math.cos(time + Math.PI) * 3;
-    }
-    
-    renderer.render(scene, camera);
-} 
+window.initializeModelViewer = initializeModelViewer; 
