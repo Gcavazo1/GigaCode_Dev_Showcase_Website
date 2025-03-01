@@ -230,7 +230,11 @@ document.addEventListener('DOMContentLoaded', () => {
                                 // Ensure the AI Assistant is in view
                                 const homeAiContainer = document.querySelector('.home-ai-container');
                                 if (homeAiContainer) {
-                                    homeAiContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                    const containerTop = homeAiContainer.offsetTop;
+                                    window.scrollTo({
+                                        top: containerTop,
+                                        behavior: 'smooth'
+                                    });
                                 }
                                 
                                 // Fade in AI Assistant

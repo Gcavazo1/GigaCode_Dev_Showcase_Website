@@ -1627,7 +1627,7 @@
     position: relative;
     width: 100%;
     max-width: 600px;
-    margin: 1rem auto;
+    margin: 0.5rem auto;
     opacity: 0;
     animation: fadeIn 0.5s ease-in-out forwards;
 }
@@ -1743,4 +1743,50 @@
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
-} 
+}
+
+/* Improve home section and AI container spacing */
+.home-ai-container {
+    min-height: auto; /* Remove min-height: 100vh */
+    display: flex;
+    flex-direction: column;
+    gap: 1rem; /* Add gap between elements */
+    padding-top: 2rem; /* Reduce top padding */
+}
+
+#home {
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 0 1rem; /* Adjust padding */
+}
+
+/* Adjust loading sequence spacing */
+.loading-sequence {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    margin: 0.5rem auto; /* Reduce margin */
+    opacity: 0;
+    animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+/* Adjust AI Assistant positioning */
+#virtual-assistant.section.no-header {
+    padding: 0;
+    margin-top: 0; /* Remove top margin */
+}
+
+.assistant-container {
+    max-width: 900px;
+    margin: 0 auto; /* Remove vertical margin */
+}
+
+/* Ensure the AI Assistant stays in view */
+.ai-assistant.enhanced {
+    margin-top: 0; /* Remove top margin */
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Adjust the scroll behavior in JavaScript */ 
