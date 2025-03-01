@@ -85,6 +85,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Access the model and rotate it right
         // This would need to be implemented in the 3d-model.js
     });
+    
+    initRobloxProjects();
 });
 
 // Smooth scrolling for navigation links
@@ -245,4 +247,43 @@ function initScrollReveal() {
     
     // Initial check
     checkReveal();
+}
+
+function initRobloxProjects() {
+    const cards = document.querySelectorAll('.roblox-project-card');
+    
+    cards.forEach(card => {
+        // Add hover effect to images
+        const image = card.querySelector('.card-hologram img');
+        
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            
+            const angleX = (y - centerY) / 20;
+            const angleY = (centerX - x) / 20;
+            
+            card.style.transform = `perspective(1000px) rotateX(${angleX}deg) rotateY(${angleY}deg) translateZ(10px)`;
+            image.style.transform = `scale(1.1) translateX(${(x - centerX) / 50}px) translateY(${(y - centerY) / 50}px)`;
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateZ(0)';
+            image.style.transform = 'scale(1) translateX(0) translateY(0)';
+        });
+        
+        // Add button interaction
+        const followButton = card.querySelector('.follow-project');
+        followButton.addEventListener('click', () => {
+            followButton.classList.add('clicked');
+            followButton.innerHTML = '<span>Following Project ✓</span><div class="button-glow"></div>';
+            setTimeout(() => {
+                followButton.classList.remove('clicked');
+            }, 1500);
+        });
+    });
 } 

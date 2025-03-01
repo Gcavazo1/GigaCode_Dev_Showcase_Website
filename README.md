@@ -7,7 +7,7 @@ A cyberpunk-inspired developer portfolio and showcase website featuring advanced
 - **Cyberpunk Design** - Dark-themed with neon glow effects and futuristic aesthetics
 - **Interactive Navigation** - Smooth scrolling with animated side navigation
 - **Live2D Integration** - Interactive animated character assistant
-- **3D Model Showcase** - WebGL-powered 3D model viewer
+- **3D Model Showcase** - WebGL-powered 3D model viewer with a cyberpunk-styled helmet
 - **Audio Visualization** - Background music with reactive visual elements
 - **Holographic UI** - Advanced UI components with holographic effects
 - **Particle Effects** - Dynamic background particle system
