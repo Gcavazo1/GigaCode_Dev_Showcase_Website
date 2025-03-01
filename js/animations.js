@@ -152,114 +152,34 @@ function initTypingEffect() {
     // so we're removing this part to avoid conflicts
 }
 
-// Enhanced loading sequence with video game style
+// Update the animation sequence
 document.addEventListener('DOMContentLoaded', () => {
     const tagline = document.querySelector('.typing-text');
     const aiSection = document.querySelector('#virtual-assistant');
-    const bioSection = document.querySelector('#bio');
+    const bioContent = document.querySelector('.bio-content');
     
-    // Hide bio section animations initially
-    if (bioSection) {
-        const bioElements = bioSection.querySelectorAll('.terminal-typing, .terminal-command');
-        bioElements.forEach(el => {
-            el.style.visibility = 'hidden';
-        });
-    }
-    
-    // Create enhanced loading sequence
-    const loadingSequence = document.createElement('div');
-    loadingSequence.className = 'loading-sequence';
-    loadingSequence.innerHTML = `
-        <div class="loading-text">Initializing AI Core</div>
-        <div class="loading-bar-container">
-            <div class="loading-bar"></div>
-            <div class="loading-percentage">0%</div>
-        </div>
-        <div class="loading-status">Establishing neural connection...</div>
-    `;
-    
-    // Insert loading sequence after tagline
-    tagline.parentNode.insertBefore(loadingSequence, tagline.nextSibling);
-    
-    // Start the sequence after tagline finishes typing
-    const taglineText = tagline.textContent;
-    tagline.textContent = '';
-    let charIndex = 0;
-    
-    function typeTagline() {
-        if (charIndex < taglineText.length) {
-            tagline.textContent += taglineText.charAt(charIndex);
-            charIndex++;
-            setTimeout(typeTagline, 50);
-        } else {
-            // Tagline finished typing, start AI loading sequence
-            setTimeout(() => {
-                loadingSequence.style.opacity = '1';
-                
-                // Update loading status messages
-                const statusMessages = [
-                    "Establishing neural connection...",
-                    "Calibrating quantum processors...",
-                    "Loading neural pathways...",
-                    "Synchronizing AI matrices...",
-                    "Initializing consciousness core...",
-                    "Neural network online"
-                ];
-                
-                const statusElement = loadingSequence.querySelector('.loading-status');
-                const percentElement = loadingSequence.querySelector('.loading-percentage');
-                
-                // Simulate loading progress
-                let progress = 0;
-                const progressInterval = setInterval(() => {
-                    progress += 1;
-                    if (progress <= 100) {
-                        percentElement.textContent = `${progress}%`;
-                        
-                        // Update status message at certain thresholds
-                        if (progress === 20) statusElement.textContent = statusMessages[1];
-                        if (progress === 40) statusElement.textContent = statusMessages[2];
-                        if (progress === 60) statusElement.textContent = statusMessages[3];
-                        if (progress === 80) statusElement.textContent = statusMessages[4];
-                        if (progress === 100) {
-                            statusElement.textContent = statusMessages[5];
-                            clearInterval(progressInterval);
-                            
-                            // Complete loading sequence
-                            setTimeout(() => {
-                                // Remove loading sequence first
-                                loadingSequence.style.opacity = '0';
-                                setTimeout(() => {
-                                    loadingSequence.remove();
-                                    
-                                    // Then show AI Assistant
-                                    const aiSection = document.querySelector('#virtual-assistant');
-                                    if (aiSection) {
-                                        aiSection.style.display = 'block'; // Ensure it's displayed
-                                        requestAnimationFrame(() => {
-                                            aiSection.classList.add('loaded');
-                                        });
-                                        
-                                        // Add glitch effect
-                                        const aiAssistant = aiSection.querySelector('.ai-assistant');
-                                        if (aiAssistant) {
-                                            aiAssistant.classList.add('glitching');
-                                            setTimeout(() => {
-                                                aiAssistant.classList.remove('glitching');
-                                            }, 500);
-                                        }
-                                    }
-                                }, 500);
-                            }, 800);
-                        }
-                    }
-                }, 30);
-            }, 800);
+    // Initial delay before starting animations
+    setTimeout(() => {
+        // Start tagline typing
+        if (tagline) {
+            initTypingEffect(tagline);
         }
-    }
-    
-    // Start the typing animation
-    typeTagline();
+        
+        // After tagline, show AI Assistant
+        setTimeout(() => {
+            if (aiSection) {
+                aiSection.classList.add('loaded');
+            }
+            
+            // After AI Assistant loads, reveal bio
+            setTimeout(() => {
+                if (bioContent) {
+                    bioContent.classList.add('reveal-active');
+                }
+            }, 800); // Delay after AI Assistant
+            
+        }, 1500); // Delay after tagline
+    }, 500); // Initial delay
 });
 
 // Update terminal command effect to accept a delay parameter
@@ -391,17 +311,17 @@ function initHoverAnimations() {
     });
 }
 
+// Keep your existing scroll reveal logic for other sections
 function checkReveal() {
-    // ... existing code ...
+    const windowHeight = window.innerHeight;
+    const revealPoint = 150;
     
-    // Add special animation for bio text separators
-    const bioTexts = document.querySelectorAll('.bio-text p');
-    bioTexts.forEach(text => {
-        const textTop = text.getBoundingClientRect().top;
-        if (textTop < windowHeight - revealPoint) {
-            text.classList.add('active');
-        } else {
-            text.classList.remove('active');
+    document.querySelectorAll('.reveal').forEach(element => {
+        if (element.classList.contains('bio-content')) return; // Skip bio content
+        
+        const revealTop = element.getBoundingClientRect().top;
+        if (revealTop < windowHeight - revealPoint) {
+            element.classList.add('reveal-active');
         }
     });
 }
