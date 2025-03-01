@@ -288,8 +288,8 @@
 /* 3D Playlist Carousel */
 .ps-playlist-container {
     position: relative;
-    height: 300px;
-    margin: 50px 0;
+    height: 200px;
+    margin: 80px 0;
     perspective: 2000px;
     overflow: visible;
 }
@@ -304,18 +304,19 @@
 
 .ps-track-card {
     position: absolute;
-    width: 280px;
-    height: 160px;
-    left: calc(50% - 140px);
-    top: calc(50% - 80px);
-    background: rgba(5, 15, 25, 0.95);
+    width: 320px;
+    height: 120px;
+    left: calc(50% - 160px);
+    top: calc(50% - 60px);
+    background: rgba(1, 8, 16, 0.95);
     border: 1px solid rgba(0, 255, 255, 0.4);
-    border-radius: 12px;
+    border-radius: 8px;
     overflow: hidden;
     transition: all 0.8s cubic-bezier(0.2, 1, 0.3, 1);
     cursor: pointer;
     transform-style: preserve-3d;
-    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5),
+                inset 0 0 30px rgba(0, 255, 255, 0.1);
 }
 
 .ps-track-card:hover {
@@ -324,7 +325,9 @@
 
 .ps-track-active {
     border: 1px solid rgba(0, 255, 255, 0.8);
-    box-shadow: 0 0 30px rgba(0, 255, 255, 0.6);
+    box-shadow: 0 0 40px rgba(0, 255, 255, 0.4),
+                inset 0 0 30px rgba(0, 255, 255, 0.2);
+    background: rgba(2, 12, 24, 0.95);
 }
 
 .ps-track-active::before {
@@ -352,36 +355,39 @@
 .ps-card-content {
     position: relative;
     padding: 20px;
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: auto 1fr;
     height: 100%;
     box-sizing: border-box;
-    gap: 15px;
 }
 
 .ps-track-number {
-    font-size: 14px;
-    letter-spacing: 1px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 24px;
+    color: rgba(0, 255, 255, 0.7);
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+    letter-spacing: 2px;
+    margin-bottom: 15px;
 }
 
 .ps-track-title {
-    font-size: 18px;
-    margin-bottom: 15px;
+    display: none;
 }
 
 .ps-track-equalizer {
     display: flex;
-    gap: 3px;
-    margin-top: auto;
-    height: 20px;
+    gap: 4px;
+    justify-content: center;
+    height: 30px;
     align-items: flex-end;
 }
 
 .ps-eq-bar {
-    width: 4px;
+    width: 5px;
     background: rgba(0, 255, 255, 0.5);
     height: 5px;
     transition: height 0.2s ease;
+    border-radius: 2px;
 }
 
 .ps-track-active .ps-eq-bar {
@@ -414,11 +420,11 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background: rgba(0, 20, 40, 0.7);
+    background: rgba(0, 20, 40, 0.9);
     border: 1px solid rgba(0, 255, 255, 0.4);
     color: #00ffff;
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -426,6 +432,7 @@
     cursor: pointer;
     z-index: 200;
     transition: all 0.3s ease;
+    font-size: 1.2em;
 }
 
 .ps-playlist-nav:hover {
@@ -434,11 +441,11 @@
 }
 
 .ps-prev {
-    left: 20px;
+    left: 40px;
 }
 
 .ps-next {
-    right: 20px;
+    right: 40px;
 }
 
 @keyframes ps-eq-animation {

@@ -559,14 +559,13 @@ class AudioVisualizer {
                 relativePos -= totalCards;
             }
             
-            // Adjusted rotation and positioning values
-            const rotation = relativePos * 30; // Reduced rotation angle
-            const zTranslation = Math.cos(Math.abs(relativePos) * 0.3) * 200 - 200; // Increased depth
-            const xTranslation = Math.sin(relativePos * 0.3) * 300; // Increased spread
-            const scale = Math.max(0.7, 1 - Math.abs(relativePos) * 0.15); // More dramatic scaling
-            const opacity = Math.max(0.3, 1 - Math.abs(relativePos) * 0.3); // More dramatic fade
+            // Adjusted positioning for better spread and depth
+            const rotation = relativePos * 25; // Reduced rotation for better readability
+            const zTranslation = Math.cos(Math.abs(relativePos) * 0.4) * 250 - 250; // More depth
+            const xTranslation = Math.sin(relativePos * 0.4) * 400; // Wider spread
+            const scale = Math.max(0.6, 1 - Math.abs(relativePos) * 0.2); // More dramatic scaling
+            const opacity = Math.max(0.2, 1 - Math.abs(relativePos) * 0.4); // More dramatic fade
             
-            // Apply transforms with adjusted values
             card.style.transform = `
                 translateX(${xTranslation}px) 
                 translateZ(${zTranslation}px) 
