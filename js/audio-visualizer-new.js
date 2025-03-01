@@ -596,6 +596,12 @@ class AudioVisualizer {
         if (!this.analyser || !this.dataArray) return;
         
         try {
+            // Check if ThreeAudioVisualizer is defined
+            if (typeof ThreeAudioVisualizer === 'undefined') {
+                console.error('ThreeAudioVisualizer is not defined. Make sure three-audio-visualizer.js is loaded.');
+                return;
+            }
+            
             // Create Three.js visualizer
             this.threeVisualizer = new ThreeAudioVisualizer(this.analyser, this.dataArray);
         } catch (error) {
