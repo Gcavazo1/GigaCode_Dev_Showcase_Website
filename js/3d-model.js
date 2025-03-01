@@ -257,4 +257,89 @@ class ModelViewer {
 
 document.addEventListener('DOMContentLoaded', () => {
     new ModelViewer();
-}); 
+});
+
+// Ensure the 3D model is properly isolated in its own container
+function initializeModelViewer(containerId) {
+    const container = document.getElementById(containerId);
+    
+    // Create scene, camera, renderer only for this container
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+    
+    const renderer = new THREE.WebGLRenderer({ 
+        antialias: true,
+        alpha: true // Allow transparency to blend with the page background
+    });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    container.appendChild(renderer.domElement);
+    
+    // Add ambient and directional light for better model visibility
+    const ambientLight = new THREE.AmbientLight(0x404040, 2);
+    scene.add(ambientLight);
+    
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
+    directionalLight.position.set(1, 1, 1);
+    scene.add(directionalLight);
+    
+    // Add cyberpunk-themed lighting
+    const neonLight1 = new THREE.PointLight(0xff00ff, 1, 100); // Magenta
+    neonLight1.position.set(2, 2, 2);
+    scene.add(neonLight1);
+    
+    const neonLight2 = new THREE.PointLight(0x00ffff, 1, 100); // Cyan
+    neonLight2.position.set(-2, -2, 2);
+    scene.add(neonLight2);
+    
+    // Load the model
+    const loader = new THREE.GLTFLoader();
+    loader.load('models/gltf/SlothSword.gltf', (gltf) => {
+        const model = gltf.scene;
+        
+        // Center the model
+        const box = new THREE.Box3().setFromObject(model);
+        const center = box.getCenter(new THREE.Vector3());
+        model.position.sub(center);
+        
+        // Add a subtle rotation animation
+        model.rotation.y = Math.PI / 4;
+        
+        scene.add(model);
+        
+        // Add controls for user interaction
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.screenSpacePanning = false;
+        controls.minDistance = 3;
+        controls.maxDistance = 10;
+        
+        // Position camera
+        camera.position.z = 5;
+        
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Add subtle automatic rotation when not being controlled
+            if (!controls.active) {
+                model.rotation.y += 0.005;
+            }
+            
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        
+        animate();
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+    });
+}
+
+// Export the function to be called from main.js
+window.initializeModelViewer = initializeModelViewer; 

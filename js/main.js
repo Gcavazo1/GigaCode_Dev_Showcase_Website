@@ -15,6 +15,43 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize scroll reveal animations
     initScrollReveal();
+    
+    // Initialize the 3D model viewer
+    if (typeof window.initializeModelViewer === 'function') {
+        window.initializeModelViewer('model-showcase');
+    }
+    
+    // Add scroll-based animation for the model container
+    const modelContainer = document.getElementById('model-showcase');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                modelContainer.classList.add('in-view');
+            } else {
+                modelContainer.classList.remove('in-view');
+            }
+        });
+    }, { threshold: 0.3 });
+    
+    if (modelContainer) {
+        observer.observe(modelContainer);
+    }
+    
+    // Add functionality to model control buttons
+    document.getElementById('rotate-left')?.addEventListener('click', () => {
+        // Access the model and rotate it left
+        // This would need to be implemented in the 3d-model.js
+    });
+    
+    document.getElementById('reset-view')?.addEventListener('click', () => {
+        // Reset the model view
+        // This would need to be implemented in the 3d-model.js
+    });
+    
+    document.getElementById('rotate-right')?.addEventListener('click', () => {
+        // Access the model and rotate it right
+        // This would need to be implemented in the 3d-model.js
+    });
 });
 
 // Smooth scrolling for navigation links
