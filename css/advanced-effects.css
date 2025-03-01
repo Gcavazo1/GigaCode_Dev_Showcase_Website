@@ -85,11 +85,11 @@
     overflow: hidden;
 }
 
-/* Main Grid Container */
+/* Holographic Interface Layout */
 .holo-container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: minmax(400px, auto) 200px;
+    grid-template-rows: 400px 200px;
     gap: 2rem;
     max-width: 1400px;
     margin: 0 auto;
@@ -109,46 +109,34 @@
         0 0 30px rgba(0, 255, 255, 0.15),
         inset 0 0 20px rgba(0, 255, 255, 0.08);
     transition: all 0.3s ease;
+    height: 100%;
 }
 
-/* Grid Positioning */
+/* Grid Layout */
 .neural-network {
     grid-column: 1;
     grid-row: 1;
-}
-
-.system-status {
-    grid-column: 2;
-    grid-row: 1;
-}
-
-.holo-timeline {
-    grid-column: 3;
-    grid-row: 1;
-}
-
-.project-matrix {
-    grid-column: 1 / -1; /* Span all columns */
-    grid-row: 2;
-}
-
-/* Individual Display Styling */
-.neural-network {
     background: linear-gradient(135deg, rgba(2, 8, 12, 0.9), rgba(0, 20, 40, 0.8));
     border-color: rgba(0, 195, 255, 0.5);
 }
 
 .system-status {
+    grid-column: 2;
+    grid-row: 1;
     background: linear-gradient(135deg, rgba(2, 8, 12, 0.9), rgba(30, 0, 40, 0.8));
     border-color: rgba(255, 0, 255, 0.5);
 }
 
 .holo-timeline {
+    grid-column: 3;
+    grid-row: 1;
     background: linear-gradient(135deg, rgba(2, 8, 12, 0.9), rgba(0, 40, 20, 0.8));
     border-color: rgba(0, 255, 128, 0.5);
 }
 
 .project-matrix {
+    grid-column: 1 / -1;
+    grid-row: 2;
     background: linear-gradient(135deg, rgba(2, 8, 12, 0.9), rgba(30, 30, 0, 0.8));
     border-color: rgba(255, 255, 0, 0.5);
 }
@@ -2057,4 +2045,78 @@
 .bio-content.reveal-active {
     opacity: 1;
     transform: translateY(0);
+}
+
+/* Terminal styling */
+.terminal-container {
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    margin: 0 auto;
+    max-width: 900px;
+}
+
+.terminal-header {
+    background: rgba(20, 20, 30, 0.9);
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+.terminal-buttons {
+    display: flex;
+    gap: 8px;
+    margin-right: 1rem;
+}
+
+.terminal-button {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.terminal-button.close { background: #ff5f56; }
+.terminal-button.minimize { background: #ffbd2e; }
+.terminal-button.maximize { background: #27c93f; }
+
+.terminal-title {
+    color: #00ffff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.terminal-body {
+    padding: 1.5rem;
+    font-family: 'Rajdhani', monospace;
+}
+
+.terminal-line {
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.terminal-prompt {
+    color: #00ffff;
+    opacity: 0.8;
+}
+
+.terminal-command {
+    color: #ffff00;
+}
+
+.terminal-output {
+    color: #e0e0e0;
+    margin: 1rem 0 2rem;
+    line-height: 1.6;
+    padding-left: 2rem;
+}
+
+.terminal-output p {
+    margin-bottom: 1rem;
 } 
