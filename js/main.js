@@ -18,7 +18,40 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize the 3D model viewer
     if (typeof window.initializeModelViewer === 'function') {
-        window.initializeModelViewer('model-showcase');
+        // Add a loading indicator before initializing the model
+        const modelContainer = document.getElementById('model-showcase');
+        if (modelContainer) {
+            // Create and add loading indicator
+            const loader = document.createElement('div');
+            loader.className = 'model-loader';
+            loader.innerHTML = `
+                <div class="loader-progress">
+                    <div class="loader-bar"></div>
+                </div>
+                <div class="loader-text">Loading 3D Model <span class="loader-percent">0%</span></div>
+            `;
+            modelContainer.appendChild(loader);
+            
+            // Initialize model with callback for loading progress
+            window.initializeModelViewer('model-showcase', (progress) => {
+                const percent = Math.floor(progress * 100);
+                const loaderBar = document.querySelector('.loader-bar');
+                const loaderPercent = document.querySelector('.loader-percent');
+                
+                if (loaderBar && loaderPercent) {
+                    loaderBar.style.width = `${percent}%`;
+                    loaderPercent.textContent = `${percent}%`;
+                    
+                    // Remove loader when complete
+                    if (percent >= 100) {
+                        setTimeout(() => {
+                            loader.classList.add('fade-out');
+                            setTimeout(() => loader.remove(), 500);
+                        }, 500);
+                    }
+                }
+            });
+        }
     }
     
     // Add scroll-based animation for the model container

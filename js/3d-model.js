@@ -260,18 +260,30 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Ensure the 3D model is properly isolated in its own container
-function initializeModelViewer(containerId) {
+function initializeModelViewer(containerId, progressCallback) {
     const container = document.getElementById(containerId);
+    if (!container) return;
     
     // Create scene, camera, renderer only for this container
     const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0a0a12);
+    
     const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+    camera.position.z = 5;
     
     const renderer = new THREE.WebGLRenderer({ 
         antialias: true,
         alpha: true // Allow transparency to blend with the page background
     });
     renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.outputEncoding = THREE.sRGBEncoding || THREE.LinearEncoding; // Fallback for older Three.js versions
+    
+    // Clear any existing canvas
+    const existingCanvas = container.querySelector('canvas');
+    if (existingCanvas) {
+        container.removeChild(existingCanvas);
+    }
+    
     container.appendChild(renderer.domElement);
     
     // Add ambient and directional light for better model visibility
@@ -291,53 +303,144 @@ function initializeModelViewer(containerId) {
     neonLight2.position.set(-2, -2, 2);
     scene.add(neonLight2);
     
+    // Create a placeholder cube while loading
+    const placeholderGeometry = new THREE.BoxGeometry(1, 1, 1);
+    const placeholderMaterial = new THREE.MeshStandardMaterial({ 
+        color: 0x00ffff,
+        emissive: 0x00ffff,
+        emissiveIntensity: 0.2,
+        wireframe: true
+    });
+    const placeholder = new THREE.Mesh(placeholderGeometry, placeholderMaterial);
+    scene.add(placeholder);
+    
+    // Animate placeholder
+    function animatePlaceholder() {
+        placeholder.rotation.x += 0.01;
+        placeholder.rotation.y += 0.01;
+    }
+    
     // Load the model
     const loader = new THREE.GLTFLoader();
-    loader.load('models/gltf/SlothSword.gltf', (gltf) => {
-        const model = gltf.scene;
-        
-        // Center the model
-        const box = new THREE.Box3().setFromObject(model);
-        const center = box.getCenter(new THREE.Vector3());
-        model.position.sub(center);
-        
-        // Add a subtle rotation animation
-        model.rotation.y = Math.PI / 4;
-        
-        scene.add(model);
-        
-        // Add controls for user interaction
-        const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.05;
-        controls.screenSpacePanning = false;
-        controls.minDistance = 3;
-        controls.maxDistance = 10;
-        
-        // Position camera
-        camera.position.z = 5;
-        
-        // Animation loop
-        function animate() {
-            requestAnimationFrame(animate);
+    let model = null;
+    let controls = null;
+    
+    loader.load(
+        'models/gltf/SlothSword.gltf', 
+        (gltf) => {
+            // Model loaded successfully
+            model = gltf.scene;
             
-            // Add subtle automatic rotation when not being controlled
-            if (!controls.active) {
-                model.rotation.y += 0.005;
+            // Center the model
+            const box = new THREE.Box3().setFromObject(model);
+            const center = box.getCenter(new THREE.Vector3());
+            model.position.sub(center);
+            
+            // Add a subtle rotation animation
+            model.rotation.y = Math.PI / 4;
+            
+            // Remove placeholder
+            scene.remove(placeholder);
+            
+            // Add model to scene
+            scene.add(model);
+            
+            // Add controls for user interaction
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.screenSpacePanning = false;
+            controls.minDistance = 3;
+            controls.maxDistance = 10;
+            
+            // Set up model control buttons
+            setupModelControls(model, controls, camera);
+            
+            // Final progress update
+            if (progressCallback) progressCallback(1.0);
+        },
+        // Show loading progress
+        (xhr) => {
+            if (progressCallback) {
+                progressCallback(xhr.loaded / xhr.total);
             }
+        },
+        // Handle errors
+        (error) => {
+            console.error('Error loading 3D model:', error);
+            if (progressCallback) progressCallback(1.0); // Complete the progress bar even on error
             
-            controls.update();
-            renderer.render(scene, camera);
+            // Make placeholder more visible as fallback
+            placeholder.material.wireframe = false;
+            placeholder.material.emissiveIntensity = 0.5;
+            placeholder.scale.set(2, 2, 2);
+        }
+    );
+    
+    // Set up model control buttons
+    function setupModelControls(model, controls, camera) {
+        const rotateLeftBtn = document.getElementById('rotate-left');
+        const resetViewBtn = document.getElementById('reset-view');
+        const rotateRightBtn = document.getElementById('rotate-right');
+        
+        if (rotateLeftBtn) {
+            rotateLeftBtn.addEventListener('click', () => {
+                if (model) model.rotation.y -= Math.PI / 4;
+            });
         }
         
-        animate();
+        if (resetViewBtn) {
+            resetViewBtn.addEventListener('click', () => {
+                if (model) {
+                    model.rotation.set(0, Math.PI / 4, 0);
+                }
+                if (controls) {
+                    controls.reset();
+                }
+                camera.position.set(0, 0, 5);
+            });
+        }
         
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            camera.aspect = container.clientWidth / container.clientHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(container.clientWidth, container.clientHeight);
-        });
+        if (rotateRightBtn) {
+            rotateRightBtn.addEventListener('click', () => {
+                if (model) model.rotation.y += Math.PI / 4;
+            });
+        }
+    }
+    
+    // Animation loop
+    function animate() {
+        requestAnimationFrame(animate);
+        
+        // Animate placeholder if model not loaded yet
+        if (scene.children.includes(placeholder)) {
+            animatePlaceholder();
+        }
+        
+        // Update controls if they exist
+        if (controls) {
+            controls.update();
+        }
+        
+        // Animate lights
+        const time = Date.now() * 0.001;
+        if (neonLight1 && neonLight2) {
+            neonLight1.position.x = Math.sin(time) * 3;
+            neonLight1.position.z = Math.cos(time) * 3;
+            neonLight2.position.x = Math.sin(time + Math.PI) * 3;
+            neonLight2.position.z = Math.cos(time + Math.PI) * 3;
+        }
+        
+        renderer.render(scene, camera);
+    }
+    
+    animate();
+    
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
     });
 }
 
