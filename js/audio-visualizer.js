@@ -276,21 +276,22 @@ class AudioVisualizer {
     drawCyberpunkBackground() {
         // Create gradient background
         const gradient = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
-        gradient.addColorStop(0, this.colorSchemes.cyberpunk.background.primary);
-        gradient.addColorStop(1, this.colorSchemes.cyberpunk.background.secondary);
+        gradient.addColorStop(0, 'rgba(0, 0, 10, 0.9)');  // Almost black at top
+        gradient.addColorStop(1, 'rgba(10, 10, 25, 0.9)'); // Very dark blue at bottom
         this.ctx.fillStyle = gradient;
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         
-        // Draw grid lines with animated glow
-        const gridOpacity = 0.1 + (Math.sin(Date.now() / 3000) * 0.05);
-        this.ctx.strokeStyle = `rgba(0, 255, 255, ${gridOpacity})`;
-        this.ctx.lineWidth = 1;
+        // Draw monochromatic grid with subtle animation
+        const time = Date.now() * 0.001;
+        const gridOpacity = 0.1 + Math.sin(time) * 0.05;
         
         // Vertical lines
         for (let x = 0; x < this.canvas.width; x += 30) {
             this.ctx.beginPath();
             this.ctx.moveTo(x, 0);
             this.ctx.lineTo(x, this.canvas.height);
+            this.ctx.strokeStyle = `rgba(255, 255, 255, ${gridOpacity * 0.5})`; // White lines with reduced opacity
+            this.ctx.lineWidth = 0.5;  // Thinner lines
             this.ctx.stroke();
         }
         
@@ -299,8 +300,20 @@ class AudioVisualizer {
             this.ctx.beginPath();
             this.ctx.moveTo(0, y);
             this.ctx.lineTo(this.canvas.width, y);
+            this.ctx.strokeStyle = `rgba(255, 255, 255, ${gridOpacity * 0.5})`; // White lines with reduced opacity
+            this.ctx.lineWidth = 0.5;  // Thinner lines
             this.ctx.stroke();
         }
+        
+        // Add subtle vignette effect
+        const vignette = this.ctx.createRadialGradient(
+            this.canvas.width / 2, this.canvas.height / 2, 0,
+            this.canvas.width / 2, this.canvas.height / 2, this.canvas.width * 0.7
+        );
+        vignette.addColorStop(0, 'rgba(0,0,0,0)');
+        vignette.addColorStop(1, 'rgba(0,0,0,0.4)');
+        this.ctx.fillStyle = vignette;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     }
     
     drawStaticVisualization() {
@@ -533,37 +546,41 @@ class AudioVisualizer {
     }
     
     drawParticles() {
+        // Increase number of particles and make them bigger
         if (!this.particles) {
-            this.particles = Array.from({ length: 50 }, () => ({
+            this.particles = Array.from({ length: 150 }, () => ({  // Increased from 50 to 150
                 x: Math.random() * this.canvas.width,
                 y: Math.random() * this.canvas.height,
-                size: Math.random() * 2 + 1,
+                size: Math.random() * 3 + 2,  // Increased base size (was 2 + 1)
                 speedX: (Math.random() - 0.5) * 2,
                 speedY: (Math.random() - 0.5) * 2,
                 hue: Math.random() * 60 + 180
             }));
         }
         
-        // Calculate average for particle reactivity
+        // Get average frequency for particle reactivity
         const average = Array.from(this.dataArray).reduce((a, b) => a + b, 0) / this.dataArray.length;
         const intensity = average / 255;
         
-        // Update and draw particles
+        // Update and draw particles with enhanced effects
         this.particles.forEach(particle => {
-            particle.x += particle.speedX * (1 + intensity);
-            particle.y += particle.speedY * (1 + intensity);
+            particle.x += particle.speedX * (1 + intensity * 2);
+            particle.y += particle.speedY * (1 + intensity * 2);
             
+            // Wrap around screen
             if (particle.x < 0) particle.x = this.canvas.width;
             if (particle.x > this.canvas.width) particle.x = 0;
             if (particle.y < 0) particle.y = this.canvas.height;
             if (particle.y > this.canvas.height) particle.y = 0;
             
+            // Draw larger particles with stronger glow
             this.ctx.beginPath();
-            this.ctx.arc(particle.x, particle.y, particle.size * (1 + intensity * 0.5), 0, Math.PI * 2);
-            this.ctx.fillStyle = `hsla(${particle.hue}, 100%, 50%, ${0.2 + intensity * 0.5})`;
+            this.ctx.arc(particle.x, particle.y, particle.size * (1 + intensity), 0, Math.PI * 2);
+            this.ctx.fillStyle = `hsla(${particle.hue}, 100%, 50%, ${0.3 + intensity * 0.5})`; // Increased base opacity
             this.ctx.fill();
             
-            this.ctx.shadowBlur = 5 + intensity * 10;
+            // Enhanced glow effect
+            this.ctx.shadowBlur = 10 + intensity * 15;  // Increased glow
             this.ctx.shadowColor = `hsla(${particle.hue}, 100%, 50%, ${intensity})`;
         });
     }
