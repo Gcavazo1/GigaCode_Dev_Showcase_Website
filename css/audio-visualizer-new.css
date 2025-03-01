@@ -1,0 +1,281 @@
+/* Basic audio player styling */
+.audio-section {
+    background: rgba(10, 15, 25, 0.9);
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 2rem auto;
+    max-width: 1000px;
+}
+
+.audio-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.audio-visualizer {
+    width: 100%;
+    height: 200px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.audio-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.track-info {
+    flex: 1;
+    color: #00ffff;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.track-title {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.control-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.control-button {
+    background: rgba(0, 20, 40, 0.8);
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    color: #00ffff;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.control-button:hover {
+    background: rgba(0, 255, 255, 0.2);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+}
+
+.play-button {
+    width: 50px;
+    height: 50px;
+}
+
+.play-button.playing {
+    background: rgba(0, 255, 255, 0.2);
+}
+
+.volume-control {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.volume-slider {
+    -webkit-appearance: none;
+    width: 100px;
+    height: 4px;
+    background: rgba(0, 255, 255, 0.2);
+    border-radius: 2px;
+    outline: none;
+}
+
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #00ffff;
+    cursor: pointer;
+}
+
+.volume-slider::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #00ffff;
+    cursor: pointer;
+    border: none;
+}
+
+/* PowerShell Terminal Music Widget - with unique class names */
+.ps-music-widget {
+    position: fixed;
+    bottom: -150px; /* Start off-screen */
+    right: 20px;
+    background: rgba(1, 10, 20, 0.9);
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    border-radius: 6px;
+    padding: 0;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+    z-index: 9999;
+    transition: bottom 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+    width: 300px;
+    overflow: hidden;
+    font-family: 'Consolas', monospace;
+}
+
+.ps-music-widget.ps-active {
+    bottom: 20px; /* Slide in from bottom */
+}
+
+.ps-widget-header {
+    background: rgba(0, 20, 40, 0.9);
+    padding: 5px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.4);
+}
+
+.ps-widget-title {
+    color: #00ffff;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.ps-widget-title i {
+    font-size: 14px;
+}
+
+.ps-widget-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.ps-widget-control {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.ps-widget-minimize {
+    background: #ffbd44;
+    border: 1px solid #dfb13a;
+}
+
+.ps-widget-close {
+    background: #ff605c;
+    border: 1px solid #e04c49;
+}
+
+.ps-widget-content {
+    padding: 15px;
+    color: #e0e0e0;
+    font-size: 14px;
+}
+
+.ps-terminal-prompt {
+    color: #0f0;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.ps-terminal-prompt::before {
+    content: 'PS C:\\Music>';
+    color: #00ffff;
+    font-weight: bold;
+}
+
+.ps-terminal-command {
+    color: #e0e0e0;
+    animation: ps-typing 1.5s steps(30, end);
+    white-space: nowrap;
+    overflow: hidden;
+    display: inline-block;
+}
+
+.ps-terminal-output {
+    margin: 10px 0;
+    padding-left: 15px;
+    border-left: 1px solid rgba(0, 255, 255, 0.3);
+}
+
+.ps-terminal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.ps-terminal-btn {
+    background: rgba(0, 20, 40, 0.8);
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    color: #00ffff;
+    padding: 5px 10px;
+    font-family: 'Consolas', monospace;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.ps-terminal-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.1), transparent);
+    transition: all 0.5s ease;
+}
+
+.ps-terminal-btn:hover {
+    background: rgba(0, 255, 255, 0.2);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+.ps-terminal-btn:hover::before {
+    left: 100%;
+}
+
+.ps-terminal-cursor {
+    display: inline-block;
+    width: 8px;
+    height: 15px;
+    background: #00ffff;
+    margin-left: 2px;
+    animation: ps-blink 1s infinite;
+    vertical-align: middle;
+}
+
+@keyframes ps-typing {
+    from { width: 0 }
+    to { width: 100% }
+}
+
+@keyframes ps-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+.ps-scan-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: rgba(0, 255, 255, 0.5);
+    opacity: 0.5;
+    z-index: 1;
+    animation: ps-scanline 6s linear infinite;
+}
+
+@keyframes ps-scanline {
+    0% { top: 0; }
+    100% { top: 100%; }
+} 
