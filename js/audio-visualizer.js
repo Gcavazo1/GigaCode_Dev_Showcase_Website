@@ -22,8 +22,9 @@ class AudioVisualizer {
         this.audioNodesInitialized = false;
         this.sourceCreated = false;
         
-        // Initialize playlist
+        // Initialize playlist with new audio files
         this.playlist = [
+            // Keep existing tracks
             { title: "Cyberpunk Theme", file: "audio/cyberpunk-theme.mp3" },
             { title: "Echoes of Valor", file: "audio/EchoesofValor.mp3" },
             { title: "Final Confrontation", file: "audio/FinalConfrontation.mp3" },
@@ -40,7 +41,13 @@ class AudioVisualizer {
             { title: "Pixelated Rise", file: "audio/PixelatedRise.mp3" },
             { title: "Quest for Triumph", file: "audio/QuestforTriumph.mp3" },
             { title: "Champion Rise", file: "audio/ChampionRise.mp3" },
-            { title: "Rise My Heroes", file: "audio/RiseMyHeroes.mp3" }
+            { title: "Rise My Heroes", file: "audio/RiseMyHeroes.mp3" },
+            
+            // Add new tracks
+            { title: "Shadow Rise", file: "audio/ShadowRise.mp3" },
+            { title: "Epic Ascendancy", file: "audio/EpicAscendancy.mp3" },
+            { title: "Echoes of Legend", file: "audio/EchoesofLegend.mp3" },
+            { title: "Chasing Legends", file: "audio/ChasingLegends.mp3" }
         ];
         
         this.currentTrack = 0;
@@ -72,6 +79,12 @@ class AudioVisualizer {
     
     // Show audio prompt method
     showAudioPrompt() {
+        // Remove any existing prompts first
+        const existingPrompt = document.querySelector('.audio-prompt-overlay');
+        if (existingPrompt) {
+            document.body.removeChild(existingPrompt);
+        }
+        
         // Create prompt element
         const promptOverlay = document.createElement('div');
         promptOverlay.className = 'audio-prompt-overlay';
@@ -86,17 +99,31 @@ class AudioVisualizer {
             </div>
         `;
         
+        // Make sure it's added to the body and properly positioned
         document.body.appendChild(promptOverlay);
+        
+        // Force a reflow to ensure styles are applied
+        promptOverlay.offsetHeight;
         
         // Add event listeners
         promptOverlay.querySelector('.enable-audio').addEventListener('click', () => {
             this.initAudio();
             this.playAudio();
-            document.body.removeChild(promptOverlay);
+            promptOverlay.style.opacity = '0';
+            setTimeout(() => {
+                if (document.body.contains(promptOverlay)) {
+                    document.body.removeChild(promptOverlay);
+                }
+            }, 500);
         });
         
         promptOverlay.querySelector('.disable-audio').addEventListener('click', () => {
-            document.body.removeChild(promptOverlay);
+            promptOverlay.style.opacity = '0';
+            setTimeout(() => {
+                if (document.body.contains(promptOverlay)) {
+                    document.body.removeChild(promptOverlay);
+                }
+            }, 500);
         });
     }
     

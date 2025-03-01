@@ -1,0 +1,102 @@
+/* Add or update these styles for the audio prompt */
+.audio-prompt-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; /* Ensure it's above everything else */
+    transition: opacity 0.5s ease; /* Add transition for fade out */
+}
+
+.audio-prompt {
+    background: rgba(10, 15, 25, 0.95);
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    border-radius: 10px;
+    padding: 2rem;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+    animation: promptFadeIn 0.5s ease-out forwards;
+}
+
+.audio-prompt h3 {
+    color: #00ffff;
+    font-family: 'Orbitron', sans-serif;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+.audio-prompt p {
+    color: #e0e0e0;
+    margin-bottom: 1.5rem;
+    font-family: 'Rajdhani', sans-serif;
+}
+
+.prompt-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+@keyframes promptFadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Add styles for the cyber buttons in the prompt */
+.audio-prompt .cyber-button {
+    background: rgba(0, 20, 40, 0.8);
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    color: #00ffff;
+    padding: 0.5rem 1rem;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 120px;
+}
+
+.audio-prompt .cyber-button:hover {
+    background: rgba(0, 255, 255, 0.2);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+}
+
+/* Ensure the audio container has proper styling */
+.audio-container {
+    position: relative;
+    z-index: 100;
+}
+
+/* Style for the audio status message */
+.audio-status {
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    color: #00ffff;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.9rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 101;
+    text-align: center;
+    max-width: 80%;
+}
+
+.audio-status.success {
+    color: #00ff00;
+    border-left: 3px solid #00ff00;
+}
+
+.audio-status.error {
+    color: #ff5f56;
+    border-left: 3px solid #ff5f56;
+} 
