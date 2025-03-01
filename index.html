@@ -578,26 +578,41 @@
             </div>
         </section>
 
-        <!-- Audio Visualization Section -->
+        <!-- Audio Section -->
         <section id="audio-section" class="section">
             <div class="section-header">
-                <h2 class="cyber-heading">Cyberpunk Soundtrack</h2>
+                <h2 class="cyber-heading">Audio Visualizer</h2>
                 <div class="neon-separator"></div>
             </div>
+            
             <div class="audio-container">
-                <div class="visualizer-wrapper">
-                    <canvas id="audio-canvas" class="audio-canvas"></canvas>
-                    <div class="audio-controls">
-                        <button id="play-audio" class="cyber-button medium" disabled>
-                            <i class="fas fa-play"></i>
-                            <span>Loading...</span>
+                <div class="audio-visualizer">
+                    <canvas id="audio-canvas"></canvas>
+                </div>
+                
+                <div class="audio-controls">
+                    <div class="track-info">
+                        <div id="track-title" class="track-title">Loading...</div>
+                    </div>
+                    
+                    <div class="control-buttons">
+                        <button id="prev-track" class="control-button">
+                            <i class="fas fa-step-backward"></i>
                         </button>
-                        <div class="volume-control">
-                            <i class="fas fa-volume-up"></i>
-                            <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="0.7">
-                        </div>
+                        <button id="play-audio" class="control-button play-button">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <button id="next-track" class="control-button">
+                            <i class="fas fa-step-forward"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="volume-control">
+                        <i class="fas fa-volume-up"></i>
+                        <input type="range" id="volume-slider" class="volume-slider" min="0" max="100" value="70">
                     </div>
                 </div>
+                
                 <audio id="background-audio" preload="auto"></audio>
             </div>
         </section>
