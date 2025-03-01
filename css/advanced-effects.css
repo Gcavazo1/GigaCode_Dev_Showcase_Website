@@ -106,7 +106,7 @@
     background: rgba(2, 8, 12, 0.8);
     border: 1px solid rgba(0, 255, 255, 0.4);
     border-radius: 12px;
-    padding: 2rem;
+    padding: 1.5rem;
     position: relative;
     overflow: hidden;
     backdrop-filter: blur(10px);
@@ -114,7 +114,7 @@
         0 0 30px rgba(0, 255, 255, 0.15),
         inset 0 0 20px rgba(0, 255, 255, 0.08);
     transition: all 0.3s ease;
-    min-height: 300px;
+    height: 400px; /* Fixed height for consistency */
 }
 
 /* Customized display types with unique color schemes */
@@ -124,6 +124,8 @@
         rgba(0, 20, 40, 0.8) 100%
     );
     border-color: rgba(0, 195, 255, 0.5);
+    grid-column: 1;
+    grid-row: 1 / 3; /* Take up two rows */
 }
 
 .neural-network h3 {
@@ -144,6 +146,8 @@
         rgba(30, 0, 40, 0.8) 100%
     );
     border-color: rgba(255, 0, 255, 0.5);
+    grid-column: 2;
+    grid-row: 1;
 }
 
 .system-status h3 {
@@ -164,6 +168,8 @@
         rgba(30, 30, 0, 0.8) 100%
     );
     border-color: rgba(255, 255, 0, 0.5);
+    grid-column: 3;
+    grid-row: 1;
 }
 
 .project-matrix h3 {
@@ -184,6 +190,8 @@
         rgba(0, 40, 20, 0.8) 100%
     );
     border-color: rgba(0, 255, 128, 0.5);
+    grid-column: 2 / 4; /* Span two columns */
+    grid-row: 2;
 }
 
 .holo-timeline h3 {
@@ -442,6 +450,12 @@
     z-index: 2;
     max-height: 180px;
     overflow-y: auto;
+    height: 100%;
+    overflow-y: auto;
+    padding-right: 1rem;
+    /* Hide scrollbar but keep functionality */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 255, 255, 0.3) transparent;
 }
 
 .timeline-event {
@@ -1850,24 +1864,20 @@
 
 /* Holographic Interface Layout */
 .holo-container {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.holo-top-row, .holo-bottom-row {
     display: grid;
-    grid-template-columns: 3fr 2fr;
+    grid-template-columns: repeat(3, 1fr);
     gap: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1rem;
 }
 
+/* Make each display a more balanced size */
 .holo-display {
     background: rgba(2, 8, 12, 0.8);
     border: 1px solid rgba(0, 255, 255, 0.4);
     border-radius: 12px;
-    padding: 2rem;
+    padding: 1.5rem;
     position: relative;
     overflow: hidden;
     backdrop-filter: blur(10px);
@@ -1875,24 +1885,91 @@
         0 0 30px rgba(0, 255, 255, 0.15),
         inset 0 0 20px rgba(0, 255, 255, 0.08);
     transition: all 0.3s ease;
-    min-height: 300px;
+    height: 400px; /* Fixed height for consistency */
+}
+
+/* Position each display in the grid */
+.neural-network {
+    grid-column: 1;
+    grid-row: 1 / 3; /* Take up two rows */
+}
+
+.system-status {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+.project-matrix {
+    grid-column: 3;
+    grid-row: 1;
+}
+
+.holo-timeline {
+    grid-column: 2 / 4; /* Span two columns */
+    grid-row: 2;
+}
+
+/* Timeline specific styling */
+.timeline-content {
+    height: 100%;
+    overflow-y: auto;
+    padding-right: 1rem;
+    /* Hide scrollbar but keep functionality */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 255, 255, 0.3) transparent;
+}
+
+/* Project Matrix specific styling */
+.matrix-content {
+    height: 100%;
+    overflow: hidden;
+    font-family: monospace;
+    font-size: 0.9rem;
+    line-height: 1.2;
 }
 
 /* Responsive adjustments */
-@media (max-width: 992px) {
-    .holo-top-row, .holo-bottom-row {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
+@media (max-width: 1200px) {
+    .holo-container {
+        grid-template-columns: 1fr 1fr;
     }
-    
-    .holo-display {
-        min-height: 250px;
+
+    .neural-network {
+        grid-column: 1;
+        grid-row: 1 / 3;
+    }
+
+    .system-status {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    .project-matrix {
+        grid-column: 2;
+        grid-row: 2;
+    }
+
+    .holo-timeline {
+        grid-column: 1 / 3;
+        grid-row: 3;
     }
 }
 
 @media (max-width: 768px) {
+    .holo-container {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .neural-network,
+    .system-status,
+    .project-matrix,
+    .holo-timeline {
+        grid-column: 1;
+        grid-row: auto;
+    }
+
     .holo-display {
-        min-height: 200px;
-        padding: 1.5rem;
+        height: 300px;
     }
 } 
