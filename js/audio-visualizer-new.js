@@ -338,6 +338,14 @@ class AudioVisualizer {
         // Add to body
         document.body.appendChild(widget);
         
+        // Force a reflow before adding the active class
+        widget.offsetHeight;
+        
+        // Animate in with a slight delay for smoother appearance
+        setTimeout(() => {
+            widget.classList.add('ps-active');
+        }, 100);
+        
         // Add event listeners
         widget.querySelector('.ps-enable-btn').addEventListener('click', () => {
             this.initAudio();
@@ -362,15 +370,14 @@ class AudioVisualizer {
                 }
             }, 30000);
         });
-        
-        // Animate in
-        setTimeout(() => {
-            widget.classList.add('ps-active');
-        }, 500);
     }
     
     closePowerShellWidget(widget) {
+        widget.style.transition = 'all 0.5s cubic-bezier(0.7, 0, 0.84, 0)';
         widget.classList.remove('ps-active');
+        widget.style.opacity = '0';
+        widget.style.transform = 'translateY(20px) scale(0.95)';
+        
         setTimeout(() => {
             if (document.body.contains(widget)) {
                 document.body.removeChild(widget);
