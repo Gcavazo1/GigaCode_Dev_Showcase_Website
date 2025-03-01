@@ -100,10 +100,28 @@ class AudioVisualizer {
         });
     }
     
+    initAudio() {
+        if (!this.audioNodesInitialized) {
+            try {
+                // Create audio context first
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Then initialize the rest
+                this.init();
+                this.audioNodesInitialized = true;
+            } catch (error) {
+                console.error("Failed to initialize audio context:", error);
+                this.showStatus("Audio initialization failed. Please try a different browser.", "error");
+            }
+        }
+    }
+    
     init() {
         try {
-            // Initialize Web Audio API
-            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            // Audio context is already created in initAudio
+            if (!this.audioContext) {
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
             
             // Determine if we're on GitHub Pages or local
             const isGitHubPages = window.location.hostname.includes('github.io');
@@ -119,11 +137,6 @@ class AudioVisualizer {
             this.resizeCanvas();
             window.addEventListener('resize', () => this.resizeCanvas());
             this.setupEventListeners();
-            
-            // Listen for user interactions
-            document.addEventListener('click', () => this.handleUserInteraction());
-            document.addEventListener('keydown', () => this.handleUserInteraction());
-            document.addEventListener('touchstart', () => this.handleUserInteraction());
             
         } catch (error) {
             console.error("Audio initialization error:", error);
@@ -166,47 +179,25 @@ class AudioVisualizer {
     
     setupAudioNodes() {
         try {
-            // If we've already created a source node, just reconnect it
-            if (this.sourceCreated) {
-                console.log('Source already created, reconnecting nodes');
-                
-                // Disconnect and reconnect
-                if (this.source) {
-                    this.source.disconnect();
-                    this.source.connect(this.analyser);
-                    this.analyser.connect(this.audioContext.destination);
-                }
-            } else {
-                // First time setup - create new nodes
-                console.log('Creating new audio nodes');
-                
-                // Create analyzer
-                this.analyser = this.audioContext.createAnalyser();
-                this.analyser.fftSize = 1024;
-                this.analyser.smoothingTimeConstant = 0.8;
-                
-                // Create data array for visualization
-                this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
-                
-                // Create source node only once
-                this.source = this.audioContext.createMediaElementSource(this.audio);
-                this.sourceCreated = true;
-                
-                // Connect nodes
-                this.source.connect(this.analyser);
-                this.analyser.connect(this.audioContext.destination);
+            if (!this.audioContext) {
+                throw new Error("Audio context not initialized");
             }
             
-            // Set initial volume
-            if (this.volumeSlider) {
-                this.audio.volume = this.volumeSlider.value;
-            }
+            // Create analyzer node
+            this.analyser = this.audioContext.createAnalyser();
+            this.analyser.fftSize = 256;
+            const bufferLength = this.analyser.frequencyBinCount;
+            this.dataArray = new Uint8Array(bufferLength);
             
-            this.audioNodesInitialized = true;
-            console.log('Audio nodes setup complete');
+            // Connect audio source to analyzer
+            this.source = this.audioContext.createMediaElementSource(this.audio);
+            this.source.connect(this.analyser);
+            this.analyser.connect(this.audioContext.destination);
+            
+            this.sourceCreated = true;
         } catch (error) {
-            console.error('Error setting up audio nodes:', error);
-            this.showStatus("Error setting up audio visualization", "error");
+            console.error("Error setting up audio nodes:", error);
+            this.showStatus("Error setting up audio visualization.", "error");
         }
     }
     
@@ -811,10 +802,43 @@ class AudioVisualizer {
         this.animate();
     }
 
-    initAudio() {
-        if (!this.audioNodesInitialized) {
-            this.init();
-            this.audioNodesInitialized = true;
+    playAudio() {
+        if (this.audio && this.audioContext) {
+            // Resume audio context (needed for Chrome's autoplay policy)
+            if (this.audioContext.state === 'suspended') {
+                this.audioContext.resume();
+            }
+            
+            this.audio.play()
+                .then(() => {
+                    this.isPlaying = true;
+                    this.updatePlayButton();
+                    this.showStatus(`Now playing: ${this.playlist[this.currentTrack].title}`);
+                })
+                .catch(error => {
+                    console.error("Error playing audio:", error);
+                    this.showStatus("Error playing audio. Try clicking the play button.", "error");
+                });
+        }
+    }
+
+    pauseAudio() {
+        if (this.audio) {
+            this.audio.pause();
+            this.isPlaying = false;
+            this.updatePlayButton();
+        }
+    }
+
+    updatePlayButton() {
+        if (this.playButton) {
+            if (this.isPlaying) {
+                this.playButton.innerHTML = '<i class="fas fa-pause"></i><span>Pause</span>';
+                this.playButton.classList.add('playing');
+            } else {
+                this.playButton.innerHTML = '<i class="fas fa-play"></i><span>Play</span>';
+                this.playButton.classList.remove('playing');
+            }
         }
     }
 }
