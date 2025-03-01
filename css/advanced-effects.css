@@ -2115,8 +2115,14 @@
     margin: 1rem 0 2rem;
     line-height: 1.6;
     padding-left: 2rem;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
 }
 
 .terminal-output p {
     margin-bottom: 1rem;
+    white-space: normal;
+    word-break: normal;
+    opacity: 0.9;
 } 
