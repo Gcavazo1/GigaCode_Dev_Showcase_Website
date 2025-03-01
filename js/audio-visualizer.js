@@ -29,19 +29,58 @@ class AudioVisualizer {
             {
                 title: "Cyberpunk Theme",
                 file: "audio/cyberpunk-theme.mp3"
+            },
+            {
+                title: "Echoes of Valor",
+                file: "audio/EchoesofValor.mp3"
+            },
+            {
+                title: "Final Confrontation",
+                file: "audio/FinalConfrontation.mp3"
+            },
+            {
+                title: "Legacy of Solitude",
+                file: "audio/LegacyofSolitude.mp3"
+            },
+            {
+                title: "Neon Shadows Dark",
+                file: "audio/NeonShadows_dark.mp3"
+            },
+            {
+                title: "Neon Shadows",
+                file: "audio/NeonShadows.mp3"
+            },
+            {
+                title: "Shadows of Desolation",
+                file: "audio/ShadowsofDesolation.mp3"
+            },
+            {
+                title: "Shadows of Tomorrow",
+                file: "audio/ShadowsofTomorrow.mp3"
+            },
+            {
+                title: "Synth Shadows",
+                file: "audio/SynthShadows.mp3"
+            },
+            {
+                title: "The Last Victory",
+                file: "audio/TheLastVictory.mp3"
             }
         ];
         
         this.currentTrack = 0;
         
-        // Add autoplay with user interaction flag
-        this.hasInteracted = false;
+        // Add autoplay flag
+        this.shouldAutoplay = true;
         
         // Listen for first user interaction
         document.addEventListener('click', () => this.handleFirstInteraction(), { once: true });
         document.addEventListener('keydown', () => this.handleFirstInteraction(), { once: true });
         
         this.init();
+        
+        // Initialize playlist UI after audio setup
+        this.initPlaylist();
     }
     
     checkBrowserSupport() {
@@ -59,46 +98,19 @@ class AudioVisualizer {
             
             this.audioContext = new AudioContext();
             
-            // Determine if we're on GitHub Pages or local
+            // Try multiple audio sources
             const isGitHubPages = window.location.hostname.includes('github.io');
-            const baseUrl = isGitHubPages ? '/GigaCode_Dev_Showcase_Website' : '';
-            const audioPath = `${baseUrl}/audio/cyberpunk-theme.mp3`;
             
-            console.log('Audio Context State:', this.audioContext.state);
-            console.log('Loading audio from:', audioPath);
+            // Use a CDN-hosted fallback for GitHub Pages
+            const audioSources = [
+                // Local path
+                isGitHubPages ? '/GigaCode_Dev_Showcase_Website/audio/cyberpunk-theme.mp3' : '/audio/cyberpunk-theme.mp3',
+                // Fallback to a CDN-hosted version
+                'https://assets.codepen.io/4358584/Anitek_-_Komorebi.mp3'
+            ];
             
-            // Create a fetch request to check if the file exists
-            fetch(audioPath)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.blob();
-                })
-                .then(blob => {
-                    const audioUrl = URL.createObjectURL(blob);
-                    this.audio.src = audioUrl;
-                    
-                    // Set up event listeners before loading
-                    this.audio.addEventListener('canplaythrough', () => {
-                        console.log('Audio can play through');
-                        this.setupAudioNodes();
-                        this.showStatus("Audio loaded successfully", "success");
-                        this.playButton.disabled = false;
-                        this.playButton.innerHTML = '<i class="fas fa-play"></i><span>Play Music</span>';
-                    });
-
-                    this.audio.addEventListener('error', (e) => {
-                        console.error('Audio loading error:', e);
-                        this.showStatus("Error loading audio file", "error");
-                    });
-
-                    this.audio.load();
-                })
-                .catch(error => {
-                    console.error("Error loading audio file:", error);
-                    this.showStatus(`Error loading audio: ${error.message}`, "error");
-                });
+            // Try loading each source until one works
+            this.tryLoadAudio(audioSources, 0);
             
             // Set up canvas
             this.resizeCanvas();
@@ -107,12 +119,66 @@ class AudioVisualizer {
             // Set up controls
             this.setupEventListeners();
             
-            // Start animation
+            // Start animation only after audio is set up
             this.animate();
         } catch (error) {
             console.error("Audio initialization error:", error);
             this.showStatus("Audio system initialization failed. Please try a different browser.", "error");
         }
+    }
+    
+    tryLoadAudio(sources, index) {
+        if (index >= sources.length) {
+            this.showStatus("Failed to load audio from all sources", "error");
+            return;
+        }
+        
+        const source = sources[index];
+        console.log(`Trying audio source ${index + 1}/${sources.length}: ${source}`);
+        
+        fetch(source)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const audioUrl = URL.createObjectURL(blob);
+                this.audio.src = audioUrl;
+                
+                // Set up event listeners before loading
+                this.audio.addEventListener('canplaythrough', () => {
+                    console.log('Audio can play through from source:', source);
+                    this.setupAudioNodes();
+                    this.showStatus("Audio loaded successfully", "success");
+                    this.playButton.disabled = false;
+                    this.playButton.innerHTML = '<i class="fas fa-play"></i><span>Play Music</span>';
+                    
+                    // Initialize the analyzer for visualization
+                    this.analyser = this.audioContext.createAnalyser();
+                    this.analyser.fftSize = 256;
+                    this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+                    
+                    // Try autoplay if enabled
+                    if (this.shouldAutoplay) {
+                        this.attemptAutoplay();
+                    }
+                });
+                
+                this.audio.addEventListener('error', (e) => {
+                    console.error('Audio loading error from source:', source, e);
+                    // Try the next source
+                    this.tryLoadAudio(sources, index + 1);
+                });
+                
+                this.audio.load();
+            })
+            .catch(error => {
+                console.error(`Error loading audio from source ${source}:`, error);
+                // Try the next source
+                this.tryLoadAudio(sources, index + 1);
+            });
     }
     
     setupAudioNodes() {
@@ -186,6 +252,11 @@ class AudioVisualizer {
     }
     
     animate() {
+        requestAnimationFrame(() => this.animate());
+        
+        // Only draw visualization if analyzer is set up
+        if (!this.analyser || !this.dataArray) return;
+        
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         
         // Get frequency data
@@ -216,37 +287,165 @@ class AudioVisualizer {
             
             x += barWidth + barSpacing;
         }
-        
-        requestAnimationFrame(() => this.animate());
     }
     
     initPlaylist() {
+        // Create a container for the playlist
         const playlistContainer = document.createElement('div');
         playlistContainer.className = 'audio-playlist';
         
+        // Add a title
+        const playlistTitle = document.createElement('div');
+        playlistTitle.className = 'playlist-title';
+        playlistTitle.innerHTML = '<i class="fas fa-music"></i> Playlist';
+        playlistContainer.appendChild(playlistTitle);
+        
+        // Create a scrollable list for the tracks
+        const trackList = document.createElement('div');
+        trackList.className = 'track-list';
+        
+        // Add each track to the list
         this.playlist.forEach((track, index) => {
             const trackButton = document.createElement('button');
             trackButton.className = 'track-button cyber-button small';
-            trackButton.textContent = track.title;
-            trackButton.addEventListener('click', () => this.loadTrack(index));
-            playlistContainer.appendChild(trackButton);
+            trackButton.innerHTML = `<span>${track.title}</span>`;
+            
+            // Highlight the current track
+            if (index === this.currentTrack) {
+                trackButton.classList.add('active');
+            }
+            
+            trackButton.addEventListener('click', () => {
+                // Update active class
+                document.querySelectorAll('.track-button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                trackButton.classList.add('active');
+                
+                // Load and play the track
+                this.loadTrack(index);
+            });
+            
+            trackList.appendChild(trackButton);
         });
         
-        this.audio.parentElement.appendChild(playlistContainer);
+        playlistContainer.appendChild(trackList);
+        
+        // Add playlist controls
+        const playlistControls = document.createElement('div');
+        playlistControls.className = 'playlist-controls';
+        
+        // Add shuffle button
+        const shuffleButton = document.createElement('button');
+        shuffleButton.className = 'playlist-control-button';
+        shuffleButton.innerHTML = '<i class="fas fa-random"></i>';
+        shuffleButton.addEventListener('click', () => this.shufflePlaylist());
+        
+        // Add previous track button
+        const prevButton = document.createElement('button');
+        prevButton.className = 'playlist-control-button';
+        prevButton.innerHTML = '<i class="fas fa-step-backward"></i>';
+        prevButton.addEventListener('click', () => this.prevTrack());
+        
+        // Add next track button
+        const nextButton = document.createElement('button');
+        nextButton.className = 'playlist-control-button';
+        nextButton.innerHTML = '<i class="fas fa-step-forward"></i>';
+        nextButton.addEventListener('click', () => this.nextTrack());
+        
+        // Add repeat button
+        const repeatButton = document.createElement('button');
+        repeatButton.className = 'playlist-control-button';
+        repeatButton.innerHTML = '<i class="fas fa-redo-alt"></i>';
+        repeatButton.addEventListener('click', () => {
+            this.audio.loop = !this.audio.loop;
+            repeatButton.classList.toggle('active');
+        });
+        
+        // Add buttons to controls
+        playlistControls.appendChild(shuffleButton);
+        playlistControls.appendChild(prevButton);
+        playlistControls.appendChild(nextButton);
+        playlistControls.appendChild(repeatButton);
+        
+        // Add controls to playlist
+        playlistContainer.appendChild(playlistControls);
+        
+        // Add playlist to the audio container
+        document.querySelector('.audio-container').appendChild(playlistContainer);
+        
+        // Add event listener for track end to play next track
+        this.audio.addEventListener('ended', () => {
+            if (!this.audio.loop) {
+                this.nextTrack();
+            }
+        });
     }
     
     loadTrack(index) {
         this.currentTrack = index;
-        this.audio.src = this.playlist[index].file;
-        this.audio.load();
-        if (this.isPlaying) {
-            this.audio.play();
-        }
+        
+        // Get the correct path based on whether we're on GitHub Pages
+        const isGitHubPages = window.location.hostname.includes('github.io');
+        const baseUrl = isGitHubPages ? '/GigaCode_Dev_Showcase_Website' : '';
+        const audioPath = `${baseUrl}/${this.playlist[index].file}`;
+        
+        console.log('Loading track:', audioPath);
+        
+        // Try to load the track
+        fetch(audioPath)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const audioUrl = URL.createObjectURL(blob);
+                this.audio.src = audioUrl;
+                this.audio.load();
+                
+                // Play if we were already playing
+                if (this.isPlaying) {
+                    this.audio.play();
+                }
+                
+                // Update the track button UI
+                document.querySelectorAll('.track-button').forEach((btn, i) => {
+                    btn.classList.toggle('active', i === index);
+                });
+                
+                this.showStatus(`Now playing: ${this.playlist[index].title}`, "success");
+            })
+            .catch(error => {
+                console.error("Error loading track:", error);
+                this.showStatus(`Error loading track: ${this.playlist[index].title}`, "error");
+            });
+    }
+    
+    nextTrack() {
+        const nextIndex = (this.currentTrack + 1) % this.playlist.length;
+        this.loadTrack(nextIndex);
+    }
+    
+    prevTrack() {
+        const prevIndex = (this.currentTrack - 1 + this.playlist.length) % this.playlist.length;
+        this.loadTrack(prevIndex);
+    }
+    
+    shufflePlaylist() {
+        // Get a random track that's not the current one
+        let randomIndex;
+        do {
+            randomIndex = Math.floor(Math.random() * this.playlist.length);
+        } while (randomIndex === this.currentTrack && this.playlist.length > 1);
+        
+        this.loadTrack(randomIndex);
     }
     
     handleFirstInteraction() {
-        if (!this.hasInteracted) {
-            this.hasInteracted = true;
+        if (!this.shouldAutoplay) {
+            this.shouldAutoplay = true;
             
             // Try to autoplay after user interaction
             this.audio.play().then(() => {
@@ -259,6 +458,22 @@ class AudioVisualizer {
                 this.showStatus("Click play to start music", "info");
             });
         }
+    }
+    
+    attemptAutoplay() {
+        // Modern browsers require user interaction before autoplay
+        // We'll try to autoplay and handle any errors gracefully
+        this.audioContext.resume().then(() => {
+            this.audio.play().then(() => {
+                this.isPlaying = true;
+                this.playButton.innerHTML = '<i class="fas fa-pause"></i><span>Pause</span>';
+                this.playButton.classList.add('playing');
+                this.showStatus("Music playing", "success");
+            }).catch(error => {
+                console.log("Autoplay prevented by browser:", error);
+                this.showStatus("Click play to start music", "info");
+            });
+        });
     }
 }
 
