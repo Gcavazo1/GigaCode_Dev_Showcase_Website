@@ -144,17 +144,20 @@ document.addEventListener('DOMContentLoaded', function() {
         aiSection.style.zIndex = '10'; // Ensure it's above other elements
     }
     
-    // Function to show AI with TV-like effect
+    // Function to show AI with a simple fade-in effect
     function showAIWithTVEffect(aiSection) {
         if (!aiSection) return;
         
-        // Add TV effect class
-        aiSection.classList.add('tv-on-effect');
+        // Remove TV effect class if it exists
+        aiSection.classList.remove('tv-on-effect');
+        
+        // Add fade-in class
+        aiSection.classList.add('fade-in-effect');
         
         // Make visible
         aiSection.style.opacity = '1';
         
-        // After effect completes, GRADUALLY reset position to normal
+        // After fade-in completes, gradually reset position to normal
         setTimeout(() => {
             // Start transition to final position
             aiSection.style.transition = 'all 0.8s ease-in-out';
@@ -167,10 +170,10 @@ document.addEventListener('DOMContentLoaded', function() {
             // After transition completes, clean up
             setTimeout(() => {
                 aiSection.classList.add('loaded');
-                aiSection.classList.remove('tv-on-effect');
+                aiSection.classList.remove('fade-in-effect');
                 aiSection.style.transition = '';
-                console.log("AI Assistant revealed with TV effect");
+                console.log("AI Assistant revealed with fade-in effect");
             }, 800);
-        }, 1000); // Wait for TV effect to complete
+        }, 1500); // Wait for fade-in to complete
     }
 }); 

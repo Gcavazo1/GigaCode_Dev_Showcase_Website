@@ -301,57 +301,21 @@
     }
 }
 
-/* Add TV-like effect for AI Assistant */
-.ai-assistant.tv-on-effect {
-    animation: tvOn 0.8s ease-out forwards;
-    transform-origin: center;
-    will-change: transform, opacity, filter;
+/* Add a simple fade-in effect */
+.ai-assistant.fade-in-effect {
+    animation: simpleFadeIn 1.5s ease-in-out forwards;
 }
 
-@keyframes tvOn {
+@keyframes simpleFadeIn {
     0% {
         opacity: 0;
-        transform: scale(0.9);
-        filter: brightness(0) blur(10px);
-    }
-    5% {
-        opacity: 0.2;
-        transform: scale(1.03);
-        filter: brightness(3) blur(8px);
-    }
-    10% {
-        opacity: 0.1;
-        transform: scale(0.97);
-        filter: brightness(0.5) blur(5px);
-    }
-    15% {
-        opacity: 0.3;
-        transform: scale(1.02);
-        filter: brightness(2) blur(7px);
-    }
-    30% {
-        opacity: 0.5;
-        transform: scale(0.99);
-        filter: brightness(1.5) blur(3px);
-    }
-    50% {
-        opacity: 0.7;
-        transform: scale(1.01);
-        filter: brightness(1.2) blur(1px);
-    }
-    70% {
-        opacity: 0.8;
-        transform: scale(0.995);
-        filter: brightness(1.1) blur(0.5px);
-    }
-    85% {
-        opacity: 0.9;
-        transform: scale(1.005);
-        filter: brightness(1.05) blur(0.2px);
     }
     100% {
         opacity: 1;
-        transform: scale(1);
-        filter: brightness(1) blur(0);
     }
+}
+
+/* Remove the tvOn animation */
+@keyframes tvOn {
+    /* Remove this animation completely */
 } 
