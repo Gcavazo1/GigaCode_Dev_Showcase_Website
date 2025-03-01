@@ -68,8 +68,8 @@ class AudioVisualizer {
         // Initialize basic components
         this.initBasic();
         
-        // Show audio prompt after ensuring no other prompts exist
-        this.showAudioPrompt();
+        // Create floating music widget instead of full-screen prompt
+        this.createMusicWidget();
     }
     
     // Initialize basic components without audio context
@@ -312,58 +312,86 @@ class AudioVisualizer {
         }
     }
     
-    showAudioPrompt() {
-        // Remove ALL existing prompts first (both overlay and embedded)
-        const existingPrompts = document.querySelectorAll('.audio-prompt, .audio-prompt-overlay');
-        existingPrompts.forEach(prompt => {
-            if (prompt && prompt.parentNode) {
-                prompt.parentNode.removeChild(prompt);
+    // New method to create a floating widget
+    createMusicWidget() {
+        // First remove any existing widgets
+        const existingWidgets = document.querySelectorAll('.music-widget');
+        existingWidgets.forEach(widget => {
+            if (widget && widget.parentNode) {
+                widget.parentNode.removeChild(widget);
             }
         });
         
-        // Create new overlay
-        const promptOverlay = document.createElement('div');
-        promptOverlay.className = 'audio-prompt-overlay';
-        promptOverlay.style.opacity = '0'; // Start invisible
-        
-        // Set the content
-        promptOverlay.innerHTML = `
-            <div class="audio-prompt">
-                <h3>Enable Music?</h3>
-                <p>This site features an immersive cyberpunk soundtrack.</p>
-                <div class="prompt-buttons">
-                    <button class="cyber-button enable-audio">ENABLE MUSIC</button>
-                    <button class="cyber-button disable-audio">NO, KEEP SILENT</button>
+        // Create widget element
+        const widget = document.createElement('div');
+        widget.className = 'music-widget';
+        widget.innerHTML = `
+            <div class="scan-line"></div>
+            <div class="widget-header">
+                <div class="widget-title">
+                    <i class="fas fa-terminal"></i>
+                    PowerShell Music Module
                 </div>
-                <p class="prompt-note">You can always play music later using the audio player.</p>
+                <div class="widget-controls">
+                    <div class="widget-control widget-minimize"></div>
+                    <div class="widget-control widget-close"></div>
+                </div>
+            </div>
+            <div class="widget-content">
+                <div class="terminal-prompt">
+                    <span class="terminal-command">Get-MusicPreference</span>
+                    <span class="terminal-cursor"></span>
+                </div>
+                <div class="terminal-output">
+                    [INFO] This site features an immersive cyberpunk soundtrack.
+                    [QUERY] Would you like to enable background music?
+                </div>
+                <div class="terminal-buttons">
+                    <button class="terminal-btn enable-btn">Enable-Music</button>
+                    <button class="terminal-btn disable-btn">Disable-Music</button>
+                </div>
             </div>
         `;
         
-        // Add to body as first child
-        document.body.insertAdjacentElement('afterbegin', promptOverlay);
-        
-        // Force reflow and fade in
-        promptOverlay.offsetHeight;
-        promptOverlay.style.opacity = '1';
+        // Add to body
+        document.body.appendChild(widget);
         
         // Add event listeners
-        promptOverlay.querySelector('.enable-audio').addEventListener('click', () => {
+        widget.querySelector('.enable-btn').addEventListener('click', () => {
             this.initAudio();
             this.playAudio();
-            this.fadeOutAndRemovePrompt(promptOverlay);
+            this.closeWidget(widget);
         });
         
-        promptOverlay.querySelector('.disable-audio').addEventListener('click', () => {
-            this.fadeOutAndRemovePrompt(promptOverlay);
+        widget.querySelector('.disable-btn').addEventListener('click', () => {
+            this.closeWidget(widget);
         });
-    }
-
-    fadeOutAndRemovePrompt(promptOverlay) {
-        promptOverlay.style.opacity = '0';
-        promptOverlay.style.pointerEvents = 'none'; // Prevent further clicks during fade
+        
+        widget.querySelector('.widget-close').addEventListener('click', () => {
+            this.closeWidget(widget);
+        });
+        
+        widget.querySelector('.widget-minimize').addEventListener('click', () => {
+            widget.classList.remove('active');
+            // Show again after 30 seconds if no choice was made
+            setTimeout(() => {
+                if (document.body.contains(widget) && !widget.classList.contains('active')) {
+                    widget.classList.add('active');
+                }
+            }, 30000);
+        });
+        
+        // Animate in
         setTimeout(() => {
-            if (document.body.contains(promptOverlay)) {
-                document.body.removeChild(promptOverlay);
+            widget.classList.add('active');
+        }, 1000);
+    }
+    
+    closeWidget(widget) {
+        widget.classList.remove('active');
+        setTimeout(() => {
+            if (document.body.contains(widget)) {
+                document.body.removeChild(widget);
             }
         }, 500);
     }
