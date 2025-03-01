@@ -63,12 +63,41 @@ class AudioVisualizer {
             }
         };
         
-        // Initialize
-        this.init();
-        this.initPlaylist();
+        // Initialize UI
+        this.initUI();
         
-        // Start animation loop
-        this.animate();
+        // Always show the audio prompt on page load
+        this.showAudioPrompt();
+    }
+    
+    // Show audio prompt method
+    showAudioPrompt() {
+        // Create prompt element
+        const promptOverlay = document.createElement('div');
+        promptOverlay.className = 'audio-prompt-overlay';
+        promptOverlay.innerHTML = `
+            <div class="audio-prompt">
+                <h3>Enable Music?</h3>
+                <p>This site features an immersive cyberpunk soundtrack.</p>
+                <div class="prompt-buttons">
+                    <button class="cyber-button enable-audio">Yes, Enable Music</button>
+                    <button class="cyber-button disable-audio">No, Keep Silent</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(promptOverlay);
+        
+        // Add event listeners
+        promptOverlay.querySelector('.enable-audio').addEventListener('click', () => {
+            this.initAudio();
+            this.playAudio();
+            document.body.removeChild(promptOverlay);
+        });
+        
+        promptOverlay.querySelector('.disable-audio').addEventListener('click', () => {
+            document.body.removeChild(promptOverlay);
+        });
     }
     
     init() {

@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to check if AI has loaded and start terminal animations
     function checkAILoaded() {
         if (aiSection && aiSection.classList.contains('loaded')) {
-            console.log("AI Assistant loaded, starting terminal animations");
             startTerminalAnimations();
         } else {
             // Check again in 100ms

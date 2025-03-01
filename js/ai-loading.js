@@ -16,8 +16,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const taglineText = tagline.getAttribute('data-text') || tagline.textContent;
         tagline.textContent = '';
         
-        console.log("Starting tagline typing with text:", taglineText);
-        
         // Create loading sequence element right away
         const loadingSequence = document.createElement('div');
         loadingSequence.className = 'loading-sequence';
@@ -54,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     setTimeout(typeTagline, 50);
                 } else {
                     tagline.classList.remove('typing');
-                    console.log("Tagline typing complete, loading sequence visible");
+                    console.log("Tagline typing complete, showing loading sequence");
                     
                     // Start the loading bar animation
                     animateLoadingBar(loadingSequence, aiSection);

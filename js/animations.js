@@ -298,26 +298,4 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add scroll event listener for reveal animations
     window.addEventListener('scroll', checkReveal);
     checkReveal(); // Check on initial load
-});
-
-// Add this function at the end of your animations.js file
-function debugTerminal() {
-    console.log("Debugging terminal elements:");
-    
-    const typingElements = document.querySelectorAll('.terminal-typing');
-    typingElements.forEach((el, i) => {
-        console.log(`Element ${i}:`, {
-            text: el.textContent,
-            dataText: el.getAttribute('data-text'),
-            width: el.offsetWidth,
-            height: el.offsetHeight,
-            display: window.getComputedStyle(el).display,
-            visibility: window.getComputedStyle(el).visibility,
-            opacity: window.getComputedStyle(el).opacity,
-            color: window.getComputedStyle(el).color
-        });
-    });
-}
-
-// Call this function after a delay
-setTimeout(debugTerminal, 15000); 
+}); 

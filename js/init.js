@@ -1,12 +1,9 @@
 // Main initialization file
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Initializing all components...');
-    
     // Initialize components in the correct order
     
     // 1. First, initialize particles background
     if (typeof initParticles === 'function') {
-        console.log('Initializing particles...');
         initParticles();
     }
     
@@ -21,7 +18,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 5. Initialize 3D model viewer
     if (document.getElementById('model-showcase')) {
-        console.log('Initializing 3D model viewer...');
         if (typeof window.initializeModelViewer === 'function') {
             window.initializeModelViewer('model-showcase');
         }
@@ -35,6 +31,4 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 8. Initialize mobile menu
     // This is handled by mobile-menu.js
-    
-    console.log('All components initialized!');
 }); 
