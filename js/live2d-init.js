@@ -60,13 +60,15 @@ class Live2DAssistant {
         try {
             console.log('Setting up Live2D with detailed logging...');
             
-            // Create PIXI Application
+            // Create PIXI Application with specific settings
             this.app = new PIXI.Application({
                 view: this.canvas,
                 autoStart: true,
                 backgroundAlpha: 0,
                 width: this.canvas.width,
-                height: this.canvas.height
+                height: this.canvas.height,
+                resolution: window.devicePixelRatio || 1,
+                autoDensity: true
             });
             
             // Load model
@@ -76,63 +78,19 @@ class Live2DAssistant {
             
             console.log('Loading Live2D model from:', modelUrl);
             console.log('PIXI version:', PIXI.VERSION);
-            console.log('Live2D available:', typeof PIXI.live2d !== 'undefined');
             
-            if (typeof PIXI.live2d !== 'undefined') {
-                console.log('Live2DModel available:', typeof PIXI.live2d.Live2DModel !== 'undefined');
-                console.log('Live2D settings:', PIXI.live2d.settings);
-            }
-            
-            // Set up model settings
-            if (typeof PIXI.live2d !== 'undefined' && typeof PIXI.live2d.settings !== 'undefined') {
+            // Initialize Live2D settings if available
+            if (PIXI.live2d) {
+                // For newer versions of pixi-live2d-display
+                PIXI.live2d.config.motionFadingDuration = 500;
+                PIXI.live2d.config.motionFadingInDuration = 1000;
+                console.log('Live2D config updated');
+            } else if (PIXI.live2d && PIXI.live2d.settings) {
+                // For older versions
                 PIXI.live2d.settings.motionFadingDuration = 500;
                 PIXI.live2d.settings.motionFadingInDuration = 1000;
                 console.log('Live2D settings updated');
             }
-            
-            // Load the model with custom handling for renamed folders
-            PIXI.live2d.Live2DModel.from(modelUrl, {
-                onError: (e) => {
-                    console.error('Error loading model:', e);
-                    console.error('Error details:', JSON.stringify(e, null, 2));
-                    this.useFallback();
-                },
-                onLoad: (model) => {
-                    console.log('Model loaded successfully');
-                    console.log('Model details:', model);
-                }
-            }).then(model => {
-                console.log('Model loaded and ready to display');
-                this.model = model;
-                
-                // Add model to stage
-                this.app.stage.addChild(model);
-                
-                // Center the model
-                model.x = this.canvas.width / 2;
-                model.y = this.canvas.height / 2;
-                
-                // Scale the model
-                const scale = Math.min(
-                    this.canvas.width / model.width,
-                    this.canvas.height / model.height
-                ) * 0.8;
-                model.scale.set(scale);
-                
-                // Setup interaction
-                model.on('hit', this.handleModelTap.bind(this));
-                
-                this.isLoaded = true;
-                console.log('Live2D model loaded successfully and added to stage');
-                
-                // Start animation loop
-                this.animate();
-                
-            }).catch(error => {
-                console.error('Error loading Live2D model:', error);
-                console.error('Error stack:', error.stack);
-                this.useFallback();
-            });
             
             // Add a loading indicator
             const loadingIndicator = document.createElement('div');
@@ -143,12 +101,57 @@ class Live2DAssistant {
             `;
             this.canvas.parentNode.appendChild(loadingIndicator);
             
-            // Remove loading indicator when model loads or fails
+            // Function to remove loading indicator
             const removeLoader = () => {
                 if (loadingIndicator.parentNode) {
                     loadingIndicator.parentNode.removeChild(loadingIndicator);
                 }
             };
+            
+            // Load the model with proper error handling
+            if (PIXI.live2d && PIXI.live2d.Live2DModel) {
+                PIXI.live2d.Live2DModel.from(modelUrl)
+                    .then(model => {
+                        console.log('Model loaded and ready to display');
+                        this.model = model;
+                        
+                        // Add model to stage
+                        this.app.stage.addChild(model);
+                        
+                        // Center the model
+                        model.x = this.canvas.width / 2;
+                        model.y = this.canvas.height / 2;
+                        
+                        // Scale the model
+                        const scale = Math.min(
+                            this.canvas.width / model.width,
+                            this.canvas.height / model.height
+                        ) * 0.8;
+                        model.scale.set(scale);
+                        
+                        // Setup interaction
+                        model.on('hit', this.handleModelTap.bind(this));
+                        
+                        this.isLoaded = true;
+                        console.log('Live2D model loaded successfully and added to stage');
+                        
+                        // Remove loading indicator
+                        removeLoader();
+                        
+                        // Start animation loop
+                        this.animate();
+                    })
+                    .catch(error => {
+                        console.error('Error loading Live2D model:', error);
+                        console.error('Error stack:', error.stack);
+                        removeLoader();
+                        this.useFallback();
+                    });
+            } else {
+                console.error('PIXI.live2d.Live2DModel is not available');
+                removeLoader();
+                this.useFallback();
+            }
             
         } catch (error) {
             console.error('Error setting up Live2D model:', error);
