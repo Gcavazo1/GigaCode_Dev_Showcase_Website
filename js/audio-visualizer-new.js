@@ -154,7 +154,7 @@ class AudioVisualizer {
             
             // Set up audio nodes
             this.analyser = this.audioContext.createAnalyser();
-            this.analyser.fftSize = 256;
+            this.analyser.fftSize = 512; // Increased for better resolution
             this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
             
             // Connect nodes
@@ -164,6 +164,9 @@ class AudioVisualizer {
             
             // Load the actual audio source
             this.loadTrack(this.currentTrack);
+            
+            // Initialize Three.js visualizer
+            this.initThreeVisualizer();
             
             console.log("Audio initialized successfully");
         } catch (error) {
@@ -258,21 +261,15 @@ class AudioVisualizer {
     }
     
     animate() {
-        // Clear canvas
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        if (!this.threeVisualizer && this.analyser && this.dataArray) {
+            // If Three.js visualizer isn't initialized yet but we have audio data,
+            // try to initialize it
+            this.initThreeVisualizer();
+        }
         
+        // Only animate equalizer on active track card
         if (this.analyser && this.dataArray) {
-            // Get frequency data
-            this.analyser.getByteFrequencyData(this.dataArray);
-            
-            // Draw visualization
-            this.drawBars();
-            
-            // Animate equalizer on active track card
             this.animateEqualizer();
-        } else {
-            // Draw placeholder visualization
-            this.drawPlaceholderBars();
         }
         
         // Continue animation
@@ -593,6 +590,13 @@ class AudioVisualizer {
             this.currentCarouselIndex = index;
             this.updateCarouselPosition();
         }
+    }
+
+    initThreeVisualizer() {
+        if (!this.analyser || !this.dataArray) return;
+        
+        // Create Three.js visualizer
+        this.threeVisualizer = new ThreeAudioVisualizer(this.analyser, this.dataArray);
     }
 }
 
