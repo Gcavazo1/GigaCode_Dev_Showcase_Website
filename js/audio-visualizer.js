@@ -184,19 +184,31 @@ class AudioVisualizer {
     }
     
     setupAudioNodes() {
-        // Set up analyzer
-        this.analyser = this.audioContext.createAnalyser();
-        this.analyser.fftSize = 256;
-        this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
-        
-        // Connect audio to analyzer
-        this.source = this.audioContext.createMediaElementSource(this.audio);
-        this.source.connect(this.analyser);
-        this.analyser.connect(this.audioContext.destination);
-        
-        // Set initial volume
-        if (this.volumeSlider) {
-            this.audio.volume = this.volumeSlider.value;
+        try {
+            // Disconnect any existing nodes
+            if (this.source) {
+                this.source.disconnect();
+            }
+            
+            // Create new analyzer with higher resolution
+            this.analyser = this.audioContext.createAnalyser();
+            this.analyser.fftSize = 1024; // Increased for better resolution
+            this.analyser.smoothingTimeConstant = 0.85; // Smoother transitions
+            this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+            
+            // Connect audio to analyzer
+            this.source = this.audioContext.createMediaElementSource(this.audio);
+            this.source.connect(this.analyser);
+            this.analyser.connect(this.audioContext.destination);
+            
+            // Set initial volume
+            if (this.volumeSlider) {
+                this.audio.volume = this.volumeSlider.value;
+            }
+            
+            console.log('Audio nodes setup complete');
+        } catch (error) {
+            console.error('Error setting up audio nodes:', error);
         }
     }
     
@@ -308,60 +320,75 @@ class AudioVisualizer {
         const centerY = this.canvas.height / 2;
         const radius = Math.min(this.canvas.width, this.canvas.height) * 0.3;
         
+        // Get frequency data
+        this.analyser.getByteFrequencyData(this.dataArray);
+        
+        // Calculate average frequency for glow effect
+        const average = this.dataArray.reduce((a, b) => a + b, 0) / this.dataArray.length;
+        const intensity = average / 255;
+        
         // Draw circular visualizer
-        for (let i = 0; i < this.dataArray.length; i++) {
+        for (let i = 0; i < this.dataArray.length; i += 2) { // Skip every other value for performance
             const amplitude = this.dataArray[i] / 255;
             const angle = (i / this.dataArray.length) * Math.PI * 2;
-            const barHeight = radius * amplitude;
-            const hue = (i / this.dataArray.length) * 360;
+            const barHeight = radius * amplitude * 1.5; // Increased multiplier for more visible effect
+            const hue = 180 + (amplitude * 60); // Cyan to blue range
             
             const x1 = centerX + Math.cos(angle) * radius;
             const y1 = centerY + Math.sin(angle) * radius;
             const x2 = centerX + Math.cos(angle) * (radius + barHeight);
             const y2 = centerY + Math.sin(angle) * (radius + barHeight);
             
-            // Draw glowing line
+            // Draw glowing line with dynamic width
             this.ctx.beginPath();
             this.ctx.moveTo(x1, y1);
             this.ctx.lineTo(x2, y2);
             this.ctx.strokeStyle = `hsla(${hue}, 100%, 50%, ${amplitude})`;
-            this.ctx.lineWidth = 3;
-            this.ctx.shadowBlur = 15;
+            this.ctx.lineWidth = 2 + amplitude * 3;
+            this.ctx.shadowBlur = 15 + intensity * 15;
             this.ctx.shadowColor = `hsla(${hue}, 100%, 50%, ${amplitude})`;
             this.ctx.stroke();
             
-            // Draw connecting lines between bars
+            // Draw connecting lines between bars with dynamic opacity
             if (i > 0) {
-                const prevAngle = ((i - 1) / this.dataArray.length) * Math.PI * 2;
-                const prevAmplitude = this.dataArray[i - 1] / 255;
+                const prevAngle = ((i - 2) / this.dataArray.length) * Math.PI * 2;
+                const prevAmplitude = this.dataArray[i - 2] / 255;
                 const prevX = centerX + Math.cos(prevAngle) * (radius + radius * prevAmplitude);
                 const prevY = centerY + Math.sin(prevAngle) * (radius + radius * prevAmplitude);
                 
                 this.ctx.beginPath();
                 this.ctx.moveTo(prevX, prevY);
                 this.ctx.lineTo(x2, y2);
-                this.ctx.strokeStyle = `hsla(${hue}, 100%, 50%, 0.2)`;
+                this.ctx.strokeStyle = `hsla(${hue}, 100%, 50%, ${amplitude * 0.3})`;
                 this.ctx.stroke();
             }
         }
         
-        // Draw center circle
+        // Draw reactive center circle
         this.ctx.beginPath();
-        this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-        this.ctx.strokeStyle = 'rgba(0, 255, 255, 0.5)';
-        this.ctx.lineWidth = 2;
+        this.ctx.arc(centerX, centerY, radius * (1 + intensity * 0.1), 0, Math.PI * 2);
+        this.ctx.strokeStyle = `rgba(0, 255, 255, ${0.3 + intensity * 0.4})`;
+        this.ctx.lineWidth = 2 + intensity * 2;
+        this.ctx.stroke();
+        
+        // Add pulsing inner circle
+        this.ctx.beginPath();
+        this.ctx.arc(centerX, centerY, radius * 0.8 * (1 + intensity * 0.2), 0, Math.PI * 2);
+        this.ctx.strokeStyle = `rgba(0, 255, 255, ${0.1 + intensity * 0.2})`;
+        this.ctx.lineWidth = 1;
         this.ctx.stroke();
     }
     
     drawParticles() {
         // Initialize particles if they don't exist
         if (!this.particles) {
-            this.particles = Array.from({ length: 50 }, () => ({
+            this.particles = Array.from({ length: 100 }, () => ({
                 x: Math.random() * this.canvas.width,
                 y: Math.random() * this.canvas.height,
-                size: Math.random() * 3 + 1,
-                speedX: Math.random() * 2 - 1,
-                speedY: Math.random() * 2 - 1
+                size: Math.random() * 2 + 1,
+                speedX: (Math.random() - 0.5) * 2,
+                speedY: (Math.random() - 0.5) * 2,
+                hue: Math.random() * 60 + 180 // Cyan to blue range
             }));
         }
         
@@ -371,9 +398,9 @@ class AudioVisualizer {
         
         // Update and draw particles
         this.particles.forEach(particle => {
-            // Update position
-            particle.x += particle.speedX * (1 + intensity);
-            particle.y += particle.speedY * (1 + intensity);
+            // Update position with audio reactivity
+            particle.x += particle.speedX * (1 + intensity * 2);
+            particle.y += particle.speedY * (1 + intensity * 2);
             
             // Wrap around screen
             if (particle.x < 0) particle.x = this.canvas.width;
@@ -381,15 +408,15 @@ class AudioVisualizer {
             if (particle.y < 0) particle.y = this.canvas.height;
             if (particle.y > this.canvas.height) particle.y = 0;
             
-            // Draw particle
+            // Draw particle with audio-reactive size and opacity
             this.ctx.beginPath();
             this.ctx.arc(particle.x, particle.y, particle.size * (1 + intensity), 0, Math.PI * 2);
-            this.ctx.fillStyle = `rgba(0, 255, 255, ${0.3 + intensity * 0.7})`;
+            this.ctx.fillStyle = `hsla(${particle.hue}, 100%, 50%, ${0.2 + intensity * 0.5})`;
             this.ctx.fill();
             
             // Add glow effect
-            this.ctx.shadowBlur = 10;
-            this.ctx.shadowColor = 'rgba(0, 255, 255, 0.5)';
+            this.ctx.shadowBlur = 5 + intensity * 10;
+            this.ctx.shadowColor = `hsla(${particle.hue}, 100%, 50%, ${intensity})`;
         });
     }
     
