@@ -58,8 +58,8 @@ class AudioVisualizer {
         // Initialize basic components
         this.initBasic();
         
-        // Show audio prompt on every visit
-        this.showAudioPrompt();
+        // Show audio prompt after a short delay to ensure DOM is ready
+        setTimeout(() => this.showAudioPrompt(), 100);
     }
     
     // Initialize basic components without audio context
@@ -312,6 +312,11 @@ class AudioVisualizer {
         // Create prompt element
         const promptOverlay = document.createElement('div');
         promptOverlay.className = 'audio-prompt-overlay';
+        
+        // Add the prompt to the body
+        document.body.insertAdjacentElement('afterbegin', promptOverlay);
+        
+        // Set the content
         promptOverlay.innerHTML = `
             <div class="audio-prompt">
                 <h3>Enable Music?</h3>
@@ -323,8 +328,9 @@ class AudioVisualizer {
                 <p class="prompt-note">You can always play music later using the audio player.</p>
             </div>
         `;
-        
-        document.body.appendChild(promptOverlay);
+
+        // Force a reflow to ensure proper positioning
+        promptOverlay.offsetHeight;
         
         // Add event listeners
         promptOverlay.querySelector('.enable-audio').addEventListener('click', () => {
