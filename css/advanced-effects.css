@@ -1026,4 +1026,14 @@
         rgba(2, 8, 12, 0.9) 0%,
         rgba(4, 16, 24, 0.7) 100%
     );
+}
+
+/* Debug styles to check if elements are rendering */
+.neural-network, .system-status, .project-matrix, .holo-timeline {
+    min-height: 200px;
+    border: 2px solid #ff0000; /* Temporary red border for debugging */
+}
+
+#network-canvas {
+    border: 1px dashed yellow; /* Temporary border to see if canvas is rendering */
 } 

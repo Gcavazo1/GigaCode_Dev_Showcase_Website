@@ -33,7 +33,14 @@ class AudioVisualizer {
             { title: "Shadows of Desolation", file: "audio/ShadowsofDesolation.mp3" },
             { title: "Shadows of Tomorrow", file: "audio/ShadowsofTomorrow.mp3" },
             { title: "Synth Shadows", file: "audio/SynthShadows.mp3" },
-            { title: "The Last Victory", file: "audio/TheLastVictory.mp3" }
+            { title: "The Last Victory", file: "audio/TheLastVictory.mp3" },
+            { title: "Digital Shadows", file: "audio/DigitalShadows.mp3" },
+            { title: "Veil of Shadows", file: "audio/VeilofShadows.mp3" },
+            { title: "Haunting Whispers", file: "audio/HauntingWhispers.mp3" },
+            { title: "Pixelated Rise", file: "audio/PixelatedRise.mp3" },
+            { title: "Quest for Triumph", file: "audio/QuestforTriumph.mp3" },
+            { title: "Champion Rise", file: "audio/ChampionRise.mp3" },
+            { title: "Rise My Heroes", file: "audio/RiseMyHeroes.mp3" }
         ];
         
         this.currentTrack = 0;

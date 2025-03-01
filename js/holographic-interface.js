@@ -1,24 +1,35 @@
 class HolographicInterface {
     constructor() {
+        console.log('Initializing Holographic Interface...');
         this.initializeDisplays();
         this.animate();
     }
 
     initializeDisplays() {
-        // Neural Network visualization
-        const networkCanvas = document.getElementById('network-canvas');
-        if (networkCanvas) {
-            this.initNetworkDisplay(networkCanvas);
+        try {
+            // Neural Network visualization
+            const networkCanvas = document.getElementById('network-canvas');
+            if (networkCanvas) {
+                console.log('Initializing Neural Network display...');
+                this.initNetworkDisplay(networkCanvas);
+            } else {
+                console.warn('Network canvas element not found');
+            }
+
+            // System Status bars
+            console.log('Initializing System Status display...');
+            this.initStatusBars();
+
+            // Project Matrix
+            console.log('Initializing Project Matrix display...');
+            this.initProjectMatrix();
+
+            // Timeline
+            console.log('Initializing Timeline display...');
+            this.initTimeline();
+        } catch (error) {
+            console.error('Error initializing displays:', error);
         }
-
-        // System Status bars
-        this.initStatusBars();
-
-        // Project Matrix
-        this.initProjectMatrix();
-
-        // Timeline
-        this.initTimeline();
     }
 
     initNetworkDisplay(canvas) {
@@ -222,5 +233,6 @@ class HolographicInterface {
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, creating Holographic Interface...');
     new HolographicInterface();
 }); 
