@@ -73,47 +73,58 @@
     }
 }
 
-/* Holographic Interface Layout */
+/* Enhanced Holographic Interface */
+.holo-section {
+    padding: 2rem;
+    background: linear-gradient(180deg, 
+        rgba(0, 0, 0, 0.8) 0%,
+        rgba(0, 20, 40, 0.8) 50%,
+        rgba(0, 0, 0, 0.8) 100%
+    );
+}
+
 .holo-container {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
-    padding: 2rem;
+    gap: 2.5rem;
     max-width: 1400px;
     margin: 0 auto;
+    position: relative;
 }
 
-.holo-top-row {
-    display: flex;
-    justify-content: space-between;
-    gap: 2rem;
-}
-
+/* Enhanced display styling */
 .holo-display {
-    background: rgba(10, 10, 18, 0.7);
+    background: rgba(2, 8, 12, 0.8);
     border: 1px solid rgba(0, 255, 255, 0.3);
-    border-radius: 10px;
-    padding: 1.5rem;
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
-    backdrop-filter: blur(5px);
-}
-
-/* Top row displays */
-.holo-top-row .holo-display {
-    flex: 1;
-    min-height: 300px;
-    max-width: calc(33.33% - 1.33rem);
-}
-
-/* Bottom horizontal display */
-.holo-timeline {
-    width: 100%;
-    min-height: 200px;
+    border-radius: 12px;
+    padding: 2rem;
     position: relative;
     overflow: hidden;
+    backdrop-filter: blur(10px);
+    box-shadow: 
+        0 0 30px rgba(0, 255, 255, 0.1),
+        inset 0 0 20px rgba(0, 255, 255, 0.05);
+    transition: all 0.3s ease;
 }
 
-/* Common holographic effects */
+/* Glowing border effect */
+.holo-display::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 255, 255, 0.5);
+    box-shadow: 
+        0 0 15px rgba(0, 255, 255, 0.3),
+        inset 0 0 15px rgba(0, 255, 255, 0.3);
+    pointer-events: none;
+    animation: borderPulse 3s infinite alternate;
+}
+
+/* Grid background with scan effect */
 .holo-display::before {
     content: '';
     position: absolute;
@@ -122,43 +133,106 @@
     right: 0;
     bottom: 0;
     background: 
-        linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.1), transparent),
-        linear-gradient(to right, rgba(0, 255, 255, 0.1) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
-    background-size: 100% 100%, 30px 30px, 30px 30px;
-    border-radius: 10px;
-    pointer-events: none;
+        linear-gradient(90deg, transparent 0%, rgba(0, 255, 255, 0.1) 50%, transparent 100%),
+        linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 200% 100%, 30px 30px, 30px 30px;
+    animation: scanline 3s linear infinite;
+    opacity: 0.5;
 }
 
-/* Display headers */
+/* Display headers with enhanced styling */
 .holo-display h3 {
     color: #00ffff;
     font-family: 'Orbitron', sans-serif;
-    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
     text-transform: uppercase;
-    letter-spacing: 2px;
-    font-size: 1.1rem;
-    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
-}
-
-/* Timeline specific styling */
-.timeline-content {
+    letter-spacing: 3px;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+    text-shadow: 
+        0 0 10px rgba(0, 255, 255, 0.5),
+        0 0 20px rgba(0, 255, 255, 0.3);
     position: relative;
-    height: calc(100% - 3rem); /* Account for header */
-    background: rgba(0, 255, 255, 0.05);
-    border-radius: 5px;
-    overflow: hidden;
 }
 
-/* Responsive adjustments */
-@media (max-width: 1200px) {
-    .holo-top-row {
-        flex-direction: column;
-    }
-    
-    .holo-top-row .holo-display {
-        max-width: 100%;
-    }
+/* Header decoration */
+.holo-display h3::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 50%;
+    height: 1px;
+    background: linear-gradient(90deg, #00ffff, transparent);
+    animation: scanHeader 2s infinite alternate;
+}
+
+/* Top row layout */
+.holo-top-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 2.5rem;
+}
+
+.holo-top-row .holo-display {
+    flex: 1;
+    min-height: 350px;
+    max-width: calc(33.33% - 1.67rem);
+}
+
+/* Timeline display */
+.holo-timeline {
+    width: 100%;
+    min-height: 250px;
+    margin-top: 1rem;
+}
+
+/* Animations */
+@keyframes borderPulse {
+    0% { opacity: 0.3; }
+    100% { opacity: 1; }
+}
+
+@keyframes scanline {
+    0% { background-position: -200% 0, 0 0, 0 0; }
+    100% { background-position: 200% 0, 0 0, 0 0; }
+}
+
+@keyframes scanHeader {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(100%); }
+}
+
+/* Hover effects */
+.holo-display:hover {
+    box-shadow: 
+        0 0 40px rgba(0, 255, 255, 0.2),
+        inset 0 0 30px rgba(0, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Display-specific styling */
+.neural-network {
+    background: linear-gradient(135deg, 
+        rgba(2, 8, 12, 0.9) 0%,
+        rgba(2, 8, 12, 0.7) 100%
+    );
+}
+
+.system-status {
+    background: linear-gradient(135deg, 
+        rgba(2, 8, 12, 0.9) 0%,
+        rgba(2, 12, 18, 0.7) 100%
+    );
+}
+
+.project-matrix {
+    background: linear-gradient(135deg, 
+        rgba(2, 8, 12, 0.9) 0%,
+        rgba(4, 12, 24, 0.7) 100%
+    );
 }
 
 /* Virtual Assistant */
@@ -764,4 +838,192 @@
 .welcome-button:hover {
     background: rgba(0, 255, 255, 0.3);
     box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+}
+
+/* Status Bars */
+.status-bar-container {
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.status-label {
+    width: 100px;
+    color: #00ffff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+}
+
+.status-bar-wrapper {
+    flex: 1;
+    height: 8px;
+    background: rgba(0, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 0 15px;
+}
+
+.status-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #00ffff, #00a0a0);
+    border-radius: 4px;
+    transition: width 1s ease-in-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.status-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: barScan 2s linear infinite;
+}
+
+.status-value {
+    color: #00ffff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    width: 50px;
+    text-align: right;
+}
+
+@keyframes barScan {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Matrix Content */
+.matrix-content {
+    font-family: monospace;
+    color: #00ffff;
+    font-size: 0.8rem;
+    line-height: 1.2;
+    height: calc(100% - 3rem);
+    overflow: hidden;
+}
+
+.matrix-line {
+    margin-bottom: 5px;
+    opacity: 0.8;
+}
+
+/* Timeline Styling */
+.timeline {
+    padding: 20px 0;
+    position: relative;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 100px;
+    width: 2px;
+    background: rgba(0, 255, 255, 0.3);
+}
+
+.timeline-event {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.event-time {
+    width: 80px;
+    text-align: right;
+    color: #00ffff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.8rem;
+}
+
+.event-line {
+    width: 40px;
+    height: 2px;
+    background: rgba(0, 255, 255, 0.3);
+    margin: 0 10px;
+}
+
+.event-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #00ffff;
+    margin-right: 15px;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+.event-content {
+    flex: 1;
+}
+
+.event-name {
+    color: #fff;
+    margin-bottom: 5px;
+}
+
+.event-status {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.timeline-event.complete .event-status {
+    color: #00ff00;
+}
+
+.timeline-event.in-progress .event-status {
+    color: #ffff00;
+}
+
+.timeline-event.pending .event-status {
+    color: #ff9900;
+}
+
+/* Canvas sizing */
+#network-canvas {
+    width: 100%;
+    height: calc(100% - 3rem);
+    display: block;
+}
+
+/* Hover effects for holographic displays */
+.holo-display:hover {
+    box-shadow: 
+        0 0 40px rgba(0, 255, 255, 0.2),
+        inset 0 0 30px rgba(0, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Display-specific styling */
+.neural-network {
+    background: linear-gradient(135deg, 
+        rgba(2, 8, 12, 0.9) 0%,
+        rgba(2, 8, 12, 0.7) 100%
+    );
+}
+
+.system-status {
+    background: linear-gradient(135deg, 
+        rgba(2, 8, 12, 0.9) 0%,
+        rgba(2, 12, 18, 0.7) 100%
+    );
+}
+
+.project-matrix {
+    background: linear-gradient(135deg, 
+        rgba(2, 8, 12, 0.9) 0%,
+        rgba(4, 12, 24, 0.7) 100%
+    );
+}
+
+.holo-timeline {
+    background: linear-gradient(135deg, 
+        rgba(2, 8, 12, 0.9) 0%,
+        rgba(4, 16, 24, 0.7) 100%
+    );
 } 
