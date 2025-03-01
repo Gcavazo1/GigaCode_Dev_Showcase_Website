@@ -265,6 +265,11 @@ class AudioVisualizer {
             // If Three.js visualizer isn't initialized yet but we have audio data,
             // try to initialize it
             this.initThreeVisualizer();
+            
+            // If still no Three.js visualizer, use our own canvas visualization
+            if (!this.threeVisualizer && this.ctx) {
+                this.drawFallbackVisualization();
+            }
         }
         
         // Only animate equalizer on active track card
@@ -604,9 +609,68 @@ class AudioVisualizer {
             
             // Create Three.js visualizer
             this.threeVisualizer = new ThreeAudioVisualizer(this.analyser, this.dataArray);
+            
+            // If we got here, Three.js visualization is working
+            console.log('Three.js visualization initialized successfully');
         } catch (error) {
             console.error('Failed to initialize Three.js visualizer:', error);
+            console.log('Falling back to canvas visualization');
             // Continue with audio playback even if visualization fails
+        }
+    }
+
+    drawFallbackVisualization() {
+        if (!this.ctx || !this.analyser || !this.dataArray) return;
+        
+        // Clear canvas
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Draw background
+        this.ctx.fillStyle = this.colorScheme.background;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Get frequency data
+        this.analyser.getByteFrequencyData(this.dataArray);
+        
+        // Draw circular visualization
+        const centerX = this.canvas.width / 2;
+        const centerY = this.canvas.height / 2;
+        const radius = Math.min(centerX, centerY) * 0.7;
+        
+        const segments = 128;
+        const angleStep = (Math.PI * 2) / segments;
+        
+        for (let i = 0; i < segments; i++) {
+            const angle = i * angleStep;
+            const dataIndex = Math.floor(i * this.dataArray.length / segments);
+            const value = this.dataArray[dataIndex] || 0;
+            
+            const barHeight = (value / 255) * radius * 0.5 + radius * 0.2;
+            
+            const x1 = centerX + Math.cos(angle) * radius;
+            const y1 = centerY + Math.sin(angle) * radius;
+            const x2 = centerX + Math.cos(angle) * (radius + barHeight);
+            const y2 = centerY + Math.sin(angle) * (radius + barHeight);
+            
+            // Calculate color based on frequency
+            const colorIndex = Math.floor(i / segments * this.colorScheme.bars.length);
+            const color = this.colorScheme.bars[colorIndex];
+            this.ctx.strokeStyle = `hsl(${color.hue}, ${color.saturation}%, ${color.lightness}%)`;
+            this.ctx.lineWidth = 2;
+            
+            // Draw line
+            this.ctx.beginPath();
+            this.ctx.moveTo(x1, y1);
+            this.ctx.lineTo(x2, y2);
+            this.ctx.stroke();
+            
+            // Draw glow
+            this.ctx.shadowBlur = 10;
+            this.ctx.shadowColor = `hsl(${color.hue}, ${color.saturation}%, ${color.lightness}%)`;
+            this.ctx.beginPath();
+            this.ctx.arc(x2, y2, 2, 0, Math.PI * 2);
+            this.ctx.fill();
+            this.ctx.shadowBlur = 0;
         }
     }
 }

@@ -5,6 +5,17 @@ class ThreeAudioVisualizer {
         this.dataArray = dataArray;
         this.canvas = document.getElementById('audio-canvas');
         
+        if (!this.canvas) {
+            console.error('Canvas element not found');
+            return;
+        }
+        
+        // Ensure canvas has dimensions
+        if (this.canvas.offsetWidth === 0 || this.canvas.offsetHeight === 0) {
+            this.canvas.width = 800;
+            this.canvas.height = 300;
+        }
+        
         // Check for WebGL support
         if (!this.isWebGLSupported()) {
             console.warn('WebGL not supported, falling back to canvas visualization');
@@ -12,67 +23,140 @@ class ThreeAudioVisualizer {
             return;
         }
         
-        try {
-            // Initialize Three.js components
-            this.initThree();
-            
-            // Start animation loop
-            this.animate();
-        } catch (error) {
-            console.error('Error initializing Three.js visualizer:', error);
-            this.fallbackVisualization();
-        }
+        // Delay Three.js initialization to ensure DOM is ready
+        setTimeout(() => {
+            try {
+                // Initialize Three.js components
+                this.initThree();
+                
+                // Start animation loop
+                this.animate();
+                console.log('Three.js visualization started');
+            } catch (error) {
+                console.error('Error initializing Three.js visualizer:', error);
+                this.fallbackVisualization();
+            }
+        }, 100);
     }
     
     isWebGLSupported() {
         try {
+            // Check if window.WebGLRenderingContext exists
+            if (!window.WebGLRenderingContext) {
+                console.warn('WebGL not supported: WebGLRenderingContext not available');
+                return false;
+            }
+            
+            // Try to get a WebGL context
             const canvas = document.createElement('canvas');
-            return !!(window.WebGLRenderingContext && 
-                (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+            let gl = null;
+            
+            try {
+                gl = canvas.getContext('webgl') || 
+                     canvas.getContext('experimental-webgl');
+            } catch (e) {
+                console.warn('Error creating WebGL context:', e);
+                return false;
+            }
+            
+            if (!gl) {
+                console.warn('WebGL not supported: Failed to get WebGL context');
+                return false;
+            }
+            
+            return true;
         } catch (e) {
+            console.warn('WebGL support check failed:', e);
             return false;
         }
     }
     
     fallbackVisualization() {
-        // Set up a fallback 2D canvas visualization
-        this.ctx = this.canvas.getContext('2d');
-        this.fallbackMode = true;
+        console.log('Using fallback 2D canvas visualization');
         
-        // Start fallback animation
-        this.animateFallback();
+        try {
+            // Make sure we can get a 2D context
+            this.ctx = this.canvas.getContext('2d');
+            if (!this.ctx) {
+                console.error('Could not get 2D context for fallback visualization');
+                return;
+            }
+            
+            this.fallbackMode = true;
+            
+            // Set canvas dimensions
+            this.canvas.width = this.canvas.offsetWidth || 800;
+            this.canvas.height = this.canvas.offsetHeight || 300;
+            
+            // Add resize handler for fallback mode
+            window.addEventListener('resize', () => {
+                if (this.fallbackMode && this.canvas) {
+                    this.canvas.width = this.canvas.offsetWidth || 800;
+                    this.canvas.height = this.canvas.offsetHeight || 300;
+                }
+            });
+            
+            // Start fallback animation
+            this.animateFallback();
+        } catch (e) {
+            console.error('Error initializing fallback visualization:', e);
+        }
     }
     
     initThree() {
-        // Create scene
-        this.scene = new THREE.Scene();
-        
-        // Create camera
-        this.camera = new THREE.PerspectiveCamera(
-            75, // Field of view
-            this.canvas.offsetWidth / this.canvas.offsetHeight, // Aspect ratio
-            0.1, // Near clipping plane
-            1000 // Far clipping plane
-        );
-        this.camera.position.z = 30;
-        
-        // Create renderer
-        this.renderer = new THREE.WebGLRenderer({
-            canvas: this.canvas,
-            alpha: true,
-            antialias: true
-        });
-        this.renderer.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight);
-        this.renderer.setClearColor(0x000000, 0);
-        
-        // Add resize handler
-        window.addEventListener('resize', () => this.onResize());
-        
-        // Create visualization elements
-        this.createVisualization();
-        
-        // Add lighting
-        this.addLighting();
+        try {
+            // Create scene with explicit parameters
+            this.scene = new THREE.Scene();
+            
+            // Create camera with safe defaults
+            const width = this.canvas.offsetWidth || 800;
+            const height = this.canvas.offsetHeight || 600;
+            const aspect = width / height;
+            
+            this.camera = new THREE.PerspectiveCamera(
+                75, // Field of view
+                aspect, // Aspect ratio
+                0.1, // Near clipping plane
+                1000 // Far clipping plane
+            );
+            this.camera.position.z = 30;
+            
+            // Create renderer with explicit error handling
+            const contextAttributes = {
+                alpha: true,
+                antialias: true,
+                powerPreference: 'default',
+                failIfMajorPerformanceCaveat: false
+            };
+            
+            // Try to create renderer with more explicit options
+            this.renderer = new THREE.WebGLRenderer({
+                canvas: this.canvas,
+                ...contextAttributes
+            });
+            
+            if (!this.renderer) {
+                throw new Error('Failed to create WebGL renderer');
+            }
+            
+            // Set size with safe defaults
+            this.renderer.setSize(width, height, false);
+            this.renderer.setClearColor(0x000000, 0);
+            
+            // Add resize handler
+            window.addEventListener('resize', () => this.onResize());
+            
+            // Create visualization elements
+            this.createVisualization();
+            
+            // Add lighting
+            this.addLighting();
+            
+            console.log('Three.js initialization successful');
+        } catch (error) {
+            console.error('Error in initThree:', error);
+            throw error; // Re-throw to trigger fallback
+        }
     }
     
     createVisualization() {
