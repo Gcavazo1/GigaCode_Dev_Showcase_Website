@@ -39,6 +39,23 @@ class AudioVisualizer {
         this.currentTrack = 0;
         this.hasInteracted = false;
         
+        // Add color transition
+        this.currentHue = 0;
+        this.colorSchemes = {
+            cyberpunk: {
+                bars: [
+                    { hue: 320, saturation: 100, lightness: 60 }, // Neon Pink
+                    { hue: 180, saturation: 100, lightness: 50 }, // Cyan
+                    { hue: 275, saturation: 100, lightness: 55 }, // Purple
+                    { hue: 120, saturation: 100, lightness: 45 }  // Neon Green
+                ],
+                background: {
+                    primary: '#120458',    // Deep Purple
+                    secondary: '#20124d'   // Rich Purple
+                }
+            }
+        };
+        
         // Initialize
         this.init();
         this.initPlaylist();
@@ -235,19 +252,23 @@ class AudioVisualizer {
     animate() {
         requestAnimationFrame(() => this.animate());
         
-        // Draw background regardless of audio state
+        // Clear canvas
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Draw background
         this.drawCyberpunkBackground();
         
-        // Only process audio data if playing and nodes are initialized
         if (this.isPlaying && this.audioNodesInitialized && this.analyser && this.dataArray) {
             // Get frequency data
             this.analyser.getByteFrequencyData(this.dataArray);
             
-            // Draw visualization
+            // Draw both visualizations
             this.drawMainVisualization();
+            // Uncomment to add waveform visualization
+            // this.drawWaveformVisualization();
+            
             this.drawParticles();
         } else {
-            // Draw static visualization when not playing
             this.drawStaticVisualization();
         }
     }
@@ -255,13 +276,14 @@ class AudioVisualizer {
     drawCyberpunkBackground() {
         // Create gradient background
         const gradient = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
-        gradient.addColorStop(0, '#000B1F');
-        gradient.addColorStop(1, '#0F2043');
+        gradient.addColorStop(0, this.colorSchemes.cyberpunk.background.primary);
+        gradient.addColorStop(1, this.colorSchemes.cyberpunk.background.secondary);
         this.ctx.fillStyle = gradient;
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         
-        // Draw grid lines
-        this.ctx.strokeStyle = 'rgba(0, 255, 255, 0.1)';
+        // Draw grid lines with animated glow
+        const gridOpacity = 0.1 + (Math.sin(Date.now() / 3000) * 0.05);
+        this.ctx.strokeStyle = `rgba(0, 255, 255, ${gridOpacity})`;
         this.ctx.lineWidth = 1;
         
         // Vertical lines
@@ -339,35 +361,175 @@ class AudioVisualizer {
         const average = Array.from(this.dataArray).reduce((a, b) => a + b, 0) / this.dataArray.length;
         const intensity = average / 255;
         
-        // Draw circular visualizer
+        // Rotate starting position by -90 degrees (pointing up) and go counter-clockwise
+        const startAngle = -Math.PI / 2; // Start from top
+        
+        // Update the color transition
+        this.currentHue = (this.currentHue + 0.5) % 360;
+        
+        const colors = {
+            bars: {
+                baseHue: this.currentHue,
+                hueRange: 60,
+                saturation: 100,
+                lightness: 50,
+                minOpacity: 0.4,
+                maxOpacity: 0.9
+            },
+            innerCircle: {
+                color: 'rgba(255, 0, 255, 0.3)',  // Neon Pink
+                glowColor: 'rgba(255, 0, 255, 0.5)',
+                pulseIntensity: 0.3
+            },
+            rings: {
+                baseColor: 'rgba(0, 255, 255, ',  // Cyan
+                glowColor: 'rgba(255, 0, 255, ',  // Pink
+                count: 4,
+                spacing: 0.25,
+                baseOpacity: 0.15
+            },
+            connections: {
+                opacity: 0.4,
+                glowIntensity: 0.6
+            }
+        };
+
+        // Draw circular visualizer with custom colors
         for (let i = 0; i < this.dataArray.length; i += 4) {
             const amplitude = this.dataArray[i] / 255;
-            const angle = (i / this.dataArray.length) * Math.PI * 2;
-            const barHeight = radius * amplitude * 1.5;
-            const hue = 180 + (amplitude * 60);
+            const angle = startAngle + ((2 * Math.PI) - (i / this.dataArray.length) * Math.PI * 2);
+            const barHeight = radius * amplitude * 1.8; // Increased height
+            
+            // Cycle through cyberpunk colors
+            const colorIndex = Math.floor(i / (this.dataArray.length / 4));
+            const baseColor = this.colorSchemes.cyberpunk.bars[colorIndex % 4];
+            const hue = baseColor.hue + (amplitude * 30); // Small hue variation
+            const opacity = colors.bars.minOpacity + (amplitude * (colors.bars.maxOpacity - colors.bars.minOpacity));
             
             const x1 = centerX + Math.cos(angle) * radius;
             const y1 = centerY + Math.sin(angle) * radius;
             const x2 = centerX + Math.cos(angle) * (radius + barHeight);
             const y2 = centerY + Math.sin(angle) * (radius + barHeight);
             
-            // Draw line
+            // Draw main bars with custom colors
             this.ctx.beginPath();
             this.ctx.moveTo(x1, y1);
             this.ctx.lineTo(x2, y2);
-            this.ctx.strokeStyle = `hsla(${hue}, 100%, 50%, ${amplitude})`;
+            this.ctx.strokeStyle = `hsla(${hue}, ${baseColor.saturation}%, ${baseColor.lightness}%, ${opacity})`;
             this.ctx.lineWidth = 2 + amplitude * 3;
-            this.ctx.shadowBlur = 15;
-            this.ctx.shadowColor = `hsla(${hue}, 100%, 50%, ${amplitude})`;
+            this.ctx.shadowBlur = 15 + (amplitude * 10);
+            this.ctx.shadowColor = `hsla(${hue}, ${baseColor.saturation}%, ${baseColor.lightness}%, ${amplitude})`;
+            this.ctx.stroke();
+            
+            // Draw connecting lines with custom opacity
+            if (i > 0) {
+                const prevAngle = startAngle + ((2 * Math.PI) - ((i - 4) / this.dataArray.length) * Math.PI * 2);
+                const prevAmplitude = this.dataArray[i - 4] / 255;
+                const prevX2 = centerX + Math.cos(prevAngle) * (radius + radius * prevAmplitude * 1.5);
+                const prevY2 = centerY + Math.sin(prevAngle) * (radius + radius * prevAmplitude * 1.5);
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(prevX2, prevY2);
+                this.ctx.lineTo(x2, y2);
+                this.ctx.strokeStyle = `hsla(${hue}, ${baseColor.saturation}%, ${baseColor.lightness}%, ${amplitude * colors.connections.opacity})`;
+                this.ctx.stroke();
+            }
+        }
+        
+        // Draw inner circle with custom colors
+        this.ctx.beginPath();
+        this.ctx.arc(centerX, centerY, radius * (0.8 + intensity * colors.innerCircle.pulseIntensity), 0, Math.PI * 2);
+        this.ctx.strokeStyle = colors.innerCircle.color;
+        this.ctx.lineWidth = 2;
+        this.ctx.shadowBlur = 15;
+        this.ctx.shadowColor = colors.innerCircle.glowColor;
+        this.ctx.stroke();
+        
+        // Draw outer rings with custom colors
+        for (let i = 0; i < colors.rings.count; i++) {
+            const ringRadius = radius * (1.2 + i * colors.rings.spacing) * (1 + intensity * 0.2);
+            const opacity = colors.rings.baseOpacity - (i * 0.02) + (intensity * 0.1);
+            this.ctx.beginPath();
+            this.ctx.arc(centerX, centerY, ringRadius, 0, Math.PI * 2);
+            this.ctx.strokeStyle = colors.rings.baseColor + opacity + ')';
+            this.ctx.lineWidth = 1;
             this.ctx.stroke();
         }
         
-        // Draw center circle
+        // Update particle colors
+        if (this.particles) {
+            this.particles.forEach(particle => {
+                const colorIndex = Math.floor(Math.random() * 4);
+                const baseColor = this.colorSchemes.cyberpunk.bars[colorIndex];
+                particle.hue = baseColor.hue;
+            });
+        }
+    }
+    
+    drawWaveformVisualization() {
+        const width = this.canvas.width;
+        const height = this.canvas.height;
+        const centerY = height / 2;
+        const intensity = Array.from(this.dataArray).reduce((a, b) => a + b, 0) / this.dataArray.length / 255;
+        
+        // Create gradient for waveform
+        const gradient = this.ctx.createLinearGradient(0, 0, width, 0);
+        gradient.addColorStop(0, `hsla(180, 100%, 50%, ${0.5 + intensity * 0.5})`);
+        gradient.addColorStop(0.5, `hsla(210, 100%, 50%, ${0.5 + intensity * 0.5})`);
+        gradient.addColorStop(1, `hsla(180, 100%, 50%, ${0.5 + intensity * 0.5})`);
+        
+        // Draw mirrored waveform
         this.ctx.beginPath();
-        this.ctx.arc(centerX, centerY, radius * (1 + intensity * 0.1), 0, Math.PI * 2);
-        this.ctx.strokeStyle = `rgba(0, 255, 255, ${0.3 + intensity * 0.4})`;
-        this.ctx.lineWidth = 2 + intensity * 2;
-        this.ctx.stroke();
+        this.ctx.moveTo(0, centerY);
+        
+        // Top wave
+        for (let i = 0; i < this.dataArray.length; i++) {
+            const x = (i / this.dataArray.length) * width;
+            const y = centerY - (this.dataArray[i] / 255) * height * 0.4;
+            
+            if (i === 0) {
+                this.ctx.moveTo(x, y);
+            } else {
+                // Use quadratic curves for smoother lines
+                const xc = (x + ((i - 1) / this.dataArray.length) * width) / 2;
+                const yc = (y + (centerY - (this.dataArray[i - 1] / 255) * height * 0.4)) / 2;
+                this.ctx.quadraticCurveTo(xc, yc, x, y);
+            }
+        }
+        
+        // Bottom wave (mirrored)
+        for (let i = this.dataArray.length - 1; i >= 0; i--) {
+            const x = (i / this.dataArray.length) * width;
+            const y = centerY + (this.dataArray[i] / 255) * height * 0.4;
+            this.ctx.lineTo(x, y);
+        }
+        
+        this.ctx.closePath();
+        this.ctx.fillStyle = gradient;
+        this.ctx.fill();
+        
+        // Add glow effect
+        this.ctx.shadowBlur = 20;
+        this.ctx.shadowColor = `rgba(0, 255, 255, ${intensity})`;
+        
+        // Add moving particles along the waveform
+        for (let i = 0; i < this.dataArray.length; i += 8) {
+            const amplitude = this.dataArray[i] / 255;
+            const x = (i / this.dataArray.length) * width;
+            const y1 = centerY - amplitude * height * 0.4;
+            const y2 = centerY + amplitude * height * 0.4;
+            
+            // Draw particles
+            this.ctx.beginPath();
+            this.ctx.arc(x, y1, 2 + amplitude * 3, 0, Math.PI * 2);
+            this.ctx.fillStyle = `rgba(0, 255, 255, ${amplitude})`;
+            this.ctx.fill();
+            
+            this.ctx.beginPath();
+            this.ctx.arc(x, y2, 2 + amplitude * 3, 0, Math.PI * 2);
+            this.ctx.fillStyle = `rgba(0, 255, 255, ${amplitude})`;
+            this.ctx.fill();
+        }
     }
     
     drawParticles() {
