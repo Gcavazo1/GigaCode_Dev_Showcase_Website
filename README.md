@@ -30,23 +30,30 @@ A cyberpunk-inspired developer portfolio and showcase website featuring advanced
 - **GSAP** - Smooth animations and transitions
 - **Web Audio API** - Audio processing and visualization
 
-## 🚀 Getting Started
+## 🚀 Live Demo
 
-1. Clone the repository:
-   ```
+Visit the live website: [GigaCode Dev Showcase](https://gcavazo1.github.io/GigaCode_Dev_Showcase_Website/)
+
+## 🛠️ Local Development
+
+To run this project locally:
+
+1. Clone the repository
+   ```bash
    git clone https://github.com/Gcavazo1/GigaCode_Dev_Showcase_Website.git
    ```
 
-2. Open `index.html` in your browser or use a local server:
+2. Navigate to project directory
+   ```bash
+   cd GigaCode_Dev_Showcase_Website
    ```
-   # Using Python
-   python -m http.server
-   
-   # Using Node.js
+
+3. Start local server
+   ```bash
    npx serve
    ```
 
-3. Navigate through the website using the side menu or scroll.
+4. Visit `http://localhost:3000` in your browser
 
 ## 🎮 Interactive Elements
 

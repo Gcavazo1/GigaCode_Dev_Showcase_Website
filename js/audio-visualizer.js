@@ -43,26 +43,38 @@ class AudioVisualizer {
             // Initialize Web Audio API
             this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
             
-            // Set up audio element
-            this.audio.src = "audio/cyberpunk-theme.mp3";
-            this.audio.load();
+            // Determine if we're on GitHub Pages or local
+            const isGitHubPages = window.location.hostname.includes('github.io');
+            const baseUrl = isGitHubPages ? '/GigaCode_Dev_Showcase_Website' : '';
+            const audioPath = `${baseUrl}/audio/cyberpunk-theme.mp3`;
             
-            // Create analyzer after audio is loaded
-            this.audio.addEventListener('loadedmetadata', () => {
-                this.setupAudioNodes();
-                this.showStatus("Audio loaded successfully", "success");
-                this.playButton.disabled = false;
-            });
+            console.log('Loading audio from:', audioPath);
             
-            // Handle audio loading error
-            this.audio.addEventListener('error', (e) => {
-                console.error("Audio error:", e);
-                this.showStatus("Error loading audio. Using fallback audio.", "error");
-                
-                // Try a fallback audio source
-                this.audio.src = "https://assets.codepen.io/4358584/Anitek_-_Komorebi.mp3";
-                this.audio.load();
-            });
+            // Create a fetch request to check if the file exists
+            fetch(audioPath)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    const audioUrl = URL.createObjectURL(blob);
+                    this.audio.src = audioUrl;
+                    this.audio.load();
+                    
+                    // Create analyzer after audio is loaded
+                    this.audio.addEventListener('loadedmetadata', () => {
+                        this.setupAudioNodes();
+                        this.showStatus("Audio loaded successfully", "success");
+                        this.playButton.disabled = false;
+                        this.playButton.innerHTML = '<i class="fas fa-play"></i><span>Play Music</span>';
+                    });
+                })
+                .catch(error => {
+                    console.error("Error loading audio file:", error);
+                    this.showStatus(`Error loading audio: ${error.message}`, "error");
+                });
             
             // Set up canvas
             this.resizeCanvas();
