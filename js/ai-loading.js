@@ -139,6 +139,9 @@ document.addEventListener('DOMContentLoaded', function() {
         aiSection.style.top = `${topOffset}px`;
         aiSection.style.left = '0';
         aiSection.style.right = '0';
+        aiSection.style.margin = '0 auto'; // Center it horizontally
+        aiSection.style.width = `${loadingSequence.offsetWidth}px`; // Match width
+        aiSection.style.zIndex = '10'; // Ensure it's above other elements
     }
     
     // Function to show AI with TV-like effect
@@ -151,15 +154,23 @@ document.addEventListener('DOMContentLoaded', function() {
         // Make visible
         aiSection.style.opacity = '1';
         
-        // After effect completes, reset position to normal
+        // After effect completes, GRADUALLY reset position to normal
         setTimeout(() => {
-            aiSection.style.position = '';
-            aiSection.style.top = '';
-            aiSection.style.left = '';
-            aiSection.style.right = '';
-            aiSection.classList.add('loaded');
-            aiSection.classList.remove('tv-on-effect');
-            console.log("AI Assistant revealed with TV effect");
-        }, 1000);
+            // Start transition to final position
+            aiSection.style.transition = 'all 0.8s ease-in-out';
+            aiSection.style.position = 'relative';
+            aiSection.style.top = '0';
+            aiSection.style.left = '0';
+            aiSection.style.right = '0';
+            aiSection.style.width = '100%';
+            
+            // After transition completes, clean up
+            setTimeout(() => {
+                aiSection.classList.add('loaded');
+                aiSection.classList.remove('tv-on-effect');
+                aiSection.style.transition = '';
+                console.log("AI Assistant revealed with TV effect");
+            }, 800);
+        }, 1000); // Wait for TV effect to complete
     }
 }); 
