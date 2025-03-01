@@ -709,4 +709,59 @@
 .audio-status.error {
     border-color: rgba(255, 0, 0, 0.5);
     color: #ff5555;
+}
+
+/* Add attention-grabbing animation for the play button */
+@keyframes pulse-attention {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 255, 255, 0.7); }
+    70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(0, 255, 255, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 255, 255, 0); }
+}
+
+#play-audio.pulse-attention {
+    animation: pulse-attention 1s infinite;
+}
+
+/* Add a welcome message for first-time visitors */
+.welcome-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(10, 10, 18, 0.9);
+    border: 1px solid rgba(0, 255, 255, 0.5);
+    border-radius: 10px;
+    padding: 2rem;
+    z-index: 1000;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+    max-width: 90%;
+    width: 400px;
+}
+
+.welcome-message h3 {
+    color: #00ffff;
+    font-family: 'Orbitron', sans-serif;
+    margin-bottom: 1rem;
+}
+
+.welcome-message p {
+    color: #ccc;
+    margin-bottom: 1.5rem;
+}
+
+.welcome-button {
+    background: rgba(0, 255, 255, 0.2);
+    color: #00ffff;
+    border: 1px solid rgba(0, 255, 255, 0.5);
+    padding: 0.75rem 1.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Orbitron', sans-serif;
+    transition: all 0.3s ease;
+}
+
+.welcome-button:hover {
+    background: rgba(0, 255, 255, 0.3);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
 } 

@@ -72,10 +72,12 @@ class AudioVisualizer {
         
         // Add autoplay flag
         this.shouldAutoplay = true;
+        this.hasInteracted = false;
         
-        // Listen for first user interaction
-        document.addEventListener('click', () => this.handleFirstInteraction(), { once: true });
-        document.addEventListener('keydown', () => this.handleFirstInteraction(), { once: true });
+        // Listen for user interactions across the entire page
+        document.addEventListener('click', () => this.handleUserInteraction());
+        document.addEventListener('keydown', () => this.handleUserInteraction());
+        document.addEventListener('touchstart', () => this.handleUserInteraction());
         
         this.init();
         
@@ -443,37 +445,58 @@ class AudioVisualizer {
         this.loadTrack(randomIndex);
     }
     
-    handleFirstInteraction() {
-        if (!this.shouldAutoplay) {
-            this.shouldAutoplay = true;
+    handleUserInteraction() {
+        if (!this.hasInteracted) {
+            this.hasInteracted = true;
+            console.log("User interaction detected, attempting to play audio...");
             
-            // Try to autoplay after user interaction
-            this.audio.play().then(() => {
-                this.isPlaying = true;
-                this.playButton.innerHTML = '<i class="fas fa-pause"></i><span>Pause</span>';
-                this.playButton.classList.add('playing');
-                this.showStatus("Music playing", "success");
-            }).catch(error => {
-                console.error("Autoplay failed:", error);
-                this.showStatus("Click play to start music", "info");
-            });
+            // Resume audio context (needed for Chrome)
+            if (this.audioContext && this.audioContext.state === 'suspended') {
+                this.audioContext.resume().then(() => {
+                    console.log("AudioContext resumed successfully");
+                    this.attemptAutoplay();
+                });
+            } else {
+                this.attemptAutoplay();
+            }
         }
     }
     
     attemptAutoplay() {
-        // Modern browsers require user interaction before autoplay
-        // We'll try to autoplay and handle any errors gracefully
-        this.audioContext.resume().then(() => {
-            this.audio.play().then(() => {
-                this.isPlaying = true;
-                this.playButton.innerHTML = '<i class="fas fa-pause"></i><span>Pause</span>';
-                this.playButton.classList.add('playing');
-                this.showStatus("Music playing", "success");
-            }).catch(error => {
-                console.log("Autoplay prevented by browser:", error);
-                this.showStatus("Click play to start music", "info");
-            });
-        });
+        console.log("Attempting autoplay...");
+        
+        // Only try to play if we have audio loaded
+        if (this.audio && this.audio.readyState >= 2) {
+            const playPromise = this.audio.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    console.log("Autoplay successful!");
+                    this.isPlaying = true;
+                    this.playButton.innerHTML = '<i class="fas fa-pause"></i><span>Pause</span>';
+                    this.playButton.classList.add('playing');
+                    this.showStatus("Music playing", "success");
+                }).catch(error => {
+                    console.error("Autoplay failed:", error);
+                    this.showStatus("Click play to start music", "info");
+                    
+                    // Add a visual cue to draw attention to the play button
+                    this.playButton.classList.add('pulse-attention');
+                    setTimeout(() => {
+                        this.playButton.classList.remove('pulse-attention');
+                    }, 2000);
+                });
+            }
+        } else {
+            console.log("Audio not ready yet, will try again when loaded");
+            
+            // Try again when the audio is loaded
+            this.audio.addEventListener('canplaythrough', () => {
+                if (this.hasInteracted && !this.isPlaying) {
+                    this.attemptAutoplay();
+                }
+            }, { once: true });
+        }
     }
 }
 

@@ -87,6 +87,12 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     initRobloxProjects();
+    
+    // Show welcome message for first-time visitors
+    if (!localStorage.getItem('returnVisitor')) {
+        showWelcomeMessage();
+        localStorage.setItem('returnVisitor', 'true');
+    }
 });
 
 // Smooth scrolling for navigation links
@@ -285,5 +291,30 @@ function initRobloxProjects() {
                 followButton.classList.remove('clicked');
             }, 1500);
         });
+    });
+}
+
+function showWelcomeMessage() {
+    const welcomeMessage = document.createElement('div');
+    welcomeMessage.className = 'welcome-message';
+    welcomeMessage.innerHTML = `
+        <h3>Welcome to GigaCode Dev Showcase</h3>
+        <p>This site features background music for an immersive experience. Would you like to enable it?</p>
+        <button class="welcome-button enable-music">Enable Music</button>
+        <button class="welcome-button skip-music">Maybe Later</button>
+    `;
+    
+    document.body.appendChild(welcomeMessage);
+    
+    // Handle button clicks
+    welcomeMessage.querySelector('.enable-music').addEventListener('click', function() {
+        // Find the audio player and trigger play
+        const playButton = document.getElementById('play-audio');
+        if (playButton) playButton.click();
+        welcomeMessage.remove();
+    });
+    
+    welcomeMessage.querySelector('.skip-music').addEventListener('click', function() {
+        welcomeMessage.remove();
     });
 } 
