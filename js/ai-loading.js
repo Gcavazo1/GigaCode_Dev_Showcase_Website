@@ -103,17 +103,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Position the AI Assistant in the same place as the loading sequence
                 positionAIAssistant(loadingSequence, aiSection);
                 
-                // Fade out loading sequence and show AI with TV effect
+                // Fade out loading sequence and show AI with fade-in effect
                 setTimeout(() => {
                     // Fade out loading sequence
                     loadingSequence.style.opacity = '0';
                     
-                    // After loading sequence is gone, show AI with TV effect
+                    // After loading sequence is gone, show AI with fade-in effect
                     setTimeout(() => {
                         loadingSequence.remove();
                         showAIWithTVEffect(aiSection);
-                    }, 500);
-                }, 800);
+                    }, 300);
+                }, 300);
             }
         }, 30);
     }
