@@ -58,6 +58,8 @@ class Live2DAssistant {
     
     setupLive2D() {
         try {
+            console.log('Setting up Live2D with detailed logging...');
+            
             // Create PIXI Application
             this.app = new PIXI.Application({
                 view: this.canvas,
@@ -73,21 +75,34 @@ class Live2DAssistant {
             const modelUrl = `${baseUrl}/${this.modelPath}`;
             
             console.log('Loading Live2D model from:', modelUrl);
+            console.log('PIXI version:', PIXI.VERSION);
+            console.log('Live2D available:', typeof PIXI.live2d !== 'undefined');
+            
+            if (typeof PIXI.live2d !== 'undefined') {
+                console.log('Live2DModel available:', typeof PIXI.live2d.Live2DModel !== 'undefined');
+                console.log('Live2D settings:', PIXI.live2d.settings);
+            }
             
             // Set up model settings
-            PIXI.live2d.settings.motionFadingDuration = 500;
-            PIXI.live2d.settings.motionFadingInDuration = 1000;
+            if (typeof PIXI.live2d !== 'undefined' && typeof PIXI.live2d.settings !== 'undefined') {
+                PIXI.live2d.settings.motionFadingDuration = 500;
+                PIXI.live2d.settings.motionFadingInDuration = 1000;
+                console.log('Live2D settings updated');
+            }
             
             // Load the model with custom handling for renamed folders
             PIXI.live2d.Live2DModel.from(modelUrl, {
                 onError: (e) => {
                     console.error('Error loading model:', e);
+                    console.error('Error details:', JSON.stringify(e, null, 2));
                     this.useFallback();
                 },
                 onLoad: (model) => {
                     console.log('Model loaded successfully');
+                    console.log('Model details:', model);
                 }
             }).then(model => {
+                console.log('Model loaded and ready to display');
                 this.model = model;
                 
                 // Add model to stage
@@ -108,13 +123,14 @@ class Live2DAssistant {
                 model.on('hit', this.handleModelTap.bind(this));
                 
                 this.isLoaded = true;
-                console.log('Live2D model loaded successfully');
+                console.log('Live2D model loaded successfully and added to stage');
                 
                 // Start animation loop
                 this.animate();
                 
             }).catch(error => {
                 console.error('Error loading Live2D model:', error);
+                console.error('Error stack:', error.stack);
                 this.useFallback();
             });
             
@@ -136,6 +152,7 @@ class Live2DAssistant {
             
         } catch (error) {
             console.error('Error setting up Live2D model:', error);
+            console.error('Error stack:', error.stack);
             this.useFallback();
         }
     }
