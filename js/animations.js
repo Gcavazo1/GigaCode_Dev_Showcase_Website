@@ -170,12 +170,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadingSequence = document.createElement('div');
     loadingSequence.className = 'loading-sequence';
     loadingSequence.innerHTML = `
-        <div class="loading-text">Initializing AI Assistant</div>
+        <div class="loading-text">Initializing AI Core</div>
         <div class="loading-bar-container">
             <div class="loading-bar"></div>
             <div class="loading-percentage">0%</div>
         </div>
-        <div class="loading-status">Establishing connection...</div>
+        <div class="loading-status">Establishing neural connection...</div>
     `;
     
     // Insert loading sequence after tagline
@@ -198,12 +198,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // Update loading status messages
                 const statusMessages = [
-                    "Establishing connection...",
-                    "Loading neural networks...",
-                    "Calibrating response algorithms...",
-                    "Initializing interface...",
-                    "Activating AI core...",
-                    "System ready"
+                    "Establishing neural connection...",
+                    "Calibrating quantum processors...",
+                    "Loading neural pathways...",
+                    "Synchronizing AI matrices...",
+                    "Initializing consciousness core...",
+                    "Neural network online"
                 ];
                 
                 const statusElement = loadingSequence.querySelector('.loading-status');
