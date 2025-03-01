@@ -100,4 +100,14 @@
 .bio-content.reveal-active {
     opacity: 1;
     transform: translateY(0);
+}
+
+/* Add animation for section header */
+#bio .section-header {
+    opacity: 0;
+    transition: opacity 0.8s ease-in-out;
+}
+
+#bio .section-header.visible {
+    opacity: 1;
 } 
