@@ -1,0 +1,103 @@
+/* New dedicated CSS file for terminal styling */
+.terminal-container {
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    margin: 0 auto;
+    max-width: 900px;
+}
+
+.terminal-header {
+    background: rgba(20, 20, 30, 0.9);
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+.terminal-buttons {
+    display: flex;
+    gap: 8px;
+    margin-right: 1rem;
+}
+
+.terminal-button {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.terminal-button.close { background: #ff5f56; }
+.terminal-button.minimize { background: #ffbd2e; }
+.terminal-button.maximize { background: #27c93f; }
+
+.terminal-title {
+    color: #00ffff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.terminal-body {
+    padding: 1.5rem;
+    font-family: 'Rajdhani', monospace;
+}
+
+.terminal-line {
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.terminal-prompt {
+    color: #00ffff;
+    opacity: 0.8;
+}
+
+.terminal-command {
+    color: #ffff00;
+    position: relative;
+    min-height: 1.2em;
+}
+
+.terminal-command.typing::after {
+    content: '|';
+    position: absolute;
+    right: -4px;
+    animation: blink 1s step-end infinite;
+}
+
+.terminal-output {
+    color: #e0e0e0;
+    margin: 1rem 0 2rem;
+    line-height: 1.6;
+    padding-left: 2rem;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+}
+
+.terminal-output p {
+    margin-bottom: 1rem;
+    opacity: 0.9;
+}
+
+@keyframes blink {
+    from, to { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+/* Bio content animation */
+.bio-content {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.bio-content.reveal-active {
+    opacity: 1;
+    transform: translateY(0);
+} 

@@ -323,4 +323,197 @@ document.head.appendChild(style);
 
 document.addEventListener('DOMContentLoaded', () => {
     new HolographicUI();
-}); 
+});
+
+// Holographic UI JavaScript
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize neural network canvas
+    initializeNetworkCanvas();
+    
+    // Initialize matrix content
+    initializeMatrixContent();
+    
+    // Initialize timeline
+    initializeTimeline();
+});
+
+function initializeNetworkCanvas() {
+    const canvas = document.getElementById('network-canvas');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+    
+    const nodes = [];
+    const connections = [];
+    const nodeCount = 15;
+    
+    // Create nodes
+    for (let i = 0; i < nodeCount; i++) {
+        nodes.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            radius: Math.random() * 3 + 2,
+            vx: (Math.random() - 0.5) * 0.5,
+            vy: (Math.random() - 0.5) * 0.5
+        });
+    }
+    
+    // Create connections
+    for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+            if (Math.random() > 0.5) {
+                connections.push([i, j]);
+            }
+        }
+    }
+    
+    // Animation function
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Update nodes
+        nodes.forEach(node => {
+            node.x += node.vx;
+            node.y += node.vy;
+            
+            // Bounce off edges
+            if (node.x < 0 || node.x > canvas.width) node.vx *= -1;
+            if (node.y < 0 || node.y > canvas.height) node.vy *= -1;
+            
+            // Keep within bounds
+            node.x = Math.max(0, Math.min(canvas.width, node.x));
+            node.y = Math.max(0, Math.min(canvas.height, node.y));
+        });
+        
+        // Draw connections
+        ctx.strokeStyle = 'rgba(0, 255, 255, 0.2)';
+        ctx.lineWidth = 1;
+        
+        connections.forEach(([i, j]) => {
+            const nodeA = nodes[i];
+            const nodeB = nodes[j];
+            const distance = Math.sqrt(
+                Math.pow(nodeA.x - nodeB.x, 2) + 
+                Math.pow(nodeA.y - nodeB.y, 2)
+            );
+            
+            // Only draw connections within a certain distance
+            if (distance < 150) {
+                ctx.beginPath();
+                ctx.moveTo(nodeA.x, nodeA.y);
+                ctx.lineTo(nodeB.x, nodeB.y);
+                
+                // Fade based on distance
+                const opacity = 1 - (distance / 150);
+                ctx.strokeStyle = `rgba(0, 255, 255, ${opacity * 0.2})`;
+                ctx.stroke();
+            }
+        });
+        
+        // Draw nodes
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = '#00ffff';
+        
+        nodes.forEach(node => {
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+            ctx.fillStyle = '#00ffff';
+            ctx.fill();
+        });
+        
+        requestAnimationFrame(animate);
+    }
+    
+    // Start animation
+    animate();
+    
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+    });
+}
+
+function initializeMatrixContent() {
+    const matrixContent = document.querySelector('.matrix-content');
+    if (!matrixContent) return;
+    
+    // Matrix is already populated with static content in HTML
+    // Add animation to make some digits change randomly
+    
+    setInterval(() => {
+        const lines = matrixContent.querySelectorAll('.matrix-line');
+        const randomLineIndex = Math.floor(Math.random() * lines.length);
+        const line = lines[randomLineIndex];
+        
+        if (line) {
+            const text = line.textContent;
+            const randomCharIndex = Math.floor(Math.random() * text.length);
+            const newChar = Math.floor(Math.random() * 2).toString();
+            
+            const newText = 
+                text.substring(0, randomCharIndex) + 
+                newChar + 
+                text.substring(randomCharIndex + 1);
+                
+            line.textContent = newText;
+            
+            // Add flash effect
+            line.style.color = '#ffffff';
+            line.style.textShadow = '0 0 10px #ffffff';
+            
+            setTimeout(() => {
+                line.style.color = '';
+                line.style.textShadow = '';
+            }, 300);
+        }
+    }, 200);
+}
+
+function initializeTimeline() {
+    // The timeline is already populated with static content in HTML
+    // Add animation to make it look active
+    
+    const events = document.querySelectorAll('.timeline-event');
+    
+    // Add pulsing effect to the in-progress event
+    const inProgressEvent = document.querySelector('.event-status.in-progress');
+    if (inProgressEvent) {
+        setInterval(() => {
+            inProgressEvent.style.opacity = '0.5';
+            setTimeout(() => {
+                inProgressEvent.style.opacity = '1';
+            }, 500);
+        }, 1000);
+    }
+    
+    // Occasionally add a new event
+    setTimeout(() => {
+        const timelineContent = document.querySelector('.timeline-content');
+        if (timelineContent) {
+            const newEvent = document.createElement('div');
+            newEvent.className = 'timeline-event';
+            newEvent.innerHTML = `
+                <div class="event-time">12:15:42</div>
+                <div class="event-marker"></div>
+                <div class="event-details">
+                    <div class="event-name">New Data Received</div>
+                    <div class="event-status in-progress">IN PROGRESS</div>
+                </div>
+            `;
+            
+            // Add with animation
+            newEvent.style.opacity = '0';
+            newEvent.style.transform = 'translateY(10px)';
+            timelineContent.appendChild(newEvent);
+            
+            setTimeout(() => {
+                newEvent.style.transition = 'all 0.5s ease';
+                newEvent.style.opacity = '1';
+                newEvent.style.transform = 'translateY(0)';
+            }, 100);
+        }
+    }, 10000); // Add after 10 seconds
+} 

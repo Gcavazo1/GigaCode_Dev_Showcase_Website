@@ -11,6 +11,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="css/gan-showcase.css">
+    <link rel="stylesheet" href="css/holographic.css">
+    <link rel="stylesheet" href="css/terminal.css">
+    <link rel="stylesheet" href="css/ai-loading.css">
+    <link rel="stylesheet" href="css/ai-assistant.css">
     
     <!-- Three.js for 3D models -->
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
@@ -163,13 +167,13 @@
             </section>
         </div>
 
-        <!-- Bio Section - Update with proper terminal style -->
+        <!-- Bio Section - Fixed Terminal -->
         <section id="bio" class="section">
             <div class="section-header">
                 <h2 class="cyber-heading">About Me</h2>
                 <div class="neon-separator"></div>
             </div>
-            <div class="bio-content reveal">
+            <div class="bio-content">
                 <div class="terminal-container">
                     <div class="terminal-header">
                         <div class="terminal-buttons">
@@ -182,7 +186,7 @@
                     <div class="terminal-body">
                         <div class="terminal-line">
                             <span class="terminal-prompt">C:\Users\Dev></span>
-                            <span class="terminal-command">get-profile -section mission</span>
+                            <span class="terminal-command" data-text="get-profile -section mission">get-profile -section mission</span>
                         </div>
                         <div class="terminal-output">
                             <p>I believe in the transformative power of AI to revolutionize development and push the boundaries of what's possible in my projects.</p>
@@ -190,7 +194,7 @@
 
                         <div class="terminal-line">
                             <span class="terminal-prompt">C:\Users\Dev></span>
-                            <span class="terminal-command">get-profile -section vision</span>
+                            <span class="terminal-command" data-text="get-profile -section vision">get-profile -section vision</span>
                         </div>
                         <div class="terminal-output">
                             <p>To build a collaborative ecosystem of forward-thinking developers and creators who leverage emerging technologies to craft innovative solutions that inspire, entertain, and solve real-world problems.</p>
@@ -198,7 +202,7 @@
 
                         <div class="terminal-line">
                             <span class="terminal-prompt">C:\Users\Dev></span>
-                            <span class="terminal-command">get-profile -section collaboration</span>
+                            <span class="terminal-command" data-text="get-profile -section collaboration">get-profile -section collaboration</span>
                         </div>
                         <div class="terminal-output">
                             <p>I'm actively seeking passionate collaborators—from mobile developers to 3D artists—who share my vision of pushing creative boundaries through technology.</p>
@@ -400,60 +404,107 @@
             </div>
         </section>
 
-        <!-- Holographic Interface Section -->
+        <!-- Holographic Interface Section - New Implementation -->
         <section id="holographic-ui" class="section holo-section">
             <div class="section-header">
                 <h2 class="cyber-heading">Holographic Interface</h2>
                 <div class="neon-separator"></div>
             </div>
-            <div class="holo-container">
-                <div class="holo-top-row">
-                    <div class="holo-display neural-network">
-                        <h3>Neural Network</h3>
-                        <canvas id="network-canvas"></canvas>
+            <div class="holo-grid">
+                <!-- Top row with 3 equal boxes -->
+                <div class="holo-box neural-network">
+                    <h3>Neural Network</h3>
+                    <canvas id="network-canvas"></canvas>
+                </div>
+                
+                <div class="holo-box system-status">
+                    <h3>System Status</h3>
+                    <div class="status-bars">
+                        <div class="status-item">
+                            <div class="status-label">CPU</div>
+                            <div class="status-bar-wrapper">
+                                <div class="status-bar cpu" style="width: 82%"></div>
+                            </div>
+                            <div class="status-value">82%</div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-label">MEMORY</div>
+                            <div class="status-bar-wrapper">
+                                <div class="status-bar memory" style="width: 65%"></div>
+                            </div>
+                            <div class="status-value">65%</div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-label">NETWORK</div>
+                            <div class="status-bar-wrapper">
+                                <div class="status-bar network" style="width: 93%"></div>
+                            </div>
+                            <div class="status-value">93%</div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-label">POWER</div>
+                            <div class="status-bar-wrapper">
+                                <div class="status-bar power" style="width: 47%"></div>
+                            </div>
+                            <div class="status-value">47%</div>
+                        </div>
                     </div>
-                    <div class="holo-display system-status">
-                        <h3>System Status</h3>
-                        <div class="status-bars">
-                            <div class="status-bar-container">
-                                <div class="status-label">CPU</div>
-                                <div class="status-bar-wrapper">
-                                    <div class="status-bar cpu" style="width: 82%"></div>
-                                </div>
-                                <div class="status-value">82%</div>
+                </div>
+                
+                <div class="holo-box timeline">
+                    <h3>Timeline</h3>
+                    <div class="timeline-content">
+                        <div class="timeline-event">
+                            <div class="event-time">08:42:15</div>
+                            <div class="event-marker"></div>
+                            <div class="event-details">
+                                <div class="event-name">System Initialization</div>
+                                <div class="event-status complete">COMPLETE</div>
                             </div>
-                            <div class="status-bar-container">
-                                <div class="status-label">MEMORY</div>
-                                <div class="status-bar-wrapper">
-                                    <div class="status-bar memory" style="width: 65%"></div>
-                                </div>
-                                <div class="status-value">65%</div>
+                        </div>
+                        <div class="timeline-event">
+                            <div class="event-time">09:15:33</div>
+                            <div class="event-marker"></div>
+                            <div class="event-details">
+                                <div class="event-name">Neural Network Training</div>
+                                <div class="event-status complete">COMPLETE</div>
                             </div>
-                            <div class="status-bar-container">
-                                <div class="status-label">NETWORK</div>
-                                <div class="status-bar-wrapper">
-                                    <div class="status-bar network" style="width: 93%"></div>
-                                </div>
-                                <div class="status-value">93%</div>
+                        </div>
+                        <div class="timeline-event">
+                            <div class="event-time">10:27:08</div>
+                            <div class="event-marker"></div>
+                            <div class="event-details">
+                                <div class="event-name">Data Synchronization</div>
+                                <div class="event-status in-progress">IN PROGRESS</div>
                             </div>
-                            <div class="status-bar-container">
-                                <div class="status-label">POWER</div>
-                                <div class="status-bar-wrapper">
-                                    <div class="status-bar power" style="width: 47%"></div>
-                                </div>
-                                <div class="status-value">47%</div>
+                        </div>
+                        <div class="timeline-event">
+                            <div class="event-time">11:00:00</div>
+                            <div class="event-marker"></div>
+                            <div class="event-details">
+                                <div class="event-name">Security Protocol Update</div>
+                                <div class="event-status pending">PENDING</div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="holo-bottom-row">
-                    <div class="holo-display project-matrix">
-                        <h3>Project Matrix</h3>
-                        <div class="matrix-content"></div>
-                    </div>
-                    <div class="holo-display holo-timeline">
-                        <h3>Timeline</h3>
-                        <div class="timeline-content"></div>
+                
+                <!-- Bottom row with one wide box -->
+                <div class="holo-box project-matrix">
+                    <h3>Project Matrix</h3>
+                    <div class="matrix-content">
+                        <div class="matrix-line">01110010110000001101101100111001011111000100000101011</div>
+                        <div class="matrix-line">11010010111100010000010101111001100111000001101011</div>
+                        <div class="matrix-line">10001100111000001110101011111111101010101111</div>
+                        <div class="matrix-line">11101000111001110110011001000100</div>
+                        <div class="matrix-line">10111110110111001111011111001100101000100000101101011000</div>
+                        <div class="matrix-line">00010001011101010100</div>
+                        <div class="matrix-line">00110000011011010111010100</div>
+                        <div class="matrix-line">01110010010011101010</div>
+                        <div class="matrix-line">10101110111111011100111010100</div>
+                        <div class="matrix-line">11001111100100000110111011110</div>
+                        <div class="matrix-line">00111000011100110111</div>
+                        <div class="matrix-line">10011000001110101011101101</div>
                     </div>
                 </div>
             </div>
@@ -632,9 +683,11 @@
     <script src="js/3d-model.js"></script>
     <script src="js/holographic-ui.js"></script>
     <script src="js/audio-visualizer.js"></script>
-    <script src="js/holographic-interface.js"></script>
     <script src="js/mobile-menu.js"></script>
     <script src="js/ai-assistant.js"></script>
     <script src="js/gan-showcase.js"></script>
+    <script src="js/terminal.js"></script>
+    <script src="js/ai-loading.js"></script>
+    <script src="js/init.js"></script>
 </body>
 </html>

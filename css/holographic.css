@@ -1,0 +1,280 @@
+/* New dedicated CSS file for holographic interface */
+.holo-section {
+    background: linear-gradient(180deg, 
+        rgba(0, 0, 0, 0.9) 0%,
+        rgba(5, 15, 30, 0.85) 50%,
+        rgba(0, 0, 0, 0.9) 100%
+    );
+    position: relative;
+    overflow: hidden;
+    padding: 3rem 2rem;
+}
+
+/* Grid layout */
+.holo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: 400px 200px;
+    gap: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+/* Box styling */
+.holo-box {
+    background: rgba(2, 8, 12, 0.8);
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    border-radius: 12px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    box-shadow: 
+        0 0 30px rgba(0, 255, 255, 0.15),
+        inset 0 0 20px rgba(0, 255, 255, 0.08);
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+/* Grid positions */
+.neural-network {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.system-status {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+.timeline {
+    grid-column: 3;
+    grid-row: 1;
+}
+
+.project-matrix {
+    grid-column: 1 / span 3;
+    grid-row: 2;
+}
+
+/* Box headers */
+.holo-box h3 {
+    color: #00ffff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.4);
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+}
+
+/* Neural Network */
+#network-canvas {
+    width: 100%;
+    height: calc(100% - 50px);
+}
+
+/* System Status */
+.status-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    height: calc(100% - 50px);
+    justify-content: space-around;
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.status-label {
+    color: #00ffff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    width: 80px;
+}
+
+.status-bar-wrapper {
+    flex: 1;
+    height: 8px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.status-bar {
+    height: 100%;
+    border-radius: 4px;
+}
+
+.status-bar.cpu {
+    background: linear-gradient(90deg, #00ffff, #00a0a0);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+}
+
+.status-bar.memory {
+    background: linear-gradient(90deg, #ff00ff, #a000a0);
+    box-shadow: 0 0 10px rgba(255, 0, 255, 0.7);
+}
+
+.status-bar.network {
+    background: linear-gradient(90deg, #ffff00, #a0a000);
+    box-shadow: 0 0 10px rgba(255, 255, 0, 0.7);
+}
+
+.status-bar.power {
+    background: linear-gradient(90deg, #00ff00, #00a000);
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
+}
+
+.status-value {
+    color: #e0e0e0;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.9rem;
+    width: 40px;
+    text-align: right;
+}
+
+/* Timeline */
+.timeline-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    height: calc(100% - 50px);
+    overflow-y: auto;
+}
+
+.timeline-event {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.event-time {
+    color: #00ffff;
+    font-family: 'Rajdhani', monospace;
+    font-size: 0.9rem;
+    width: 80px;
+}
+
+.event-marker {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #00ffff;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+}
+
+.event-details {
+    flex: 1;
+}
+
+.event-name {
+    color: #e0e0e0;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.9rem;
+}
+
+.event-status {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+}
+
+.event-status.complete {
+    color: #00ff00;
+}
+
+.event-status.in-progress {
+    color: #ffff00;
+}
+
+.event-status.pending {
+    color: #ff9900;
+}
+
+/* Project Matrix */
+.matrix-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    height: calc(100% - 50px);
+    overflow: hidden;
+    font-family: monospace;
+}
+
+.matrix-line {
+    color: #00ff00;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    opacity: 0.8;
+    animation: matrixScroll 30s linear infinite;
+}
+
+@keyframes matrixScroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    .holo-grid {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 350px 350px 200px;
+    }
+    
+    .neural-network {
+        grid-column: 1;
+        grid-row: 1;
+    }
+    
+    .system-status {
+        grid-column: 2;
+        grid-row: 1;
+    }
+    
+    .timeline {
+        grid-column: 1 / span 2;
+        grid-row: 2;
+    }
+    
+    .project-matrix {
+        grid-column: 1 / span 2;
+        grid-row: 3;
+    }
+}
+
+@media (max-width: 768px) {
+    .holo-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(3, 350px) 200px;
+    }
+    
+    .neural-network,
+    .system-status,
+    .timeline,
+    .project-matrix {
+        grid-column: 1;
+    }
+    
+    .neural-network {
+        grid-row: 1;
+    }
+    
+    .system-status {
+        grid-row: 2;
+    }
+    
+    .timeline {
+        grid-row: 3;
+    }
+    
+    .project-matrix {
+        grid-row: 4;
+    }
+} 
