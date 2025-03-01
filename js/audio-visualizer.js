@@ -192,11 +192,11 @@ class AudioVisualizer {
             
             // Create new analyzer with higher resolution
             this.analyser = this.audioContext.createAnalyser();
-            this.analyser.fftSize = 1024; // Increased for better resolution
-            this.analyser.smoothingTimeConstant = 0.85; // Smoother transitions
+            this.analyser.fftSize = 2048; // Increased for better resolution
+            this.analyser.smoothingTimeConstant = 0.85;
             this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
             
-            // Connect audio to analyzer
+            // Create and connect nodes
             this.source = this.audioContext.createMediaElementSource(this.audio);
             this.source.connect(this.analyser);
             this.analyser.connect(this.audioContext.destination);
@@ -206,7 +206,11 @@ class AudioVisualizer {
                 this.audio.volume = this.volumeSlider.value;
             }
             
-            console.log('Audio nodes setup complete');
+            console.log('Audio nodes setup complete', {
+                fftSize: this.analyser.fftSize,
+                frequencyBinCount: this.analyser.frequencyBinCount,
+                audioContext: this.audioContext.state
+            });
         } catch (error) {
             console.error('Error setting up audio nodes:', error);
         }
@@ -268,22 +272,38 @@ class AudioVisualizer {
     animate() {
         requestAnimationFrame(() => this.animate());
         
-        // Only draw visualization if analyzer is set up
-        if (!this.analyser || !this.dataArray) return;
+        // Only draw visualization if analyzer is set up and audio is playing
+        if (!this.analyser || !this.dataArray || !this.isPlaying) {
+            // Draw static visualization when not playing
+            this.drawCyberpunkBackground();
+            this.drawMainVisualization();
+            this.drawParticles();
+            return;
+        }
         
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        // Get frequency data
+        // Get fresh frequency data
         this.analyser.getByteFrequencyData(this.dataArray);
         
-        // Draw cyberpunk city background
+        // Calculate average frequency for overall intensity
+        const average = Array.from(this.dataArray).reduce((a, b) => a + b, 0) / this.dataArray.length;
+        const intensity = average / 255;
+        
+        // Clear canvas
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Draw visualization layers
         this.drawCyberpunkBackground();
-        
-        // Draw main visualization
         this.drawMainVisualization();
-        
-        // Draw reactive particles
         this.drawParticles();
+        
+        // Log visualization data occasionally for debugging
+        if (Math.random() < 0.01) { // Log roughly every 100 frames
+            console.log('Visualization data:', {
+                average,
+                intensity,
+                sampleValue: this.dataArray[0]
+            });
+        }
     }
     
     drawCyberpunkBackground() {
@@ -533,103 +553,27 @@ class AudioVisualizer {
             })
             .then(blob => {
                 const audioUrl = URL.createObjectURL(blob);
+                
+                // Disconnect old audio nodes before changing source
+                if (this.source) {
+                    this.source.disconnect();
+                }
+                
                 this.audio.src = audioUrl;
                 this.audio.load();
                 
-                // Play if we were already playing
-                if (this.isPlaying) {
-                    this.audio.play();
-                }
-                
-                // Update the track button UI
-                document.querySelectorAll('.track-button').forEach((btn, i) => {
-                    btn.classList.toggle('active', i === index);
-                });
-                
-                this.showStatus(`Now playing: ${this.playlist[index].title}`, "success");
-            })
-            .catch(error => {
-                console.error("Error loading track:", error);
-                this.showStatus(`Error loading track: ${this.playlist[index].title}`, "error");
-            });
-    }
-    
-    nextTrack() {
-        const nextIndex = (this.currentTrack + 1) % this.playlist.length;
-        this.loadTrack(nextIndex);
-    }
-    
-    prevTrack() {
-        const prevIndex = (this.currentTrack - 1 + this.playlist.length) % this.playlist.length;
-        this.loadTrack(prevIndex);
-    }
-    
-    shufflePlaylist() {
-        // Get a random track that's not the current one
-        let randomIndex;
-        do {
-            randomIndex = Math.floor(Math.random() * this.playlist.length);
-        } while (randomIndex === this.currentTrack && this.playlist.length > 1);
-        
-        this.loadTrack(randomIndex);
-    }
-    
-    handleUserInteraction() {
-        if (!this.hasInteracted) {
-            this.hasInteracted = true;
-            console.log("User interaction detected, attempting to play audio...");
-            
-            // Resume audio context (needed for Chrome)
-            if (this.audioContext && this.audioContext.state === 'suspended') {
-                this.audioContext.resume().then(() => {
-                    console.log("AudioContext resumed successfully");
-                    this.attemptAutoplay();
-                });
-            } else {
-                this.attemptAutoplay();
-            }
-        }
-    }
-    
-    attemptAutoplay() {
-        console.log("Attempting autoplay...");
-        
-        // Only try to play if we have audio loaded
-        if (this.audio && this.audio.readyState >= 2) {
-            const playPromise = this.audio.play();
-            
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    console.log("Autoplay successful!");
-                    this.isPlaying = true;
-                    this.playButton.innerHTML = '<i class="fas fa-pause"></i><span>Pause</span>';
-                    this.playButton.classList.add('playing');
-                    this.showStatus("Music playing", "success");
-                }).catch(error => {
-                    console.error("Autoplay failed:", error);
-                    this.showStatus("Click play to start music", "info");
+                // Set up new audio nodes after loading new track
+                this.audio.addEventListener('canplaythrough', () => {
+                    this.setupAudioNodes();
                     
-                    // Add a visual cue to draw attention to the play button
-                    this.playButton.classList.add('pulse-attention');
-                    setTimeout(() => {
-                        this.playButton.classList.remove('pulse-attention');
-                    }, 2000);
-                });
-            }
-        } else {
-            console.log("Audio not ready yet, will try again when loaded");
-            
-            // Try again when the audio is loaded
-            this.audio.addEventListener('canplaythrough', () => {
-                if (this.hasInteracted && !this.isPlaying) {
-                    this.attemptAutoplay();
-                }
-            }, { once: true });
-        }
-    }
-}
-
-// Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    new AudioVisualizer();
-}); 
+                    // Play if we were already playing
+                    if (this.isPlaying) {
+                        this.audio.play();
+                    }
+                    
+                    // Update the track button UI
+                    document.querySelectorAll('.track-button').forEach((btn, i) => {
+                        btn.classList.toggle('active', i === index);
+                    });
+                    
+                    this.showStatus(`
