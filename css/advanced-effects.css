@@ -260,18 +260,20 @@
     padding: 0.5rem 1.5rem;
     background: rgba(0, 255, 255, 0.1);
     border: 1px solid rgba(0, 255, 255, 0.3);
-    color: #00ffff;
+    color: #FFDE59;
     transition: all 0.3s ease;
 }
 
 #play-audio:hover {
     background: rgba(0, 255, 255, 0.2);
     box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+    color: #FFE77A;
 }
 
 #play-audio.playing {
     background: rgba(255, 0, 255, 0.2);
     border-color: rgba(255, 0, 255, 0.3);
+    color: #FFE77A;
 }
 
 .volume-control {
@@ -344,7 +346,7 @@
 }
 
 .playlist-title {
-    color: #00ffff;
+    color: #FFDE59;
     font-size: 1.2rem;
     font-family: 'Orbitron', sans-serif;
     text-align: center;
@@ -383,7 +385,7 @@
 .track-button {
     background: rgba(10, 10, 18, 0.8);
     border: 1px solid rgba(0, 255, 255, 0.3);
-    color: #00ffff;
+    color: #FFDE59;
     padding: 0.5rem 1rem;
     border-radius: 5px;
     cursor: pointer;
@@ -394,14 +396,16 @@
 }
 
 .track-button:hover {
-    background: rgba(0, 255, 255, 0.2);
+    background: rgba(0, 255, 255, 0.1);
     box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+    color: #FFE77A;
 }
 
 .track-button.active {
-    background: rgba(0, 255, 255, 0.3);
+    background: rgba(0, 255, 255, 0.2);
     box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
     border-color: rgba(0, 255, 255, 0.8);
+    color: #FFE77A;
 }
 
 .playlist-controls {
@@ -415,7 +419,7 @@
 .playlist-control-button {
     background: rgba(10, 10, 18, 0.8);
     border: 1px solid rgba(0, 255, 255, 0.3);
-    color: #00ffff;
+    color: #FFDE59;
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -427,13 +431,15 @@
 }
 
 .playlist-control-button:hover {
-    background: rgba(0, 255, 255, 0.2);
+    background: rgba(0, 255, 255, 0.1);
     box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+    color: #FFE77A;
 }
 
 .playlist-control-button.active {
-    background: rgba(0, 255, 255, 0.3);
+    background: rgba(0, 255, 255, 0.2);
     box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    color: #FFE77A;
 }
 
 /* Responsive Styles */
