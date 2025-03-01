@@ -288,10 +288,10 @@
 /* 3D Playlist Carousel */
 .ps-playlist-container {
     position: relative;
-    height: 200px;
-    margin: 30px 0;
-    perspective: 1000px;
-    overflow: hidden;
+    height: 300px;
+    margin: 50px 0;
+    perspective: 2000px;
+    overflow: visible;
 }
 
 .ps-playlist-carousel {
@@ -304,18 +304,18 @@
 
 .ps-track-card {
     position: absolute;
-    width: 180px;
-    height: 120px;
-    left: calc(50% - 90px);
-    top: calc(50% - 60px);
-    background: rgba(5, 15, 25, 0.8);
+    width: 280px;
+    height: 160px;
+    left: calc(50% - 140px);
+    top: calc(50% - 80px);
+    background: rgba(5, 15, 25, 0.95);
     border: 1px solid rgba(0, 255, 255, 0.4);
-    border-radius: 8px;
+    border-radius: 12px;
     overflow: hidden;
     transition: all 0.8s cubic-bezier(0.2, 1, 0.3, 1);
     cursor: pointer;
     transform-style: preserve-3d;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
 }
 
 .ps-track-card:hover {
@@ -351,28 +351,22 @@
 
 .ps-card-content {
     position: relative;
-    padding: 15px;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     height: 100%;
     box-sizing: border-box;
+    gap: 15px;
 }
 
 .ps-track-number {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 12px;
-    color: rgba(0, 255, 255, 0.7);
-    margin-bottom: 5px;
+    font-size: 14px;
+    letter-spacing: 1px;
 }
 
 .ps-track-title {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 14px;
-    color: #ffffff;
-    margin-bottom: 10px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 18px;
+    margin-bottom: 15px;
 }
 
 .ps-track-equalizer {

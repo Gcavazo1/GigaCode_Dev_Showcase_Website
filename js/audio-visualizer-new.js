@@ -55,12 +55,12 @@ class AudioVisualizer {
         // Visualization colors
         this.colorScheme = {
             bars: [
-                { hue: 180, saturation: 100, lightness: 50 }, // Cyan
-                { hue: 320, saturation: 100, lightness: 60 }, // Neon Pink
-                { hue: 275, saturation: 100, lightness: 55 }, // Purple
-                { hue: 120, saturation: 100, lightness: 45 }  // Neon Green
+                { hue: 180, saturation: 100, lightness: 60 }, // Brighter cyan
+                { hue: 320, saturation: 100, lightness: 70 }, // Brighter pink
+                { hue: 275, saturation: 90, lightness: 65 },  // Softer purple
+                { hue: 140, saturation: 100, lightness: 55 }  // Adjusted green
             ],
-            background: '#120458' // Deep Purple
+            background: '#0a0a14' // Slightly lighter background
         };
         
         // Initialize
@@ -545,31 +545,34 @@ class AudioVisualizer {
         const carousel = document.querySelector('.ps-playlist-carousel');
         if (!carousel) {
             console.warn('Playlist carousel not found');
-            return; // Safety check
+            return;
         }
         
         const cards = carousel.querySelectorAll('.ps-track-card');
         const totalCards = cards.length;
-        if (totalCards === 0) return; // Another safety check
+        if (totalCards === 0) return;
         
         cards.forEach((card, index) => {
-            // Calculate position relative to current index
             let relativePos = (index - this.currentCarouselIndex + totalCards) % totalCards;
             
-            // Adjust for shortest path (for better rotation)
             if (relativePos > totalCards / 2) {
                 relativePos -= totalCards;
             }
             
-            // Calculate rotation and z-translation
-            const rotation = relativePos * 40; // 40 degrees between cards
-            const zTranslation = Math.cos(Math.abs(relativePos) * 0.2) * 100 - 100;
-            const xTranslation = Math.sin(relativePos * 0.2) * 200;
-            const scale = Math.max(0.8, 1 - Math.abs(relativePos) * 0.1);
-            const opacity = Math.max(0.4, 1 - Math.abs(relativePos) * 0.2);
+            // Adjusted rotation and positioning values
+            const rotation = relativePos * 30; // Reduced rotation angle
+            const zTranslation = Math.cos(Math.abs(relativePos) * 0.3) * 200 - 200; // Increased depth
+            const xTranslation = Math.sin(relativePos * 0.3) * 300; // Increased spread
+            const scale = Math.max(0.7, 1 - Math.abs(relativePos) * 0.15); // More dramatic scaling
+            const opacity = Math.max(0.3, 1 - Math.abs(relativePos) * 0.3); // More dramatic fade
             
-            // Apply transforms
-            card.style.transform = `translateX(${xTranslation}px) translateZ(${zTranslation}px) rotateY(${rotation}deg) scale(${scale})`;
+            // Apply transforms with adjusted values
+            card.style.transform = `
+                translateX(${xTranslation}px) 
+                translateZ(${zTranslation}px) 
+                rotateY(${rotation}deg) 
+                scale(${scale})
+            `;
             card.style.opacity = opacity;
             card.style.zIndex = 100 - Math.abs(relativePos);
         });
