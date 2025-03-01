@@ -148,27 +148,8 @@ function initTypingEffect() {
         });
     }
     
-    // Also handle the home section typing text
-    const homeTypingText = document.querySelector('.typing-text');
-    if (homeTypingText) {
-        const text = homeTypingText.textContent;
-        homeTypingText.textContent = '';
-        
-        setTimeout(() => {
-            let i = 0;
-            const typeSpeed = 100;
-            
-            function typeWriter() {
-                if (i < text.length) {
-                    homeTypingText.textContent += text.charAt(i);
-                    i++;
-                    setTimeout(typeWriter, typeSpeed);
-                }
-            }
-            
-            typeWriter();
-        }, 500);
-    }
+    // We'll handle the home section typing text separately in the AI loading sequence
+    // so we're removing this part to avoid conflicts
 }
 
 // Add this function to create the terminal command typing effect
@@ -335,4 +316,56 @@ function debugTerminal() {
 }
 
 // Call this function after a delay
-setTimeout(debugTerminal, 15000); 
+setTimeout(debugTerminal, 15000);
+
+// Add this to your animations.js file
+document.addEventListener('DOMContentLoaded', () => {
+    const tagline = document.querySelector('.typing-text');
+    const aiSection = document.querySelector('#virtual-assistant');
+    
+    // Create loading sequence elements
+    const loadingSequence = document.createElement('div');
+    loadingSequence.className = 'loading-sequence';
+    loadingSequence.innerHTML = `
+        <div class="loading-text">Initializing AI Assistant...</div>
+        <div class="loading-bar"></div>
+    `;
+    
+    // Insert loading sequence after tagline
+    tagline.parentNode.insertBefore(loadingSequence, tagline.nextSibling);
+    
+    // Start the sequence after tagline finishes typing
+    const taglineText = tagline.textContent;
+    tagline.textContent = '';
+    let charIndex = 0;
+    
+    function typeTagline() {
+        if (charIndex < taglineText.length) {
+            tagline.textContent += taglineText.charAt(charIndex);
+            charIndex++;
+            setTimeout(typeTagline, 50);
+        } else {
+            // Tagline finished typing, start AI loading sequence
+            setTimeout(() => {
+                loadingSequence.style.opacity = '1';
+                
+                // After loading animation completes
+                setTimeout(() => {
+                    // Fade in AI Assistant
+                    aiSection.classList.add('loaded');
+                    
+                    // Fade out loading sequence
+                    loadingSequence.style.opacity = '0';
+                    
+                    // Remove loading sequence after fade out
+                    setTimeout(() => {
+                        loadingSequence.remove();
+                    }, 500);
+                }, 2000); // Give more time for the loading animation
+            }, 800); // Slightly longer pause after tagline
+        }
+    }
+    
+    // Start the typing animation
+    typeTagline();
+}); 

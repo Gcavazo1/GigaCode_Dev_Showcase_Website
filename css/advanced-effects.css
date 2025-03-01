@@ -1589,303 +1589,109 @@
 }
 
 /* Glitch effect container */
-.glitch-effect {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: transparent;
-    z-index: 3;
-    overflow: hidden;
+.glitch-container {
+    margin-bottom: 1.5rem;
+}
+
+.tagline {
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+    min-height: 2em;
+}
+
+/* AI Assistant entrance animation */
+#virtual-assistant {
     opacity: 0;
-    pointer-events: none;
-    animation: randomGlitch 8s infinite;
+    transform: translateY(20px);
+    transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+    margin-top: 2rem; /* Add some space after the loading sequence */
 }
 
-/* Glitch effect animation */
-@keyframes randomGlitch {
-    0%, 100% { opacity: 0; }
-    10%, 10.5% { opacity: 1; transform: translate(2px, 0); }
-    10.7%, 11% { opacity: 0; }
-    50%, 50.5% { opacity: 1; transform: translate(-2px, 0); }
-    50.7%, 51% { opacity: 0; }
-    90%, 90.5% { opacity: 1; transform: translate(0, -2px); }
-    90.7%, 91% { opacity: 0; }
+#virtual-assistant.loaded {
+    opacity: 1;
+    transform: translateY(0);
 }
 
-/* Enhanced AI avatar */
-.ai-assistant.enhanced .ai-avatar {
-    background: linear-gradient(135deg, 
-        rgba(0, 0, 0, 0.9) 0%,
-        rgba(0, 20, 40, 0.8) 100%
-    );
-    border-right: 1px solid rgba(0, 255, 255, 0.4);
+/* Add a subtle animation to the AI Assistant when it loads */
+#virtual-assistant.loaded .ai-assistant {
+    animation: assistantGlow 2s ease-in-out;
+}
+
+@keyframes assistantGlow {
+    0% { box-shadow: 0 0 0px rgba(0, 255, 255, 0); }
+    50% { box-shadow: 0 0 30px rgba(0, 255, 255, 0.4); }
+    100% { box-shadow: 0 0 15px rgba(0, 255, 255, 0.2); }
+}
+
+/* Video game style loading sequence */
+.loading-sequence {
     position: relative;
+    width: 100%;
+    max-width: 500px;
+    height: 4px;
+    background: rgba(0, 0, 0, 0.3);
+    margin: 2rem auto;
     overflow: hidden;
-}
-
-/* Enhanced hologram with more dynamic effects */
-.ai-assistant.enhanced .ai-hologram {
-    background: radial-gradient(
-        circle,
-        rgba(0, 40, 60, 0.6) 0%,
-        rgba(0, 0, 0, 0.8) 70%
-    );
-    box-shadow: 
-        0 0 30px rgba(0, 255, 255, 0.3),
-        inset 0 0 20px rgba(0, 255, 255, 0.2);
-    animation: 
-        hologram-float 3s ease-in-out infinite alternate,
-        hologram-pulse 4s ease-in-out infinite;
-}
-
-@keyframes hologram-pulse {
-    0%, 100% { box-shadow: 0 0 30px rgba(0, 255, 255, 0.3), inset 0 0 20px rgba(0, 255, 255, 0.2); }
-    50% { box-shadow: 0 0 40px rgba(0, 255, 255, 0.4), inset 0 0 30px rgba(0, 255, 255, 0.3); }
-}
-
-/* Enhanced AI face elements */
-.ai-assistant.enhanced .ai-eye {
-    background: linear-gradient(90deg, #00ffff, #00ccff);
-    box-shadow: 
-        0 0 10px #00ffff,
-        0 0 20px rgba(0, 255, 255, 0.5);
-    animation: eyePulse 3s infinite alternate;
-}
-
-@keyframes eyePulse {
-    0% { box-shadow: 0 0 10px #00ffff, 0 0 20px rgba(0, 255, 255, 0.5); }
-    100% { box-shadow: 0 0 15px #00ffff, 0 0 30px rgba(0, 255, 255, 0.7); }
-}
-
-.ai-assistant.enhanced .ai-mouth {
-    background: linear-gradient(90deg, #00ccff, #00ffff);
-    box-shadow: 
-        0 0 10px #00ffff,
-        0 0 20px rgba(0, 255, 255, 0.5);
-}
-
-/* Enhanced scan line with more vibrant color */
-.ai-assistant.enhanced .ai-scan-line {
-    background: linear-gradient(90deg, 
-        transparent 0%,
-        rgba(0, 255, 255, 0.8) 50%,
-        transparent 100%
-    );
-    height: 3px;
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
-    animation: scanLine 1.5s linear infinite;
-}
-
-/* Enhanced chat interface */
-.ai-assistant.enhanced .ai-chat-interface {
-    background: rgba(0, 10, 20, 0.5);
-    border-left: none;
-    position: relative;
-}
-
-/* Add interface header */
-.interface-header {
-    display: flex;
-    align-items: center;
-    padding: 10px 15px;
-    background: rgba(0, 0, 0, 0.4);
-    border-bottom: 1px solid rgba(0, 255, 255, 0.3);
-    margin-bottom: 10px;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.9rem;
-    color: #00ffff;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.status-indicator {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: #00ffff;
-    margin-right: 10px;
-    box-shadow: 0 0 10px #00ffff;
-    animation: statusBlink 2s infinite alternate;
-}
-
-@keyframes statusBlink {
-    0%, 90% { opacity: 1; }
-    95% { opacity: 0.3; }
-    100% { opacity: 1; }
-}
-
-.interface-controls {
-    margin-left: auto;
-    display: flex;
-    gap: 8px;
-}
-
-.interface-controls span {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.5);
-}
-
-.interface-controls span:nth-child(1) {
-    background: #ff5555;
-}
-
-.interface-controls span:nth-child(2) {
-    background: #ffff55;
-}
-
-.interface-controls span:nth-child(3) {
-    background: #55ff55;
-}
-
-/* Enhanced chat messages container */
-.ai-assistant.enhanced .ai-chat-messages {
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(0, 255, 255, 0.2);
-    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
-    position: relative;
-    overflow: hidden;
-}
-
-/* Add scan effect to messages container */
-.ai-assistant.enhanced .ai-chat-messages::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: 
-        linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
-    background-size: 20px 20px;
-    pointer-events: none;
-    z-index: 1;
-}
-
-/* Enhanced message styling */
-.ai-assistant.enhanced .ai-message {
-    background: rgba(0, 20, 30, 0.6);
-    border-left: 3px solid rgba(0, 255, 255, 0.7);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    position: relative;
-    z-index: 2;
-    animation: 
-        message-appear 0.3s ease-out,
-        messagePulse 4s infinite alternate;
-}
-
-@keyframes messagePulse {
-    0% { border-left-color: rgba(0, 255, 255, 0.7); }
-    100% { border-left-color: rgba(0, 255, 255, 1); }
-}
-
-.ai-assistant.enhanced .ai-message.user-message {
-    background: rgba(30, 0, 30, 0.6);
-    border-right: 3px solid rgba(255, 0, 255, 0.7);
-    border-left: none;
-    animation: 
-        message-appear 0.3s ease-out,
-        userMessagePulse 4s infinite alternate;
-}
-
-@keyframes userMessagePulse {
-    0% { border-right-color: rgba(255, 0, 255, 0.7); }
-    100% { border-right-color: rgba(255, 0, 255, 1); }
-}
-
-/* Enhanced input styling */
-.ai-assistant.enhanced .ai-chat-input input {
-    background: rgba(0, 10, 20, 0.7);
-    border: 1px solid rgba(0, 255, 255, 0.4);
-    color: #e0e0e0;
-    font-family: 'Rajdhani', sans-serif;
-    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
-    transition: all 0.3s ease;
-}
-
-.ai-assistant.enhanced .ai-chat-input input:focus {
-    border-color: rgba(0, 255, 255, 0.8);
-    box-shadow: 
-        inset 0 0 10px rgba(0, 0, 0, 0.5),
-        0 0 10px rgba(0, 255, 255, 0.3);
-    outline: none;
-}
-
-.ai-assistant.enhanced .ai-chat-input button {
-    background: linear-gradient(135deg, 
-        rgba(0, 150, 255, 0.5) 0%,
-        rgba(0, 255, 255, 0.5) 100%
-    );
-    border: 1px solid rgba(0, 255, 255, 0.6);
-    color: #ffffff;
-    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
-    transition: all 0.3s ease;
-}
-
-.ai-assistant.enhanced .ai-chat-input button:hover {
-    background: linear-gradient(135deg, 
-        rgba(0, 180, 255, 0.7) 0%,
-        rgba(0, 255, 255, 0.7) 100%
-    );
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
-    transform: translateY(-2px);
-}
-
-/* Enhanced quick action buttons */
-.ai-assistant.enhanced .ai-quick-actions .cyber-button {
-    background: rgba(0, 20, 40, 0.6);
-    border: 1px solid rgba(0, 255, 255, 0.5);
+    border-radius: 2px;
     box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
+    opacity: 0;
+    animation: fadeIn 0.5s ease-in-out forwards;
 }
 
-.ai-assistant.enhanced .ai-quick-actions .cyber-button::before {
-    content: '';
+.loading-bar {
     position: absolute;
     top: 0;
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, 
-        transparent 0%, 
-        rgba(0, 255, 255, 0.2) 50%, 
-        transparent 100%
+    background: linear-gradient(
+        90deg,
+        transparent,
+        #00ffff,
+        transparent
     );
-    transition: all 0.5s ease;
+    animation: loadingProgress 1.5s ease-in-out;
 }
 
-.ai-assistant.enhanced .ai-quick-actions .cyber-button:hover {
-    background: rgba(0, 40, 60, 0.8);
-    border-color: rgba(0, 255, 255, 0.8);
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
-    transform: translateY(-2px);
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
-.ai-assistant.enhanced .ai-quick-actions .cyber-button:hover::before {
-    left: 100%;
+/* Loading text style */
+.loading-text {
+    font-family: 'Orbitron', sans-serif;
+    color: #00ffff;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+    animation: textPulse 1.5s infinite alternate;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .ai-assistant.enhanced {
-        flex-direction: column;
-    }
-    
-    .ai-assistant.enhanced .ai-avatar {
-        width: 100%;
-        height: 200px;
-        border-right: none;
-        border-bottom: 1px solid rgba(0, 255, 255, 0.4);
-    }
-    
-    .interface-header {
-        padding: 8px 10px;
-        font-size: 0.8rem;
-    }
+@keyframes textPulse {
+    from { opacity: 0.7; text-shadow: 0 0 5px rgba(0, 255, 255, 0.5); }
+    to { opacity: 1; text-shadow: 0 0 10px rgba(0, 255, 255, 0.8); }
+}
+
+/* Improve home section spacing */
+#home {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 60vh; /* Ensure enough vertical space */
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+.glitch-container {
+    margin-bottom: 1.5rem;
+}
+
+.tagline {
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+    min-height: 2em;
 } 
