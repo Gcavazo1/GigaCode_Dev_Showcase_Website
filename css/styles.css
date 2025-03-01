@@ -1187,4 +1187,52 @@ h1, h2, h3, h4, h5, h6 {
 
 @keyframes spin {
     to { transform: rotate(360deg); }
+}
+
+/* Enhanced Fallback Assistant */
+.fallback-assistant {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 8px;
+    color: #00ffff;
+    font-family: 'Orbitron', sans-serif;
+    text-align: center;
+}
+
+.fallback-content {
+    padding: 20px;
+    max-width: 80%;
+}
+
+.fallback-icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+    animation: pulse 2s infinite alternate;
+}
+
+.fallback-assistant h3 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.fallback-assistant p {
+    font-size: 16px;
+    opacity: 0.8;
+    margin-bottom: 20px;
+}
+
+.fallback-buttons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+@keyframes pulse {
+    from { transform: scale(1); text-shadow: 0 0 10px rgba(0, 255, 255, 0.5); }
+    to { transform: scale(1.1); text-shadow: 0 0 20px rgba(0, 255, 255, 0.8), 0 0 30px rgba(0, 255, 255, 0.6); }
 } 

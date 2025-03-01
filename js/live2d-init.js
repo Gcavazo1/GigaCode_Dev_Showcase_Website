@@ -214,10 +214,17 @@ class Live2DAssistant {
         const fallbackDiv = document.createElement('div');
         fallbackDiv.className = 'fallback-assistant';
         fallbackDiv.innerHTML = `
-            <div>
-                <i class="fas fa-robot" style="font-size: 48px; margin-bottom: 20px;"></i>
-                <p>Virtual Assistant</p>
-                <p style="font-size: 14px; opacity: 0.7;">Interactive model unavailable</p>
+            <div class="fallback-content">
+                <div class="fallback-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3>Virtual Assistant</h3>
+                <p>I'm here to help you navigate this portfolio.</p>
+                <div class="fallback-buttons">
+                    <button class="cyber-button small">About Me</button>
+                    <button class="cyber-button small">Projects</button>
+                    <button class="cyber-button small">Contact</button>
+                </div>
             </div>
         `;
         
@@ -231,6 +238,25 @@ class Live2DAssistant {
         // Add to DOM
         this.canvas.parentNode.appendChild(fallbackDiv);
         this.canvas.style.display = 'none';
+        
+        // Add event listeners to buttons
+        const buttons = fallbackDiv.querySelectorAll('.cyber-button');
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                const text = button.textContent.trim();
+                const responseDiv = document.querySelector('.assistant-text');
+                
+                if (responseDiv) {
+                    if (text === 'About Me') {
+                        responseDiv.textContent = "I'm a virtual assistant designed to help you navigate this portfolio. The developer behind this site specializes in mobile apps, Roblox games, and interactive web experiences.";
+                    } else if (text === 'Projects') {
+                        responseDiv.textContent = "This portfolio showcases mobile apps, Roblox games, 3D models, and interactive web experiences. Check out the different sections to learn more!";
+                    } else if (text === 'Contact') {
+                        responseDiv.textContent = "You can contact the developer through the social links in the navigation bar or by filling out the join team form.";
+                    }
+                }
+            });
+        });
         
         console.log('Fallback UI displayed');
     }
