@@ -1590,13 +1590,12 @@
 
 /* Glitch effect container */
 .glitch-container {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 .tagline {
-    margin-top: 1rem;
-    margin-bottom: 2rem;
-    min-height: 2em;
+    margin: 1rem 0;
+    min-height: 1.5em;
 }
 
 /* AI Assistant entrance animation */
@@ -1623,164 +1622,139 @@
     100% { box-shadow: 0 0 15px rgba(0, 255, 255, 0.2); }
 }
 
-/* Enhanced video game style loading sequence */
+/* Neon Cyberpunk Loading Sequence */
 .loading-sequence {
     position: relative;
     width: 100%;
-    max-width: 500px;
-    height: 30px;
-    background: rgba(0, 0, 0, 0.5);
+    max-width: 600px;
     margin: 2rem auto;
-    overflow: hidden;
-    border-radius: 4px;
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
     opacity: 0;
     animation: fadeIn 0.5s ease-in-out forwards;
-    border: 1px solid rgba(0, 255, 255, 0.4);
-    padding: 3px;
-}
-
-.loading-bar-container {
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    position: relative;
-    border-radius: 2px;
-    overflow: hidden;
-}
-
-.loading-bar {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 0%;
-    height: 100%;
-    background: linear-gradient(90deg, 
-        rgba(0, 255, 255, 0.7), 
-        rgba(0, 255, 255, 1), 
-        rgba(0, 255, 255, 0.7)
-    );
-    box-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
-    animation: progressBar 3s ease-in-out forwards;
-}
-
-.loading-percentage {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: #00ffff;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.9rem;
-    text-shadow: 0 0 5px rgba(0, 255, 255, 0.7);
-    z-index: 2;
 }
 
 .loading-text {
     font-family: 'Orbitron', sans-serif;
     color: #00ffff;
-    font-size: 0.9rem;
+    font-size: 1rem;
     text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
     text-align: center;
-    margin-bottom: 0.8rem;
-    text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+    margin-bottom: 1rem;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+    animation: textPulse 2s infinite;
+}
+
+.loading-bar-container {
+    height: 4px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    padding: 2px;
+    border-radius: 2px;
+    position: relative;
+    overflow: hidden;
+}
+
+.loading-bar {
+    height: 100%;
+    width: 0%;
+    background: #00ffff;
+    position: relative;
+    border-radius: 1px;
+    box-shadow: 
+        0 0 10px rgba(0, 255, 255, 0.5),
+        0 0 20px rgba(0, 255, 255, 0.5),
+        0 0 40px rgba(0, 255, 255, 0.5);
+    animation: neonPulse 1s ease-in-out infinite;
+}
+
+.loading-bar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.8),
+        transparent
+    );
+    animation: shimmer 1s linear infinite;
+}
+
+.loading-percentage {
+    position: absolute;
+    right: -40px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #00ffff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.8rem;
+    text-shadow: 0 0 5px rgba(0, 255, 255, 0.7);
 }
 
 .loading-status {
+    text-align: center;
+    margin-top: 1rem;
     font-family: 'Rajdhani', sans-serif;
     color: rgba(0, 255, 255, 0.8);
-    font-size: 0.8rem;
-    text-align: center;
-    margin-top: 0.8rem;
-    height: 1.2em;
+    font-size: 0.9rem;
+    min-height: 1.2em;
+    opacity: 0.8;
 }
 
+/* Scan lines effect */
+.loading-bar-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 1px,
+        rgba(0, 255, 255, 0.1) 1px,
+        rgba(0, 255, 255, 0.1) 2px
+    );
+    pointer-events: none;
+}
+
+@keyframes neonPulse {
+    0% { box-shadow: 0 0 10px rgba(0, 255, 255, 0.5), 0 0 20px rgba(0, 255, 255, 0.5); }
+    50% { box-shadow: 0 0 15px rgba(0, 255, 255, 0.7), 0 0 30px rgba(0, 255, 255, 0.7); }
+    100% { box-shadow: 0 0 10px rgba(0, 255, 255, 0.5), 0 0 20px rgba(0, 255, 255, 0.5); }
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+@keyframes textPulse {
+    0% { text-shadow: 0 0 5px rgba(0, 255, 255, 0.5); }
+    50% { text-shadow: 0 0 15px rgba(0, 255, 255, 0.8), 0 0 30px rgba(0, 255, 255, 0.4); }
+    100% { text-shadow: 0 0 5px rgba(0, 255, 255, 0.5); }
+}
+
+/* Update the progress animation */
 @keyframes progressBar {
     0% { width: 0%; }
-    20% { width: 20%; }
-    40% { width: 38%; }
-    50% { width: 52%; }
-    60% { width: 65%; }
-    80% { width: 85%; }
-    95% { width: 95%; }
+    5% { width: 5%; }
+    15% { width: 25%; }
+    25% { width: 38%; }
+    35% { width: 45%; }
+    45% { width: 58%; }
+    65% { width: 75%; }
+    75% { width: 85%; }
+    85% { width: 92%; }
+    98% { width: 99%; }
     100% { width: 100%; }
 }
 
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
-}
-
-/* Add glitch effect for AI Assistant appearance */
-.ai-assistant.glitching {
-    animation: glitchEffect 0.5s ease-in-out;
-}
-
-@keyframes glitchEffect {
-    0% { transform: translate(0); filter: hue-rotate(0deg); }
-    10% { transform: translate(-5px, 2px); filter: hue-rotate(90deg); }
-    20% { transform: translate(5px, -2px); filter: hue-rotate(180deg); }
-    30% { transform: translate(-3px, -2px); filter: hue-rotate(270deg); }
-    40% { transform: translate(3px, 2px); filter: hue-rotate(360deg); }
-    50% { transform: translate(0); filter: hue-rotate(0deg); }
-    60% { transform: translate(4px, -1px); filter: hue-rotate(90deg); }
-    70% { transform: translate(-4px, 1px); filter: hue-rotate(180deg); }
-    80% { transform: translate(2px, 2px); filter: hue-rotate(270deg); }
-    90% { transform: translate(-2px, -2px); filter: hue-rotate(360deg); }
-    100% { transform: translate(0); filter: hue-rotate(0deg); }
-}
-
-/* Add animation for bio section */
-#bio {
-    opacity: 0.7;
-    transform: translateY(20px);
-    transition: all 0.8s ease-out;
-}
-
-#bio.animate-in {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* Adjust AI Assistant section spacing and positioning */
-#virtual-assistant.section.no-header {
-    padding-top: 0;
-    margin-top: 1rem;
-}
-
-/* Adjust the assistant container for better positioning */
-.assistant-container {
-    max-width: 900px;
-    margin: 0 auto;
-}
-
-/* Enhance the AI Assistant appearance */
-.ai-assistant.enhanced {
-    border-radius: 12px;
-    box-shadow: 
-        0 0 30px rgba(0, 255, 255, 0.2),
-        inset 0 0 20px rgba(0, 255, 255, 0.1);
-    margin-top: 1rem;
-}
-
-/* Adjust loading sequence to better align with AI Assistant */
-.loading-sequence {
-    margin-bottom: 1rem;
-}
-
-/* Improve the transition between loading and AI Assistant */
-#virtual-assistant.loaded {
-    animation: slideInFromTop 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-@keyframes slideInFromTop {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 } 

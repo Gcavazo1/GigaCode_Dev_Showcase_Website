@@ -227,10 +227,16 @@ document.addEventListener('DOMContentLoaded', () => {
                             
                             // Complete loading sequence
                             setTimeout(() => {
-                                // Fade in AI Assistant with a glitch effect
+                                // Ensure the AI Assistant is in view
+                                const homeAiContainer = document.querySelector('.home-ai-container');
+                                if (homeAiContainer) {
+                                    homeAiContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                }
+                                
+                                // Fade in AI Assistant
                                 aiSection.classList.add('loaded');
                                 
-                                // Add glitch effect to AI Assistant
+                                // Add glitch effect
                                 const aiAssistant = aiSection.querySelector('.ai-assistant');
                                 if (aiAssistant) {
                                     aiAssistant.classList.add('glitching');
@@ -241,46 +247,13 @@ document.addEventListener('DOMContentLoaded', () => {
                                 
                                 // Fade out loading sequence
                                 loadingSequence.style.opacity = '0';
-                                
-                                // Remove loading sequence after fade out
                                 setTimeout(() => {
                                     loadingSequence.remove();
-                                    
-                                    // Start bio section animations after AI Assistant loads
-                                    setTimeout(() => {
-                                        if (bioSection) {
-                                            bioSection.classList.add('animate-in');
-                                            const bioElements = bioSection.querySelectorAll('.terminal-typing, .terminal-command');
-                                            bioElements.forEach(el => {
-                                                el.style.visibility = 'visible';
-                                            });
-                                            
-                                            // Reinitialize terminal typing effects
-                                            initTerminalCommandEffect(true);
-                                            
-                                            // Scroll to bio section
-                                            setTimeout(() => {
-                                                bioSection.scrollIntoView({ behavior: 'smooth' });
-                                            }, 1000);
-                                        }
-                                    }, 1000);
                                 }, 500);
                             }, 800);
                         }
                     }
                 }, 30);
-                
-                // When complete, adjust the scroll position to show both tagline and AI Assistant
-                setTimeout(() => {
-                    // Scroll to position that shows both tagline and AI Assistant
-                    window.scrollTo({
-                        top: document.querySelector('#home').offsetTop,
-                        behavior: 'smooth'
-                    });
-                    
-                    // Then continue with bio section animations
-                    // ...
-                }, 1000);
             }, 800);
         }
     }

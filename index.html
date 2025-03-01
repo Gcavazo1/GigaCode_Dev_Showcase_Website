@@ -100,64 +100,67 @@
 
     <!-- Main Content -->
     <main class="main-content">
-        <!-- Home Section -->
-        <section id="home" class="section">
-            <div class="glitch-container">
-                <h1 class="glitch-text" data-text="GigaCode Developer Showcase">
-                    <span class="highlight-letter">G</span><span class="regular-letter">iga</span><span class="highlight-letter">C</span><span class="regular-letter">ode Developer Showcase</span>
-                </h1>
-            </div>
-            <div class="tagline">
-                <span class="typing-text">Building the future, one line of code at a time.</span>
-            </div>
-            <!-- Loading sequence will be inserted here by JavaScript -->
-        </section>
+        <!-- Create a container for home and AI sections -->
+        <div class="home-ai-container">
+            <!-- Home Section -->
+            <section id="home" class="section">
+                <div class="glitch-container">
+                    <h1 class="glitch-text" data-text="GigaCode Developer Showcase">
+                        <span class="highlight-letter">G</span><span class="regular-letter">iga</span><span class="highlight-letter">C</span><span class="regular-letter">ode Developer Showcase</span>
+                    </h1>
+                </div>
+                <div class="tagline">
+                    <span class="typing-text">Building the future, one line of code at a time.</span>
+                </div>
+                <!-- Loading sequence will be inserted here -->
+            </section>
 
-        <!-- Virtual Assistant Section - Remove header and adjust positioning -->
-        <section id="virtual-assistant" class="section no-header">
-            <div class="assistant-container">
-                <div class="ai-assistant enhanced">
-                    <div class="ai-avatar">
-                        <div class="glitch-effect"></div>
-                        <div class="ai-hologram">
-                            <div class="ai-face">
-                                <div class="ai-eyes">
-                                    <div class="ai-eye left"></div>
-                                    <div class="ai-eye right"></div>
+            <!-- Virtual Assistant Section -->
+            <section id="virtual-assistant" class="section no-header">
+                <div class="assistant-container">
+                    <div class="ai-assistant enhanced">
+                        <div class="ai-avatar">
+                            <div class="glitch-effect"></div>
+                            <div class="ai-hologram">
+                                <div class="ai-face">
+                                    <div class="ai-eyes">
+                                        <div class="ai-eye left"></div>
+                                        <div class="ai-eye right"></div>
+                                    </div>
+                                    <div class="ai-mouth"></div>
                                 </div>
-                                <div class="ai-mouth"></div>
+                                <div class="ai-scan-line"></div>
+                                <div class="ai-glow"></div>
                             </div>
-                            <div class="ai-scan-line"></div>
-                            <div class="ai-glow"></div>
+                            <div class="circuit-overlay"></div>
                         </div>
-                        <div class="circuit-overlay"></div>
-                    </div>
-                    <div class="ai-chat-interface">
-                        <div class="interface-header">
-                            <div class="status-indicator"></div>
-                            <span>GigaCode AI v2.0</span>
-                            <div class="interface-controls">
-                                <span></span>
-                                <span></span>
-                                <span></span>
+                        <div class="ai-chat-interface">
+                            <div class="interface-header">
+                                <div class="status-indicator"></div>
+                                <span>GigaCode AI v2.0</span>
+                                <div class="interface-controls">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="ai-chat-messages">
-                            <div class="ai-message">Hello! I'm your cyberpunk AI assistant. How can I help you today?</div>
-                        </div>
-                        <div class="ai-chat-input">
-                            <input type="text" placeholder="Ask me anything..." id="ai-input">
-                            <button id="ai-send"><i class="fas fa-paper-plane"></i></button>
-                        </div>
-                        <div class="ai-quick-actions">
-                            <button class="cyber-button small" data-query="Tell me about this portfolio">Portfolio</button>
-                            <button class="cyber-button small" data-query="What projects are showcased here?">Projects</button>
-                            <button class="cyber-button small" data-query="How can I contact the developer?">Contact</button>
+                            <div class="ai-chat-messages">
+                                <div class="ai-message">Hello! I'm your cyberpunk AI assistant. How can I help you today?</div>
+                            </div>
+                            <div class="ai-chat-input">
+                                <input type="text" placeholder="Ask me anything..." id="ai-input">
+                                <button id="ai-send"><i class="fas fa-paper-plane"></i></button>
+                            </div>
+                            <div class="ai-quick-actions">
+                                <button class="cyber-button small" data-query="Tell me about this portfolio">Portfolio</button>
+                                <button class="cyber-button small" data-query="What projects are showcased here?">Projects</button>
+                                <button class="cyber-button small" data-query="How can I contact the developer?">Contact</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        </div>
 
         <!-- Bio Section - Update with simplified terminal style -->
         <section id="bio" class="section">
