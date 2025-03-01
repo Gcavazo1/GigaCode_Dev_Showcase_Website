@@ -1,28 +1,28 @@
 {
-    "name": "MY_WEBSITE-MAIN",
-    "description": "A cyberpunk-inspired link-tree portfolio showcasing my dev skills, AI collaboration, and projects.",
+    "name": "GigaCode_Dev_Showcase_Website",
+    "description": "A cyberpunk-inspired portfolio showcasing development skills, AI collaboration, and interactive projects.",
     "rules": {
       "project-structure": {
         "folders": [
           {
-            "name": "src",
-            "description": "Contains all source files for the project."
-          },
-          {
-            "name": "src/components",
-            "description": "Reusable UI components such as buttons, cards, and sections."
-          },
-          {
-            "name": "src/assets",
-            "description": "Images, icons, and fonts used in the site."
-          },
-          {
-            "name": "src/css",
+            "name": "css",
             "description": "All stylesheets, including global and component-specific styles."
           },
           {
-            "name": "src/js",
-            "description": "JavaScript files handling interactivity, animations, and API integrations."
+            "name": "js",
+            "description": "JavaScript files handling interactivity, animations, and visualizations."
+          },
+          {
+            "name": "images",
+            "description": "Image assets for projects, UI elements, and backgrounds."
+          },
+          {
+            "name": "audio",
+            "description": "Music tracks for the audio visualizer component."
+          },
+          {
+            "name": "models",
+            "description": "3D model files for the Three.js showcase."
           }
         ],
         "files": [
@@ -31,24 +31,104 @@
             "description": "Main entry point for the website."
           },
           {
-            "name": "src/css/styles.css",
+            "name": "css/styles.css",
             "description": "Global styles including layout, typography, and theme."
           },
           {
-            "name": "src/css/animations.css",
+            "name": "css/animations.css",
             "description": "Custom animations and transitions for the website."
           },
           {
-            "name": "src/js/main.js",
+            "name": "css/advanced-effects.css",
+            "description": "Advanced visual effects like glitches and neon glows."
+          },
+          {
+            "name": "css/responsive.css",
+            "description": "Media queries and responsive design rules."
+          },
+          {
+            "name": "css/terminal.css",
+            "description": "Styling for the terminal-style bio section."
+          },
+          {
+            "name": "css/holographic.css",
+            "description": "Styling for the holographic interface components."
+          },
+          {
+            "name": "css/gan-showcase.css",
+            "description": "Styling for the AI image generation demo."
+          },
+          {
+            "name": "css/ai-assistant.css",
+            "description": "Styling for the AI chat assistant."
+          },
+          {
+            "name": "css/ai-loading.css",
+            "description": "Styling for AI loading animations."
+          },
+          {
+            "name": "css/audio-visualizer.css",
+            "description": "Styling for the audio player and visualizer."
+          },
+          {
+            "name": "css/tagline.css",
+            "description": "Styling for the animated tagline."
+          },
+          {
+            "name": "css/nav.css",
+            "description": "Styling for the side navigation."
+          },
+          {
+            "name": "js/main.js",
             "description": "Core functionality and event handling."
           },
           {
-            "name": "src/js/animations.js",
-            "description": "Handles all GSAP or CSS-based animations."
+            "name": "js/animations.js",
+            "description": "Handles all animations and transitions."
           },
           {
-            "name": "src/js/navigation.js",
-            "description": "Handles smooth scrolling and navigation behavior."
+            "name": "js/particles.js",
+            "description": "Background particle system."
+          },
+          {
+            "name": "js/3d-model.js",
+            "description": "Three.js implementation for 3D model showcase."
+          },
+          {
+            "name": "js/holographic-ui.js",
+            "description": "Interactive holographic interface elements."
+          },
+          {
+            "name": "js/audio-visualizer.js",
+            "description": "Audio player with Web Audio API visualization."
+          },
+          {
+            "name": "js/mobile-menu.js",
+            "description": "Mobile navigation handling."
+          },
+          {
+            "name": "js/ai-assistant.js",
+            "description": "AI chat assistant functionality."
+          },
+          {
+            "name": "js/gan-showcase.js",
+            "description": "GAN-based image generation demo."
+          },
+          {
+            "name": "js/terminal.js",
+            "description": "Terminal typing and command effects."
+          },
+          {
+            "name": "js/ai-loading.js",
+            "description": "AI loading sequence animations."
+          },
+          {
+            "name": "js/init.js",
+            "description": "Initialization sequence for all components."
+          },
+          {
+            "name": "js/nav.js",
+            "description": "Navigation behavior and scroll handling."
           }
         ]
       },
@@ -59,11 +139,11 @@
           "meta-tags": [
             {
               "name": "viewport",
-              "content": "width=device-width, initial-scale=1.0"
+              "content": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
             },
             {
               "name": "description",
-              "content": "Showcasing AI-powered development with animations, projects, and collaborations."
+              "content": "GigaCode Developer Showcase - Cyberpunk Portfolio"
             }
           ]
         },
@@ -71,25 +151,44 @@
           "use-bem-naming": true,
           "prefer-custom-properties": true,
           "animations": {
-            "use-gsap": true,
-            "fallback-css-transitions": true
+            "use-keyframes": true,
+            "prefer-transforms": true
           }
         },
         "javascript": {
           "use-es6": true,
           "separate-concerns": true,
-          "avoid-inline-scripts": true,
-          "modular-structure": true
+          "modular-structure": true,
+          "prefer-classes": true
         }
       },
       "performance": {
         "lazy-load-images": true,
-        "minify-css-js": true,
+        "optimize-fonts": true,
         "use-cdn-for-libraries": [
+          "three.js",
           "gsap",
           "font-awesome"
-        ],
-        "optimize-fonts": true
+        ]
+      },
+      "design": {
+        "color-scheme": {
+          "primary": "#00ffff", // Cyan
+          "secondary": "#ff00ff", // Magenta
+          "accent": "#ffff00", // Yellow
+          "background": "#0a0a14", // Dark blue-black
+          "text": "#e0e0e0" // Light gray
+        },
+        "typography": {
+          "headings": "Orbitron, sans-serif",
+          "body": "Rajdhani, sans-serif",
+          "monospace": "monospace"
+        },
+        "animations": {
+          "prefer-subtle": false,
+          "use-glitch-effects": true,
+          "use-neon-effects": true
+        }
       }
     }
   }
