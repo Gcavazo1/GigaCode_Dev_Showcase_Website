@@ -86,9 +86,9 @@ class ModelViewer {
         const loader = new THREE.GLTFLoader();
         
         try {
-            // Load the SlothSword model
+            // Try loading a sample model from Three.js examples
             loader.load(
-                'models/gltf/SlothSword.gltf',  // Path to your GLTF model
+                'https://threejs.org/examples/models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf',
                 (gltf) => {
                     // Remove any existing model
                     if (this.model) {
@@ -135,16 +135,16 @@ class ModelViewer {
                         this.activeAction.play();
                     }
                     
-                    console.log('Model loaded successfully');
+                    console.log("Model loaded successfully:", gltf);
                 },
                 // Show loading progress
                 (xhr) => {
-                    const loadingPercent = Math.floor((xhr.loaded / xhr.total) * 100);
-                    console.log(`Loading model: ${loadingPercent}% loaded`);
+                    console.log(`Loading progress: ${Math.floor((xhr.loaded / xhr.total) * 100)}%`);
                 },
                 // Handle errors
                 (error) => {
-                    console.error('Error loading 3D model:', error);
+                    console.error("Error loading model:", error);
+                    console.error("Error details:", error.message);
                     this.createFallbackModel();
                 }
             );
@@ -326,7 +326,7 @@ function initializeModelViewer(containerId, progressCallback) {
     let controls = null;
     
     loader.load(
-        'models/gltf/SlothSword.gltf', 
+        'https://threejs.org/examples/models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf', 
         (gltf) => {
             // Model loaded successfully
             model = gltf.scene;
