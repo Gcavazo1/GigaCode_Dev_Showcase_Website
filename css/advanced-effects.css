@@ -1767,6 +1767,7 @@
     flex-direction: column;
     gap: 0;
     padding-top: 1rem;
+    margin-bottom: 2rem; /* Add space after AI Assistant */
 }
 
 #home {
@@ -1972,4 +1973,35 @@
     .holo-display {
         height: 300px;
     }
+}
+
+/* Adjust spacing between sections */
+.section {
+    min-height: auto; /* Remove min-height: 100vh */
+    padding: 3rem 2rem; /* Reduce padding */
+}
+
+/* Specific adjustment for About Me section */
+#bio.section {
+    padding-top: 2rem; /* Reduce top padding specifically for bio section */
+}
+
+/* Adjust AI Assistant container spacing */
+.home-ai-container {
+    min-height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding-top: 1rem;
+    margin-bottom: 2rem; /* Add space after AI Assistant */
+}
+
+/* Adjust the neon separator margin */
+.neon-separator {
+    margin: 0.5rem auto; /* Reduce margin of section headers */
+}
+
+/* Adjust section header spacing */
+.section-header {
+    margin-bottom: 2rem; /* Reduce bottom margin */
 } 
