@@ -83,6 +83,9 @@ class AudioVisualizer {
         
         // Start animation
         this.animate();
+        
+        // Create playlist carousel
+        this.createPlaylistCarousel();
     }
     
     setupEventListeners() {
@@ -121,6 +124,24 @@ class AudioVisualizer {
                 this.initAudio();
             }
             this.prevTrack();
+        });
+        
+        // Add keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                this.rotateCarousel('prev');
+            } else if (e.key === 'ArrowRight') {
+                this.rotateCarousel('next');
+            } else if (e.key === 'Enter') {
+                // Play the currently focused track
+                if (this.currentCarouselIndex !== undefined) {
+                    if (!this.audioContext) {
+                        this.initAudio();
+                    }
+                    this.loadTrack(this.currentCarouselIndex);
+                    this.playAudio();
+                }
+            }
         });
     }
     
@@ -208,6 +229,9 @@ class AudioVisualizer {
         this.audio.src = this.playlist[index].file;
         document.getElementById('track-title').textContent = this.playlist[index].title;
         
+        // Update active track in playlist carousel
+        this.updatePlaylistActiveTrack(index);
+        
         if (this.isPlaying) {
             this.playAudio();
         } else {
@@ -243,6 +267,9 @@ class AudioVisualizer {
             
             // Draw visualization
             this.drawBars();
+            
+            // Animate equalizer on active track card
+            this.animateEqualizer();
         } else {
             // Draw placeholder visualization
             this.drawPlaceholderBars();
@@ -292,6 +319,39 @@ class AudioVisualizer {
             this.ctx.fillRect(x, this.canvas.height - barHeight, barWidth, barHeight);
             
             x += barWidth + 1;
+        }
+    }
+    
+    animateEqualizer() {
+        if (!this.analyser || !this.dataArray) return;
+        
+        // Get the active track card
+        const activeCard = document.querySelector('.ps-track-active');
+        if (!activeCard) return;
+        
+        // Get the equalizer bars
+        const eqBars = activeCard.querySelectorAll('.ps-eq-bar');
+        if (!eqBars.length) return;
+        
+        try {
+            // Get frequency data
+            this.analyser.getByteFrequencyData(this.dataArray);
+            
+            // Animate equalizer bars based on frequency data
+            const barCount = eqBars.length;
+            const step = Math.floor(this.dataArray.length / barCount);
+            
+            for (let i = 0; i < barCount; i++) {
+                const dataIndex = i * step;
+                if (dataIndex < this.dataArray.length) {
+                    const value = this.dataArray[dataIndex];
+                    const height = Math.max(4, value / 5); // Scale down the value
+                    
+                    eqBars[i].style.height = `${height}px`;
+                }
+            }
+        } catch (error) {
+            console.error('Error animating equalizer:', error);
         }
     }
     
@@ -383,6 +443,154 @@ class AudioVisualizer {
                 document.body.removeChild(widget);
             }
         }, 500);
+    }
+
+    createPlaylistCarousel() {
+        // Check if audio container exists
+        const audioContainer = document.querySelector('.audio-container');
+        if (!audioContainer) {
+            console.warn('Audio container not found, delaying playlist creation');
+            setTimeout(() => this.createPlaylistCarousel(), 500);
+            return;
+        }
+        
+        // Create playlist container
+        const playlistContainer = document.createElement('div');
+        playlistContainer.className = 'ps-playlist-container';
+        
+        // Create carousel wrapper
+        const carousel = document.createElement('div');
+        carousel.className = 'ps-playlist-carousel';
+        
+        // Add track cards
+        this.playlist.forEach((track, index) => {
+            const card = document.createElement('div');
+            card.className = 'ps-track-card';
+            card.dataset.index = index;
+            
+            // Add active class to current track
+            if (index === this.currentTrack) {
+                card.classList.add('ps-track-active');
+            }
+            
+            // Create card content
+            card.innerHTML = `
+                <div class="ps-card-glitch-effect"></div>
+                <div class="ps-card-content">
+                    <div class="ps-track-number">${(index + 1).toString().padStart(2, '0')}</div>
+                    <div class="ps-track-title">${track.title}</div>
+                    <div class="ps-track-equalizer">
+                        ${Array(5).fill(0).map(() => '<div class="ps-eq-bar"></div>').join('')}
+                    </div>
+                </div>
+                <div class="ps-card-shine"></div>
+            `;
+            
+            // Add click event to play track
+            card.addEventListener('click', () => {
+                if (!this.audioContext) {
+                    this.initAudio();
+                }
+                this.loadTrack(index);
+                this.playAudio();
+                this.updatePlaylistActiveTrack(index);
+            });
+            
+            carousel.appendChild(card);
+        });
+        
+        // Add navigation buttons
+        const prevBtn = document.createElement('button');
+        prevBtn.className = 'ps-playlist-nav ps-prev';
+        prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+        prevBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.rotateCarousel('prev');
+        });
+        
+        const nextBtn = document.createElement('button');
+        nextBtn.className = 'ps-playlist-nav ps-next';
+        nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+        nextBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.rotateCarousel('next');
+        });
+        
+        // Assemble components
+        playlistContainer.appendChild(prevBtn);
+        playlistContainer.appendChild(carousel);
+        playlistContainer.appendChild(nextBtn);
+        
+        // Add to audio container
+        audioContainer.appendChild(playlistContainer);
+        
+        // Initialize carousel position
+        this.currentCarouselIndex = this.currentTrack;
+        this.updateCarouselPosition();
+    }
+
+    rotateCarousel(direction) {
+        const totalTracks = this.playlist.length;
+        
+        if (direction === 'next') {
+            this.currentCarouselIndex = (this.currentCarouselIndex + 1) % totalTracks;
+        } else {
+            this.currentCarouselIndex = (this.currentCarouselIndex - 1 + totalTracks) % totalTracks;
+        }
+        
+        this.updateCarouselPosition();
+    }
+
+    updateCarouselPosition() {
+        const carousel = document.querySelector('.ps-playlist-carousel');
+        if (!carousel) {
+            console.warn('Playlist carousel not found');
+            return; // Safety check
+        }
+        
+        const cards = carousel.querySelectorAll('.ps-track-card');
+        const totalCards = cards.length;
+        if (totalCards === 0) return; // Another safety check
+        
+        cards.forEach((card, index) => {
+            // Calculate position relative to current index
+            let relativePos = (index - this.currentCarouselIndex + totalCards) % totalCards;
+            
+            // Adjust for shortest path (for better rotation)
+            if (relativePos > totalCards / 2) {
+                relativePos -= totalCards;
+            }
+            
+            // Calculate rotation and z-translation
+            const rotation = relativePos * 40; // 40 degrees between cards
+            const zTranslation = Math.cos(Math.abs(relativePos) * 0.2) * 100 - 100;
+            const xTranslation = Math.sin(relativePos * 0.2) * 200;
+            const scale = Math.max(0.8, 1 - Math.abs(relativePos) * 0.1);
+            const opacity = Math.max(0.4, 1 - Math.abs(relativePos) * 0.2);
+            
+            // Apply transforms
+            card.style.transform = `translateX(${xTranslation}px) translateZ(${zTranslation}px) rotateY(${rotation}deg) scale(${scale})`;
+            card.style.opacity = opacity;
+            card.style.zIndex = 100 - Math.abs(relativePos);
+        });
+    }
+
+    updatePlaylistActiveTrack(index) {
+        const cards = document.querySelectorAll('.ps-track-card');
+        if (cards.length === 0) return; // Safety check
+        
+        // Remove active class from all cards
+        cards.forEach(card => card.classList.remove('ps-track-active'));
+        
+        // Add active class to current track
+        const activeCard = document.querySelector(`.ps-track-card[data-index="${index}"]`);
+        if (activeCard) {
+            activeCard.classList.add('ps-track-active');
+            
+            // Rotate carousel to show active track
+            this.currentCarouselIndex = index;
+            this.updateCarouselPosition();
+        }
     }
 }
 

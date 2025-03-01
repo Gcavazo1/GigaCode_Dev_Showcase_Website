@@ -283,4 +283,176 @@
 @keyframes ps-scanline {
     0% { top: 0; }
     100% { top: 100%; }
+}
+
+/* 3D Playlist Carousel */
+.ps-playlist-container {
+    position: relative;
+    height: 200px;
+    margin: 30px 0;
+    perspective: 1000px;
+    overflow: hidden;
+}
+
+.ps-playlist-carousel {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.ps-track-card {
+    position: absolute;
+    width: 180px;
+    height: 120px;
+    left: calc(50% - 90px);
+    top: calc(50% - 60px);
+    background: rgba(5, 15, 25, 0.8);
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+    cursor: pointer;
+    transform-style: preserve-3d;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+}
+
+.ps-track-card:hover {
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.5);
+}
+
+.ps-track-active {
+    border: 1px solid rgba(0, 255, 255, 0.8);
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.6);
+}
+
+.ps-track-active::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #00ffff, transparent);
+    animation: ps-scan-active 2s linear infinite;
+}
+
+.ps-card-glitch-effect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), transparent 80%);
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.ps-card-content {
+    position: relative;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.ps-track-number {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 12px;
+    color: rgba(0, 255, 255, 0.7);
+    margin-bottom: 5px;
+}
+
+.ps-track-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 14px;
+    color: #ffffff;
+    margin-bottom: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ps-track-equalizer {
+    display: flex;
+    gap: 3px;
+    margin-top: auto;
+    height: 20px;
+    align-items: flex-end;
+}
+
+.ps-eq-bar {
+    width: 4px;
+    background: rgba(0, 255, 255, 0.5);
+    height: 5px;
+    transition: height 0.2s ease;
+}
+
+.ps-track-active .ps-eq-bar {
+    animation: ps-eq-animation 1.2s infinite ease-in-out;
+}
+
+.ps-track-active .ps-eq-bar:nth-child(1) { animation-delay: 0.0s; }
+.ps-track-active .ps-eq-bar:nth-child(2) { animation-delay: 0.2s; }
+.ps-track-active .ps-eq-bar:nth-child(3) { animation-delay: 0.4s; }
+.ps-track-active .ps-eq-bar:nth-child(4) { animation-delay: 0.6s; }
+.ps-track-active .ps-eq-bar:nth-child(5) { animation-delay: 0.8s; }
+
+.ps-card-shine {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.03) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    transform: rotate(45deg);
+    pointer-events: none;
+}
+
+.ps-playlist-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 20, 40, 0.7);
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    color: #00ffff;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 200;
+    transition: all 0.3s ease;
+}
+
+.ps-playlist-nav:hover {
+    background: rgba(0, 255, 255, 0.2);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+}
+
+.ps-prev {
+    left: 20px;
+}
+
+.ps-next {
+    right: 20px;
+}
+
+@keyframes ps-eq-animation {
+    0%, 100% { height: 5px; }
+    50% { height: 20px; }
+}
+
+@keyframes ps-scan-active {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
 } 
