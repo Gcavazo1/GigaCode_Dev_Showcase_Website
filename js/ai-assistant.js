@@ -44,6 +44,9 @@ class AIAssistant {
         
         // Start idle animation
         this.startIdleAnimation();
+        
+        // Add glitch effects
+        this.createGlitchEffect();
     }
     
     handleUserInput() {
@@ -216,6 +219,58 @@ class AIAssistant {
         this.mouth.style.height = '2px';
         this.avatar.classList.remove('speaking');
         this.isAnimating = false;
+    }
+    
+    // Add a method to create random glitch effects
+    createGlitchEffect() {
+        // Randomly create glitch effects
+        setInterval(() => {
+            if (Math.random() < 0.1) { // 10% chance of glitch
+                this.triggerGlitch();
+            }
+        }, 5000);
+    }
+    
+    // Method to trigger a glitch effect
+    triggerGlitch() {
+        const glitchElement = document.querySelector('.glitch-effect');
+        if (!glitchElement) return;
+        
+        // Create random glitch elements
+        const glitchCount = Math.floor(Math.random() * 5) + 3;
+        let glitchHTML = '';
+        
+        for (let i = 0; i < glitchCount; i++) {
+            const top = Math.random() * 100;
+            const left = Math.random() * 100;
+            const width = Math.random() * 50 + 10;
+            const height = Math.random() * 10 + 2;
+            const color = Math.random() < 0.5 ? '#00ffff' : '#ff00ff';
+            
+            glitchHTML += `<div style="
+                position: absolute;
+                top: ${top}%;
+                left: ${left}%;
+                width: ${width}px;
+                height: ${height}px;
+                background-color: ${color};
+                opacity: 0.7;
+                z-index: 4;
+            "></div>`;
+        }
+        
+        glitchElement.innerHTML = glitchHTML;
+        
+        // Show glitch effect
+        glitchElement.style.opacity = '1';
+        
+        // Hide after a short time
+        setTimeout(() => {
+            glitchElement.style.opacity = '0';
+            setTimeout(() => {
+                glitchElement.innerHTML = '';
+            }, 300);
+        }, 150);
     }
 }
 

@@ -17,6 +17,19 @@ class ModelViewer {
     }
     
     init() {
+        // Get the container element
+        this.container = document.getElementById(this.containerId);
+        
+        // Check if container exists before proceeding
+        if (!this.container) {
+            console.warn(`Container with ID "${this.containerId}" not found. 3D model viewer initialization aborted.`);
+            return;
+        }
+        
+        // Get dimensions
+        this.width = this.container.clientWidth;
+        this.height = this.container.clientHeight;
+        
         // Create scene
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(0x0a0a12);
@@ -255,8 +268,24 @@ class ModelViewer {
     }
 }
 
+// Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    new ModelViewer();
+    const modelContainer = document.getElementById('model-showcase');
+    
+    // Only initialize if the container exists
+    if (modelContainer) {
+        window.modelViewer = new ModelViewer('model-showcase');
+        
+        // Make the initialization function available globally
+        window.initializeModelViewer = (containerId, progressCallback) => {
+            if (!window.modelViewer) {
+                window.modelViewer = new ModelViewer(containerId, progressCallback);
+            }
+            return window.modelViewer;
+        };
+    } else {
+        console.warn('Model showcase container not found. 3D model viewer not initialized.');
+    }
 });
 
 // Ensure the 3D model is properly isolated in its own container
