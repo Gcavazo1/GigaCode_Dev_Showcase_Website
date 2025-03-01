@@ -343,24 +343,34 @@
             </div>
         </section>
 
-        <!-- Holographic UI Section -->
-        <section id="holographic-ui" class="section">
-            <div class="section-header">
-                <h2 class="cyber-heading">Holographic Interface</h2>
-                <div class="neon-separator"></div>
-            </div>
-            <div class="holographic-container">
-                <div class="holographic-element" data-depth="1.5">
-                    <h3>Neural Network</h3>
-                    <div class="holo-graph"></div>
+        <!-- Holographic Interface Section -->
+        <section class="holo-section">
+            <h2>HOLOGRAPHIC INTERFACE</h2>
+            <div class="holo-container">
+                <!-- Top row displays -->
+                <div class="holo-top-row">
+                    <div class="holo-display neural-network">
+                        <h3>Neural Network</h3>
+                        <canvas id="network-canvas"></canvas>
+                    </div>
+                    
+                    <div class="holo-display system-status">
+                        <h3>System Status</h3>
+                        <div class="status-bars">
+                            <!-- Status bars content -->
+                        </div>
+                    </div>
+                    
+                    <div class="holo-display project-matrix">
+                        <h3>Project Matrix</h3>
+                        <div class="matrix-content"></div>
+                    </div>
                 </div>
-                <div class="holographic-element" data-depth="1">
-                    <h3>System Status</h3>
-                    <div class="holo-stats"></div>
-                </div>
-                <div class="holographic-element" data-depth="2">
-                    <h3>Project Matrix</h3>
-                    <div class="holo-matrix"></div>
+                
+                <!-- New bottom horizontal display -->
+                <div class="holo-display holo-timeline">
+                    <h3>System Timeline</h3>
+                    <div class="timeline-content"></div>
                 </div>
             </div>
         </section>
