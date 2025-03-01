@@ -79,6 +79,9 @@ class AudioVisualizer {
         document.addEventListener('keydown', () => this.handleUserInteraction());
         document.addEventListener('touchstart', () => this.handleUserInteraction());
         
+        // Add looping by default
+        this.isLooping = true;
+        
         this.init();
         
         // Initialize playlist UI after audio setup
@@ -123,6 +126,9 @@ class AudioVisualizer {
             
             // Start animation only after audio is set up
             this.animate();
+            
+            // Set default looping
+            this.audio.loop = this.isLooping;
         } catch (error) {
             console.error("Audio initialization error:", error);
             this.showStatus("Audio system initialization failed. Please try a different browser.", "error");
@@ -355,13 +361,20 @@ class AudioVisualizer {
         nextButton.innerHTML = '<i class="fas fa-step-forward"></i>';
         nextButton.addEventListener('click', () => this.nextTrack());
         
-        // Add repeat button
+        // Add repeat button - make it active by default
         const repeatButton = document.createElement('button');
-        repeatButton.className = 'playlist-control-button';
+        repeatButton.className = 'playlist-control-button active';
         repeatButton.innerHTML = '<i class="fas fa-redo-alt"></i>';
         repeatButton.addEventListener('click', () => {
-            this.audio.loop = !this.audio.loop;
-            repeatButton.classList.toggle('active');
+            this.isLooping = !this.isLooping;
+            this.audio.loop = this.isLooping;
+            repeatButton.classList.toggle('active', this.isLooping);
+            
+            if (this.isLooping) {
+                this.showStatus("Track will repeat", "info");
+            } else {
+                this.showStatus("Auto-advance to next track", "info");
+            }
         });
         
         // Add buttons to controls
@@ -376,11 +389,12 @@ class AudioVisualizer {
         // Add playlist to the audio container
         document.querySelector('.audio-container').appendChild(playlistContainer);
         
-        // Add event listener for track end to play next track
+        // Update the ended event listener to respect looping setting
         this.audio.addEventListener('ended', () => {
-            if (!this.audio.loop) {
+            if (!this.isLooping) {
                 this.nextTrack();
             }
+            // If looping is enabled, the audio element's native loop will handle it
         });
     }
     
@@ -418,89 +432,10 @@ class AudioVisualizer {
                 });
                 
                 this.showStatus(`Now playing: ${this.playlist[index].title}`, "success");
+                
+                // Apply current loop setting to the new track
+                this.audio.loop = this.isLooping;
             })
             .catch(error => {
                 console.error("Error loading track:", error);
-                this.showStatus(`Error loading track: ${this.playlist[index].title}`, "error");
-            });
-    }
-    
-    nextTrack() {
-        const nextIndex = (this.currentTrack + 1) % this.playlist.length;
-        this.loadTrack(nextIndex);
-    }
-    
-    prevTrack() {
-        const prevIndex = (this.currentTrack - 1 + this.playlist.length) % this.playlist.length;
-        this.loadTrack(prevIndex);
-    }
-    
-    shufflePlaylist() {
-        // Get a random track that's not the current one
-        let randomIndex;
-        do {
-            randomIndex = Math.floor(Math.random() * this.playlist.length);
-        } while (randomIndex === this.currentTrack && this.playlist.length > 1);
-        
-        this.loadTrack(randomIndex);
-    }
-    
-    handleUserInteraction() {
-        if (!this.hasInteracted) {
-            this.hasInteracted = true;
-            console.log("User interaction detected, attempting to play audio...");
-            
-            // Resume audio context (needed for Chrome)
-            if (this.audioContext && this.audioContext.state === 'suspended') {
-                this.audioContext.resume().then(() => {
-                    console.log("AudioContext resumed successfully");
-                    this.attemptAutoplay();
-                });
-            } else {
-                this.attemptAutoplay();
-            }
-        }
-    }
-    
-    attemptAutoplay() {
-        console.log("Attempting autoplay...");
-        
-        // Only try to play if we have audio loaded
-        if (this.audio && this.audio.readyState >= 2) {
-            const playPromise = this.audio.play();
-            
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    console.log("Autoplay successful!");
-                    this.isPlaying = true;
-                    this.playButton.innerHTML = '<i class="fas fa-pause"></i><span>Pause</span>';
-                    this.playButton.classList.add('playing');
-                    this.showStatus("Music playing", "success");
-                }).catch(error => {
-                    console.error("Autoplay failed:", error);
-                    this.showStatus("Click play to start music", "info");
-                    
-                    // Add a visual cue to draw attention to the play button
-                    this.playButton.classList.add('pulse-attention');
-                    setTimeout(() => {
-                        this.playButton.classList.remove('pulse-attention');
-                    }, 2000);
-                });
-            }
-        } else {
-            console.log("Audio not ready yet, will try again when loaded");
-            
-            // Try again when the audio is loaded
-            this.audio.addEventListener('canplaythrough', () => {
-                if (this.hasInteracted && !this.isPlaying) {
-                    this.attemptAutoplay();
-                }
-            }, { once: true });
-        }
-    }
-}
-
-// Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    new AudioVisualizer();
-}); 
+                this.showStatus(`
