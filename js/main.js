@@ -349,4 +349,44 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             requestAnimationFrame(scrollToElement);
         }
     });
-}); 
+});
+
+// Add this function to optimize performance
+function optimizePerformance() {
+    // Lazy load images
+    const lazyImages = document.querySelectorAll('img[data-src]');
+    if ('IntersectionObserver' in window) {
+        const imageObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    img.src = img.dataset.src;
+                    img.removeAttribute('data-src');
+                    imageObserver.unobserve(img);
+                }
+            });
+        });
+        
+        lazyImages.forEach(img => imageObserver.observe(img));
+    } else {
+        // Fallback for browsers without IntersectionObserver
+        lazyImages.forEach(img => {
+            img.src = img.dataset.src;
+            img.removeAttribute('data-src');
+        });
+    }
+    
+    // Throttle scroll events
+    let scrollTimeout;
+    window.addEventListener('scroll', () => {
+        if (!scrollTimeout) {
+            scrollTimeout = setTimeout(() => {
+                scrollTimeout = null;
+                // Perform scroll-based operations here
+            }, 20);
+        }
+    });
+}
+
+// Call the function when the page is loaded
+window.addEventListener('load', optimizePerformance); 

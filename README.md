@@ -1,82 +1,42 @@
-# GigaCode Dev Showcase Website
+# GigaCode Developer Portfolio
 
-A cyberpunk-inspired developer portfolio and showcase website featuring advanced web technologies including Live2D integration, 3D model showcase, holographic UI, and interactive animations.
+A cyberpunk-themed portfolio website showcasing mobile apps, Roblox games, 3D models, and interactive web experiences.
 
-## 🌟 Features
+## Features
 
-- **Cyberpunk Design** - Dark-themed with neon glow effects and futuristic aesthetics
-- **Interactive Navigation** - Smooth scrolling with animated side navigation
-- **Live2D Integration** - Interactive animated character assistant
-- **3D Model Showcase** - WebGL-powered 3D model viewer with a cyberpunk-styled helmet
-- **Audio Visualization** - Background music with reactive visual elements
-- **Holographic UI** - Advanced UI components with holographic effects
-- **Particle Effects** - Dynamic background particle system
-- **Responsive Layout** - Optimized for various screen sizes
+- Interactive 3D model showcase using Three.js
+- Holographic interface with animated displays
+- AI Assistant with speech synthesis and natural language processing
+- Audio visualizer with playlist functionality
+- Particle system background
+- Responsive design for all devices
+- Cyberpunk-themed UI with neon effects and animations
 
-## 📋 Sections
+## Technologies Used
 
-- **Bio & Mission** - Developer introduction with animated text effects
-- **Mobile App Projects** - Showcase of mobile application development
-- **Roblox Projects** - Upcoming game development projects
-- **Donation Area** - Support options with animated payment buttons
-- **Developer Recruitment** - Join the team section with interactive form
+- HTML5, CSS3, JavaScript
+- Three.js for 3D rendering
+- Web Audio API for sound visualization
+- Speech Synthesis API for AI Assistant voice
+- CSS animations and transitions
+- Responsive design with media queries
 
-## 🛠️ Technologies
-
-- **HTML5/CSS3** - Modern markup and styling
-- **JavaScript (ES6+)** - Advanced interaction and animations
-- **Live2D Cubism** - 2D character animation
-- **Three.js** - 3D rendering and model display
-- **GSAP** - Smooth animations and transitions
-- **Web Audio API** - Audio processing and visualization
-
-## 🚀 Live Demo
-
-Visit the live website: [GigaCode Dev Showcase](https://gcavazo1.github.io/GigaCode_Dev_Showcase_Website/)
-
-## 🛠️ Local Development
-
-To run this project locally:
+## Setup
 
 1. Clone the repository
-   ```bash
-   git clone https://github.com/Gcavazo1/GigaCode_Dev_Showcase_Website.git
-   ```
+2. Open index.html in your browser or use a local server
 
-2. Navigate to project directory
-   ```bash
-   cd GigaCode_Dev_Showcase_Website
-   ```
+## Browser Compatibility
 
-3. Start local server
-   ```bash
-   npx serve
-   ```
+Tested and working in:
+- Chrome (recommended for best experience)
+- Firefox
+- Edge
+- Safari
 
-4. Visit `http://localhost:3000` in your browser
+## Credits
 
-## 🎮 Interactive Elements
-
-- **Live2D Assistant** - Interact with the animated character for guidance
-- **3D Models** - Rotate and zoom the 3D models in the showcase
-- **Audio Controls** - Toggle background music and visualizations
-- **Holographic Panels** - Interactive information displays with hover effects
-
-## 🔮 Future Enhancements
-
-- Voice command integration
-- Expanded 3D model gallery
-- Interactive project demos
-- AR/VR project showcase
-
-## 📝 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🤝 Contributing
-
-Interested in contributing? Check out the recruitment section on the website or open an issue/PR on GitHub.
-
-## 📞 Contact
-
-For inquiries, reach out through the contact form on the website or via GitHub.
+- Font Awesome for icons
+- Google Fonts for typography
+- GSAP for animations
+- Three.js for 3D rendering
