@@ -14,6 +14,11 @@ class AudioVisualizer {
         this.dataArray = null;
         this.source = null;
         
+        // Add a status message element
+        this.statusMessage = document.createElement('div');
+        this.statusMessage.className = 'audio-status';
+        document.querySelector('.audio-container').appendChild(this.statusMessage);
+        
         this.playlist = [
             {
                 title: "Cyberpunk Theme",
@@ -23,49 +28,82 @@ class AudioVisualizer {
         
         this.currentTrack = 0;
         
+        // Add autoplay with user interaction flag
+        this.hasInteracted = false;
+        
+        // Listen for first user interaction
+        document.addEventListener('click', () => this.handleFirstInteraction(), { once: true });
+        document.addEventListener('keydown', () => this.handleFirstInteraction(), { once: true });
+        
         this.init();
     }
     
     init() {
-        // Initialize Web Audio API
-        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        try {
+            // Initialize Web Audio API
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // Set up audio element
+            this.audio.src = "audio/cyberpunk-theme.mp3";
+            this.audio.load();
+            
+            // Create analyzer after audio is loaded
+            this.audio.addEventListener('loadedmetadata', () => {
+                this.setupAudioNodes();
+                this.showStatus("Audio loaded successfully", "success");
+                this.playButton.disabled = false;
+            });
+            
+            // Handle audio loading error
+            this.audio.addEventListener('error', (e) => {
+                console.error("Audio error:", e);
+                this.showStatus("Error loading audio. Using fallback audio.", "error");
+                
+                // Try a fallback audio source
+                this.audio.src = "https://assets.codepen.io/4358584/Anitek_-_Komorebi.mp3";
+                this.audio.load();
+            });
+            
+            // Set up canvas
+            this.resizeCanvas();
+            window.addEventListener('resize', () => this.resizeCanvas());
+            
+            // Set up controls
+            this.setupEventListeners();
+            
+            // Start animation
+            this.animate();
+        } catch (error) {
+            console.error("Audio initialization error:", error);
+            this.showStatus("Your browser doesn't support Web Audio API", "error");
+        }
+    }
+    
+    setupAudioNodes() {
+        // Set up analyzer
         this.analyser = this.audioContext.createAnalyser();
         this.analyser.fftSize = 256;
         this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
         
-        // Set up audio source
+        // Connect audio to analyzer
         this.source = this.audioContext.createMediaElementSource(this.audio);
         this.source.connect(this.analyser);
         this.analyser.connect(this.audioContext.destination);
         
         // Set initial volume
-        this.audio.volume = this.volumeSlider.value;
+        if (this.volumeSlider) {
+            this.audio.volume = this.volumeSlider.value;
+        }
+    }
+    
+    showStatus(message, type) {
+        this.statusMessage.textContent = message;
+        this.statusMessage.className = `audio-status ${type}`;
         
-        // Set up canvas
-        this.resizeCanvas();
-        window.addEventListener('resize', () => this.resizeCanvas());
-        
-        // Set up controls
-        this.setupEventListeners();
-        
-        // Start animation
-        this.animate();
-        
-        // Add loading indicator
-        this.audio.addEventListener('loadeddata', () => {
-            console.log('Audio loaded successfully');
-            this.playButton.disabled = false;
-            this.playButton.textContent = 'Play Music';
-        });
-        
-        // Add error handling
-        this.audio.addEventListener('error', (e) => {
-            console.error('Error loading audio:', e);
-            this.playButton.textContent = 'Audio Load Error';
-            this.playButton.disabled = true;
-        });
-        
-        this.initPlaylist();
+        // Hide status after 5 seconds
+        setTimeout(() => {
+            this.statusMessage.style.opacity = '0';
+        }, 5000);
     }
     
     setupEventListeners() {
@@ -167,6 +205,23 @@ class AudioVisualizer {
         this.audio.load();
         if (this.isPlaying) {
             this.audio.play();
+        }
+    }
+    
+    handleFirstInteraction() {
+        if (!this.hasInteracted) {
+            this.hasInteracted = true;
+            
+            // Try to autoplay after user interaction
+            this.audio.play().then(() => {
+                this.isPlaying = true;
+                this.playButton.innerHTML = '<i class="fas fa-pause"></i><span>Pause</span>';
+                this.playButton.classList.add('playing');
+                this.showStatus("Music playing", "success");
+            }).catch(error => {
+                console.error("Autoplay failed:", error);
+                this.showStatus("Click play to start music", "info");
+            });
         }
     }
 }

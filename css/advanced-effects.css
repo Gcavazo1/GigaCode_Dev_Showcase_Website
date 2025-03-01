@@ -601,4 +601,29 @@
     .project-features {
         grid-template-columns: repeat(2, 1fr);
     }
+}
+
+.audio-status {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    color: white;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    z-index: 10;
+    transition: opacity 0.5s ease;
+}
+
+.audio-status.success {
+    border-color: rgba(0, 255, 0, 0.5);
+    color: #00ff00;
+}
+
+.audio-status.error {
+    border-color: rgba(255, 0, 0, 0.5);
+    color: #ff5555;
 } 
