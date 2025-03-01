@@ -88,7 +88,7 @@ class ModelViewer {
         try {
             // Try loading a sample model from Three.js examples
             loader.load(
-                'https://threejs.org/examples/models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf',
+                'models/gltf/SlothSword.gltf',
                 (gltf) => {
                     // Remove any existing model
                     if (this.model) {
@@ -326,7 +326,7 @@ function initializeModelViewer(containerId, progressCallback) {
     let controls = null;
     
     loader.load(
-        'https://threejs.org/examples/models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf', 
+        'models/gltf/SlothSword.gltf',
         (gltf) => {
             // Model loaded successfully
             model = gltf.scene;
