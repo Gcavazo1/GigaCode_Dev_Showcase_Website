@@ -1,0 +1,109 @@
+{
+    "name": "MY_WEBSITE-MAIN",
+    "description": "A cyberpunk-inspired link-tree portfolio showcasing my dev skills, AI collaboration, and projects.",
+    "rules": {
+      "project-structure": {
+        "folders": [
+          {
+            "name": "src",
+            "description": "Contains all source files for the project."
+          },
+          {
+            "name": "src/components",
+            "description": "Reusable UI components such as buttons, cards, and sections."
+          },
+          {
+            "name": "src/assets",
+            "description": "Images, icons, and fonts used in the site."
+          },
+          {
+            "name": "src/css",
+            "description": "All stylesheets, including global and component-specific styles."
+          },
+          {
+            "name": "src/js",
+            "description": "JavaScript files handling interactivity, animations, and API integrations."
+          }
+        ],
+        "files": [
+          {
+            "name": "index.html",
+            "description": "Main entry point for the website."
+          },
+          {
+            "name": "src/css/styles.css",
+            "description": "Global styles including layout, typography, and theme."
+          },
+          {
+            "name": "src/css/animations.css",
+            "description": "Custom animations and transitions for the website."
+          },
+          {
+            "name": "src/js/main.js",
+            "description": "Core functionality and event handling."
+          },
+          {
+            "name": "src/js/animations.js",
+            "description": "Handles all GSAP or CSS-based animations."
+          },
+          {
+            "name": "src/js/navigation.js",
+            "description": "Handles smooth scrolling and navigation behavior."
+          }
+        ]
+      },
+      "coding-standards": {
+        "html": {
+          "use-semantic-tags": true,
+          "enforce-accessibility": true,
+          "meta-tags": [
+            {
+              "name": "viewport",
+              "content": "width=device-width, initial-scale=1.0"
+            },
+            {
+              "name": "description",
+              "content": "Showcasing AI-powered development with animations, projects, and collaborations."
+            }
+          ]
+        },
+        "css": {
+          "use-bem-naming": true,
+          "prefer-custom-properties": true,
+          "animations": {
+            "use-gsap": true,
+            "fallback-css-transitions": true
+          }
+        },
+        "javascript": {
+          "use-es6": true,
+          "separate-concerns": true,
+          "avoid-inline-scripts": true,
+          "modular-structure": true
+        }
+      },
+      "performance": {
+        "lazy-load-images": true,
+        "minify-css-js": true,
+        "use-cdn-for-libraries": [
+          "gsap",
+          "font-awesome"
+        ],
+        "optimize-fonts": true
+      }
+    }
+  }
+  
+  📁 MY_WEBSITE-MAIN
+│── 📄 index.html          # Main entry point
+│── 📁 src
+│   ├── 📁 components      # Reusable UI components
+│   ├── 📁 assets          # Images, icons, fonts
+│   ├── 📁 css
+│   │   ├── styles.css     # Global styles
+│   │   ├── animations.css # Custom animations
+│   ├── 📁 js
+│   │   ├── main.js        # Core functionality
+│   │   ├── animations.js  # GSAP-based animations
+│   │   ├── navigation.js  # Smooth scrolling & navigation
+│── 📄 .cursor-rules.json  # AI coding rules

@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GigaCode Developer | Cyberpunk Portfolio</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/advanced-effects.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Three.js for 3D models -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.min.js"></script>
+    
+    <!-- Live2D for anime character -->
+    <script src="https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/dylanNew/live2d/js/live2d.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@5.3.3/dist/pixi.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pixi-live2d-display/dist/index.min.js"></script>
+
+    <!-- Postprocessing for 3D models -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/postprocessing/EffectComposer.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/postprocessing/RenderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/postprocessing/UnrealBloomPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/shaders/CopyShader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/shaders/LuminosityHighPassShader.js"></script>
+</head>
+<body>
+    <!-- Background Elements -->
+    <div class="cyber-background">
+        <div class="grid-overlay"></div>
+        <div class="glow-circle circle-1"></div>
+        <div class="glow-circle circle-2"></div>
+        <div class="glow-circle circle-3"></div>
+        <div class="glow-circle circle-4"></div>
+    </div>
+    
+    <!-- Particle System Canvas -->
+    <canvas id="particles-canvas" class="particles-canvas"></canvas>
+
+    <!-- Navigation -->
+    <nav class="side-nav">
+        <div class="nav-logo">
+            <div class="logo-glow"></div>
+            <span>DEV</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#home" class="active"><i class="fas fa-home"></i><span>Home</span></a></li>
+            <li><a href="#bio"><i class="fas fa-user"></i><span>Bio</span></a></li>
+            <li><a href="#mobile-apps"><i class="fas fa-mobile-alt"></i><span>Mobile Apps</span></a></li>
+            <li><a href="#roblox-projects"><i class="fas fa-gamepad"></i><span>Roblox</span></a></li>
+            <li><a href="#showcase"><i class="fas fa-cube"></i><span>3D Showcase</span></a></li>
+            <li><a href="#holographic-ui"><i class="fas fa-vr-cardboard"></i><span>Holo UI</span></a></li>
+            <li><a href="#virtual-assistant"><i class="fas fa-robot"></i><span>Assistant</span></a></li>
+            <li><a href="#audio-section"><i class="fas fa-music"></i><span>Audio</span></a></li>
+            <li><a href="#donate"><i class="fas fa-hand-holding-heart"></i><span>Donate</span></a></li>
+            <li><a href="#join-team"><i class="fas fa-users"></i><span>Join Team</span></a></li>
+        </ul>
+        <div class="nav-footer">
+            <a href="https://github.com/yourusername" target="_blank"><i class="fab fa-github"></i></a>
+            <a href="https://twitter.com/yourusername" target="_blank"><i class="fab fa-twitter"></i></a>
+            <a href="https://linkedin.com/in/yourusername" target="_blank"><i class="fab fa-linkedin"></i></a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Home Section -->
+        <section id="home" class="section">
+            <div class="glitch-container">
+                <h1 class="glitch-text" data-text="GigaCode Developer">
+                    <span class="highlight-letter">G</span><span class="regular-letter">iga</span><span class="highlight-letter">C</span><span class="regular-letter">ode Developer</span>
+                </h1>
+            </div>
+            <div class="tagline">
+                <span class="typing-text">Building the future, one line of code at a time.</span>
+            </div>
+            <div class="scroll-indicator">
+                <span>Scroll Down</span>
+                <div class="scroll-arrow"></div>
+            </div>
+        </section>
+
+        <!-- Bio Section - Update with simplified terminal style -->
+        <section id="bio" class="section">
+            <div class="section-header">
+                <h2 class="cyber-heading">About Me</h2>
+                <div class="neon-separator"></div>
+            </div>
+            <div class="bio-content">
+                <div class="terminal-container">
+                    <div class="terminal-header">
+                        <div class="terminal-buttons">
+                            <span class="terminal-button close"></span>
+                            <span class="terminal-button minimize"></span>
+                            <span class="terminal-button maximize"></span>
+                        </div>
+                        <div class="terminal-title">dev_profile.exe</div>
+                    </div>
+                    <div class="terminal-body">
+                        <div class="terminal-line">
+                            <span class="terminal-prompt">C:\Users\Dev></span>
+                            <span class="terminal-command">get-profile -section bio</span>
+                        </div>
+                        <div class="terminal-output bio-text">
+                            <p class="terminal-typing" data-text="I'm a versatile developer with expertise in cross-platform mobile technologies like Flutter and React Native. My journey in tech began with a fascination for creating experiences that seamlessly bridge the digital and physical worlds."></p>
+                        </div>
+                        
+                        <div class="terminal-line">
+                            <span class="terminal-prompt">C:\Users\Dev></span>
+                            <span class="terminal-command">get-profile -section experience</span>
+                        </div>
+                        <div class="terminal-output bio-text">
+                            <p class="terminal-typing delay-1" data-text="With a foundation in mobile app development, I'm expanding my creative horizons into the immersive realms of mobile gaming and Roblox development—spaces where innovation and imagination collide to create memorable user experiences."></p>
+                        </div>
+                        
+                        <div class="terminal-line">
+                            <span class="terminal-prompt">C:\Users\Dev></span>
+                            <span class="terminal-command">get-profile -section philosophy</span>
+                        </div>
+                        <div class="terminal-output bio-text">
+                            <p class="terminal-typing delay-2" data-text="I believe in the transformative power of AI to revolutionize development workflows, enabling creators to focus on innovation rather than repetition. By leveraging cutting-edge AI tools, I'm constantly pushing the boundaries of what's possible in my projects."></p>
+                        </div>
+                        
+                        <div class="terminal-line">
+                            <span class="terminal-prompt">C:\Users\Dev></span>
+                            <span class="terminal-command">get-profile -section mission</span>
+                        </div>
+                        <div class="terminal-output mission-statement">
+                            <h3 class="cyber-subheading terminal-response">MISSION:</h3>
+                            <p class="terminal-typing delay-3" data-text="To build a collaborative ecosystem of forward-thinking developers, designers, and creators who harness emerging technologies to craft immersive digital experiences that inspire, entertain, and solve real-world problems."></p>
+                        </div>
+                        
+                        <div class="terminal-line">
+                            <span class="terminal-prompt">C:\Users\Dev></span>
+                            <span class="terminal-command">get-profile -section team</span>
+                        </div>
+                        <div class="terminal-output mission-statement">
+                            <p class="terminal-typing delay-4" data-text="I'm actively seeking passionate collaborators—from experienced Roblox builders and Lua scripters to 3D modelers, sound designers, and fellow programmers—who share my vision of pushing creative boundaries through technology."></p>
+                        </div>
+                        
+                        <div class="terminal-line">
+                            <span class="terminal-prompt blink">C:\Users\Dev></span>
+                            <span class="terminal-cursor"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mobile Apps Section -->
+        <section id="mobile-apps" class="section">
+            <div class="section-header">
+                <h2 class="cyber-heading">Mobile Applications</h2>
+                <div class="neon-separator"></div>
+            </div>
+            <div class="projects-grid">
+                <!-- Project Card 1 -->
+                <div class="project-card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="project-image">
+                                <img src="images/app1.jpg" alt="Mobile App 1">
+                            </div>
+                            <h3 class="project-title">Stay Hard 956</h3>
+                        </div>
+                        <div class="card-back">
+                            <p class="project-description">Stay_Hard_956 is a fitness app designed to bring Laredo’s health and wellness community together. Featuring real-time activity tracking, trainer networks, and community announcements, it’s the go-to platform for staying fit and connected. With easy access to local gyms and trainers, Stay_Hard_956 helps users achieve their fitness goals while supporting the local fitness scene.
+
+                            </p>
+                            <div class="project-links">
+                                <a href="#" class="cyber-button small">Demo</a>
+                                <a href="#" class="cyber-button small">GitHub</a>
+                            </div>
+                            <div class="tech-stack">
+                                <span>React Native</span>
+                                <span>Firebase</span>
+                                <span>TensorFlow</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project Card 2 -->
+                <div class="project-card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="project-image">
+                                <img src="images/app2.jpg" alt="Mobile App 2">
+                            </div>
+                            <h3 class="project-title">SmartEats</h3>
+                        </div>
+                        <div class="card-back">
+                            <p class="project-description">SmartEats is the ultimate AI-driven meal planning app designed to take the guesswork out of healthy eating. Powered by advanced AI models, SmartEats personalizes meal plans based on your age, weight, activity level, and dietary preferences, ensuring you get optimized nutrition tailored to your goals.
+
+                            </p>
+                            <div class="project-links">
+                                <a href="#" class="cyber-button small">Demo</a>
+                                <a href="#" class="cyber-button small">GitHub</a>
+                            </div>
+                            <div class="tech-stack">
+                                <span>Flutter</span>
+                                <span>Node.js</span>
+                                <span>MongoDB</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project Card 3 -->
+                <div class="project-card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="project-image">
+                                <img src="images/app3.jpg" alt="Mobile App 3">
+                            </div>
+                            <h3 class="project-title">AR Navigator</h3>
+                        </div>
+                        <div class="card-back">
+                            <p class="project-description">Augmented reality navigation system that overlays directions and points of interest on the real world.</p>
+                            <div class="project-links">
+                                <a href="#" class="cyber-button small">Demo</a>
+                                <a href="#" class="cyber-button small">GitHub</a>
+                            </div>
+                            <div class="tech-stack">
+                                <span>Swift</span>
+                                <span>ARKit</span>
+                                <span>CoreLocation</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Roblox Projects Section -->
+        <section id="roblox-projects" class="section">
+            <div class="section-header">
+                <h2 class="cyber-heading">Roblox Projects</h2>
+                <div class="neon-separator"></div>
+            </div>
+            <div class="roblox-grid">
+                <!-- Roblox Project 1 -->
+                <div class="roblox-card">
+                    <div class="roblox-image">
+                        <img src="images/roblox1.jpg" alt="Roblox Project 1">
+                        <div class="status-badge">In Development</div>
+                    </div>
+                    <div class="roblox-info">
+                        <h3 class="roblox-title">Cyber City Simulator</h3>
+                        <p class="roblox-description">A futuristic city-building game where players construct and manage their own cyberpunk metropolis.</p>
+                        <div class="roblox-features">
+                            <span>Multiplayer</span>
+                            <span>Economy System</span>
+                            <span>Custom Characters</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Roblox Project 2 -->
+                <div class="roblox-card">
+                    <div class="roblox-image">
+                        <img src="images/roblox2.jpg" alt="Roblox Project 2">
+                        <div class="status-badge">Coming Soon</div>
+                    </div>
+                    <div class="roblox-info">
+                        <h3 class="roblox-title">Neon Racer</h3>
+                        <p class="roblox-description">High-speed racing game set in a neon-lit futuristic world with customizable vehicles and tracks.</p>
+                        <div class="roblox-features">
+                            <span>Competitive Racing</span>
+                            <span>Vehicle Customization</span>
+                            <span>Dynamic Tracks</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3D Model Showcase Section -->
+        <section id="showcase" class="section">
+            <div class="section-header">
+                <h2 class="cyber-heading">3D Showcase</h2>
+                <div class="neon-separator"></div>
+            </div>
+            <div id="model-container" class="model-container"></div>
+            <div class="model-controls">
+                <button id="toggle-rotation" class="cyber-button small">Stop Rotation</button>
+                <button id="toggle-wireframe" class="cyber-button small">Show Wireframe</button>
+            </div>
+        </section>
+
+        <!-- Holographic UI Section -->
+        <section id="holographic-ui" class="section">
+            <div class="section-header">
+                <h2 class="cyber-heading">Holographic Interface</h2>
+                <div class="neon-separator"></div>
+            </div>
+            <div class="holographic-container">
+                <div class="holographic-element" data-depth="1.5">
+                    <h3>Neural Network</h3>
+                    <div class="holo-graph"></div>
+                </div>
+                <div class="holographic-element" data-depth="1">
+                    <h3>System Status</h3>
+                    <div class="holo-stats"></div>
+                </div>
+                <div class="holographic-element" data-depth="2">
+                    <h3>Project Matrix</h3>
+                    <div class="holo-matrix"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Virtual Assistant Section -->
+        <section id="virtual-assistant" class="section">
+            <div class="section-header">
+                <h2 class="cyber-heading">Virtual Assistant</h2>
+                <div class="neon-separator"></div>
+            </div>
+            <div class="assistant-container">
+                <canvas id="live2d-canvas" width="400" height="600"></canvas>
+                <div class="assistant-dialog">
+                    <p class="assistant-text typing-text">How can I assist you today?</p>
+                    <div class="assistant-buttons">
+                        <button class="cyber-button small">Portfolio</button>
+                        <button class="cyber-button small">Contact</button>
+                        <button class="cyber-button small">Projects</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Audio Visualization Section -->
+        <section id="audio-section" class="section">
+            <div class="section-header">
+                <h2 class="cyber-heading">Cyberpunk Soundtrack</h2>
+                <div class="neon-separator"></div>
+            </div>
+            <div class="audio-container">
+                <canvas id="audio-canvas" class="audio-canvas"></canvas>
+                <audio id="background-audio" loop>
+                    <source src="audio/cyberpunk-theme.mp3" type="audio/mp3">
+                </audio>
+                <button id="play-audio" class="cyber-button medium">Play Music</button>
+            </div>
+        </section>
+
+        <!-- Donation Section -->
+        <section id="donate" class="section">
+            <div class="section-header">
+                <h2 class="cyber-heading">Support My Work</h2>
+                <div class="neon-separator"></div>
+            </div>
+            <div class="donation-content">
+                <p class="donation-text">If you enjoy my projects and want to support future development, consider making a donation. Every contribution helps!</p>
+                <div class="donation-buttons">
+                    <a href="#" class="donation-button paypal">
+                        <i class="fab fa-paypal"></i>
+                        <span>PayPal</span>
+                        <div class="button-glow"></div>
+                    </a>
+                    <a href="#" class="donation-button patreon">
+                        <i class="fab fa-patreon"></i>
+                        <span>Patreon</span>
+                        <div class="button-glow"></div>
+                    </a>
+                    <a href="#" class="donation-button kofi">
+                        <i class="fas fa-mug-hot"></i>
+                        <span>Ko-fi</span>
+                        <div class="button-glow"></div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Join Team Section -->
+        <section id="join-team" class="section">
+            <div class="section-header">
+                <h2 class="cyber-heading">Join My Team</h2>
+                <div class="neon-separator"></div>
+            </div>
+            <div class="recruitment-content">
+                <div class="recruitment-text">
+                    <h3 class="animated-headline">Looking for <span class="highlight-text">talented developers</span> to collaborate on exciting projects!</h3>
+                    <p>I'm always on the lookout for passionate developers, designers, and creative minds to join forces on innovative projects. If you're interested in creating cutting-edge applications and games, let's connect!</p>
+                    <ul class="positions-list">
+                        <li><span class="position-badge">Mobile Developers</span></li>
+                        <li><span class="position-badge">UI/UX Designers</span></li>
+                        <li><span class="position-badge">Roblox Scripters</span></li>
+                        <li><span class="position-badge">3D Artists</span></li>
+                    </ul>
+                </div>
+                <div class="recruitment-action">
+                    <button id="join-button" class="cyber-button large">
+                        <span>Apply Now</span>
+                        <div class="button-glow"></div>
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal for Join Team Form -->
+    <div id="join-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 class="modal-title">Join The Team</h2>
+            <form id="join-form" class="cyber-form">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="position">Position</label>
+                    <select id="position" name="position">
+                        <option value="mobile-dev">Mobile Developer</option>
+                        <option value="ui-designer">UI/UX Designer</option>
+                        <option value="roblox-dev">Roblox Developer</option>
+                        <option value="3d-artist">3D Artist</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="portfolio">Portfolio URL</label>
+                    <input type="url" id="portfolio" name="portfolio">
+                </div>
+                <div class="form-group">
+                    <label for="message">Why do you want to join?</label>
+                    <textarea id="message" name="message" rows="4"></textarea>
+                </div>
+                <button type="submit" class="cyber-button">Submit Application</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/animations.js"></script>
+    <script src="js/particles.js"></script>
+    <script src="js/3d-model.js"></script>
+    <script src="js/holographic-ui.js"></script>
+    <script src="js/live2d-init.js"></script>
+    <script src="js/audio-visualizer.js"></script>
+</body>
+</html>
