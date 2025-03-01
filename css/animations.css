@@ -473,4 +473,14 @@
     100% {
         clip: rect(54px, 9999px, 160px, 0);
     }
+}
+
+/* Look for and remove any AI Assistant animation styles */
+.ai-assistant, #virtual-assistant {
+    /* Check for animation properties here */
+}
+
+/* Look for tagline typing animations */
+.typing-text {
+    /* Check for animation properties here */
 } 
