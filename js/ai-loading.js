@@ -23,9 +23,11 @@ document.addEventListener('DOMContentLoaded', function() {
         function typeTagline() {
             if (charIndex < taglineText.length) {
                 tagline.textContent += taglineText.charAt(charIndex);
+                tagline.classList.add('typing');
                 charIndex++;
                 setTimeout(typeTagline, 50);
             } else {
+                tagline.classList.remove('typing');
                 console.log("Tagline typing complete, showing loading sequence");
                 // After tagline is typed, show loading sequence
                 showLoadingSequence();
