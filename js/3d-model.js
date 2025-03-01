@@ -86,9 +86,9 @@ class ModelViewer {
         const loader = new THREE.GLTFLoader();
         
         try {
-            // Try loading a sample model from Three.js examples
+            // Load the ASUS ROG monitor model
             loader.load(
-                'models/gltf/SlothSword.gltf',
+                'models/asusROGmodel/asusROGmodel.glb',
                 (gltf) => {
                     // Remove any existing model
                     if (this.model) {
@@ -99,7 +99,7 @@ class ModelViewer {
                     this.model = gltf.scene;
                     
                     // Scale and position the model appropriately
-                    this.model.scale.set(0.5, 0.5, 0.5); // Adjust scale as needed
+                    this.model.scale.set(0.8, 0.8, 0.8); // Adjust scale for monitor
                     this.scene.add(this.model);
                     
                     // Center model
@@ -145,6 +145,15 @@ class ModelViewer {
                 (error) => {
                     console.error("Error loading model:", error);
                     console.error("Error details:", error.message);
+                    console.error("Error stack:", error.stack);
+                    
+                    // Try to provide more specific error information
+                    if (error.message.includes("404")) {
+                        console.error("Model file not found. Check the path: 'models/asusROGmodel/asusROGmodel.glb'");
+                    } else if (error.message.includes("Cross-Origin")) {
+                        console.error("CORS issue. Try using a local server to serve your files.");
+                    }
+                    
                     this.createFallbackModel();
                 }
             );
@@ -269,7 +278,7 @@ function initializeModelViewer(containerId, progressCallback) {
     scene.background = new THREE.Color(0x0a0a12);
     
     const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
-    camera.position.z = 5;
+    camera.position.set(0, 0, 7); // Move camera back a bit for larger models
     
     const renderer = new THREE.WebGLRenderer({ 
         antialias: true,
@@ -326,7 +335,7 @@ function initializeModelViewer(containerId, progressCallback) {
     let controls = null;
     
     loader.load(
-        'models/gltf/SlothSword.gltf',
+        'models/asusROGmodel/asusROGmodel.glb',
         (gltf) => {
             // Model loaded successfully
             model = gltf.scene;
@@ -408,32 +417,6 @@ function initializeModelViewer(containerId, progressCallback) {
         }
     }
     
-    // Animation loop
-    function animate() {
-        requestAnimationFrame(animate);
-        
-        // Animate placeholder if model not loaded yet
-        if (scene.children.includes(placeholder)) {
-            animatePlaceholder();
-        }
-        
-        // Update controls if they exist
-        if (controls) {
-            controls.update();
-        }
-        
-        // Animate lights
-        const time = Date.now() * 0.001;
-        if (neonLight1 && neonLight2) {
-            neonLight1.position.x = Math.sin(time) * 3;
-            neonLight1.position.z = Math.cos(time) * 3;
-            neonLight2.position.x = Math.sin(time + Math.PI) * 3;
-            neonLight2.position.z = Math.cos(time + Math.PI) * 3;
-        }
-        
-        renderer.render(scene, camera);
-    }
-    
     animate();
     
     // Handle window resize
@@ -445,4 +428,30 @@ function initializeModelViewer(containerId, progressCallback) {
 }
 
 // Export the function to be called from main.js
-window.initializeModelViewer = initializeModelViewer; 
+window.initializeModelViewer = initializeModelViewer;
+
+// Animation loop
+function animate() {
+    requestAnimationFrame(animate);
+    
+    // Animate placeholder if model not loaded yet
+    if (scene.children.includes(placeholder)) {
+        animatePlaceholder();
+    }
+    
+    // Update controls if they exist
+    if (controls) {
+        controls.update();
+    }
+    
+    // Animate lights
+    const time = Date.now() * 0.001;
+    if (neonLight1 && neonLight2) {
+        neonLight1.position.x = Math.sin(time) * 3;
+        neonLight1.position.z = Math.cos(time) * 3;
+        neonLight2.position.x = Math.sin(time + Math.PI) * 3;
+        neonLight2.position.z = Math.cos(time + Math.PI) * 3;
+    }
+    
+    renderer.render(scene, camera);
+} 
