@@ -1747,11 +1747,10 @@
 
 /* Improve home section and AI container spacing */
 .home-ai-container {
-    min-height: auto; /* Remove min-height: 100vh */
+    min-height: auto;
     display: flex;
     flex-direction: column;
-    gap: 1rem; /* Add gap between elements */
-    padding-top: 2rem; /* Reduce top padding */
+    gap: 1rem;
 }
 
 #home {
@@ -1773,20 +1772,44 @@
 /* Adjust AI Assistant positioning */
 #virtual-assistant.section.no-header {
     padding: 0;
-    margin-top: 0; /* Remove top margin */
+    margin: 0;
+    opacity: 0;
+    visibility: hidden; /* Hide initially */
 }
 
+/* Loaded state */
+#virtual-assistant.section.no-header.loaded {
+    opacity: 1;
+    visibility: visible;
+    animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+        visibility: visible;
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        visibility: visible;
+    }
+}
+
+/* Ensure the AI Assistant container is properly sized */
 .assistant-container {
     max-width: 900px;
-    margin: 0 auto; /* Remove vertical margin */
+    margin: 0 auto;
+    width: 100%;
 }
 
-/* Ensure the AI Assistant stays in view */
+/* Enhanced AI Assistant styling */
 .ai-assistant.enhanced {
-    margin-top: 0; /* Remove top margin */
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-/* Adjust the scroll behavior in JavaScript */ 
+    opacity: 1; /* Make sure the assistant itself is visible */
+    width: 100%;
+    margin: 0;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+} 

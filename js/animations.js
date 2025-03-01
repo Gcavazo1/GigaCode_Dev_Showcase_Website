@@ -227,32 +227,28 @@ document.addEventListener('DOMContentLoaded', () => {
                             
                             // Complete loading sequence
                             setTimeout(() => {
-                                // Ensure the AI Assistant is in view
-                                const homeAiContainer = document.querySelector('.home-ai-container');
-                                if (homeAiContainer) {
-                                    const containerTop = homeAiContainer.offsetTop;
-                                    window.scrollTo({
-                                        top: containerTop,
-                                        behavior: 'smooth'
-                                    });
-                                }
-                                
-                                // Fade in AI Assistant
-                                aiSection.classList.add('loaded');
-                                
-                                // Add glitch effect
-                                const aiAssistant = aiSection.querySelector('.ai-assistant');
-                                if (aiAssistant) {
-                                    aiAssistant.classList.add('glitching');
-                                    setTimeout(() => {
-                                        aiAssistant.classList.remove('glitching');
-                                    }, 500);
-                                }
-                                
-                                // Fade out loading sequence
+                                // Remove loading sequence first
                                 loadingSequence.style.opacity = '0';
                                 setTimeout(() => {
                                     loadingSequence.remove();
+                                    
+                                    // Then show AI Assistant
+                                    const aiSection = document.querySelector('#virtual-assistant');
+                                    if (aiSection) {
+                                        aiSection.style.display = 'block'; // Ensure it's displayed
+                                        requestAnimationFrame(() => {
+                                            aiSection.classList.add('loaded');
+                                        });
+                                        
+                                        // Add glitch effect
+                                        const aiAssistant = aiSection.querySelector('.ai-assistant');
+                                        if (aiAssistant) {
+                                            aiAssistant.classList.add('glitching');
+                                            setTimeout(() => {
+                                                aiAssistant.classList.remove('glitching');
+                                            }, 500);
+                                        }
+                                    }
                                 }, 500);
                             }, 800);
                         }
