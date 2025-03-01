@@ -549,4 +549,3 @@ class AudioVisualizer {
 document.addEventListener('DOMContentLoaded', () => {
     new AudioVisualizer();
 });
-                    this.showStatus(`
