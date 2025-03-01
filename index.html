@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/gan-showcase.css">
     
     <!-- Three.js for 3D models -->
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
@@ -75,13 +76,14 @@
             <span>DEV</span>
         </div>
         <ul class="nav-links">
-            <li><a href="#home" class="active"><i class="fas fa-home"></i><span>Home</span></a></li>
+            <li><a href="#home"><i class="fas fa-home"></i><span>Home</span></a></li>
             <li><a href="#virtual-assistant"><i class="fas fa-robot"></i><span>Assistant</span></a></li>
             <li><a href="#bio"><i class="fas fa-user"></i><span>Bio</span></a></li>
             <li><a href="#mobile-apps"><i class="fas fa-mobile-alt"></i><span>Mobile Apps</span></a></li>
             <li><a href="#roblox-projects"><i class="fas fa-gamepad"></i><span>Roblox</span></a></li>
             <li><a href="#showcase"><i class="fas fa-cube"></i><span>3D Showcase</span></a></li>
             <li><a href="#holographic-ui"><i class="fas fa-vr-cardboard"></i><span>Holo UI</span></a></li>
+            <li><a href="#gan-showcase"><i class="fas fa-brain"></i><span>AI Gen</span></a></li>
             <li><a href="#audio-section"><i class="fas fa-music"></i><span>Audio</span></a></li>
             <li><a href="#donate"><i class="fas fa-hand-holding-heart"></i><span>Donate</span></a></li>
             <li><a href="#join-team"><i class="fas fa-users"></i><span>Join Team</span></a></li>
@@ -479,6 +481,54 @@
             </div>
         </section>
 
+        <!-- Add this after the Holographic Interface section and before the Audio section -->
+        <section id="gan-showcase" class="section">
+            <div class="section-header">
+                <h2 class="cyber-heading">AI Image Generation</h2>
+                <div class="neon-separator"></div>
+            </div>
+            
+            <div class="gan-container">
+                <div class="gan-controls">
+                    <div class="slider-container">
+                        <label>Style Factor</label>
+                        <input type="range" id="style-slider" min="0" max="100" value="50">
+                    </div>
+                    <div class="slider-container">
+                        <label>Complexity</label>
+                        <input type="range" id="complexity-slider" min="0" max="100" value="70">
+                    </div>
+                    <div class="gan-buttons">
+                        <button id="generate-btn" class="cyber-button">Generate Image</button>
+                        <button id="randomize-btn" class="cyber-button">Randomize</button>
+                        <button id="save-btn" class="cyber-button">Save Image</button>
+                    </div>
+                </div>
+                
+                <div class="gan-display">
+                    <div class="gan-output">
+                        <div class="output-container">
+                            <canvas id="gan-canvas" width="512" height="512"></canvas>
+                            <div class="loading-overlay">
+                                <div class="cyber-spinner"></div>
+                                <div class="generation-status">Initializing AI...</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="gan-info">
+                        <h3>Generative Adversarial Network</h3>
+                        <p>This demo uses a GAN (Generative Adversarial Network) to create unique cyberpunk-style images in real-time. Adjust the sliders to control the output style and complexity.</p>
+                        <p>GANs consist of two neural networks competing against each other: a Generator that creates images and a Discriminator that evaluates them. Through this adversarial process, the system learns to generate increasingly realistic content.</p>
+                        <div class="tech-details">
+                            <span class="tech-badge">TensorFlow.js</span>
+                            <span class="tech-badge">StyleGAN2</span>
+                            <span class="tech-badge">WebGL</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Audio Visualization Section -->
         <section id="audio-section" class="section">
             <div class="section-header">
@@ -607,5 +657,6 @@
     <script src="js/holographic-interface.js"></script>
     <script src="js/mobile-menu.js"></script>
     <script src="js/ai-assistant.js"></script>
+    <script src="js/gan-showcase.js"></script>
 </body>
 </html>
