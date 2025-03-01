@@ -5,11 +5,42 @@ class ThreeAudioVisualizer {
         this.dataArray = dataArray;
         this.canvas = document.getElementById('audio-canvas');
         
-        // Initialize Three.js components
-        this.initThree();
+        // Check for WebGL support
+        if (!this.isWebGLSupported()) {
+            console.warn('WebGL not supported, falling back to canvas visualization');
+            this.fallbackVisualization();
+            return;
+        }
         
-        // Start animation loop
-        this.animate();
+        try {
+            // Initialize Three.js components
+            this.initThree();
+            
+            // Start animation loop
+            this.animate();
+        } catch (error) {
+            console.error('Error initializing Three.js visualizer:', error);
+            this.fallbackVisualization();
+        }
+    }
+    
+    isWebGLSupported() {
+        try {
+            const canvas = document.createElement('canvas');
+            return !!(window.WebGLRenderingContext && 
+                (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+        } catch (e) {
+            return false;
+        }
+    }
+    
+    fallbackVisualization() {
+        // Set up a fallback 2D canvas visualization
+        this.ctx = this.canvas.getContext('2d');
+        this.fallbackMode = true;
+        
+        // Start fallback animation
+        this.animateFallback();
     }
     
     initThree() {
@@ -302,5 +333,65 @@ class ThreeAudioVisualizer {
         
         // Continue animation loop
         requestAnimationFrame(() => this.animate());
+    }
+    
+    // Add a fallback animation method
+    animateFallback() {
+        if (!this.ctx || !this.fallbackMode) return;
+        
+        // Clear canvas
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Draw background
+        this.ctx.fillStyle = 'rgba(0, 10, 20, 0.2)';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        if (this.analyser && this.dataArray) {
+            // Get frequency data
+            this.analyser.getByteFrequencyData(this.dataArray);
+            
+            // Draw circular visualization
+            const centerX = this.canvas.width / 2;
+            const centerY = this.canvas.height / 2;
+            const radius = Math.min(centerX, centerY) * 0.7;
+            
+            const segments = 128;
+            const angleStep = (Math.PI * 2) / segments;
+            
+            for (let i = 0; i < segments; i++) {
+                const angle = i * angleStep;
+                const dataIndex = Math.floor(i * this.dataArray.length / segments);
+                const value = this.dataArray[dataIndex] || 0;
+                
+                const barHeight = (value / 255) * radius * 0.5 + radius * 0.2;
+                
+                const x1 = centerX + Math.cos(angle) * radius;
+                const y1 = centerY + Math.sin(angle) * radius;
+                const x2 = centerX + Math.cos(angle) * (radius + barHeight);
+                const y2 = centerY + Math.sin(angle) * (radius + barHeight);
+                
+                // Calculate color based on frequency
+                const hue = (i / segments) * 360;
+                this.ctx.strokeStyle = `hsl(${hue}, 100%, 60%)`;
+                this.ctx.lineWidth = 2;
+                
+                // Draw line
+                this.ctx.beginPath();
+                this.ctx.moveTo(x1, y1);
+                this.ctx.lineTo(x2, y2);
+                this.ctx.stroke();
+                
+                // Draw glow
+                this.ctx.shadowBlur = 10;
+                this.ctx.shadowColor = `hsl(${hue}, 100%, 60%)`;
+                this.ctx.beginPath();
+                this.ctx.arc(x2, y2, 2, 0, Math.PI * 2);
+                this.ctx.fill();
+                this.ctx.shadowBlur = 0;
+            }
+        }
+        
+        // Continue animation
+        requestAnimationFrame(() => this.animateFallback());
     }
 } 

@@ -595,8 +595,13 @@ class AudioVisualizer {
     initThreeVisualizer() {
         if (!this.analyser || !this.dataArray) return;
         
-        // Create Three.js visualizer
-        this.threeVisualizer = new ThreeAudioVisualizer(this.analyser, this.dataArray);
+        try {
+            // Create Three.js visualizer
+            this.threeVisualizer = new ThreeAudioVisualizer(this.analyser, this.dataArray);
+        } catch (error) {
+            console.error('Failed to initialize Three.js visualizer:', error);
+            // Continue with audio playback even if visualization fails
+        }
     }
 }
 
