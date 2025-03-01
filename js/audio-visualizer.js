@@ -239,7 +239,7 @@ class AudioVisualizer {
             this.audio.play().catch(error => {
                 console.error("Play failed:", error);
                 this.showStatus("Playback failed. Try clicking again.", "error");
-            });
+                });
         }
     }
     
@@ -749,4 +749,4 @@ class AudioVisualizer {
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     new AudioVisualizer();
-});
+}); 
