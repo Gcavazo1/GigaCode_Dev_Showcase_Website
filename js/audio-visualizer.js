@@ -2,22 +2,28 @@
 
 class AudioVisualizer {
     constructor() {
+        // First check browser compatibility
+        if (!this.checkBrowserSupport()) {
+            this.showStatus("Your browser doesn't support Web Audio API. Please try Chrome, Firefox, or Safari.", "error");
+            return;
+        }
+
         this.audio = document.getElementById('background-audio');
         this.playButton = document.getElementById('play-audio');
         this.volumeSlider = document.getElementById('volume-slider');
         this.canvas = document.getElementById('audio-canvas');
         this.ctx = this.canvas.getContext('2d');
         
+        // Add status message element first
+        this.statusMessage = document.createElement('div');
+        this.statusMessage.className = 'audio-status';
+        document.querySelector('.audio-container').appendChild(this.statusMessage);
+        
         this.isPlaying = false;
         this.audioContext = null;
         this.analyser = null;
         this.dataArray = null;
         this.source = null;
-        
-        // Add a status message element
-        this.statusMessage = document.createElement('div');
-        this.statusMessage.className = 'audio-status';
-        document.querySelector('.audio-container').appendChild(this.statusMessage);
         
         this.playlist = [
             {
@@ -38,16 +44,27 @@ class AudioVisualizer {
         this.init();
     }
     
+    checkBrowserSupport() {
+        return !!(window.AudioContext || window.webkitAudioContext) && 
+               !!document.createElement('audio').canPlayType('audio/mp3');
+    }
+    
     init() {
         try {
-            // Initialize Web Audio API
-            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            // Create audio context with error handling
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) {
+                throw new Error('Web Audio API is not supported');
+            }
+            
+            this.audioContext = new AudioContext();
             
             // Determine if we're on GitHub Pages or local
             const isGitHubPages = window.location.hostname.includes('github.io');
             const baseUrl = isGitHubPages ? '/GigaCode_Dev_Showcase_Website' : '';
             const audioPath = `${baseUrl}/audio/cyberpunk-theme.mp3`;
             
+            console.log('Audio Context State:', this.audioContext.state);
             console.log('Loading audio from:', audioPath);
             
             // Create a fetch request to check if the file exists
@@ -61,15 +78,22 @@ class AudioVisualizer {
                 .then(blob => {
                     const audioUrl = URL.createObjectURL(blob);
                     this.audio.src = audioUrl;
-                    this.audio.load();
                     
-                    // Create analyzer after audio is loaded
-                    this.audio.addEventListener('loadedmetadata', () => {
+                    // Set up event listeners before loading
+                    this.audio.addEventListener('canplaythrough', () => {
+                        console.log('Audio can play through');
                         this.setupAudioNodes();
                         this.showStatus("Audio loaded successfully", "success");
                         this.playButton.disabled = false;
                         this.playButton.innerHTML = '<i class="fas fa-play"></i><span>Play Music</span>';
                     });
+
+                    this.audio.addEventListener('error', (e) => {
+                        console.error('Audio loading error:', e);
+                        this.showStatus("Error loading audio file", "error");
+                    });
+
+                    this.audio.load();
                 })
                 .catch(error => {
                     console.error("Error loading audio file:", error);
@@ -87,7 +111,7 @@ class AudioVisualizer {
             this.animate();
         } catch (error) {
             console.error("Audio initialization error:", error);
-            this.showStatus("Your browser doesn't support Web Audio API", "error");
+            this.showStatus("Audio system initialization failed. Please try a different browser.", "error");
         }
     }
     
