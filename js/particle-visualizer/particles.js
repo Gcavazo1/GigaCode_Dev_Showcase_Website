@@ -150,6 +150,10 @@ class ParticleSystem {
   }
 
   createShapedGeometry(shape = 'sphere') {
+    if (this.geometry) {
+      this.geometry.dispose(); // Clean up old geometry
+    }
+    
     this.geometry = new THREE.BufferGeometry();
     
     // Arrays for attributes
@@ -163,36 +167,38 @@ class ParticleSystem {
     for (let i = 0; i < this.particleCount; i++) {
       const i3 = i * 3;
       
-      // Choose distribution based on shape
       let x, y, z;
       
       switch(shape) {
         case 'cube':
-          x = (Math.random() - 0.5) * 10;
-          y = (Math.random() - 0.5) * 10;
-          z = (Math.random() - 0.5) * 10;
+          // More organized cube distribution
+          x = (Math.random() - 0.5) * 8;
+          y = (Math.random() - 0.5) * 8;
+          z = (Math.random() - 0.5) * 8;
           break;
           
         case 'plane':
-          x = (Math.random() - 0.5) * 15;
-          y = (Math.random() - 0.5) * 15;
-          z = (Math.random() - 0.5) * 2;
+          // Wider, flatter plane
+          x = (Math.random() - 0.5) * 20;
+          y = (Math.random() - 0.5) * 20;
+          z = (Math.random() - 0.5) * 0.5; // Very thin on Z axis
           break;
           
         case 'ring':
+          // More defined ring shape
           const angle = Math.random() * Math.PI * 2;
-          const radiusRing = 5 + Math.random() * 2;  
+          const radiusRing = 8 + Math.random() * 1; // More consistent radius
           x = Math.cos(angle) * radiusRing;
           y = Math.sin(angle) * radiusRing;
-          z = (Math.random() - 0.5) * 2;
+          z = (Math.random() - 0.5) * 1; // Thinner depth
           break;
           
         case 'sphere':
         default:
-          // Sphere distribution (existing code)
-          const radius = Math.random() * 5;
+          // Better sphere distribution using spherical coordinates
+          const radius = 5 + Math.random() * 2;
           const theta = Math.random() * Math.PI * 2;
-          const phi = Math.acos(2 * Math.random() - 1);
+          const phi = Math.acos((Math.random() * 2) - 1);
           
           x = radius * Math.sin(phi) * Math.cos(theta);
           y = radius * Math.sin(phi) * Math.sin(theta);
@@ -210,12 +216,14 @@ class ParticleSystem {
       this.randomness[i3 + 2] = Math.random() * 2 - 1;
       
       // Scale (size variation)
-      this.scales[i] = Math.random();
+      this.scales[i] = 0.5 + Math.random() * 0.5; // More consistent sizes
     }
     
     this.geometry.setAttribute('position', new THREE.BufferAttribute(this.positions, 3));
     this.geometry.setAttribute('aScale', new THREE.BufferAttribute(this.scales, 1));
     this.geometry.setAttribute('aRandomness', new THREE.BufferAttribute(this.randomness, 3));
+    
+    return this.geometry;
   }
 
   createGeometry() {
@@ -245,19 +253,12 @@ class ParticleSystem {
       
       // Update amplitude based on audio with reactivity
       this.uniforms.uAmplitude.value = 0.5 + audioData.low * 2.0 * reactivity;
-      
-      // Update color influence with reactivity
-      this.uniforms.uColor.value.r = 0.5 + audioData.high * 0.8 * reactivity;
-      this.uniforms.uColor.value.g = 0.2 + audioData.mid * 0.5 * reactivity;
-      this.uniforms.uColor.value.b = 0.8 + audioData.low * 0.8 * reactivity;
     }
     
     // Handle beat detection with reactivity
     if (beatDetected) {
       this.uniforms.uBeat.value = 1.5 * this.reactivityMultiplier;
-      console.log('[Particles] Beat detected!');
     } else {
-      // Gradually decrease beat value
       this.uniforms.uBeat.value *= 0.9;
     }
   }

@@ -86,10 +86,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Apply shape change if visualizer exists
         if (window.particleVisualizer && window.particleVisualizer.particleSystem) {
           // Remove old particles
-          window.particleVisualizer.scene.remove(window.particleVisualizer.particleSystem.points);
+          if (window.particleVisualizer.particleSystem.points) {
+            window.particleVisualizer.scene.remove(window.particleVisualizer.particleSystem.points);
+          }
           
-          // Create new shape
+          // Create new geometry with selected shape
           window.particleVisualizer.particleSystem.createShapedGeometry(shape);
+          
+          // Create new points with the new geometry
           const particles = window.particleVisualizer.particleSystem.create();
           window.particleVisualizer.scene.add(particles);
         }
@@ -112,24 +116,24 @@ document.addEventListener('DOMContentLoaded', async () => {
           
           switch(colorScheme) {
             case 'cyan':
-              uniforms.startColor.value.set(0x0a2463); // Deep blue
-              uniforms.endColor.value.set(0x08f7fe);   // Cyan
-              uniforms.uColor.value.set(0x08f7fe);     // Cyan
+              uniforms.startColor.value.setHex(0x0a2463);
+              uniforms.endColor.value.setHex(0x08f7fe);
+              uniforms.uColor.value.setHex(0x08f7fe);
               break;
             case 'purple':
-              uniforms.startColor.value.set(0x33001b); // Dark purple
-              uniforms.endColor.value.set(0xff00ff);   // Magenta
-              uniforms.uColor.value.set(0xff00ff);     // Magenta
+              uniforms.startColor.value.setHex(0x33001b);
+              uniforms.endColor.value.setHex(0xff00ff);
+              uniforms.uColor.value.setHex(0xff00ff);
               break;
             case 'green':
-              uniforms.startColor.value.set(0x003300); // Dark green
-              uniforms.endColor.value.set(0x00ff99);   // Cyber green
-              uniforms.uColor.value.set(0x00ff99);     // Cyber green
+              uniforms.startColor.value.setHex(0x003300);
+              uniforms.endColor.value.setHex(0x00ff99);
+              uniforms.uColor.value.setHex(0x00ff99);
               break;
             case 'multi':
-              uniforms.startColor.value.set(0xff0099); // Pink
-              uniforms.endColor.value.set(0x0099ff);   // Blue
-              uniforms.uColor.value.set(0x00ff99);     // Green
+              uniforms.startColor.value.setHex(0xff0099);
+              uniforms.endColor.value.setHex(0x0099ff);
+              uniforms.uColor.value.setHex(0x00ff99);
               break;
           }
         }
