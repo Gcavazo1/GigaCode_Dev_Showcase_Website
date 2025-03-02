@@ -2423,3 +2423,20 @@ input[type="range"]::-webkit-slider-thumb {
 .toggle-controls.active .hide-text {
   display: inline;
 }
+
+/* Add these new color themes */
+.cyberpunk-theme {
+  background: linear-gradient(45deg, #ff0055, #00ffe7);
+}
+
+.neon-theme {
+  background: linear-gradient(45deg, #ff00cc, #00ffaa);
+}
+
+.sunset-theme {
+  background: linear-gradient(45deg, #ff3300, #ffcc00);
+}
+
+.matrix-theme {
+  background: linear-gradient(45deg, #001100, #00ff00);
+}

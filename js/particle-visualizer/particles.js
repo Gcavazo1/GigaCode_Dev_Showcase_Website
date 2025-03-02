@@ -231,9 +231,20 @@ class ParticleSystem {
   }
 
   create() {
-    this.createGeometry();
-    this.points = new THREE.Points(this.geometry, this.material);
-    return this.points;
+    if (!this.geometry) {
+      this.createGeometry();
+    }
+    
+    if (this.points) {
+      // If points already exist, just update the geometry
+      this.points.geometry.dispose();
+      this.points.geometry = this.geometry;
+      return this.points;
+    } else {
+      // Create new points
+      this.points = new THREE.Points(this.geometry, this.material);
+      return this.points;
+    }
   }
 
   update(time, audioData, beatDetected) {
