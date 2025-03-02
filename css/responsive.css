@@ -147,10 +147,6 @@
     flex-direction: column;
   }
   
-  .visualizer-wrapper {
-    width: 100%;
-  }
-  
   .playlist-container {
     width: 100%;
     margin-top: 20px;

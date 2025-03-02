@@ -623,7 +623,7 @@
     flex-wrap: wrap;
 }
 
-/* Audio Visualizer */
+/* Audio Player */
 .audio-container {
     position: relative;
     width: 100%;
@@ -634,13 +634,6 @@
     padding: 2rem;
     border: 1px solid rgba(0, 255, 255, 0.3);
     box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
-}
-
-.visualizer-wrapper {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 16/9;
-    margin-bottom: 1rem;
 }
 
 .audio-canvas {
