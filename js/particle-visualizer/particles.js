@@ -14,12 +14,13 @@ class ParticleSystem {
     this.geometry = null;
     this.material = null;
     this.points = null;
+    this.reactivityMultiplier = 1.0; // Default reactivity level
     
     // Shader uniforms
     this.uniforms = {
       uTime: { value: 0 },
       uSize: { value: this.particleSize },
-      uColor: { value: new THREE.Color(0x00ffff) },
+      uColor: { value: new THREE.Color(0x08f7fe) },
       uFrequencyData: { value: new Float32Array(128).fill(0) },
       uBassFrequency: { value: 0.0 },
       uMidFrequency: { value: 0.0 },
@@ -31,8 +32,9 @@ class ParticleSystem {
       uMaxDistance: { value: 1.8 },
       uOffsetSize: { value: 2.0 },
       uOffsetGain: { value: 0.0 },
-      startColor: { value: new THREE.Color(0xff00ff) },
-      endColor: { value: new THREE.Color(0x00ffff) }
+      startColor: { value: new THREE.Color(0x0a2463) },
+      endColor: { value: new THREE.Color(0x00ff99) },
+      uColor: { value: new THREE.Color(0x08f7fe) }
     };
   }
 
@@ -148,27 +150,60 @@ class ParticleSystem {
     });
   }
 
-  createGeometry() {
+  createShapedGeometry(shape = 'sphere') {
     this.geometry = new THREE.BufferGeometry();
     
-    // Positions - random in a sphere
+    // Arrays for attributes
     this.positions = new Float32Array(this.particleCount * 3);
     this.scales = new Float32Array(this.particleCount);
     this.randomness = new Float32Array(this.particleCount * 3);
     
-    console.log('[Particles] Creating geometry with', this.particleCount, 'particles');
+    console.log(`[Particles] Creating ${shape} with ${this.particleCount} particles`);
     
+    // Position based on selected shape
     for (let i = 0; i < this.particleCount; i++) {
       const i3 = i * 3;
       
-      // Position - random in a sphere
-      const radius = Math.random() * 5;
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
+      // Choose distribution based on shape
+      let x, y, z;
       
-      this.positions[i3] = radius * Math.sin(phi) * Math.cos(theta);
-      this.positions[i3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
-      this.positions[i3 + 2] = radius * Math.cos(phi);
+      switch(shape) {
+        case 'cube':
+          x = (Math.random() - 0.5) * 10;
+          y = (Math.random() - 0.5) * 10;
+          z = (Math.random() - 0.5) * 10;
+          break;
+          
+        case 'plane':
+          x = (Math.random() - 0.5) * 15;
+          y = (Math.random() - 0.5) * 15;
+          z = (Math.random() - 0.5) * 2;
+          break;
+          
+        case 'ring':
+          const angle = Math.random() * Math.PI * 2;
+          const radius = 5 + Math.random() * 2;
+          x = Math.cos(angle) * radius;
+          y = Math.sin(angle) * radius;
+          z = (Math.random() - 0.5) * 2;
+          break;
+          
+        case 'sphere':
+        default:
+          // Sphere distribution (existing code)
+          const radius = Math.random() * 5;
+          const theta = Math.random() * Math.PI * 2;
+          const phi = Math.acos(2 * Math.random() - 1);
+          
+          x = radius * Math.sin(phi) * Math.cos(theta);
+          y = radius * Math.sin(phi) * Math.sin(theta);
+          z = radius * Math.cos(phi);
+          break;
+      }
+      
+      this.positions[i3] = x;
+      this.positions[i3 + 1] = y;
+      this.positions[i3 + 2] = z;
       
       // Randomness for animation variation
       this.randomness[i3] = Math.random() * 2 - 1;
@@ -184,6 +219,10 @@ class ParticleSystem {
     this.geometry.setAttribute('aRandomness', new THREE.BufferAttribute(this.randomness, 3));
   }
 
+  createGeometry() {
+    this.createShapedGeometry('sphere'); // Default shape
+  }
+
   create() {
     this.createGeometry();
     this.points = new THREE.Points(this.geometry, this.material);
@@ -196,29 +235,31 @@ class ParticleSystem {
     // Update time uniform
     this.uniforms.uTime.value = time;
     
-    // Update audio data uniforms with more dramatic effects
+    // Update audio data uniforms with reactivity multiplier
     if (audioData) {
-      // Apply with stronger multipliers to make effects more visible
-      this.uniforms.uBassFrequency.value = audioData.low;
-      this.uniforms.uMidFrequency.value = audioData.mid;
-      this.uniforms.uHighFrequency.value = audioData.high;
+      const reactivity = this.reactivityMultiplier;
       
-      // Update amplitude based on audio - increased effect
-      this.uniforms.uAmplitude.value = 0.5 + audioData.low * 2.0;
+      // Apply with adjustable reactivity
+      this.uniforms.uBassFrequency.value = audioData.low * reactivity;
+      this.uniforms.uMidFrequency.value = audioData.mid * reactivity;
+      this.uniforms.uHighFrequency.value = audioData.high * reactivity;
       
-      // Update color influence - make it stronger
-      this.uniforms.uColor.value.r = 0.5 + audioData.high * 0.8;
-      this.uniforms.uColor.value.g = 0.2 + audioData.mid * 0.5;
-      this.uniforms.uColor.value.b = 0.8 + audioData.low * 0.8;
+      // Update amplitude based on audio with reactivity
+      this.uniforms.uAmplitude.value = 0.5 + audioData.low * 2.0 * reactivity;
+      
+      // Update color influence with reactivity
+      this.uniforms.uColor.value.r = 0.5 + audioData.high * 0.8 * reactivity;
+      this.uniforms.uColor.value.g = 0.2 + audioData.mid * 0.5 * reactivity;
+      this.uniforms.uColor.value.b = 0.8 + audioData.low * 0.8 * reactivity;
     }
     
-    // Handle beat detection with stronger effect
+    // Handle beat detection with reactivity
     if (beatDetected) {
-      this.uniforms.uBeat.value = 1.5; // Stronger beat response
+      this.uniforms.uBeat.value = 1.5 * this.reactivityMultiplier;
       console.log('[Particles] Beat detected!');
     } else {
       // Gradually decrease beat value
-      this.uniforms.uBeat.value *= 0.9; // Slower decay
+      this.uniforms.uBeat.value *= 0.9;
     }
   }
 

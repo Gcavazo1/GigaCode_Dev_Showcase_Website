@@ -773,5 +773,42 @@
 
     <!-- Add this before the audio-player.js script -->
     <script type="module" src="js/particle-visualizer.js"></script>
+
+    <!-- Add this after the canvas element -->
+    <div class="visualizer-controls">
+        <div class="control-panel">
+            <h3>Visualizer Controls</h3>
+            <div class="control-group">
+                <label>Shape</label>
+                <div class="control-buttons">
+                    <button data-shape="sphere">Sphere</button>
+                    <button data-shape="cube">Cube</button>
+                    <button data-shape="plane">Plane</button>
+                    <button data-shape="ring">Ring</button>
+                </div>
+            </div>
+            <div class="control-group">
+                <label>Color</label>
+                <div class="color-buttons">
+                    <button data-color="cyan" class="color-btn cyan-theme"></button>
+                    <button data-color="purple" class="color-btn purple-theme"></button>
+                    <button data-color="green" class="color-btn green-theme"></button>
+                    <button data-color="multi" class="color-btn multi-theme"></button>
+                </div>
+            </div>
+            <div class="control-group">
+                <label>Particle Size: <span id="size-value">30</span></label>
+                <input type="range" id="size-control" min="10" max="100" value="30">
+            </div>
+            <div class="control-group">
+                <label>Reactivity: <span id="reactivity-value">1.0</span></label>
+                <input type="range" id="reactivity-control" min="0.2" max="3.0" step="0.1" value="1.0">
+            </div>
+        </div>
+        <button class="toggle-controls">
+            <span class="show-text">Show Controls</span>
+            <span class="hide-text">Hide</span>
+        </button>
+    </div>
 </body>
 </html>

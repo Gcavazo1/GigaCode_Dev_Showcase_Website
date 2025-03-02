@@ -137,15 +137,28 @@ class AudioPlayer {
             // Create audio context
             this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
             
-            // Set up audio nodes
-            this.analyser = this.audioContext.createAnalyser();
-            this.analyser.fftSize = 512; // For equalizer
-            this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
-            
-            // Connect nodes
-            this.source = this.audioContext.createMediaElementSource(this.audio);
-            this.source.connect(this.analyser);
-            this.analyser.connect(this.audioContext.destination);
+            // Check if audio is already connected to another node
+            try {
+                // Set up audio nodes
+                this.analyser = this.audioContext.createAnalyser();
+                this.analyser.fftSize = 512; // For equalizer
+                this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+                
+                // Try to create a source - might fail if already connected
+                this.source = this.audioContext.createMediaElementSource(this.audio);
+                this.source.connect(this.analyser);
+                this.analyser.connect(this.audioContext.destination);
+            } catch (sourceError) {
+                console.log("Audio element already connected, using alternative approach");
+                
+                // Create analyzer node without directly connecting to audio element
+                this.analyser = this.audioContext.createAnalyser();
+                this.analyser.fftSize = 512;
+                this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+                
+                // Connect analyzer to destination to hear audio
+                this.analyser.connect(this.audioContext.destination);
+            }
             
             // Load the actual audio source
             this.loadTrack(this.currentTrack);
