@@ -34,7 +34,6 @@ class ParticleSystem {
       uOffsetGain: { value: 0.0 },
       startColor: { value: new THREE.Color(0x0a2463) },
       endColor: { value: new THREE.Color(0x00ff99) },
-      uColor: { value: new THREE.Color(0x08f7fe) }
     };
   }
 
@@ -182,9 +181,9 @@ class ParticleSystem {
           
         case 'ring':
           const angle = Math.random() * Math.PI * 2;
-          const radius = 5 + Math.random() * 2;
-          x = Math.cos(angle) * radius;
-          y = Math.sin(angle) * radius;
+          const radiusRing = 5 + Math.random() * 2;  
+          x = Math.cos(angle) * radiusRing;
+          y = Math.sin(angle) * radiusRing;
           z = (Math.random() - 0.5) * 2;
           break;
           
