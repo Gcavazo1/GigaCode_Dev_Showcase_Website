@@ -89,81 +89,79 @@
     opacity: 0.95; /* Slightly transparent to show grid */
 }
 
-/* Updated model controls */
+/* Updated model controls for single reset button */
 .model-controls {
     position: absolute;
     bottom: 30px;
     left: 50%;
     transform: translateX(-50%);
-    display: flex;
-    gap: 1.5rem;
     z-index: 10;
-    background: rgba(2, 8, 15, 0.9);
-    padding: 15px 25px;
-    border-radius: 35px;
-    border: 1px solid rgba(0, 255, 255, 0.3);
-    box-shadow: 
-        0 0 20px rgba(0, 255, 255, 0.2),
-        inset 0 0 15px rgba(0, 255, 255, 0.1);
-    backdrop-filter: blur(5px);
 }
 
-/* Enhanced neon buttons */
-.neon-button {
-    background: rgba(5, 15, 30, 0.95);
-    border: 2px solid rgba(0, 255, 255, 0.6);
+/* Enhanced reset button */
+.reset-button {
+    background: rgba(5, 15, 30, 0.85);
     color: #00ffff;
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    padding: 10px 25px;
+    border: none;
+    outline: none;
     cursor: pointer;
-    font-size: 1.3em;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 30px;
     position: relative;
     overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
 }
 
-/* Enhanced button effects */
-.neon-button::before {
+/* Add cyberpunk border glow */
+.reset-button::before {
     content: '';
     position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    border-radius: 50%;
-    background: linear-gradient(45deg, 
-        rgba(0, 255, 255, 0.1),
-        rgba(0, 255, 255, 0),
-        rgba(255, 0, 255, 0.1)
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, 
+        rgba(0, 255, 255, 0.5), 
+        rgba(255, 0, 255, 0.5), 
+        rgba(0, 255, 255, 0.5)
     );
+    margin: -2px;
+    border-radius: 32px;
     z-index: -1;
-    animation: borderRotate 4s linear infinite;
+    animation: borderGlow 3s linear infinite;
 }
 
-.neon-button::after {
+/* Add inner dark background */
+.reset-button::after {
     content: '';
     position: absolute;
-    inset: 4px;
-    border-radius: 50%;
+    inset: 2px;
     background: rgba(5, 15, 30, 0.95);
+    border-radius: 28px;
     z-index: -1;
 }
 
-.neon-button:hover {
-    background: rgba(0, 255, 255, 0.1);
-    transform: translateY(-2px) scale(1.1);
+.reset-button:hover {
+    transform: translateY(-2px);
     box-shadow: 
-        0 0 20px rgba(0, 255, 255, 0.4),
-        0 0 30px rgba(0, 255, 255, 0.2),
-        0 0 40px rgba(0, 255, 255, 0.1);
+        0 0 20px rgba(0, 255, 255, 0.6),
+        0 0 40px rgba(0, 255, 255, 0.3);
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
 }
 
-.neon-button:active {
-    transform: translateY(1px) scale(0.95);
+.reset-button:active {
+    transform: translateY(1px);
+}
+
+/* Add new keyframe animation for the border glow */
+@keyframes borderGlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
 .loading-text {
