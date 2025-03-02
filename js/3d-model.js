@@ -57,26 +57,6 @@ function initializeModelViewer(containerId, modelUrl, progressCallback) {
     // Set up Three.js scene
     const scene = new THREE.Scene();
     
-    // Load background texture
-    const textureLoader = new THREE.TextureLoader();
-    textureLoader.load('images/backgrounds/3Dmodel_background.png', function(texture) {
-        // Create a material using the texture with opacity
-        const material = new THREE.MeshBasicMaterial({
-            map: texture,
-            transparent: true,
-            opacity: 0.3 // Adjust opacity as needed (0-1)
-        });
-        
-        // Create a background plane
-        const planeGeometry = new THREE.PlaneGeometry(20, 20);
-        const plane = new THREE.Mesh(planeGeometry, material);
-        plane.position.z = -10; // Place it behind other objects
-        scene.add(plane);
-    });
-    
-    // Set a darker background for areas not covered by the image
-    scene.background = new THREE.Color(0x050505);
-    
     // Set up camera
     const camera = new THREE.PerspectiveCamera(
         75, 
@@ -89,10 +69,11 @@ function initializeModelViewer(containerId, modelUrl, progressCallback) {
     // Set up renderer
     const renderer = new THREE.WebGLRenderer({ 
         antialias: true,
-        alpha: true 
+        alpha: true // This is important for transparency
     });
     renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.outputEncoding = THREE.sRGBEncoding || THREE.LinearEncoding; // Fallback for compatibility
+    renderer.setClearColor(0x000000, 0); // Transparent background
+    renderer.outputEncoding = THREE.sRGBEncoding || THREE.LinearEncoding;
     
     // Clear any existing canvas
     const existingCanvas = container.querySelector('canvas');
