@@ -1,8 +1,8 @@
-import * as THREE from 'three';
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.module.js';
 
 // Define shader paths for loading
-const vertexShaderPath = 'js/particle-visualizer/shaders/particle-vertex.glsl';
-const fragmentShaderPath = 'js/particle-visualizer/shaders/particle-fragment.glsl';
+const vertexShaderPath = '/js/particle-visualizer/shaders/particle-vertex.glsl';
+const fragmentShaderPath = '/js/particle-visualizer/shaders/particle-fragment.glsl';
 
 class ParticleSystem {
   constructor() {

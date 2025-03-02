@@ -1,7 +1,8 @@
-import ParticleVisualizer from './particle-visualizer/visualizer.js';
-
-// Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
+// Use dynamic import instead
+document.addEventListener('DOMContentLoaded', async () => {
+  // Dynamically import the visualizer module
+  const { default: ParticleVisualizer } = await import('./particle-visualizer/visualizer.js');
+  
   const visualizer = new ParticleVisualizer();
   
   // Make it globally accessible

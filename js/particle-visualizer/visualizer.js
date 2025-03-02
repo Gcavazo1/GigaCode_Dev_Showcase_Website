@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.module.js';
 import ParticleSystem from './particles.js';
 import AudioAnalyzer from './audio/analyzer.js';
 import BeatDetector from './audio/beat-detector.js';
