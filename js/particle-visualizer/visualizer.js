@@ -28,6 +28,10 @@ class ParticleVisualizer {
     // Debug mode
     this.debugMode = true;
     
+    // Add rotation properties
+    this.autoRotate = true;
+    this.rotationSpeed = 0.005;
+    
     // Initialize
     this.init();
     this.animate();
@@ -114,6 +118,12 @@ class ParticleVisualizer {
     } else {
       // Update with default values when not playing
       this.particleSystem.update(elapsedTime);
+    }
+    
+    // Add rotation when autoRotate is enabled
+    if (this.autoRotate && this.particleSystem && this.particleSystem.points) {
+      this.particleSystem.points.rotation.x += this.rotationSpeed;
+      this.particleSystem.points.rotation.y += this.rotationSpeed;
     }
     
     // Render

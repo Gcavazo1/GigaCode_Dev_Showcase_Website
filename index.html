@@ -783,6 +783,7 @@
                 <div class="control-buttons">
                     <button data-shape="sphere">Sphere</button>
                     <button data-shape="cube">Cube</button>
+                    <button data-shape="cylinder">Cylinder</button>
                     <button data-shape="plane">Plane</button>
                     <button data-shape="ring">Ring</button>
                     <button data-shape="star">Star</button>
@@ -818,6 +819,12 @@
             <div class="control-group">
                 <label>Reactivity: <span id="reactivity-value">1.0</span></label>
                 <input type="range" id="reactivity-control" min="0.2" max="3.0" step="0.1" value="1.0">
+            </div>
+            <div class="control-group">
+                <label>Behavior</label>
+                <div class="control-buttons">
+                    <button id="toggle-rotation" class="active">Auto-Rotate</button>
+                </div>
             </div>
         </div>
         <button class="toggle-controls">

@@ -199,4 +199,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Set initial active buttons
     document.querySelector('[data-shape="sphere"]').classList.add('active');
   }
+
+  // Add rotation toggle functionality
+  const rotationToggle = document.getElementById('toggle-rotation');
+  if (rotationToggle) {
+    rotationToggle.addEventListener('click', () => {
+      rotationToggle.classList.toggle('active');
+      if (window.particleVisualizer) {
+        window.particleVisualizer.autoRotate = rotationToggle.classList.contains('active');
+      }
+    });
+  }
 });

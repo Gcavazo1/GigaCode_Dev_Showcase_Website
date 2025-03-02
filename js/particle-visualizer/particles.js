@@ -102,27 +102,38 @@ class ParticleSystem {
         
         fragmentShader = `
           uniform vec3 uColor;
+          uniform vec3 startColor;
+          uniform vec3 endColor;
           uniform float uBassFrequency;
           uniform float uMidFrequency;
           uniform float uHighFrequency;
           
           varying vec3 vPosition;
+          varying float vDistance;
           varying float vScale;
           
+          float circle(in vec2 _st, in float _radius) {
+            vec2 dist = _st - vec2(0.5);
+            return 1.0 - smoothstep(_radius - (_radius * 0.01),
+                                   _radius + (_radius * 0.01),
+                                   dot(dist, dist) * 4.0);
+          }
+          
           void main() {
-            // Create soft circle
-            vec2 center = gl_PointCoord - 0.5;
-            float dist = length(center) * 2.0;
-            float circle = 1.0 - smoothstep(0.0, 1.0, dist);
+            // Create soft circle with feathered edge
+            vec2 uv = vec2(gl_PointCoord.x, 1.0 - gl_PointCoord.y);
+            vec3 circ = vec3(circle(uv, 1.0));
             
-            // More dramatic color changes with audio
-            vec3 color = uColor;
-            color.r += uHighFrequency * 0.8;
-            color.g += uMidFrequency * 0.5;
-            color.b += uBassFrequency * 0.8;
+            // Interpolate between start and end colors based on distance
+            vec3 color = mix(startColor, endColor, vDistance);
             
-            // Add vScale influence for more variety
-            float alpha = circle * (0.5 + vScale * 0.5) * (0.7 + uMidFrequency * 0.3);
+            // Add audio reactivity for subtle color modifications
+            color.r += uHighFrequency * 0.2;
+            color.g += uMidFrequency * 0.2;
+            color.b += uBassFrequency * 0.2;
+            
+            // Use distance-based alpha like in the reference
+            float alpha = circ.r * vDistance * 0.8;
             
             gl_FragColor = vec4(color, alpha);
           }
@@ -157,11 +168,18 @@ class ParticleSystem {
     // Create geometry based on shape
     switch(shape) {
       case 'cube':
-        // Use BoxGeometry with segments for better particle distribution
-        const boxSize = 8;
+        // Use higher segment counts for cube
+        const widthSegments = Math.floor(THREE.MathUtils.randInt(15, 25));
+        const heightSegments = Math.floor(THREE.MathUtils.randInt(15, 35)); 
+        const depthSegments = Math.floor(THREE.MathUtils.randInt(15, 35));
+        
         this.geometry = new THREE.BoxGeometry(
-          boxSize, boxSize, boxSize,
-          15, 15, 15 // Width, height, depth segments
+          8, // width
+          8, // height
+          8, // depth
+          widthSegments,
+          heightSegments,
+          depthSegments
         );
         break;
         
@@ -236,6 +254,25 @@ class ParticleSystem {
         starGeometry.setAttribute('position', positionAttribute);
         
         this.geometry = starGeometry;
+        break;
+        
+      case 'cylinder':
+        // Match the reference's high segment counts for cylinder
+        const radialSegments = 92; // Higher count for smoother cylinder
+        const heightSegments = 180; // Higher count for more particles
+        this.geometry = new THREE.CylinderGeometry(
+          5, // radius top
+          5, // radius bottom
+          10, // height
+          radialSegments,
+          heightSegments,
+          true // open-ended
+        );
+        // Important: rotate cylinder to match reference
+        const cylinder = new THREE.Mesh(this.geometry);
+        cylinder.rotation.set(Math.PI / 2, 0, 0);
+        cylinder.updateMatrix();
+        this.geometry.applyMatrix4(cylinder.matrix);
         break;
     }
     
