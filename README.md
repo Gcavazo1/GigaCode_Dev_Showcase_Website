@@ -1,68 +1,39 @@
 # GigaCode Developer Showcase
 
-A cyberpunk-inspired portfolio website showcasing development skills, AI collaboration, and projects with immersive interactive elements.
+A cyberpunk-themed portfolio showcasing development projects, 3D models, and interactive web experiences.
 
 ## Features
 
-- **Cyberpunk Aesthetic**: Neon colors, glitch effects, and futuristic UI elements
-- **Interactive AI Assistant**: Chat with an AI assistant about the portfolio
-- **Terminal-Style Bio**: Developer information displayed in a command-line interface
-- **Project Showcases**: Mobile apps and Roblox projects with flip-card animations
-- **3D Model Viewer**: Interactive 3D model showcase with lighting effects
-- **Holographic Interface**: Real-time data visualization with cyberpunk styling
-- **AI Image Generation**: Interactive GAN demo for generating cyberpunk-style images
-- **Immersive Audio Experience**: Three.js powered 3D audio visualizer with reactive elements
-- **3D Playlist Carousel**: Interactive 3D carousel for browsing music tracks
-- **Responsive Design**: Optimized for all device sizes
+- **Reactive Particle Background**: Dynamic, audio-reactive particle system that responds to music
+- **Interactive 3D Models**: WebGL-powered 3D model showcase with controls
+- **Audio Player**: Cyberpunk-themed music player with 3D carousel interface
+- **GAN AI Generation**: Interactive AI image generation demo
+- **Holographic UI**: Futuristic UI components with cyberpunk aesthetic
+- **Virtual Assistant**: AI assistant with chat interface
+- **Mobile and Roblox Projects**: Showcase of mobile and Roblox development work
 
-## Technologies Used
+## Audio-Reactive Particle Visualizer
 
-- **HTML5/CSS3**: Semantic markup and advanced CSS features
-- **JavaScript**: ES6+ for interactive elements and animations
-- **Three.js**: 3D model rendering and audio visualization
-- **Web Audio API**: Audio processing and visualization
-- **Canvas API**: Real-time graphics rendering
-- **GSAP**: Advanced animations and transitions
-- **Font Awesome**: Iconography
-- **Google Fonts**: Typography (Orbitron, Rajdhani)
+The portfolio features a full-page audio-reactive particle system that responds to music playing in the audio player. The visualizer:
 
-## Audio Visualizer
+- Creates thousands of particles that move organically using curl noise algorithms
+- Analyzes audio in real-time to extract frequency data and detect beats
+- Maps different frequency bands (bass, mid, high) to visual properties like particle size, color, and movement
+- Provides an immersive visual experience that complements the cyberpunk aesthetic
 
-The portfolio features an advanced audio visualizer built with Three.js that creates an immersive audio experience:
+### Technical Implementation
 
-- **3D Circular Visualizer**: A ring of 3D bars that react to different frequency bands
-- **Particle System**: Thousands of particles that pulse and move with the music
-- **Cyberpunk Grid**: A TRON-like grid that grounds the visualization in 3D space
-- **Dynamic Lighting**: Colored point lights that enhance the depth and atmosphere
-- **Fallback Support**: Gracefully falls back to 2D canvas visualization if WebGL is not supported
+The particle visualizer is implemented using:
 
-The audio player also includes a 3D carousel for browsing through the music tracks, with each track represented as a 3D card that displays real-time equalizer data.
+- Three.js for efficient WebGL rendering
+- GLSL shaders for high-performance particle animations
+- Web Audio API for real-time audio analysis
+- Curl noise algorithms for organic particle movement
 
-## Browser Compatibility
+## Browser Support
 
-- Chrome (recommended for best experience)
-- Firefox
-- Edge
-- Safari (WebGL features may have limited support)
-
-## Requirements
-
-- Modern browser with WebGL support for full 3D visualization experience
-- JavaScript enabled
-- Audio output device for audio features
-
-## Setup
-
-1. Clone the repository
-2. Open `index.html` in your browser or use a local server
+This portfolio is optimized for modern desktop browsers with WebGL support. For the best experience, use Chrome, Firefox, or Edge on a desktop computer.
 
 ## Credits
 
-- Music tracks from various artists (see audio section for details)
-- 3D models created with Blender
-- Icons from Font Awesome
-- Fonts from Google Fonts
-
-## License
-
-MIT License - See LICENSE file for details
+The audio-reactive particle visualization is inspired by [Interactive Particles Music Visualizer](https://github.com/tgcnzn/Interactive-Particles-Music-Visualizer) by tgcnzn.

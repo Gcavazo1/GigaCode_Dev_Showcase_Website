@@ -70,6 +70,9 @@
     </style>
 </head>
 <body>
+    <!-- Add this right after the body tag, before any other content -->
+    <canvas id="background-visualizer" class="background-visualizer"></canvas>
+    
     <!-- Background Elements -->
     <div class="cyber-background">
         <div class="grid-overlay"></div>
@@ -767,5 +770,8 @@
         }
     });
     </script>
+
+    <!-- Add this before the audio-player.js script -->
+    <script src="js/particle-visualizer.js"></script>
 </body>
 </html>
