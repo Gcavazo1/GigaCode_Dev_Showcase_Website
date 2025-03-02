@@ -56,7 +56,26 @@ function initializeModelViewer(containerId, modelUrl, progressCallback) {
     
     // Set up Three.js scene
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0a0a12);
+    
+    // Load background texture
+    const textureLoader = new THREE.TextureLoader();
+    textureLoader.load('images/backgrounds/3Dmodel_background.png', function(texture) {
+        // Create a material using the texture with opacity
+        const material = new THREE.MeshBasicMaterial({
+            map: texture,
+            transparent: true,
+            opacity: 0.3 // Adjust opacity as needed (0-1)
+        });
+        
+        // Create a background plane
+        const planeGeometry = new THREE.PlaneGeometry(20, 20);
+        const plane = new THREE.Mesh(planeGeometry, material);
+        plane.position.z = -10; // Place it behind other objects
+        scene.add(plane);
+    });
+    
+    // Set a darker background for areas not covered by the image
+    scene.background = new THREE.Color(0x050505);
     
     // Set up camera
     const camera = new THREE.PerspectiveCamera(
