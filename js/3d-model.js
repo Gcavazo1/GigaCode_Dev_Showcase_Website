@@ -1,305 +1,79 @@
-// 3D Model Viewer for Cyberpunk Portfolio
+// Cyberpunk 3D Model Showcase
+// Standalone function-based approach for multiple containers
 
-class ModelViewer {
-    constructor(containerId) {
-        this.containerId = containerId;
-        this.container = document.getElementById(this.containerId);
-        
-        if (!this.container) {
-            throw new Error(`Container with ID "${this.containerId}" not found`);
-        }
-
-        // Check for WebGL support
-        if (!this.isWebGLSupported()) {
-            throw new Error('WebGL not supported');
-        }
-
-        this.scene = null;
-        this.camera = null;
-        this.renderer = null;
-        this.model = null;
-        this.controls = null;
-        this.lights = [];
-        this.autoRotate = true;
-        this.wireframe = false;
-        this.mixer = null;
-        
-        // Initialize components
-        this.init();
-        this.setupEventListeners();
-    }
-    
-    init() {
-        // Get the container element
-        this.container = document.getElementById(this.containerId);
-        
-        // Check if container exists before proceeding
-        if (!this.container) {
-            console.warn(`Container with ID "${this.containerId}" not found. 3D model viewer initialization aborted.`);
-            return;
-        }
-        
-        // Get dimensions
-        this.width = this.container.clientWidth;
-        this.height = this.container.clientHeight;
-        
-        // Create scene
-        this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(0x0a0a12);
-        
-        // Create camera
-        this.camera = new THREE.PerspectiveCamera(
-            75, 
-            this.container.clientWidth / this.container.clientHeight, 
-            0.1, 
-            1000
-        );
-        this.camera.position.z = 5;
-        
-        // Create renderer
-        this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
-        this.renderer.outputEncoding = THREE.sRGBEncoding;
-        this.container.appendChild(this.renderer.domElement);
-        
-        // Add lights
-        this.addLights();
-        
-        // Load model
-        this.loadModel();
-        
-        // Add orbit controls
-        this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-        this.controls.enableDamping = true;
-        this.controls.dampingFactor = 0.05;
-        
-        // Start animation loop
-        this.animate();
-        
-        // Handle window resize
-        window.addEventListener('resize', () => this.onWindowResize());
-        
-        // Add post-processing
-        this.setupPostProcessing();
-    }
-    
-    addLights() {
-        // Ambient light
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-        this.scene.add(ambientLight);
-        this.lights.push(ambientLight);
-        
-        // Directional light (cyan)
-        const directionalLight = new THREE.DirectionalLight(0x00ffff, 1);
-        directionalLight.position.set(0, 1, 2);
-        this.scene.add(directionalLight);
-        this.lights.push(directionalLight);
-        
-        // Point light (magenta)
-        const purpleLight = new THREE.PointLight(0xff00ff, 1, 10);
-        purpleLight.position.set(-2, 1, 3);
-        this.scene.add(purpleLight);
-        this.lights.push(purpleLight);
-        
-        // Point light (yellow)
-        const yellowLight = new THREE.PointLight(0xf9f900, 1, 10);
-        yellowLight.position.set(2, -1, 3);
-        this.scene.add(yellowLight);
-        this.lights.push(yellowLight);
-    }
-    
-    loadModel(progressCallback) {
-        const loader = new THREE.GLTFLoader();
-        
-        try {
-            loader.load(
-                'https://threejs.org/examples/models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf',
-                (gltf) => {
-                    if (this.model) {
-                        this.scene.remove(this.model);
-                    }
-                    
-                    this.model = gltf.scene;
-                    this.model.scale.set(2, 2, 2); // Make it bigger
-                    this.scene.add(this.model);
-                    
-                    // Center model
-                    const box = new THREE.Box3().setFromObject(this.model);
-                    const center = box.getCenter(new THREE.Vector3());
-                    this.model.position.x = -center.x;
-                    this.model.position.y = -center.y;
-                    this.model.position.z = -center.z;
-                    
-                    // Apply materials
-                    this.model.traverse((child) => {
-                        if (child.isMesh) {
-                            child.material.metalness = 0.8;
-                            child.material.roughness = 0.2;
-                            child.material.emissive = new THREE.Color(0x00ffff);
-                            child.material.emissiveIntensity = 0.5;
-                        }
-                    });
-                    
-                    if (progressCallback) progressCallback(1);
-                    console.log("Model loaded successfully");
-                },
-                (xhr) => {
-                    if (progressCallback) {
-                        progressCallback(xhr.loaded / xhr.total);
-                    }
-                },
-                (error) => {
-                    console.error("Error loading model:", error);
-                    this.createFallbackModel();
-                    if (progressCallback) progressCallback(1);
-                }
-            );
-        } catch (error) {
-            console.error('Error in model loading process:', error);
-            this.createFallbackModel();
-            if (progressCallback) progressCallback(1);
-        }
-    }
-    
-    createFallbackModel() {
-        // Create a placeholder if model fails to load
-        const geometry = new THREE.BoxGeometry(2, 2, 2);
-        const material = new THREE.MeshStandardMaterial({ 
-            color: 0x00ffff,
-            metalness: 0.7,
-            roughness: 0.2,
-            emissive: 0x003333
-        });
-        this.model = new THREE.Mesh(geometry, material);
-        this.scene.add(this.model);
-    }
-    
-    animate() {
-        requestAnimationFrame(() => this.animate());
-        
-        // Update animation mixer if it exists
-        if (this.mixer) {
-            this.mixer.update(0.016); // Update at approximately 60fps
-        }
-        
-        // Auto-rotate model if enabled
-        if (this.autoRotate && this.model) {
-            this.model.rotation.y += 0.005;
-        }
-        
-        // Update controls
-        if (this.controls) {
-            this.controls.update();
-        }
-        
-        // Animate lights
-        this.lights.forEach((light, index) => {
-            if (light.type === 'PointLight') {
-                const time = Date.now() * 0.001;
-                const radius = 3;
-                light.position.x = Math.sin(time * 0.5 + index) * radius;
-                light.position.z = Math.cos(time * 0.5 + index) * radius;
-            }
-        });
-        
-        // Render scene
-        this.composer.render();
-    }
-    
-    onWindowResize() {
-        this.camera.aspect = this.container.clientWidth / this.container.clientHeight;
-        this.camera.updateProjectionMatrix();
-        this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
-    }
-    
-    setupEventListeners() {
-        const toggleRotationBtn = document.getElementById('toggle-rotation');
-        if (toggleRotationBtn) {
-            toggleRotationBtn.addEventListener('click', () => {
-                this.autoRotate = !this.autoRotate;
-                toggleRotationBtn.textContent = this.autoRotate ? 'Stop Rotation' : 'Start Rotation';
-            });
-        }
-        
-        const toggleWireframeBtn = document.getElementById('toggle-wireframe');
-        if (toggleWireframeBtn) {
-            toggleWireframeBtn.addEventListener('click', () => {
-                this.wireframe = !this.wireframe;
-                toggleWireframeBtn.textContent = this.wireframe ? 'Show Solid' : 'Show Wireframe';
-                
-                if (this.model) {
-                    this.model.traverse((child) => {
-                        if (child.isMesh) {
-                            child.material.wireframe = this.wireframe;
-                        }
-                    });
-                }
-            });
-        }
-    }
-    
-    setupPostProcessing() {
-        // Import necessary modules
-        const { EffectComposer } = THREE.EffectComposer;
-        const { RenderPass } = THREE.RenderPass;
-        const { UnrealBloomPass } = THREE.UnrealBloomPass;
-        
-        // Create composer
-        this.composer = new EffectComposer(this.renderer);
-        
-        // Add render pass
-        const renderPass = new RenderPass(this.scene, this.camera);
-        this.composer.addPass(renderPass);
-        
-        // Add bloom pass for glow effect
-        const bloomPass = new UnrealBloomPass(
-            new THREE.Vector2(window.innerWidth, window.innerHeight),
-            1.5,   // strength
-            0.4,   // radius
-            0.85   // threshold
-        );
-        this.composer.addPass(bloomPass);
+// Check if WebGL is supported
+function isWebGLSupported() {
+    try {
+        const canvas = document.createElement('canvas');
+        return !!(window.WebGLRenderingContext && 
+            (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+    } catch (e) {
+        console.warn('WebGL support check failed:', e);
+        return false;
     }
 }
 
-// Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    const modelContainer = document.getElementById('model-showcase');
+// Initialize a 3D model viewer in a specific container
+function initializeModelViewer(containerId, modelUrl, progressCallback) {
+    // Set defaults for parameters
+    modelUrl = modelUrl || 'https://threejs.org/examples/models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf';
     
-    // Only initialize if the container exists
-    if (modelContainer) {
-        window.modelViewer = new ModelViewer('model-showcase');
-        
-        // Make the initialization function available globally
-        window.initializeModelViewer = (containerId, progressCallback) => {
-            if (!window.modelViewer) {
-                window.modelViewer = new ModelViewer(containerId, progressCallback);
-            }
-            return window.modelViewer;
-        };
-    } else {
-        console.warn('Model showcase container not found. 3D model viewer not initialized.');
-    }
-});
-
-// Ensure the 3D model is properly isolated in its own container
-function initializeModelViewer(containerId, progressCallback) {
+    // Get container element
     const container = document.getElementById(containerId);
-    if (!container) return;
+    if (!container) {
+        console.error(`Container with ID "${containerId}" not found`);
+        return null;
+    }
     
-    // Create scene, camera, renderer only for this container
+    // Check WebGL support
+    if (!isWebGLSupported()) {
+        console.error('WebGL not supported by your browser');
+        showModelPlaceholder(container);
+        return null;
+    }
+    
+    // Create loading text if it doesn't exist
+    let loadingText = container.querySelector('.loading-text');
+    if (!loadingText) {
+        loadingText = document.createElement('div');
+        loadingText.className = 'loading-text';
+        loadingText.textContent = 'Loading 3D Model 0%';
+        container.appendChild(loadingText);
+    }
+    
+    // Create controls if they don't exist
+    let controls = container.querySelector('.model-controls');
+    if (!controls) {
+        controls = document.createElement('div');
+        controls.className = 'model-controls';
+        controls.innerHTML = `
+            <button id="${containerId}-rotate-left" class="neon-button">⟲</button>
+            <button id="${containerId}-reset-view" class="neon-button">Reset</button>
+            <button id="${containerId}-rotate-right" class="neon-button">⟳</button>
+        `;
+        container.appendChild(controls);
+    }
+    
+    // Set up Three.js scene
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0a0a12);
     
-    const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+    // Set up camera
+    const camera = new THREE.PerspectiveCamera(
+        75, 
+        container.clientWidth / container.clientHeight, 
+        0.1, 
+        1000
+    );
     camera.position.z = 5;
     
+    // Set up renderer
     const renderer = new THREE.WebGLRenderer({ 
         antialias: true,
-        alpha: true // Allow transparency to blend with the page background
+        alpha: true 
     });
     renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.outputEncoding = THREE.sRGBEncoding || THREE.LinearEncoding; // Fallback for older Three.js versions
+    renderer.outputEncoding = THREE.sRGBEncoding || THREE.LinearEncoding; // Fallback for compatibility
     
     // Clear any existing canvas
     const existingCanvas = container.querySelector('canvas');
@@ -309,102 +83,193 @@ function initializeModelViewer(containerId, progressCallback) {
     
     container.appendChild(renderer.domElement);
     
-    // Add ambient and directional light for better model visibility
-    const ambientLight = new THREE.AmbientLight(0x404040, 2);
+    // Set up lights
+    const lights = [];
+    
+    // Ambient light
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     scene.add(ambientLight);
+    lights.push(ambientLight);
     
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
-    directionalLight.position.set(1, 1, 1);
+    // Directional light (cyan)
+    const directionalLight = new THREE.DirectionalLight(0x00ffff, 1);
+    directionalLight.position.set(0, 1, 2);
     scene.add(directionalLight);
+    lights.push(directionalLight);
     
-    // Add cyberpunk-themed lighting
-    const neonLight1 = new THREE.PointLight(0xff00ff, 1, 100); // Magenta
-    neonLight1.position.set(2, 2, 2);
-    scene.add(neonLight1);
+    // Point light (magenta)
+    const purpleLight = new THREE.PointLight(0xff00ff, 1, 10);
+    purpleLight.position.set(-2, 1, 3);
+    scene.add(purpleLight);
+    lights.push(purpleLight);
     
-    const neonLight2 = new THREE.PointLight(0x00ffff, 1, 100); // Cyan
-    neonLight2.position.set(-2, -2, 2);
-    scene.add(neonLight2);
+    // Point light (yellow)
+    const yellowLight = new THREE.PointLight(0xf9f900, 1, 10);
+    yellowLight.position.set(2, -1, 3);
+    scene.add(yellowLight);
+    lights.push(yellowLight);
     
-    // Create a placeholder cube while loading
-    const placeholderGeometry = new THREE.BoxGeometry(1, 1, 1);
-    const placeholderMaterial = new THREE.MeshStandardMaterial({ 
-        color: 0x00ffff,
-        emissive: 0x00ffff,
-        emissiveIntensity: 0.2,
-        wireframe: true
-    });
-    const placeholder = new THREE.Mesh(placeholderGeometry, placeholderMaterial);
-    scene.add(placeholder);
+    // Set up orbit controls
+    const orbitControls = new THREE.OrbitControls(camera, renderer.domElement);
+    orbitControls.enableDamping = true;
+    orbitControls.dampingFactor = 0.05;
     
-    // Animate placeholder
-    function animatePlaceholder() {
-        placeholder.rotation.x += 0.01;
-        placeholder.rotation.y += 0.01;
+    // Load 3D model
+    let model = null;
+    const loader = new THREE.GLTFLoader();
+    
+    // Custom progress callback
+    const updateProgress = (progress) => {
+        if (loadingText) {
+            const percent = Math.floor(progress * 100);
+            loadingText.textContent = `Loading 3D Model ${percent}%`;
+            
+            // Hide loading text when complete
+            if (progress >= 1) {
+                setTimeout(() => {
+                    loadingText.style.opacity = '0';
+                    setTimeout(() => {
+                        if (loadingText.parentNode) {
+                            loadingText.parentNode.removeChild(loadingText);
+                        }
+                    }, 500);
+                }, 1000);
+            }
+        }
+        
+        // Call external progress callback if provided
+        if (progressCallback) {
+            progressCallback(progress);
+        }
+    };
+    
+    try {
+        loader.load(
+            modelUrl,
+            (gltf) => {
+                // Remove placeholder if it exists
+                if (model) {
+                    scene.remove(model);
+                }
+                
+                // Add loaded model
+                model = gltf.scene;
+                model.scale.set(2, 2, 2); // Scale up for better visibility
+                scene.add(model);
+                
+                // Center model
+                const box = new THREE.Box3().setFromObject(model);
+                const center = box.getCenter(new THREE.Vector3());
+                model.position.x = -center.x;
+                model.position.y = -center.y;
+                model.position.z = -center.z;
+                
+                // Apply cyberpunk materials
+                model.traverse((child) => {
+                    if (child.isMesh) {
+                        child.material.metalness = 0.8;
+                        child.material.roughness = 0.2;
+                        child.material.emissive = new THREE.Color(0x00ffff);
+                        child.material.emissiveIntensity = 0.5;
+                    }
+                });
+                
+                // Set up animation mixer if animations exist
+                let mixer = null;
+                if (gltf.animations && gltf.animations.length > 0) {
+                    mixer = new THREE.AnimationMixer(model);
+                    const action = mixer.clipAction(gltf.animations[0]);
+                    action.play();
+                }
+                
+                // Update progress to completed
+                updateProgress(1.0);
+                console.log(`Model loaded in container ${containerId}`);
+                
+                // Set up control buttons
+                setupModelControls(containerId, model, orbitControls, camera);
+            },
+            // Progress callback
+            (xhr) => {
+                updateProgress(xhr.loaded / xhr.total);
+            },
+            // Error callback
+            (error) => {
+                console.error(`Error loading model for ${containerId}:`, error);
+                createFallbackModel(scene);
+                updateProgress(1.0);
+            }
+        );
+    } catch (error) {
+        console.error(`Error in model loading process for ${containerId}:`, error);
+        createFallbackModel(scene);
+        updateProgress(1.0);
     }
     
-    // Load the model
-    const loader = new THREE.GLTFLoader();
-    let model = null;
-    let controls = null;
+    // Create fallback model if loading fails
+    function createFallbackModel(scene) {
+        const geometry = new THREE.BoxGeometry(2, 2, 2);
+        const material = new THREE.MeshStandardMaterial({ 
+            color: 0x00ffff,
+            metalness: 0.7,
+            roughness: 0.2,
+            emissive: 0x003333,
+            wireframe: true
+        });
+        model = new THREE.Mesh(geometry, material);
+        scene.add(model);
+    }
     
-    loader.load(
-        'https://threejs.org/examples/models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf', 
-        (gltf) => {
-            // Model loaded successfully
-            model = gltf.scene;
-            
-            // Center the model
-            const box = new THREE.Box3().setFromObject(model);
-            const center = box.getCenter(new THREE.Vector3());
-            model.position.sub(center);
-            
-            // Add a subtle rotation animation
-            model.rotation.y = Math.PI / 4;
-            
-            // Remove placeholder
-            scene.remove(placeholder);
-            
-            // Add model to scene
-            scene.add(model);
-            
-            // Add controls for user interaction
-            controls = new THREE.OrbitControls(camera, renderer.domElement);
-            controls.enableDamping = true;
-            controls.dampingFactor = 0.05;
-            controls.screenSpacePanning = false;
-            controls.minDistance = 3;
-            controls.maxDistance = 10;
-            
-            // Set up model control buttons
-            setupModelControls(model, controls, camera);
-            
-            // Final progress update
-            if (progressCallback) progressCallback(1.0);
-        },
-        // Show loading progress
-        (xhr) => {
-            if (progressCallback) {
-                progressCallback(xhr.loaded / xhr.total);
-            }
-        },
-        // Handle errors
-        (error) => {
-            console.error('Error loading 3D model:', error);
-            if (progressCallback) progressCallback(1.0); // Complete the progress bar even on error
-            
-            // Make placeholder more visible as fallback
-            placeholder.material.wireframe = false;
-            placeholder.material.emissiveIntensity = 0.5;
-            placeholder.scale.set(2, 2, 2);
+    // Set up post-processing with bloom effect
+    const composer = setupPostProcessing(renderer, scene, camera);
+    
+    // Set up animation loop
+    let autoRotate = true;
+    const clock = new THREE.Clock();
+    
+    function animate() {
+        requestAnimationFrame(animate);
+        
+        // Auto-rotate model
+        if (autoRotate && model) {
+            model.rotation.y += 0.005;
         }
-    );
+        
+        // Update controls
+        orbitControls.update();
+        
+        // Animate lights
+        const time = Date.now() * 0.001;
+        lights.forEach((light, index) => {
+            if (light.type === 'PointLight') {
+                const radius = 3;
+                light.position.x = Math.sin(time * 0.5 + index) * radius;
+                light.position.z = Math.cos(time * 0.5 + index) * radius;
+            }
+        });
+        
+        // Render with post-processing
+        composer.render();
+    }
     
-    // Set up model control buttons
-    function setupModelControls(model, controls, camera) {
-        const rotateLeftBtn = document.getElementById('rotate-left');
-        const resetViewBtn = document.getElementById('reset-view');
-        const rotateRightBtn = document.getElementById('rotate-right');
+    // Start animation loop
+    animate();
+    
+    // Handle window resize
+    function onWindowResize() {
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        composer.setSize(container.clientWidth, container.clientHeight);
+    }
+    
+    window.addEventListener('resize', onWindowResize);
+    
+    // Set up model controls
+    function setupModelControls(containerId, model, controls, camera) {
+        const rotateLeftBtn = document.getElementById(`${containerId}-rotate-left`);
+        const resetViewBtn = document.getElementById(`${containerId}-reset-view`);
+        const rotateRightBtn = document.getElementById(`${containerId}-rotate-right`);
         
         if (rotateLeftBtn) {
             rotateLeftBtn.addEventListener('click', () => {
@@ -431,42 +296,87 @@ function initializeModelViewer(containerId, progressCallback) {
         }
     }
     
-    animate();
-    
-    // Handle window resize
-    window.addEventListener('resize', () => {
-        camera.aspect = container.clientWidth / container.clientHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(container.clientWidth, container.clientHeight);
-    });
-}
-
-// Export the function to be called from main.js
-window.initializeModelViewer = initializeModelViewer;
-
-function showModelPlaceholder() {
-    const container = document.querySelector('.model-viewer');
-    if (container) {
-        container.innerHTML = `
-            <div class="model-placeholder">
-                <div class="placeholder-icon"><i class="fas fa-cube"></i></div>
-                <div class="placeholder-text">3D Model Viewer Unavailable</div>
-                <div class="placeholder-subtext">Your browser may not support WebGL</div>
-            </div>
-        `;
-    }
-}
-
-// Add this check before trying to create a GLTFLoader
-function initializeModelViewer() {
-    // Check if THREE.GLTFLoader exists
-    if (typeof THREE === 'undefined' || typeof THREE.GLTFLoader !== 'function') {
-        console.error('THREE.GLTFLoader not available. Falling back to placeholder.');
-        showModelPlaceholder();
-        return;
+    // Set up post-processing
+    function setupPostProcessing(renderer, scene, camera) {
+        const composer = new THREE.EffectComposer(renderer);
+        
+        // Add render pass
+        const renderPass = new THREE.RenderPass(scene, camera);
+        composer.addPass(renderPass);
+        
+        // Add bloom pass for glow effect
+        const bloomPass = new THREE.UnrealBloomPass(
+            new THREE.Vector2(container.clientWidth, container.clientHeight),
+            1.0,   // strength
+            0.8,   // radius
+            0.2    // threshold
+        );
+        composer.addPass(bloomPass);
+        
+        return composer;
     }
     
-    // Rest of the initialization code...
-    const loader = new THREE.GLTFLoader();
-    // ...
-} 
+    // Return controller object for external control
+    return {
+        scene,
+        camera,
+        renderer,
+        model,
+        controls: orbitControls,
+        toggleAutoRotate: () => {
+            autoRotate = !autoRotate;
+            return autoRotate;
+        },
+        dispose: () => {
+            // Clean up resources
+            window.removeEventListener('resize', onWindowResize);
+            renderer.dispose();
+            if (model) {
+                scene.remove(model);
+                model.traverse((object) => {
+                    if (object.geometry) object.geometry.dispose();
+                    if (object.material) object.material.dispose();
+                });
+            }
+        }
+    };
+}
+
+// Show placeholder if model can't be loaded
+function showModelPlaceholder(container) {
+    container.innerHTML = `
+        <div class="model-placeholder">
+            <div class="placeholder-icon"><i class="fas fa-cube"></i></div>
+            <div class="placeholder-text">3D Model Viewer Unavailable</div>
+            <div class="placeholder-subtext">Your browser may not support WebGL</div>
+        </div>
+    `;
+}
+
+// Initialize 3D model viewers when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    // Get all model containers by class
+    const containers = document.querySelectorAll('.model-container');
+    
+    // If no containers with class are found, try the specific ID
+    if (containers.length === 0) {
+        const modelContainer = document.getElementById('model-container');
+        if (modelContainer) {
+            initializeModelViewer('model-container');
+        } else {
+            console.warn('No model containers found on page');
+        }
+    } else {
+        // Initialize each container
+        containers.forEach(container => {
+            if (container.id) {
+                initializeModelViewer(container.id);
+            } else {
+                console.warn('Model container missing ID attribute');
+            }
+        });
+    }
+});
+
+// Make the function available globally
+window.initializeModelViewer = initializeModelViewer; 
