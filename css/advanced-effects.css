@@ -2359,22 +2359,6 @@
   border-color: rgba(255, 255, 255, 0.8);
 }
 
-.cyan-theme {
-  background: linear-gradient(45deg, #0a2463, #08f7fe);
-}
-
-.purple-theme {
-  background: linear-gradient(45deg, #600060, #ff00ff);
-}
-
-.green-theme {
-  background: linear-gradient(45deg, #003300, #00ff99);
-}
-
-.multi-theme {
-  background: linear-gradient(45deg, #ff0099, #00ff99, #0099ff);
-}
-
 input[type="range"] {
   width: 100%;
   background: rgba(0, 0, 0, 0.3);
@@ -2424,19 +2408,69 @@ input[type="range"]::-webkit-slider-thumb {
   display: inline;
 }
 
-/* Add these new color themes */
-.cyberpunk-theme {
-  background: linear-gradient(45deg, #ff0055, #00ffe7);
+/* Color picker styles */
+.color-picker-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
-.neon-theme {
-  background: linear-gradient(45deg, #ff00cc, #00ffaa);
+.color-picker-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
 }
 
-.sunset-theme {
-  background: linear-gradient(45deg, #ff3300, #ffcc00);
+.color-picker-group label {
+  font-size: 12px;
+  margin-bottom: 2px;
 }
 
-.matrix-theme {
-  background: linear-gradient(45deg, #001100, #00ff00);
+input[type="color"] {
+  width: 40px;
+  height: 40px;
+  border: 2px solid rgba(0, 255, 255, 0.3);
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  overflow: hidden;
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: 50%;
+}
+
+.color-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 5px;
+}
+
+.preset-btn {
+  flex: 1;
+  min-width: 60px;
+  background: rgba(0, 0, 0, 0.4);
+  color: #00ffff;
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  padding: 5px 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 11px;
+  transition: all 0.3s ease;
+}
+
+.preset-btn:hover,
+.preset-btn.active {
+  background: rgba(0, 255, 255, 0.2);
+  border-color: rgba(0, 255, 255, 0.6);
 }

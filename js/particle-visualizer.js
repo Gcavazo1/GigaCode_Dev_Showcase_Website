@@ -105,65 +105,64 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     });
     
-    // Color buttons
-    const colorButtons = document.querySelectorAll('.color-buttons [data-color]');
-    colorButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const colorScheme = btn.getAttribute('data-color');
+    // Color picker functionality
+    const startColorPicker = document.getElementById('start-color-picker');
+    const endColorPicker = document.getElementById('end-color-picker');
+    const accentColorPicker = document.getElementById('accent-color-picker');
+    const presetButtons = document.querySelectorAll('.preset-btn');
+    
+    // Function to convert HTML color to hex
+    function htmlColorToHex(htmlColor) {
+      // Remove the # if it exists
+      const color = htmlColor.replace('#', '');
+      // Convert to integer
+      return parseInt(color, 16);
+    }
+    
+    // Function to update colors
+    function updateColors() {
+      if (window.particleVisualizer && window.particleVisualizer.particleSystem) {
+        const uniforms = window.particleVisualizer.particleSystem.uniforms;
         
-        // Remove active class from all buttons
-        colorButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        
-        // Apply color change if visualizer exists
-        if (window.particleVisualizer && window.particleVisualizer.particleSystem) {
-          const uniforms = window.particleVisualizer.particleSystem.uniforms;
+        uniforms.startColor.value.setHex(htmlColorToHex(startColorPicker.value));
+        uniforms.endColor.value.setHex(htmlColorToHex(endColorPicker.value));
+        uniforms.uColor.value.setHex(htmlColorToHex(accentColorPicker.value));
+      }
+    }
+    
+    // Apply color changes when pickers are adjusted
+    if (startColorPicker && endColorPicker && accentColorPicker) {
+      startColorPicker.addEventListener('input', updateColors);
+      endColorPicker.addEventListener('input', updateColors);
+      accentColorPicker.addEventListener('input', updateColors);
+    }
+    
+    // Handle preset buttons
+    if (presetButtons.length) {
+      presetButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          // Remove active class from all buttons
+          presetButtons.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
           
-          switch(colorScheme) {
-            case 'cyan':
-              uniforms.startColor.value.setHex(0x0a2463);
-              uniforms.endColor.value.setHex(0x08f7fe);
-              uniforms.uColor.value.setHex(0x08f7fe);
-              break;
-            case 'purple':
-              uniforms.startColor.value.setHex(0x33001b);
-              uniforms.endColor.value.setHex(0xff00ff);
-              uniforms.uColor.value.setHex(0xff00ff);
-              break;
-            case 'green':
-              uniforms.startColor.value.setHex(0x003300);
-              uniforms.endColor.value.setHex(0x00ff99);
-              uniforms.uColor.value.setHex(0x00ff99);
-              break;
-            case 'multi':
-              uniforms.startColor.value.setHex(0xff0099);
-              uniforms.endColor.value.setHex(0x0099ff);
-              uniforms.uColor.value.setHex(0x00ff99);
-              break;
-            case 'cyberpunk':
-              uniforms.startColor.value.setHex(0xff0055);
-              uniforms.endColor.value.setHex(0x00ffe7);
-              uniforms.uColor.value.setHex(0xff00cc);
-              break;
-            case 'neon':
-              uniforms.startColor.value.setHex(0xff00cc);
-              uniforms.endColor.value.setHex(0x00ffaa);
-              uniforms.uColor.value.setHex(0xffcc00);
-              break;
-            case 'sunset':
-              uniforms.startColor.value.setHex(0xff3300);
-              uniforms.endColor.value.setHex(0xffcc00);
-              uniforms.uColor.value.setHex(0xff6600);
-              break;
-            case 'matrix':
-              uniforms.startColor.value.setHex(0x001100);
-              uniforms.endColor.value.setHex(0x00ff00);
-              uniforms.uColor.value.setHex(0x88ff88);
-              break;
-          }
-        }
+          // Get colors from data attributes
+          const startColor = btn.getAttribute('data-start');
+          const endColor = btn.getAttribute('data-end');
+          const accentColor = btn.getAttribute('data-accent');
+          
+          // Update color pickers
+          startColorPicker.value = startColor;
+          endColorPicker.value = endColor;
+          accentColorPicker.value = accentColor;
+          
+          // Apply colors
+          updateColors();
+        });
       });
-    });
+      
+      // Set initial active preset
+      presetButtons[0].classList.add('active');
+    }
     
     // Particle size control
     const sizeSlider = document.getElementById('size-control');
@@ -199,6 +198,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Set initial active buttons
     document.querySelector('[data-shape="sphere"]').classList.add('active');
-    document.querySelector('[data-color="cyan"]').classList.add('active');
   }
 });

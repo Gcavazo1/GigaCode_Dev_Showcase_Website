@@ -788,16 +788,26 @@
                 </div>
             </div>
             <div class="control-group">
-                <label>Color</label>
-                <div class="color-buttons">
-                    <button data-color="cyan" class="color-btn cyan-theme"></button>
-                    <button data-color="purple" class="color-btn purple-theme"></button>
-                    <button data-color="green" class="color-btn green-theme"></button>
-                    <button data-color="multi" class="color-btn multi-theme"></button>
-                    <button data-color="cyberpunk" class="color-btn cyberpunk-theme"></button>
-                    <button data-color="neon" class="color-btn neon-theme"></button>
-                    <button data-color="sunset" class="color-btn sunset-theme"></button>
-                    <button data-color="matrix" class="color-btn matrix-theme"></button>
+                <label>Colors</label>
+                <div class="color-picker-container">
+                    <div class="color-picker-group">
+                        <label>Start Color</label>
+                        <input type="color" id="start-color-picker" value="#0a2463">
+                    </div>
+                    <div class="color-picker-group">
+                        <label>End Color</label>
+                        <input type="color" id="end-color-picker" value="#00ff99">
+                    </div>
+                    <div class="color-picker-group">
+                        <label>Accent Color</label>
+                        <input type="color" id="accent-color-picker" value="#08f7fe">
+                    </div>
+                </div>
+                <div class="color-presets">
+                    <button class="preset-btn" data-start="#0a2463" data-end="#08f7fe" data-accent="#08f7fe">Cyan</button>
+                    <button class="preset-btn" data-start="#33001b" data-end="#ff00ff" data-accent="#ff00ff">Purple</button>
+                    <button class="preset-btn" data-start="#ff0055" data-end="#00ffe7" data-accent="#ff00cc">Cyberpunk</button>
+                    <button class="preset-btn" data-start="#001100" data-end="#00ff00" data-accent="#88ff88">Matrix</button>
                 </div>
             </div>
             <div class="control-group">
