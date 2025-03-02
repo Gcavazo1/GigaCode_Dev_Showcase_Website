@@ -638,6 +638,9 @@ class AudioVisualizer {
     drawFallbackVisualization() {
         if (!this.ctx || !this.analyser || !this.dataArray) return;
         
+        // Save the canvas state
+        this.ctx.save();
+        
         // Clear canvas with background
         this.ctx.fillStyle = this.colorScheme.background;
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
@@ -658,6 +661,8 @@ class AudioVisualizer {
         this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
         this.ctx.strokeStyle = 'rgba(0, 255, 255, 0.3)';
         this.ctx.lineWidth = 2;
+        
+        // Set shadow properties ONCE before drawing all elements
         this.ctx.shadowBlur = 15;
         this.ctx.shadowColor = 'rgba(0, 255, 255, 0.5)';
         this.ctx.stroke();
@@ -687,7 +692,6 @@ class AudioVisualizer {
             const currentColor = `hsl(${color.hue}, ${color.saturation}%, ${lightness}%)`;
             this.ctx.strokeStyle = currentColor;
             this.ctx.shadowColor = currentColor;
-            this.ctx.shadowBlur = 10 + intensity * 10; // Stronger glow for louder sounds
             
             // Draw line with glow
             this.ctx.beginPath();
@@ -705,6 +709,9 @@ class AudioVisualizer {
         
         // Draw enhanced particles
         this.drawEnhancedParticles(centerX, centerY, radius);
+        
+        // Restore the canvas state
+        this.ctx.restore();
     }
 
     // Enhanced particle system with better visibility
@@ -719,6 +726,13 @@ class AudioVisualizer {
         
         // More particles and larger size
         const particleCount = Math.floor(50 + intensity * 100);
+        
+        // Save current shadow settings
+        const currentShadowBlur = this.ctx.shadowBlur;
+        const currentShadowColor = this.ctx.shadowColor;
+        
+        // Set strong glow for particles
+        this.ctx.shadowBlur = 15;
         
         // Draw particles with strong glow
         for (let i = 0; i < particleCount; i++) {
@@ -736,16 +750,19 @@ class AudioVisualizer {
             const color = this.colorScheme.bars[colorIndex];
             const alpha = 0.8 * (1 - distance / (radius * 2.5));
             
-            // Set strong glow
-            this.ctx.shadowBlur = 15;
-            this.ctx.shadowColor = `hsla(${color.hue}, ${color.saturation}%, ${color.lightness}%, ${alpha})`;
+            const particleColor = `hsla(${color.hue}, ${color.saturation}%, ${color.lightness}%, ${alpha})`;
+            this.ctx.fillStyle = particleColor;
+            this.ctx.shadowColor = particleColor;
             
             // Draw particle
             this.ctx.beginPath();
             this.ctx.arc(x, y, size, 0, Math.PI * 2);
-            this.ctx.fillStyle = `hsla(${color.hue}, ${color.saturation}%, ${color.lightness}%, ${alpha})`;
             this.ctx.fill();
         }
+        
+        // Restore previous shadow settings
+        this.ctx.shadowBlur = currentShadowBlur;
+        this.ctx.shadowColor = currentShadowColor;
     }
 
     // Enhanced grid with better visibility
@@ -753,11 +770,15 @@ class AudioVisualizer {
         const width = this.canvas.width;
         const height = this.canvas.height;
         
+        // Save current shadow settings
+        const currentShadowBlur = this.ctx.shadowBlur;
+        const currentShadowColor = this.ctx.shadowColor;
+        
         // More visible grid lines
         this.ctx.strokeStyle = 'rgba(0, 255, 255, 0.15)';
         this.ctx.lineWidth = 1;
         
-        // Reset shadow blur for grid
+        // Set shadow for grid
         this.ctx.shadowBlur = 5;
         this.ctx.shadowColor = 'rgba(0, 255, 255, 0.3)';
         
@@ -781,6 +802,10 @@ class AudioVisualizer {
             this.ctx.lineTo(x, gridTop);
             this.ctx.stroke();
         }
+        
+        // Restore previous shadow settings
+        this.ctx.shadowBlur = currentShadowBlur;
+        this.ctx.shadowColor = currentShadowColor;
     }
 
     // Add a placeholder visualization for when no audio is playing
