@@ -110,7 +110,6 @@ class ParticleSystem {
         `;
         
         fragmentShader = `
-          uniform vec3 uColor;
           uniform vec3 startColor;
           uniform vec3 endColor;
           uniform float uBassFrequency;
@@ -131,18 +130,20 @@ class ParticleSystem {
           void main() {
             // Create soft circle with feathered edge
             vec2 uv = vec2(gl_PointCoord.x, 1.0 - gl_PointCoord.y);
-            vec3 circ = vec3(circle(uv, 1.0));
+            float circ = circle(uv, 1.0);
             
-            // Interpolate between start and end colors based on distance
+            // Clear color interpolation based on distance
             vec3 color = mix(startColor, endColor, vDistance);
             
-            // Add audio reactivity for subtle color modifications
-            color.r += uHighFrequency * 0.2;
-            color.g += uMidFrequency * 0.2;
-            color.b += uBassFrequency * 0.2;
+            // Apply subtle audio reactivity
+            color += vec3(
+              uHighFrequency * 0.2,
+              uMidFrequency * 0.2,
+              uBassFrequency * 0.2
+            );
             
-            // Use distance-based alpha like in the reference
-            float alpha = circ.r * vDistance * 0.8;
+            // Distance-based alpha with strong falloff at edges
+            float alpha = circ * (vDistance * 0.6 + 0.4);
             
             gl_FragColor = vec4(color, alpha);
           }
@@ -211,60 +212,6 @@ class ParticleSystem {
         );
         break;
         
-      case 'sphere':
-      default:
-        // Use SphereGeometry with many segments
-        this.geometry = new THREE.SphereGeometry(
-          5, // radius
-          32, // width segments
-          32 // height segments
-        );
-        break;
-        
-      case 'star':
-        // Create a 3D star shape
-        const starGeometry = new THREE.BufferGeometry();
-        const vertices = [];
-        
-        // Parameters for the star
-        const innerRadius = 2.5;
-        const outerRadius = 7;
-        const numPoints = 10;
-        const heightVariation = 3;
-        
-        // Create the star points
-        for (let i = 0; i < numPoints * 2; i++) {
-          const angle = (Math.PI * 2 * i) / (numPoints * 2);
-          const radius = i % 2 === 0 ? outerRadius : innerRadius;
-          
-          // x and z form the star shape in the horizontal plane
-          const x = Math.cos(angle) * radius;
-          const z = Math.sin(angle) * radius;
-          
-          // Add some randomness to y to create 3D effect
-          const y = (Math.random() - 0.5) * heightVariation;
-          
-          vertices.push(x, y, z);
-        }
-        
-        // Add some particles in the center to fill it out
-        for (let i = 0; i < 500; i++) {
-          const angle = Math.random() * Math.PI * 2;
-          const radius = Math.random() * innerRadius;
-          const x = Math.cos(angle) * radius;
-          const z = Math.sin(angle) * radius;
-          const y = (Math.random() - 0.5) * heightVariation * 0.5;
-          
-          vertices.push(x, y, z);
-        }
-        
-        // Create position attribute from vertices
-        const positionAttribute = new THREE.Float32BufferAttribute(vertices, 3);
-        starGeometry.setAttribute('position', positionAttribute);
-        
-        this.geometry = starGeometry;
-        break;
-        
       case 'cylinder':
         // Match the reference's high segment counts for cylinder
         const radialSegments = 92; // Higher count for smoother cylinder
@@ -282,6 +229,16 @@ class ParticleSystem {
         cylinder.rotation.set(Math.PI / 2, 0, 0);
         cylinder.updateMatrix();
         this.geometry.applyMatrix4(cylinder.matrix);
+        break;
+        
+      case 'sphere':
+      default:
+        // Use SphereGeometry with many segments
+        this.geometry = new THREE.SphereGeometry(
+          5, // radius
+          32, // width segments
+          32 // height segments
+        );
         break;
     }
     

@@ -108,8 +108,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Color picker functionality
     const startColorPicker = document.getElementById('start-color-picker');
     const endColorPicker = document.getElementById('end-color-picker');
-    const accentColorPicker = document.getElementById('accent-color-picker');
-    const presetButtons = document.querySelectorAll('.preset-btn');
     
     // Function to convert HTML color to hex
     function htmlColorToHex(htmlColor) {
@@ -126,42 +124,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         uniforms.startColor.value.setHex(htmlColorToHex(startColorPicker.value));
         uniforms.endColor.value.setHex(htmlColorToHex(endColorPicker.value));
-        uniforms.uColor.value.setHex(htmlColorToHex(accentColorPicker.value));
       }
     }
     
     // Apply color changes when pickers are adjusted
-    if (startColorPicker && endColorPicker && accentColorPicker) {
+    if (startColorPicker && endColorPicker) {
       startColorPicker.addEventListener('input', updateColors);
       endColorPicker.addEventListener('input', updateColors);
-      accentColorPicker.addEventListener('input', updateColors);
-    }
-    
-    // Handle preset buttons
-    if (presetButtons.length) {
-      presetButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-          // Remove active class from all buttons
-          presetButtons.forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          
-          // Get colors from data attributes
-          const startColor = btn.getAttribute('data-start');
-          const endColor = btn.getAttribute('data-end');
-          const accentColor = btn.getAttribute('data-accent');
-          
-          // Update color pickers
-          startColorPicker.value = startColor;
-          endColorPicker.value = endColor;
-          accentColorPicker.value = accentColor;
-          
-          // Apply colors
-          updateColors();
-        });
-      });
-      
-      // Set initial active preset
-      presetButtons[0].classList.add('active');
     }
     
     // Particle size control
