@@ -14,8 +14,9 @@ attribute vec3 aRandomness;
 varying vec3 vPosition;
 varying float vDistance;
 varying float vScale;
+varying vec3 vColor;
 
-// Curl noise function for organic movement
+// Turbulence noise function for organic movement
 vec3 mod289(vec3 x) {
   return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
@@ -55,48 +56,61 @@ float noise(vec2 v) {
   return 130.0 * dot(m, g);
 }
 
+// Curl noise function for fluid movement
 vec3 curl(vec3 p) {
-  const float step = 0.01;
-  float noise1 = noise(vec2(p.x + uTime * 0.2, p.y + uTime * 0.3));
-  float noise2 = noise(vec2(p.y + uTime * 0.1, p.z + uTime * 0.2));
-  float noise3 = noise(vec2(p.z + uTime * 0.3, p.x + uTime * 0.1));
+  float noise1, noise2, noise3;
+  float eps = 0.01;
   
-  vec3 curl = vec3(
-    noise1 * sin(p.y * uFrequency + uTime),
-    noise2 * sin(p.z * uFrequency + uTime),
-    noise3 * sin(p.x * uFrequency + uTime)
-  );
+  // Use amplitude from audio to intensify movement
+  float amp = uAmplitude;
   
-  return curl * uAmplitude;
+  // Add time-based movement amplified by beat
+  float timeScale = uTime * 0.3 * (1.0 + uBeat * 0.5);
+  
+  // Different frequencies for each dimension
+  noise1 = noise(vec2(p.y * 0.1 + timeScale, p.z * 0.1 + timeScale * 0.8)) * amp;
+  noise2 = noise(vec2(p.z * 0.1 + timeScale * 1.2, p.x * 0.1 + timeScale * 0.7)) * amp;
+  noise3 = noise(vec2(p.x * 0.1 + timeScale * 0.9, p.y * 0.1 + timeScale * 1.1)) * amp;
+  
+  // Add audio reactivity to the curl pattern
+  noise1 *= 1.0 + uBassFrequency * 1.2;
+  noise2 *= 1.0 + uMidFrequency * 1.0;
+  noise3 *= 1.0 + uHighFrequency * 0.8;
+  
+  return vec3(noise1, noise2, noise3);
 }
 
 void main() {
-  // Original position
-  vec3 pos = position;
+  // Original position with randomness for variation
+  vec3 pos = position + aRandomness * 0.3;
   
-  // Add curl noise movement
-  vec3 curlForce = curl(pos * 0.1 + aRandomness * 0.1);
+  // Apply curl noise movement
+  vec3 curlForce = curl(pos * uFrequency);
   
-  // Apply audio reactivity
-  curlForce *= 1.0 + uBassFrequency * 2.0;
+  // Apply beat pulse effect
+  float beatEffect = uBeat * aScale * 0.5;
   
-  // Apply beat effect
-  float beatEffect = uBeat * 0.2 * aScale;
-  
-  // Calculate final position
-  vec3 newPosition = pos + curlForce * (1.0 + beatEffect);
+  // Apply audio-reactive displacement
+  pos += curlForce * (1.0 + beatEffect);
   
   // Calculate distance for color interpolation
-  float distance = length(newPosition - position) / uMaxDistance;
+  float distance = length(pos - position) / uMaxDistance;
   vDistance = clamp(distance, 0.0, 1.0);
   
-  // Transform position
-  vec4 mvPosition = modelViewMatrix * vec4(newPosition, 1.0);
+  // Calculate colors based on position and audio
+  vColor = vec3(
+    0.5 + uHighFrequency * 0.7, 
+    0.2 + uMidFrequency * 0.5, 
+    0.8 + uBassFrequency * 0.8
+  );
+  
+  // Apply model transformation
+  vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
   
   // Calculate size based on audio
   float size = uSize;
-  size *= 0.5 + uMidFrequency * 0.8; // Mid frequencies affect size
-  size *= aScale * (0.2 + 0.8 * uBassFrequency); // Bass affects size variation
+  size *= 0.2 + uMidFrequency * 1.5; // Mid frequencies affect size
+  size *= aScale * (0.5 + uBassFrequency); // Bass affects size variation
   size *= 1.0 + uBeat * 0.5; // Beat makes particles bigger
   
   // Set point size with perspective

@@ -5,7 +5,7 @@ class AudioAnalyzer {
       mid: 0,
       high: 0
     };
-    this.smoothingFactor = 0.8; // For smooth transitions
+    this.smoothingFactor = 0.6; // Less smoothing = more responsive (was 0.8)
     this.audioContext = null;
     this.analyser = null;
     this.dataArray = null;
@@ -31,6 +31,9 @@ class AudioAnalyzer {
         // Create analyzer node
         this.analyser = this.audioContext.createAnalyser();
         this.analyser.fftSize = 1024;
+        this.analyser.smoothingTimeConstant = 0.5; // More responsive (default is 0.8)
+        this.analyser.minDecibels = -100; // Detect quieter sounds (default is -100)
+        this.analyser.maxDecibels = -30; // Better dynamic range (default is -30)
         this.bufferLength = this.analyser.frequencyBinCount;
         this.dataArray = new Uint8Array(this.bufferLength);
         
@@ -46,6 +49,9 @@ class AudioAnalyzer {
         // Create analyzer node
         this.analyser = this.audioContext.createAnalyser();
         this.analyser.fftSize = 1024;
+        this.analyser.smoothingTimeConstant = 0.5; // More responsive (default is 0.8)
+        this.analyser.minDecibels = -100; // Detect quieter sounds (default is -100)
+        this.analyser.maxDecibels = -30; // Better dynamic range (default is -30)
         this.bufferLength = this.analyser.frequencyBinCount;
         this.dataArray = new Uint8Array(this.bufferLength);
         
