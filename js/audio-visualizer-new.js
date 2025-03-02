@@ -83,6 +83,12 @@ class AudioVisualizer {
         // Visualization state
         this.fallbackVisualizerActive = false;
         
+        // Add this to the constructor
+        this.offscreenCanvas = document.createElement('canvas');
+        this.offscreenCanvas.width = this.canvas.width;
+        this.offscreenCanvas.height = this.canvas.height;
+        this.offscreenCtx = this.offscreenCanvas.getContext('2d');
+        
         // Initialize
         this.initBasic();
         
@@ -281,29 +287,30 @@ class AudioVisualizer {
     }
     
     animate() {
-        // If we have audio data, always use the fallback visualization
         if (this.analyser && this.dataArray) {
-            // Get frequency data once per frame
+            // Get frequency data
             this.analyser.getByteFrequencyData(this.dataArray);
             
-            // Clear canvas with background
+            // Clear both canvases
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            this.offscreenCtx.clearRect(0, 0, this.offscreenCanvas.width, this.offscreenCanvas.height);
+            
+            // Draw background on main canvas
             this.ctx.fillStyle = this.colorScheme.background;
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
             
-            // Draw visualization elements in order
-            this.drawEnhancedGrid();
-            this.drawCircularVisualizer();
-            this.drawEnhancedParticles();
+            // Draw visualization on offscreen canvas
+            this.drawCircularVisualizerOffscreen();
             
-            // Always animate equalizer on active track card
+            // Copy offscreen canvas to main canvas
+            this.ctx.drawImage(this.offscreenCanvas, 0, 0);
+            
+            // Animate equalizer
             this.animateEqualizer();
         } else {
-            // Draw placeholder visualization when no audio data
             this.drawPlaceholderVisualization();
         }
         
-        // Continue animation
         requestAnimationFrame(() => this.animate());
     }
     
@@ -885,25 +892,26 @@ class AudioVisualizer {
         }
     }
 
-    // Separate the circular visualization into its own method
-    drawCircularVisualizer() {
-        if (!this.ctx || !this.dataArray) return;
+    // New method to draw on offscreen canvas
+    drawCircularVisualizerOffscreen() {
+        if (!this.offscreenCtx || !this.dataArray) return;
         
-        // Draw circular visualization
-        const centerX = this.canvas.width / 2;
-        const centerY = this.canvas.height / 2;
+        const centerX = this.offscreenCanvas.width / 2;
+        const centerY = this.offscreenCanvas.height / 2;
         const radius = Math.min(centerX, centerY) * 0.6;
         
-        // Draw base circle with glow
-        this.ctx.beginPath();
-        this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-        this.ctx.strokeStyle = 'rgba(0, 255, 255, 0.3)';
-        this.ctx.lineWidth = 2;
-        this.ctx.shadowBlur = 15;
-        this.ctx.shadowColor = 'rgba(0, 255, 255, 0.5)';
-        this.ctx.stroke();
+        // Draw base circle
+        this.offscreenCtx.beginPath();
+        this.offscreenCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        this.offscreenCtx.strokeStyle = 'rgba(0, 255, 255, 0.3)';
+        this.offscreenCtx.lineWidth = 2;
+        this.offscreenCtx.stroke();
         
-        // Draw frequency bars with enhanced glow
+        // Set shadow properties for all subsequent drawing operations
+        this.offscreenCtx.shadowBlur = 15;
+        this.offscreenCtx.shadowColor = 'rgba(0, 255, 255, 0.5)';
+        
+        // Draw frequency bars
         const segments = 120;
         const angleStep = (Math.PI * 2) / segments;
         
@@ -918,112 +926,22 @@ class AudioVisualizer {
             const x2 = centerX + Math.cos(angle) * (radius + barHeight);
             const y2 = centerY + Math.sin(angle) * (radius + barHeight);
             
-            // Calculate color based on frequency
+            // Calculate color
             const colorIndex = Math.floor((i / segments) * this.colorScheme.bars.length);
             const color = this.colorScheme.bars[colorIndex % this.colorScheme.bars.length];
             const intensity = value / 255;
             const lightness = color.lightness + (intensity * 20);
             
-            // Set color and enhanced glow
+            // Set color
             const currentColor = `hsl(${color.hue}, ${color.saturation}%, ${lightness}%)`;
-            this.ctx.strokeStyle = currentColor;
-            this.ctx.shadowColor = currentColor;
-            this.ctx.shadowBlur = 15;
+            this.offscreenCtx.strokeStyle = currentColor;
+            this.offscreenCtx.shadowColor = currentColor;
             
-            // Draw line with glow
-            this.ctx.beginPath();
-            this.ctx.moveTo(x1, y1);
-            this.ctx.lineTo(x2, y2);
-            this.ctx.lineWidth = 2 + intensity * 2; // Thicker lines for louder sounds
-            this.ctx.stroke();
-            
-            // Draw endpoint with glow
-            this.ctx.beginPath();
-            this.ctx.arc(x2, y2, 2 + intensity * 2, 0, Math.PI * 2);
-            this.ctx.fillStyle = currentColor;
-            this.ctx.fill();
-        }
-    }
-
-    // Update the particle method to use the current data
-    drawEnhancedParticles() {
-        if (!this.ctx || !this.dataArray) return;
-        
-        const centerX = this.canvas.width / 2;
-        const centerY = this.canvas.height / 2;
-        const radius = Math.min(centerX, centerY) * 0.6;
-        
-        // Calculate average frequency for intensity
-        let sum = 0;
-        for (let i = 0; i < this.dataArray.length; i++) {
-            sum += this.dataArray[i];
-        }
-        const avgFrequency = sum / this.dataArray.length;
-        const intensity = avgFrequency / 255;
-        
-        // More particles and larger size
-        const particleCount = Math.floor(50 + intensity * 100);
-        
-        // Set strong glow for particles
-        this.ctx.shadowBlur = 15;
-        
-        // Draw particles with strong glow
-        for (let i = 0; i < particleCount; i++) {
-            const angle = Math.random() * Math.PI * 2;
-            const distance = Math.random() * radius * 2;
-            
-            const x = centerX + Math.cos(angle) * distance;
-            const y = centerY + Math.sin(angle) * distance;
-            
-            // Larger particles
-            const size = Math.max(2, 4 * (1 - distance / (radius * 2.5)) * intensity);
-            
-            // Brighter colors
-            const colorIndex = i % this.colorScheme.bars.length;
-            const color = this.colorScheme.bars[colorIndex];
-            const alpha = 0.8 * (1 - distance / (radius * 2.5));
-            
-            const particleColor = `hsla(${color.hue}, ${color.saturation}%, ${color.lightness}%, ${alpha})`;
-            this.ctx.fillStyle = particleColor;
-            this.ctx.shadowColor = particleColor;
-            
-            // Draw particle
-            this.ctx.beginPath();
-            this.ctx.arc(x, y, size, 0, Math.PI * 2);
-            this.ctx.fill();
-        }
-    }
-
-    // Update the grid method to be simpler and more visible
-    drawEnhancedGrid() {
-        const width = this.canvas.width;
-        const height = this.canvas.height;
-        
-        // More visible grid lines
-        this.ctx.strokeStyle = 'rgba(0, 255, 255, 0.15)';
-        this.ctx.lineWidth = 1;
-        this.ctx.shadowBlur = 5;
-        this.ctx.shadowColor = 'rgba(0, 255, 255, 0.3)';
-        
-        const gridSpacing = 30;
-        
-        // Draw grid in bottom half of canvas
-        const gridTop = height * 0.5;
-        
-        // Horizontal lines
-        for (let y = height; y >= gridTop; y -= gridSpacing) {
-            this.ctx.beginPath();
-            this.ctx.moveTo(0, y);
-            this.ctx.lineTo(width, y);
-            this.ctx.stroke();
-        }
-        
-        // Vertical lines
-        for (let x = 0; x < width; x += gridSpacing) {
-            this.ctx.beginPath();
-            this.ctx.moveTo(x, height);
-            this.ctx.lineTo(x, gridTop);
-            this.ctx.stroke();
+            // Draw line
+            this.offscreenCtx.beginPath();
+            this.offscreenCtx.moveTo(x1, y1);
+            this.offscreenCtx.lineTo(x2, y2);
+            this.offscreenCtx.stroke();
         }
     }
 }
