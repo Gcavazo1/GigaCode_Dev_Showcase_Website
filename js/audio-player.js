@@ -147,6 +147,9 @@ class AudioPlayer {
             this.source.connect(this.analyser);
             this.analyser.connect(this.audioContext.destination);
             
+            // Share the analyzer with other components
+            window.audioPlayerAnalyser = this.analyser;
+            
             // Load the actual audio source
             this.loadTrack(this.currentTrack);
             
