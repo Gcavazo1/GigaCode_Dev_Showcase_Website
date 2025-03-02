@@ -85,9 +85,15 @@ class AudioVisualizer {
         
         // Add this to the constructor
         this.offscreenCanvas = document.createElement('canvas');
-        this.offscreenCanvas.width = this.canvas.width;
-        this.offscreenCanvas.height = this.canvas.height;
-        this.offscreenCtx = this.offscreenCanvas.getContext('2d');
+        this.offscreenCanvas.width = this.canvas.width || this.canvas.offsetWidth;
+        this.offscreenCanvas.height = this.canvas.height || this.canvas.offsetHeight;
+        this.offscreenCtx = this.offscreenCanvas.getContext('2d', {
+            alpha: true,
+            willReadFrequently: false
+        });
+        
+        // Log offscreen canvas dimensions
+        console.log('Offscreen canvas dimensions:', this.offscreenCanvas.width, 'x', this.offscreenCanvas.height);
         
         // Initialize
         this.initBasic();
