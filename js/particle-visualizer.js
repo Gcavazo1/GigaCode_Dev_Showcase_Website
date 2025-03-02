@@ -202,34 +202,3 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.querySelector('[data-color="cyan"]').classList.add('active');
   }
 });
-
-// Update the color buttons in the HTML first
-const colorButtonsHTML = `
-  <div class="color-buttons">
-    <button data-color="cyan" class="color-btn cyan-theme"></button>
-    <button data-color="purple" class="color-btn purple-theme"></button>
-    <button data-color="green" class="color-btn green-theme"></button>
-    <button data-color="multi" class="color-btn multi-theme"></button>
-    <button data-color="cyberpunk" class="color-btn cyberpunk-theme"></button>
-    <button data-color="neon" class="color-btn neon-theme"></button>
-    <button data-color="sunset" class="color-btn sunset-theme"></button>
-    <button data-color="matrix" class="color-btn matrix-theme"></button>
-  </div>
-`;
-
-// Then add these CSS styles
-.cyberpunk-theme {
-  background: linear-gradient(45deg, #ff0055, #00ffe7);
-}
-
-.neon-theme {
-  background: linear-gradient(45deg, #ff00cc, #00ffaa);
-}
-
-.sunset-theme {
-  background: linear-gradient(45deg, #ff3300, #ffcc00);
-}
-
-.matrix-theme {
-  background: linear-gradient(45deg, #001100, #00ff00);
-}
