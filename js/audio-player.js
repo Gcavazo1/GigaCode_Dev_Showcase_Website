@@ -1,37 +1,20 @@
-// Cyberpunk Audio Visualizer with PowerShell-style widget
-let audioVisualizerInstance = null;
+// Cyberpunk Audio Player with PowerShell-style widget
+let audioPlayerInstance = null;
 
-class AudioVisualizer {
+class AudioPlayer {
     constructor() {
         // Singleton pattern
-        if (audioVisualizerInstance) {
-            return audioVisualizerInstance;
+        if (audioPlayerInstance) {
+            return audioPlayerInstance;
         }
-        audioVisualizerInstance = this;
+        audioPlayerInstance = this;
 
-        console.log('Initializing AudioVisualizer');
+        console.log('Initializing Audio Player');
         
         // Core elements
         this.audio = document.getElementById('background-audio');
         this.playButton = document.getElementById('play-audio');
         this.volumeSlider = document.getElementById('volume-slider');
-        this.canvas = document.getElementById('audio-canvas');
-        
-        if (!this.canvas) {
-            console.error('Audio canvas not found!');
-            return;
-        }
-        
-        console.log('Canvas found:', this.canvas);
-        console.log('Canvas dimensions:', this.canvas.offsetWidth, 'x', this.canvas.offsetHeight);
-        
-        this.ctx = this.canvas.getContext('2d');
-        if (!this.ctx) {
-            console.error('Could not get 2D context from canvas!');
-            return;
-        }
-        
-        console.log('2D context obtained successfully');
         
         // State
         this.isPlaying = false;
@@ -69,20 +52,6 @@ class AudioVisualizer {
         ];
         this.currentTrack = 0;
         
-        // Visualization colors
-        this.colorScheme = {
-            bars: [
-                { hue: 180, saturation: 100, lightness: 60 }, // Brighter cyan
-                { hue: 320, saturation: 100, lightness: 70 }, // Brighter pink
-                { hue: 275, saturation: 90, lightness: 65 },  // Softer purple
-                { hue: 140, saturation: 100, lightness: 55 }  // Adjusted green
-            ],
-            background: '#0a0a14' // Slightly lighter background
-        };
-        
-        // Visualization state
-        this.fallbackVisualizerActive = false;
-        
         // Initialize
         this.initBasic();
         
@@ -91,21 +60,17 @@ class AudioVisualizer {
     }
     
     initBasic() {
-        // Set up canvas
-        this.resizeCanvas();
-        window.addEventListener('resize', () => this.resizeCanvas());
-        
         // Set up event listeners
         this.setupEventListeners();
         
         // Load first track info
         this.loadTrackInfo(this.currentTrack);
         
-        // Start animation
-        this.animate();
-        
         // Create playlist carousel
         this.createPlaylistCarousel();
+        
+        // Start animation for equalizer
+        this.animateEqualizer();
     }
     
     setupEventListeners() {
@@ -174,7 +139,7 @@ class AudioVisualizer {
             
             // Set up audio nodes
             this.analyser = this.audioContext.createAnalyser();
-            this.analyser.fftSize = 512; // Increased for better resolution
+            this.analyser.fftSize = 512; // For equalizer
             this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
             
             // Connect nodes
@@ -185,32 +150,10 @@ class AudioVisualizer {
             // Load the actual audio source
             this.loadTrack(this.currentTrack);
             
-            // Initialize Three.js visualizer
-            this.initThreeVisualizer();
-            
             console.log("Audio initialized successfully");
         } catch (error) {
             console.error("Error initializing audio:", error);
         }
-    }
-    
-    initThreeVisualizer() {
-        if (!this.analyser || !this.dataArray) return;
-        
-        try {
-            // Create Three.js visualizer
-            this.threeVisualizer = new ThreeAudioVisualizer(this.analyser, this.dataArray);
-            console.log('Three.js visualization initialized successfully');
-        } catch (error) {
-            console.error('Failed to initialize Three.js visualizer:', error);
-            console.log('Falling back to canvas visualization');
-            // Continue with audio playback even if visualization fails
-        }
-    }
-    
-    resizeCanvas() {
-        this.canvas.width = this.canvas.offsetWidth;
-        this.canvas.height = this.canvas.offsetHeight;
     }
     
     togglePlay() {
@@ -294,23 +237,15 @@ class AudioVisualizer {
         }
     }
     
-    animate() {
+    animateEqualizer() {
         if (this.analyser && this.dataArray) {
-            // If Three.js visualizer is not available, use enhanced canvas fallback
-            if (!this.threeVisualizer) {
-                this.drawEnhancedFallbackVisualization();
-            }
-            
-            // Always animate equalizer
-            this.animateEqualizer();
-        } else {
-            this.drawPlaceholderVisualization();
+            this.updateEqualizer();
         }
         
-        requestAnimationFrame(() => this.animate());
+        requestAnimationFrame(() => this.animateEqualizer());
     }
     
-    animateEqualizer() {
+    updateEqualizer() {
         if (!this.analyser || !this.dataArray) return;
         
         // Get the active track card
@@ -582,227 +517,9 @@ class AudioVisualizer {
             this.updateCarouselPosition();
         }
     }
-
-    // Update the placeholder visualization
-    drawPlaceholderVisualization() {
-        if (!this.ctx) return;
-        
-        // Clear canvas
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        // Draw background
-        this.ctx.fillStyle = this.colorScheme.background;
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        const centerX = this.canvas.width / 2;
-        const centerY = this.canvas.height / 2;
-        const baseRadius = Math.min(centerX, centerY) * 0.4;
-        
-        // Draw a simple wireframe sphere
-        this.drawSimpleWireframeSphere(centerX, centerY, baseRadius);
-        
-        // Draw "Play to visualize" text
-        this.ctx.font = '16px "Orbitron", sans-serif';
-        this.ctx.textAlign = 'center';
-        this.ctx.fillStyle = 'rgba(0, 255, 255, 0.7)';
-        this.ctx.fillText('Play to visualize audio', centerX, centerY + 5);
-    }
-
-    // Add a simple wireframe sphere for the placeholder
-    drawSimpleWireframeSphere(centerX, centerY, radius) {
-        // Sphere parameters
-        const rings = 16;
-        const segments = 16;
-        
-        // Draw rings
-        for (let i = 0; i < rings; i++) {
-            const phi = (Math.PI * i) / rings;
-            const ringRadius = radius * Math.sin(phi);
-            const y = centerY + radius * Math.cos(phi);
-            
-            this.ctx.beginPath();
-            this.ctx.arc(centerX, y, ringRadius, 0, Math.PI * 2);
-            this.ctx.strokeStyle = 'rgba(0, 255, 255, 0.3)';
-            this.ctx.lineWidth = 1;
-            this.ctx.stroke();
-        }
-        
-        // Draw segments
-        for (let i = 0; i < segments; i++) {
-            const theta = (Math.PI * 2 * i) / segments;
-            const x = Math.cos(theta);
-            const z = Math.sin(theta);
-            
-            this.ctx.beginPath();
-            this.ctx.moveTo(centerX, centerY - radius);
-            this.ctx.quadraticCurveTo(
-                centerX + x * radius * 1.5, 
-                centerY, 
-                centerX, 
-                centerY + radius
-            );
-            this.ctx.strokeStyle = 'rgba(0, 255, 255, 0.3)';
-            this.ctx.lineWidth = 1;
-            this.ctx.stroke();
-        }
-        
-        // Add pulsing effect
-        const time = Date.now() / 1000;
-        const pulseScale = Math.sin(time) * 0.1 + 0.9;
-        
-        // Draw outer glow
-        this.ctx.beginPath();
-        this.ctx.arc(centerX, centerY, radius * pulseScale, 0, Math.PI * 2);
-        this.ctx.strokeStyle = 'rgba(0, 255, 255, 0.5)';
-        this.ctx.lineWidth = 2;
-        this.ctx.shadowBlur = 15;
-        this.ctx.shadowColor = 'rgba(0, 255, 255, 0.7)';
-        this.ctx.stroke();
-        this.ctx.shadowBlur = 0;
-    }
-
-    // Add a subtle background grid
-    drawBackgroundGrid(centerX, centerY, size) {
-        const gridSize = 40;
-        const halfSize = size / 2;
-        
-        this.ctx.strokeStyle = 'rgba(0, 255, 255, 0.1)';
-        this.ctx.lineWidth = 0.5;
-        
-        // Draw horizontal grid lines
-        for (let y = centerY - halfSize; y <= centerY + halfSize; y += gridSize) {
-            this.ctx.beginPath();
-            this.ctx.moveTo(centerX - halfSize, y);
-            this.ctx.lineTo(centerX + halfSize, y);
-            this.ctx.stroke();
-        }
-        
-        // Draw vertical grid lines
-        for (let x = centerX - halfSize; x <= centerX + halfSize; x += gridSize) {
-            this.ctx.beginPath();
-            this.ctx.moveTo(x, centerY - halfSize);
-            this.ctx.lineTo(x, centerY + halfSize);
-            this.ctx.stroke();
-        }
-    }
-
-    // Add an enhanced fallback visualization
-    drawEnhancedFallbackVisualization() {
-        if (!this.ctx || !this.analyser || !this.dataArray) return;
-        
-        // Get frequency data
-        this.analyser.getByteFrequencyData(this.dataArray);
-        
-        // Clear canvas
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.fillStyle = this.colorScheme.background;
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        const centerX = this.canvas.width / 2;
-        const centerY = this.canvas.height / 2;
-        
-        // Calculate average frequency for overall intensity
-        const avgFrequency = Array.from(this.dataArray).reduce((a, b) => a + b, 0) / this.dataArray.length;
-        const intensity = avgFrequency / 255;
-        
-        // Draw a circular audio spectrum
-        this.drawCircularSpectrum(centerX, centerY, intensity);
-        
-        // Draw particles based on audio
-        this.drawAudioParticles(centerX, centerY, intensity);
-        
-        // Draw subtle grid
-        this.drawBackgroundGrid(centerX, centerY, Math.min(this.canvas.width, this.canvas.height) * 0.8);
-    }
-
-    // Draw a circular audio spectrum
-    drawCircularSpectrum(centerX, centerY, intensity) {
-        const baseRadius = Math.min(centerX, centerY) * 0.5;
-        const segments = 128;
-        const angleStep = (Math.PI * 2) / segments;
-        
-        // Add rotation based on time
-        const time = Date.now() / 5000; // Slow rotation
-        
-        // Draw base circle with glow
-        this.ctx.beginPath();
-        this.ctx.arc(centerX, centerY, baseRadius, 0, Math.PI * 2);
-        this.ctx.strokeStyle = 'rgba(0, 255, 255, 0.3)';
-        this.ctx.lineWidth = 2;
-        this.ctx.shadowBlur = 15;
-        this.ctx.shadowColor = 'rgba(0, 255, 255, 0.5)';
-        this.ctx.stroke();
-        
-        // Draw frequency bars with rotation
-        for (let i = 0; i < segments; i++) {
-            const angle = i * angleStep + time; // Add rotation
-            const dataIndex = Math.floor(i * this.dataArray.length / segments);
-            const value = this.dataArray[dataIndex] || 0;
-            const barHeight = (value / 255) * baseRadius * 0.8;
-            
-            const x1 = centerX + Math.cos(angle) * baseRadius;
-            const y1 = centerY + Math.sin(angle) * baseRadius;
-            const x2 = centerX + Math.cos(angle) * (baseRadius + barHeight);
-            const y2 = centerY + Math.sin(angle) * (baseRadius + barHeight);
-            
-            // Calculate color based on frequency
-            const colorIndex = Math.floor((i / segments) * this.colorScheme.bars.length);
-            const color = this.colorScheme.bars[colorIndex % this.colorScheme.bars.length];
-            const barIntensity = value / 255;
-            const lightness = color.lightness + (barIntensity * 20);
-            
-            // Set color and glow
-            const currentColor = `hsl(${color.hue}, ${color.saturation}%, ${lightness}%)`;
-            this.ctx.strokeStyle = currentColor;
-            this.ctx.shadowColor = currentColor;
-            
-            // Draw line with glow
-            this.ctx.beginPath();
-            this.ctx.moveTo(x1, y1);
-            this.ctx.lineTo(x2, y2);
-            this.ctx.lineWidth = 2 + barIntensity * 2;
-            this.ctx.stroke();
-            
-            // Draw endpoint
-            this.ctx.beginPath();
-            this.ctx.arc(x2, y2, 2 + barIntensity * 2, 0, Math.PI * 2);
-            this.ctx.fillStyle = currentColor;
-            this.ctx.fill();
-        }
-    }
-
-    // Draw particles that react to audio
-    drawAudioParticles(centerX, centerY, intensity) {
-        const baseRadius = Math.min(centerX, centerY) * 0.5;
-        const particleCount = Math.floor(50 + intensity * 100);
-        
-        this.ctx.shadowBlur = 10;
-        
-        for (let i = 0; i < particleCount; i++) {
-            const angle = Math.random() * Math.PI * 2;
-            const distance = Math.random() * baseRadius * 2;
-            
-            const x = centerX + Math.cos(angle) * distance;
-            const y = centerY + Math.sin(angle) * distance;
-            
-            const size = Math.max(1, 3 * (1 - distance / (baseRadius * 2)) * intensity);
-            
-            const colorIndex = i % this.colorScheme.bars.length;
-            const color = this.colorScheme.bars[colorIndex];
-            const alpha = 0.7 * (1 - distance / (baseRadius * 2));
-            
-            const particleColor = `hsla(${color.hue}, ${color.saturation}%, ${color.lightness}%, ${alpha})`;
-            this.ctx.fillStyle = particleColor;
-            this.ctx.shadowColor = particleColor;
-            
-            this.ctx.beginPath();
-            this.ctx.arc(x, y, size, 0, Math.PI * 2);
-            this.ctx.fill();
-        }
-    }
 }
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    new AudioVisualizer();
+    new AudioPlayer();
 }); 
