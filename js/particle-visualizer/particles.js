@@ -1,8 +1,8 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.module.js';
 
 // Define shader paths for loading
-const vertexShaderPath = '/js/particle-visualizer/shaders/particle-vertex.glsl';
-const fragmentShaderPath = '/js/particle-visualizer/shaders/particle-fragment.glsl';
+const vertexShaderPath = './shaders/particle-vertex.glsl';
+const fragmentShaderPath = './shaders/particle-fragment.glsl';
 
 class ParticleSystem {
   constructor() {
@@ -39,16 +39,85 @@ class ParticleSystem {
   async load() {
     // Load shader code from files
     try {
-      const [vertexShader, fragmentShader] = await Promise.all([
-        fetch(vertexShaderPath).then(r => r.text()),
-        fetch(fragmentShaderPath).then(r => r.text())
-      ]);
+      console.log('[Particles] Attempting to load shaders from:', vertexShaderPath, fragmentShaderPath);
+      
+      let vertexShader, fragmentShader;
+      
+      try {
+        [vertexShader, fragmentShader] = await Promise.all([
+          fetch(vertexShaderPath).then(r => {
+            if (!r.ok) throw new Error(`Failed to load vertex shader: ${r.status}`);
+            return r.text();
+          }),
+          fetch(fragmentShaderPath).then(r => {
+            if (!r.ok) throw new Error(`Failed to load fragment shader: ${r.status}`);
+            return r.text();
+          })
+        ]);
+      } catch (fetchError) {
+        console.error('Error fetching shader files:', fetchError);
+        console.log('[Particles] Using fallback inline shaders');
+        
+        // Fallback to inline shaders
+        vertexShader = `
+          uniform float uTime;
+          uniform float uSize;
+          uniform float uBassFrequency;
+          uniform float uMidFrequency;
+          uniform float uHighFrequency;
+          
+          attribute float aScale;
+          
+          varying vec3 vPosition;
+          varying float vScale;
+          
+          void main() {
+            vec3 pos = position;
+            
+            // Add simple movement
+            pos.x += sin(uTime * 0.2 + pos.z * 0.5) * 0.2;
+            pos.y += cos(uTime * 0.2 + pos.x * 0.5) * 0.2;
+            pos.z += sin(uTime * 0.2 + pos.y * 0.5) * 0.2;
+            
+            vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+            gl_Position = projectionMatrix * mvPosition;
+            
+            // Size based on audio
+            float size = uSize * (0.5 + uMidFrequency * 0.8) * aScale;
+            gl_PointSize = size * (1.0 / -mvPosition.z);
+            
+            vPosition = position;
+            vScale = aScale;
+          }
+        `;
+        
+        fragmentShader = `
+          uniform vec3 uColor;
+          uniform float uBassFrequency;
+          
+          varying vec3 vPosition;
+          varying float vScale;
+          
+          void main() {
+            // Create soft circle
+            vec2 center = gl_PointCoord - 0.5;
+            float dist = length(center) * 2.0;
+            float circle = 1.0 - smoothstep(0.0, 1.0, dist);
+            
+            // Base color
+            vec3 color = uColor;
+            color.b += uBassFrequency * 0.8;
+            
+            gl_FragColor = vec4(color, circle * 0.8);
+          }
+        `;
+      }
       
       this.createMaterial(vertexShader, fragmentShader);
-      console.log('[Particles] Shader loading status:', true ? 'Success' : 'Failed');
+      console.log('[Particles] Shader loading status: Success');
       return true;
     } catch (error) {
-      console.error('Error loading shaders:', error);
+      console.error('Error in shader processing:', error);
       return false;
     }
   }
