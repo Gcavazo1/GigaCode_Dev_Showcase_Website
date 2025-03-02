@@ -71,11 +71,13 @@ function initializeModelViewer(containerId, modelUrl, progressCallback) {
     const renderer = new THREE.WebGLRenderer({ 
         antialias: true,
         alpha: true,
-        premultipliedAlpha: false
+        premultipliedAlpha: false,
+        logarithmicDepthBuffer: true
     });
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.outputEncoding = THREE.sRGBEncoding || THREE.LinearEncoding; // Fallback for compatibility
     renderer.setClearColor(0x000000, 0);
+    renderer.setClearAlpha(0);
     
     // Clear any existing canvas
     const existingCanvas = container.querySelector('canvas');
@@ -84,6 +86,10 @@ function initializeModelViewer(containerId, modelUrl, progressCallback) {
     }
     
     container.appendChild(renderer.domElement);
+    
+    // Add this after creating the renderer
+    renderer.domElement.style.opacity = '0.95'; // Slightly transparent to show grid
+    renderer.domElement.style.mixBlendMode = 'screen'; // Better blending with background
     
     // Set up lights
     const lights = [];
