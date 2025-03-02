@@ -5,28 +5,56 @@ class ThreeAudioVisualizer {
         this.dataArray = dataArray;
         this.canvas = document.getElementById('audio-canvas');
         
-        // Check for WebGL support
+        // Check for WebGL support more thoroughly
         if (!this.isWebGLSupported()) {
             console.warn('WebGL not supported, falling back to canvas visualization');
-            return;
+            return null; // Return null to indicate initialization failed
         }
         
-        // Initialize Three.js components
+        // Initialize Three.js components with better error handling
         try {
             this.initThree();
             this.animate();
             console.log('Three.js visualization started successfully');
+            return this; // Return the instance if successful
         } catch (error) {
             console.error('Error initializing Three.js visualizer:', error);
+            return null; // Return null to indicate initialization failed
         }
     }
     
     isWebGLSupported() {
         try {
+            // Try to create a WebGL context with explicit attributes
             const canvas = document.createElement('canvas');
-            return !!(window.WebGLRenderingContext && 
-                (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+            const contextAttributes = {
+                alpha: true,
+                antialias: true,
+                depth: true,
+                failIfMajorPerformanceCaveat: false,
+                powerPreference: 'default',
+                premultipliedAlpha: true,
+                preserveDrawingBuffer: false,
+                stencil: true
+            };
+            
+            // Try WebGL2 first, then fall back to WebGL1
+            let gl = canvas.getContext('webgl2', contextAttributes) || 
+                     canvas.getContext('webgl', contextAttributes) || 
+                     canvas.getContext('experimental-webgl', contextAttributes);
+                     
+            if (!gl) {
+                console.warn('WebGL context creation failed');
+                return false;
+            }
+            
+            // Check for necessary extensions and capabilities
+            const extensions = gl.getSupportedExtensions();
+            console.log('WebGL supported extensions:', extensions);
+            
+            return true;
         } catch (e) {
+            console.warn('WebGL support check failed:', e);
             return false;
         }
     }
@@ -41,14 +69,24 @@ class ThreeAudioVisualizer {
         this.camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
         this.camera.position.set(0, 0, 20);
         
-        // Renderer setup
-        this.renderer = new THREE.WebGLRenderer({ 
-            canvas: this.canvas,
-            alpha: true,
-            antialias: true
-        });
-        this.renderer.setSize(width, height);
-        this.renderer.setClearColor(0x0a0a14, 1); // Match our background color
+        // Renderer setup with more robust error handling
+        try {
+            this.renderer = new THREE.WebGLRenderer({ 
+                canvas: this.canvas,
+                alpha: true,
+                antialias: true,
+                powerPreference: 'default',
+                preserveDrawingBuffer: false,
+                precision: 'highp',
+                logarithmicDepthBuffer: false
+            });
+            
+            this.renderer.setSize(width, height);
+            this.renderer.setClearColor(0x0a0a14, 1);
+        } catch (error) {
+            console.error('Error creating WebGL renderer:', error);
+            throw new Error('Failed to create WebGL renderer');
+        }
         
         // Create uniforms for shaders
         this.uniforms = {

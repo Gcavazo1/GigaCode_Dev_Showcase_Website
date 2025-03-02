@@ -296,9 +296,9 @@ class AudioVisualizer {
     
     animate() {
         if (this.analyser && this.dataArray) {
-            // If Three.js visualizer is not available, use canvas fallback
+            // If Three.js visualizer is not available, use enhanced canvas fallback
             if (!this.threeVisualizer) {
-                this.drawPlaceholderVisualization();
+                this.drawEnhancedFallbackVisualization();
             }
             
             // Always animate equalizer
@@ -683,6 +683,121 @@ class AudioVisualizer {
             this.ctx.moveTo(x, centerY - halfSize);
             this.ctx.lineTo(x, centerY + halfSize);
             this.ctx.stroke();
+        }
+    }
+
+    // Add an enhanced fallback visualization
+    drawEnhancedFallbackVisualization() {
+        if (!this.ctx || !this.analyser || !this.dataArray) return;
+        
+        // Get frequency data
+        this.analyser.getByteFrequencyData(this.dataArray);
+        
+        // Clear canvas
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.fillStyle = this.colorScheme.background;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        const centerX = this.canvas.width / 2;
+        const centerY = this.canvas.height / 2;
+        
+        // Calculate average frequency for overall intensity
+        const avgFrequency = Array.from(this.dataArray).reduce((a, b) => a + b, 0) / this.dataArray.length;
+        const intensity = avgFrequency / 255;
+        
+        // Draw a circular audio spectrum
+        this.drawCircularSpectrum(centerX, centerY, intensity);
+        
+        // Draw particles based on audio
+        this.drawAudioParticles(centerX, centerY, intensity);
+        
+        // Draw subtle grid
+        this.drawBackgroundGrid(centerX, centerY, Math.min(this.canvas.width, this.canvas.height) * 0.8);
+    }
+
+    // Draw a circular audio spectrum
+    drawCircularSpectrum(centerX, centerY, intensity) {
+        const baseRadius = Math.min(centerX, centerY) * 0.5;
+        const segments = 128;
+        const angleStep = (Math.PI * 2) / segments;
+        
+        // Add rotation based on time
+        const time = Date.now() / 5000; // Slow rotation
+        
+        // Draw base circle with glow
+        this.ctx.beginPath();
+        this.ctx.arc(centerX, centerY, baseRadius, 0, Math.PI * 2);
+        this.ctx.strokeStyle = 'rgba(0, 255, 255, 0.3)';
+        this.ctx.lineWidth = 2;
+        this.ctx.shadowBlur = 15;
+        this.ctx.shadowColor = 'rgba(0, 255, 255, 0.5)';
+        this.ctx.stroke();
+        
+        // Draw frequency bars with rotation
+        for (let i = 0; i < segments; i++) {
+            const angle = i * angleStep + time; // Add rotation
+            const dataIndex = Math.floor(i * this.dataArray.length / segments);
+            const value = this.dataArray[dataIndex] || 0;
+            const barHeight = (value / 255) * baseRadius * 0.8;
+            
+            const x1 = centerX + Math.cos(angle) * baseRadius;
+            const y1 = centerY + Math.sin(angle) * baseRadius;
+            const x2 = centerX + Math.cos(angle) * (baseRadius + barHeight);
+            const y2 = centerY + Math.sin(angle) * (baseRadius + barHeight);
+            
+            // Calculate color based on frequency
+            const colorIndex = Math.floor((i / segments) * this.colorScheme.bars.length);
+            const color = this.colorScheme.bars[colorIndex % this.colorScheme.bars.length];
+            const barIntensity = value / 255;
+            const lightness = color.lightness + (barIntensity * 20);
+            
+            // Set color and glow
+            const currentColor = `hsl(${color.hue}, ${color.saturation}%, ${lightness}%)`;
+            this.ctx.strokeStyle = currentColor;
+            this.ctx.shadowColor = currentColor;
+            
+            // Draw line with glow
+            this.ctx.beginPath();
+            this.ctx.moveTo(x1, y1);
+            this.ctx.lineTo(x2, y2);
+            this.ctx.lineWidth = 2 + barIntensity * 2;
+            this.ctx.stroke();
+            
+            // Draw endpoint
+            this.ctx.beginPath();
+            this.ctx.arc(x2, y2, 2 + barIntensity * 2, 0, Math.PI * 2);
+            this.ctx.fillStyle = currentColor;
+            this.ctx.fill();
+        }
+    }
+
+    // Draw particles that react to audio
+    drawAudioParticles(centerX, centerY, intensity) {
+        const baseRadius = Math.min(centerX, centerY) * 0.5;
+        const particleCount = Math.floor(50 + intensity * 100);
+        
+        this.ctx.shadowBlur = 10;
+        
+        for (let i = 0; i < particleCount; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const distance = Math.random() * baseRadius * 2;
+            
+            const x = centerX + Math.cos(angle) * distance;
+            const y = centerY + Math.sin(angle) * distance;
+            
+            const size = Math.max(1, 3 * (1 - distance / (baseRadius * 2)) * intensity);
+            
+            const colorIndex = i % this.colorScheme.bars.length;
+            const color = this.colorScheme.bars[colorIndex];
+            const alpha = 0.7 * (1 - distance / (baseRadius * 2));
+            
+            const particleColor = `hsla(${color.hue}, ${color.saturation}%, ${color.lightness}%, ${alpha})`;
+            this.ctx.fillStyle = particleColor;
+            this.ctx.shadowColor = particleColor;
+            
+            this.ctx.beginPath();
+            this.ctx.arc(x, y, size, 0, Math.PI * 2);
+            this.ctx.fill();
         }
     }
 }
