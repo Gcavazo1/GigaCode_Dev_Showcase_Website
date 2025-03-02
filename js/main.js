@@ -88,11 +88,37 @@ document.addEventListener('DOMContentLoaded', function() {
     
     initRobloxProjects();
     
-    // Show welcome message for first-time visitors
-    if (!localStorage.getItem('returnVisitor')) {
-        showWelcomeMessage();
-        localStorage.setItem('returnVisitor', 'true');
-    }
+    // Add smooth scrolling with performance optimization
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Close mobile menu if open
+            const mobileMenu = document.querySelector('.mobile-menu-toggle');
+            if (mobileMenu && mobileMenu.classList.contains('active')) {
+                const event = new Event('click');
+                mobileMenu.dispatchEvent(event);
+            }
+            
+            const targetId = this.getAttribute('href');
+            const targetElement = document.querySelector(targetId);
+            
+            if (targetElement) {
+                // Use requestAnimationFrame for smoother scrolling
+                const scrollToElement = () => {
+                    const yOffset = -80; // Adjust based on your header height
+                    const y = targetElement.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                    
+                    window.scrollTo({
+                        top: y,
+                        behavior: 'smooth'
+                    });
+                };
+                
+                requestAnimationFrame(scrollToElement);
+            }
+        });
+    });
 });
 
 // Smooth scrolling for navigation links
@@ -293,63 +319,6 @@ function initRobloxProjects() {
         });
     });
 }
-
-function showWelcomeMessage() {
-    const welcomeMessage = document.createElement('div');
-    welcomeMessage.className = 'welcome-message';
-    welcomeMessage.innerHTML = `
-        <h3>Welcome to GigaCode Dev Showcase</h3>
-        <p>This site features background music for an immersive experience. Would you like to enable it?</p>
-        <button class="welcome-button enable-music">Enable Music</button>
-        <button class="welcome-button skip-music">Maybe Later</button>
-    `;
-    
-    document.body.appendChild(welcomeMessage);
-    
-    // Handle button clicks
-    welcomeMessage.querySelector('.enable-music').addEventListener('click', function() {
-        // Find the audio player and trigger play
-        const playButton = document.getElementById('play-audio');
-        if (playButton) playButton.click();
-        welcomeMessage.remove();
-    });
-    
-    welcomeMessage.querySelector('.skip-music').addEventListener('click', function() {
-        welcomeMessage.remove();
-    });
-}
-
-// Add smooth scrolling with performance optimization
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-        e.preventDefault();
-        
-        // Close mobile menu if open
-        const mobileMenu = document.querySelector('.mobile-menu-toggle');
-        if (mobileMenu && mobileMenu.classList.contains('active')) {
-            const event = new Event('click');
-            mobileMenu.dispatchEvent(event);
-        }
-        
-        const targetId = this.getAttribute('href');
-        const targetElement = document.querySelector(targetId);
-        
-        if (targetElement) {
-            // Use requestAnimationFrame for smoother scrolling
-            const scrollToElement = () => {
-                const yOffset = -80; // Adjust based on your header height
-                const y = targetElement.getBoundingClientRect().top + window.pageYOffset + yOffset;
-                
-                window.scrollTo({
-                    top: y,
-                    behavior: 'smooth'
-                });
-            };
-            
-            requestAnimationFrame(scrollToElement);
-        }
-    });
-});
 
 // Add this function to optimize performance
 function optimizePerformance() {

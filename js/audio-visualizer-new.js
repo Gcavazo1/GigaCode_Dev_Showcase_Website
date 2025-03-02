@@ -642,11 +642,11 @@ class AudioVisualizer {
         this.ctx.fillStyle = this.colorScheme.background;
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         
-        // Draw grid first (in background)
-        this.drawSimpleGrid();
-        
         // Get frequency data
         this.analyser.getByteFrequencyData(this.dataArray);
+        
+        // Draw grid first (in background)
+        this.drawEnhancedGrid();
         
         // Draw circular visualization
         const centerX = this.canvas.width / 2;
@@ -656,16 +656,15 @@ class AudioVisualizer {
         // Draw base circle with glow
         this.ctx.beginPath();
         this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-        this.ctx.strokeStyle = 'rgba(0, 255, 255, 0.2)';
-        this.ctx.lineWidth = 1;
+        this.ctx.strokeStyle = 'rgba(0, 255, 255, 0.3)';
+        this.ctx.lineWidth = 2;
+        this.ctx.shadowBlur = 15;
+        this.ctx.shadowColor = 'rgba(0, 255, 255, 0.5)';
         this.ctx.stroke();
         
-        // Draw frequency bars
+        // Draw frequency bars with enhanced glow
         const segments = 120;
         const angleStep = (Math.PI * 2) / segments;
-        
-        // Enable glow effects
-        this.ctx.shadowBlur = 10;
         
         for (let i = 0; i < segments; i++) {
             const angle = i * angleStep;
@@ -684,77 +683,91 @@ class AudioVisualizer {
             const intensity = value / 255;
             const lightness = color.lightness + (intensity * 20);
             
-            // Set color and glow
+            // Set color and enhanced glow
             const currentColor = `hsl(${color.hue}, ${color.saturation}%, ${lightness}%)`;
             this.ctx.strokeStyle = currentColor;
             this.ctx.shadowColor = currentColor;
+            this.ctx.shadowBlur = 10 + intensity * 10; // Stronger glow for louder sounds
             
-            // Draw line
+            // Draw line with glow
             this.ctx.beginPath();
             this.ctx.moveTo(x1, y1);
             this.ctx.lineTo(x2, y2);
+            this.ctx.lineWidth = 2 + intensity * 2; // Thicker lines for louder sounds
             this.ctx.stroke();
             
-            // Draw endpoint
+            // Draw endpoint with glow
             this.ctx.beginPath();
-            this.ctx.arc(x2, y2, 2, 0, Math.PI * 2);
+            this.ctx.arc(x2, y2, 2 + intensity * 2, 0, Math.PI * 2);
             this.ctx.fillStyle = currentColor;
             this.ctx.fill();
         }
         
-        // Draw particles on top
-        this.drawSimpleParticles(centerX, centerY, radius);
+        // Draw enhanced particles
+        this.drawEnhancedParticles(centerX, centerY, radius);
     }
 
-    // Simplified particle system
-    drawSimpleParticles(centerX, centerY, radius) {
+    // Enhanced particle system with better visibility
+    drawEnhancedParticles(centerX, centerY, radius) {
         // Calculate average frequency for intensity
-        const sum = this.dataArray.reduce((a, b) => a + b, 0);
-        const intensity = (sum / this.dataArray.length) / 255;
+        let sum = 0;
+        for (let i = 0; i < this.dataArray.length; i++) {
+            sum += this.dataArray[i];
+        }
+        const avgFrequency = sum / this.dataArray.length;
+        const intensity = avgFrequency / 255;
         
-        const particleCount = Math.floor(30 + intensity * 50);
+        // More particles and larger size
+        const particleCount = Math.floor(50 + intensity * 100);
         
-        // Keep shadow glow enabled for particles
-        this.ctx.shadowBlur = 15;
-        
+        // Draw particles with strong glow
         for (let i = 0; i < particleCount; i++) {
             const angle = Math.random() * Math.PI * 2;
-            const distance = Math.random() * radius * 1.5;
+            const distance = Math.random() * radius * 2;
             
             const x = centerX + Math.cos(angle) * distance;
             const y = centerY + Math.sin(angle) * distance;
             
-            const size = Math.max(2, 3 * (1 - distance / (radius * 2)) * intensity);
+            // Larger particles
+            const size = Math.max(2, 4 * (1 - distance / (radius * 2.5)) * intensity);
             
+            // Brighter colors
             const colorIndex = i % this.colorScheme.bars.length;
             const color = this.colorScheme.bars[colorIndex];
-            const alpha = 0.7 * (1 - distance / (radius * 2));
+            const alpha = 0.8 * (1 - distance / (radius * 2.5));
             
-            const particleColor = `hsla(${color.hue}, ${color.saturation}%, ${color.lightness}%, ${alpha})`;
-            this.ctx.fillStyle = particleColor;
-            this.ctx.shadowColor = particleColor;
+            // Set strong glow
+            this.ctx.shadowBlur = 15;
+            this.ctx.shadowColor = `hsla(${color.hue}, ${color.saturation}%, ${color.lightness}%, ${alpha})`;
             
+            // Draw particle
             this.ctx.beginPath();
             this.ctx.arc(x, y, size, 0, Math.PI * 2);
+            this.ctx.fillStyle = `hsla(${color.hue}, ${color.saturation}%, ${color.lightness}%, ${alpha})`;
             this.ctx.fill();
         }
     }
 
-    // Simplified grid
-    drawSimpleGrid() {
+    // Enhanced grid with better visibility
+    drawEnhancedGrid() {
         const width = this.canvas.width;
         const height = this.canvas.height;
         
-        this.ctx.strokeStyle = 'rgba(0, 255, 255, 0.1)';
+        // More visible grid lines
+        this.ctx.strokeStyle = 'rgba(0, 255, 255, 0.15)';
         this.ctx.lineWidth = 1;
-        this.ctx.shadowBlur = 0; // Disable glow for grid
         
-        const gridSpacing = 40;
-        const startY = height;
-        const endY = height * 0.5;
+        // Reset shadow blur for grid
+        this.ctx.shadowBlur = 5;
+        this.ctx.shadowColor = 'rgba(0, 255, 255, 0.3)';
+        
+        const gridSpacing = 30;
+        
+        // Draw grid in bottom half of canvas
+        const gridTop = height * 0.5;
         
         // Horizontal lines
-        for (let y = startY; y > endY; y -= gridSpacing) {
+        for (let y = height; y >= gridTop; y -= gridSpacing) {
             this.ctx.beginPath();
             this.ctx.moveTo(0, y);
             this.ctx.lineTo(width, y);
@@ -764,8 +777,8 @@ class AudioVisualizer {
         // Vertical lines
         for (let x = 0; x < width; x += gridSpacing) {
             this.ctx.beginPath();
-            this.ctx.moveTo(x, startY);
-            this.ctx.lineTo(x, endY);
+            this.ctx.moveTo(x, height);
+            this.ctx.lineTo(x, gridTop);
             this.ctx.stroke();
         }
     }
