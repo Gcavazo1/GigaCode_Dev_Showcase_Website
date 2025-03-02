@@ -96,14 +96,16 @@ class AudioSphereVisualizer {
             this.params.threshold
         );
         
-        // Create output pass
-        const outputPass = new THREE.OutputPass();
-        
         // Create composer
         this.composer = new THREE.EffectComposer(this.renderer);
         this.composer.addPass(renderScene);
         this.composer.addPass(this.bloomPass);
-        this.composer.addPass(outputPass);
+        
+        // Instead of OutputPass, use ShaderPass with CopyShader
+        // This is more compatible with older Three.js versions
+        const finalPass = new THREE.ShaderPass(THREE.CopyShader);
+        finalPass.renderToScreen = true;
+        this.composer.addPass(finalPass);
     }
     
     initAudio() {
