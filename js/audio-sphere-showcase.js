@@ -87,25 +87,36 @@ class AudioSphereVisualizer {
     }
     
     initAudio() {
-        // Get audio element from the audio player
-        this.audio = document.getElementById('background-audio');
-        if (!this.audio) {
-            console.error('Audio element not found');
-            return;
+        try {
+            // Get audio element from the audio player
+            this.audio = document.getElementById('background-audio');
+            if (!this.audio) {
+                console.error('Audio element not found');
+                return;
+            }
+            
+            // Check if audio is already connected to an analyzer (from the audio player)
+            if (window.audioPlayerAnalyser) {
+                console.log('Using existing audio analyzer from audio player');
+                this.analyser = window.audioPlayerAnalyser;
+                this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+                return;
+            }
+            
+            // If no existing analyzer, create our own
+            console.log('Creating new audio analyzer');
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            this.analyser = this.audioContext.createAnalyser();
+            this.analyser.fftSize = 512;
+            this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+            
+            // Connect audio to analyzer
+            this.source = this.audioContext.createMediaElementSource(this.audio);
+            this.source.connect(this.analyser);
+            this.analyser.connect(this.audioContext.destination);
+        } catch (error) {
+            console.error('Error initializing audio:', error);
         }
-        
-        // Create audio context
-        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        
-        // Create analyzer
-        this.analyser = this.audioContext.createAnalyser();
-        this.analyser.fftSize = 512;
-        this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
-        
-        // Connect audio to analyzer
-        this.source = this.audioContext.createMediaElementSource(this.audio);
-        this.source.connect(this.analyser);
-        this.analyser.connect(this.audioContext.destination);
     }
     
     initControls() {
@@ -125,21 +136,8 @@ class AudioSphereVisualizer {
             this.uniforms.u_blue.value = this.params.blue;
         });
         
-        // Bloom controls
-        document.getElementById('bloom-strength').addEventListener('input', (e) => {
-            this.params.strength = parseFloat(e.target.value);
-            this.bloomPass.strength = this.params.strength;
-        });
-        
-        document.getElementById('bloom-radius').addEventListener('input', (e) => {
-            this.params.radius = parseFloat(e.target.value);
-            this.bloomPass.radius = this.params.radius;
-        });
-        
-        document.getElementById('bloom-threshold').addEventListener('input', (e) => {
-            this.params.threshold = parseFloat(e.target.value);
-            this.bloomPass.threshold = this.params.threshold;
-        });
+        // We can keep the bloom control event listeners, but they won't do anything
+        // since we removed the bloom pass
     }
     
     onResize() {
@@ -147,9 +145,8 @@ class AudioSphereVisualizer {
         this.camera.aspect = this.canvas.offsetWidth / this.canvas.offsetHeight;
         this.camera.updateProjectionMatrix();
         
-        // Update renderer and composer
+        // Update renderer
         this.renderer.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight);
-        this.composer.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight);
     }
     
     animate() {
