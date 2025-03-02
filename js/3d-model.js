@@ -1,8 +1,19 @@
 // 3D Model Viewer for Cyberpunk Portfolio
 
 class ModelViewer {
-    constructor() {
-        this.container = document.getElementById('model-container');
+    constructor(containerId) {
+        this.containerId = containerId;
+        this.container = document.getElementById(this.containerId);
+        
+        if (!this.container) {
+            throw new Error(`Container with ID "${this.containerId}" not found`);
+        }
+
+        // Check for WebGL support
+        if (!this.isWebGLSupported()) {
+            throw new Error('WebGL not supported');
+        }
+
         this.scene = null;
         this.camera = null;
         this.renderer = null;
@@ -11,7 +22,9 @@ class ModelViewer {
         this.lights = [];
         this.autoRotate = true;
         this.wireframe = false;
+        this.mixer = null;
         
+        // Initialize components
         this.init();
         this.setupEventListeners();
     }
