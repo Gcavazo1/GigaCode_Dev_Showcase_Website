@@ -769,15 +769,34 @@
     <script src="js/nav.js"></script>
     <script src="js/audio-sphere-showcase.js"></script>
 
-    <!-- Update to Three.js 0.174.0 -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.174.0/build/three.min.js"></script>
-
     <!-- Add the required modules -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.174.0/examples/js/postprocessing/EffectComposer.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.174.0/examples/js/postprocessing/RenderPass.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.174.0/examples/js/postprocessing/ShaderPass.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.174.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.174.0/examples/js/shaders/CopyShader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.174.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "/node_modules/three/build/three.module.js",
+        "three/addons/": "/node_modules/three/examples/jsm/"
+      }
+    }
+    </script>
+    <script type="module">
+      import * as THREE from 'three';
+      import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+      import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+      import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+      import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+      import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+      import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+      import { CopyShader } from 'three/addons/shaders/CopyShader.js';
+      
+      // Make THREE available globally
+      window.THREE = THREE;
+      window.THREE.OrbitControls = OrbitControls;
+      window.THREE.GLTFLoader = GLTFLoader;
+      window.THREE.EffectComposer = EffectComposer;
+      window.THREE.RenderPass = RenderPass;
+      window.THREE.UnrealBloomPass = UnrealBloomPass;
+      window.THREE.ShaderPass = ShaderPass;
+      window.THREE.CopyShader = CopyShader;
+    </script>
 </body>
 </html>
