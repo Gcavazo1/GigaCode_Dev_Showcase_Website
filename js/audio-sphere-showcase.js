@@ -1,6 +1,12 @@
 // Audio Sphere Showcase
 class AudioSphereVisualizer {
     constructor() {
+        // Check if THREE is available
+        if (typeof THREE === 'undefined') {
+            console.error('THREE is not defined. Make sure Three.js is loaded before initializing AudioSphereVisualizer.');
+            return;
+        }
+        
         this.canvas = document.getElementById('sphere-canvas');
         if (!this.canvas) {
             console.error('Sphere canvas not found');
@@ -340,12 +346,4 @@ class AudioSphereVisualizer {
             }
         `;
     }
-}
-
-// Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    // Wait a bit to ensure audio player is initialized
-    setTimeout(() => {
-        new AudioSphereVisualizer();
-    }, 1000);
-}); 
+} 
