@@ -20,29 +20,46 @@ class AudioAnalyzer {
   }
 
   connect(audioElement) {
-    if (!audioElement || this.isConnected) return;
+    if (!audioElement || this.isConnected) return false;
     
     try {
-      // Create audio context if it doesn't exist
-      this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      
-      // Create analyzer node
-      this.analyser = this.audioContext.createAnalyser();
-      this.analyser.fftSize = 1024;
-      this.bufferLength = this.analyser.frequencyBinCount;
-      this.dataArray = new Uint8Array(this.bufferLength);
-      
-      // Create source from audio element and connect
-      this.source = this.audioContext.createMediaElementSource(audioElement);
-      this.source.connect(this.analyser);
-      this.analyser.connect(this.audioContext.destination);
-      
-      this.isConnected = true;
-      console.log('Audio analyzer connected successfully');
-      
-      return true;
+      // Look for existing audio context in the audio player
+      if (window.audioPlayerInstance && window.audioPlayerInstance.audioContext) {
+        console.log('[AudioAnalyzer] Using existing AudioContext from audio player');
+        this.audioContext = window.audioPlayerInstance.audioContext;
+        
+        // Create analyzer node
+        this.analyser = this.audioContext.createAnalyser();
+        this.analyser.fftSize = 1024;
+        this.bufferLength = this.analyser.frequencyBinCount;
+        this.dataArray = new Uint8Array(this.bufferLength);
+        
+        // Connect to the destination to capture audio
+        this.analyser.connect(this.audioContext.destination);
+        
+        this.isConnected = true;
+        return true;
+      } else {
+        // Continue with original code to create a new context
+        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // Create analyzer node
+        this.analyser = this.audioContext.createAnalyser();
+        this.analyser.fftSize = 1024;
+        this.bufferLength = this.analyser.frequencyBinCount;
+        this.dataArray = new Uint8Array(this.bufferLength);
+        
+        // Create source from audio element and connect
+        this.source = this.audioContext.createMediaElementSource(audioElement);
+        this.source.connect(this.analyser);
+        this.analyser.connect(this.audioContext.destination);
+        
+        this.isConnected = true;
+        console.log('[AudioAnalyzer] New audio context created and connected');
+        return true;
+      }
     } catch (error) {
-      console.error('Error connecting audio analyzer:', error);
+      console.error('[AudioAnalyzer] Error connecting:', error);
       return false;
     }
   }

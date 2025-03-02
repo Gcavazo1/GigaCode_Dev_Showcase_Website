@@ -65,6 +65,7 @@ class ParticleSystem {
           uniform float uBassFrequency;
           uniform float uMidFrequency;
           uniform float uHighFrequency;
+          uniform float uBeat;
           
           attribute float aScale;
           
@@ -74,16 +75,23 @@ class ParticleSystem {
           void main() {
             vec3 pos = position;
             
-            // Add simple movement
-            pos.x += sin(uTime * 0.2 + pos.z * 0.5) * 0.2;
-            pos.y += cos(uTime * 0.2 + pos.x * 0.5) * 0.2;
-            pos.z += sin(uTime * 0.2 + pos.y * 0.5) * 0.2;
+            // Add audio-reactive movement
+            float bassEffect = uBassFrequency * 0.5;
+            float beatEffect = uBeat * 0.3;
+            
+            // More dynamic movement with audio reactivity
+            pos.x += sin(uTime * 0.2 + pos.z * 0.5) * (0.2 + bassEffect);
+            pos.y += cos(uTime * 0.2 + pos.x * 0.5) * (0.2 + uMidFrequency * 0.5);
+            pos.z += sin(uTime * 0.2 + pos.y * 0.5) * (0.2 + uHighFrequency * 0.5);
+            
+            // Add pulse effect on beats
+            pos *= 1.0 + beatEffect * aScale;
             
             vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
             gl_Position = projectionMatrix * mvPosition;
             
-            // Size based on audio
-            float size = uSize * (0.5 + uMidFrequency * 0.8) * aScale;
+            // Size based on audio - more dramatic effect
+            float size = uSize * (0.2 + uMidFrequency * 1.5 + uBeat) * aScale;
             gl_PointSize = size * (1.0 / -mvPosition.z);
             
             vPosition = position;
@@ -94,6 +102,8 @@ class ParticleSystem {
         fragmentShader = `
           uniform vec3 uColor;
           uniform float uBassFrequency;
+          uniform float uMidFrequency;
+          uniform float uHighFrequency;
           
           varying vec3 vPosition;
           varying float vScale;
@@ -104,11 +114,16 @@ class ParticleSystem {
             float dist = length(center) * 2.0;
             float circle = 1.0 - smoothstep(0.0, 1.0, dist);
             
-            // Base color
+            // More dramatic color changes with audio
             vec3 color = uColor;
+            color.r += uHighFrequency * 0.8;
+            color.g += uMidFrequency * 0.5;
             color.b += uBassFrequency * 0.8;
             
-            gl_FragColor = vec4(color, circle * 0.8);
+            // Add vScale influence for more variety
+            float alpha = circle * (0.5 + vScale * 0.5) * (0.7 + uMidFrequency * 0.3);
+            
+            gl_FragColor = vec4(color, alpha);
           }
         `;
       }
@@ -181,25 +196,29 @@ class ParticleSystem {
     // Update time uniform
     this.uniforms.uTime.value = time;
     
-    // Update audio data uniforms
+    // Update audio data uniforms with more dramatic effects
     if (audioData) {
+      // Apply with stronger multipliers to make effects more visible
       this.uniforms.uBassFrequency.value = audioData.low;
       this.uniforms.uMidFrequency.value = audioData.mid;
       this.uniforms.uHighFrequency.value = audioData.high;
       
-      // Update amplitude based on audio
-      this.uniforms.uAmplitude.value = 0.8 + audioData.mid * 0.5;
+      // Update amplitude based on audio - increased effect
+      this.uniforms.uAmplitude.value = 0.5 + audioData.low * 2.0;
       
-      // Update offset gain based on mid frequencies
-      this.uniforms.uOffsetGain.value = audioData.mid * 0.6;
+      // Update color influence - make it stronger
+      this.uniforms.uColor.value.r = 0.5 + audioData.high * 0.8;
+      this.uniforms.uColor.value.g = 0.2 + audioData.mid * 0.5;
+      this.uniforms.uColor.value.b = 0.8 + audioData.low * 0.8;
     }
     
-    // Handle beat detection
+    // Handle beat detection with stronger effect
     if (beatDetected) {
-      this.uniforms.uBeat.value = 1.0;
+      this.uniforms.uBeat.value = 1.5; // Stronger beat response
+      console.log('[Particles] Beat detected!');
     } else {
       // Gradually decrease beat value
-      this.uniforms.uBeat.value *= 0.95;
+      this.uniforms.uBeat.value *= 0.9; // Slower decay
     }
   }
 
