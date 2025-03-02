@@ -5,7 +5,7 @@ class ParticleSystem {
         this.canvas = document.getElementById('particles-canvas');
         this.ctx = this.canvas.getContext('2d');
         this.particles = [];
-        this.particleCount = 100;
+        this.particleCount = 150;
         this.colors = ['#0ff', '#f0f', '#f9f900'];
         this.mouseX = 0;
         this.mouseY = 0;

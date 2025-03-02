@@ -67,32 +67,41 @@ class ParticleSystem {
           uniform float uMidFrequency;
           uniform float uHighFrequency;
           uniform float uBeat;
+          uniform float uAmplitude;
+          uniform float uFrequency;
+          uniform float uMaxDistance;
           
           attribute float aScale;
+          attribute vec3 aRandomness;
           
           varying vec3 vPosition;
           varying float vScale;
+          varying float vDistance;
           
           void main() {
             vec3 pos = position;
             
-            // Add audio-reactive movement
-            float bassEffect = uBassFrequency * 0.5;
-            float beatEffect = uBeat * 0.3;
+            // Add audio-reactive movement using curl noise-inspired patterns
+            float bassEffect = uBassFrequency * 0.7;
+            float beatEffect = uBeat * 0.4;
             
-            // More dynamic movement with audio reactivity
-            pos.x += sin(uTime * 0.2 + pos.z * 0.5) * (0.2 + bassEffect);
-            pos.y += cos(uTime * 0.2 + pos.x * 0.5) * (0.2 + uMidFrequency * 0.5);
-            pos.z += sin(uTime * 0.2 + pos.y * 0.5) * (0.2 + uHighFrequency * 0.5);
+            // Apply randomness and audio-reactive displacement
+            pos.x += sin(uTime * 0.2 + pos.z * 0.5) * (0.3 + bassEffect) + aRandomness.x * uAmplitude;
+            pos.y += cos(uTime * 0.3 + pos.x * 0.5) * (0.3 + uMidFrequency * 0.6) + aRandomness.y * uAmplitude;
+            pos.z += sin(uTime * 0.4 + pos.y * 0.5) * (0.3 + uHighFrequency * 0.6) + aRandomness.z * uAmplitude;
             
             // Add pulse effect on beats
             pos *= 1.0 + beatEffect * aScale;
+            
+            // Calculate distance for color gradient (like in the reference)
+            float distance = length(pos - position) / uMaxDistance;
+            vDistance = clamp(distance, 0.0, 1.0);
             
             vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
             gl_Position = projectionMatrix * mvPosition;
             
             // Size based on audio - more dramatic effect
-            float size = uSize * (0.2 + uMidFrequency * 1.5 + uBeat) * aScale;
+            float size = uSize * (0.3 + uMidFrequency * 1.5 + uBeat * 0.5) * aScale;
             gl_PointSize = size * (1.0 / -mvPosition.z);
             
             vPosition = position;
