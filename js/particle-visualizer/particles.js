@@ -154,72 +154,111 @@ class ParticleSystem {
       this.geometry.dispose(); // Clean up old geometry
     }
     
-    this.geometry = new THREE.BufferGeometry();
-    
-    // Arrays for attributes
-    this.positions = new Float32Array(this.particleCount * 3);
-    this.scales = new Float32Array(this.particleCount);
-    this.randomness = new Float32Array(this.particleCount * 3);
-    
-    console.log(`[Particles] Creating ${shape} with ${this.particleCount} particles`);
-    
-    // Position based on selected shape
-    for (let i = 0; i < this.particleCount; i++) {
-      const i3 = i * 3;
-      
-      let x, y, z;
-      
-      switch(shape) {
-        case 'cube':
-          // More organized cube distribution
-          x = (Math.random() - 0.5) * 8;
-          y = (Math.random() - 0.5) * 8;
-          z = (Math.random() - 0.5) * 8;
-          break;
+    // Create geometry based on shape
+    switch(shape) {
+      case 'cube':
+        // Use BoxGeometry with segments for better particle distribution
+        const boxSize = 8;
+        this.geometry = new THREE.BoxGeometry(
+          boxSize, boxSize, boxSize,
+          15, 15, 15 // Width, height, depth segments
+        );
+        break;
+        
+      case 'plane':
+        // Use PlaneGeometry with many segments
+        const planeSize = 15;
+        this.geometry = new THREE.PlaneGeometry(
+          planeSize, planeSize,
+          30, 30 // Width and height segments
+        );
+        break;
+        
+      case 'ring':
+        // Use TorusGeometry (ring shape)
+        this.geometry = new THREE.TorusGeometry(
+          8, // radius
+          0.5, // tube radius
+          16, // radial segments
+          100 // tubular segments
+        );
+        break;
+        
+      case 'sphere':
+      default:
+        // Use SphereGeometry with many segments
+        this.geometry = new THREE.SphereGeometry(
+          5, // radius
+          32, // width segments
+          32 // height segments
+        );
+        break;
+        
+      case 'star':
+        // Create a 3D star shape
+        const starGeometry = new THREE.BufferGeometry();
+        const vertices = [];
+        
+        // Parameters for the star
+        const innerRadius = 2.5;
+        const outerRadius = 7;
+        const numPoints = 10;
+        const heightVariation = 3;
+        
+        // Create the star points
+        for (let i = 0; i < numPoints * 2; i++) {
+          const angle = (Math.PI * 2 * i) / (numPoints * 2);
+          const radius = i % 2 === 0 ? outerRadius : innerRadius;
           
-        case 'plane':
-          // Wider, flatter plane
-          x = (Math.random() - 0.5) * 20;
-          y = (Math.random() - 0.5) * 20;
-          z = (Math.random() - 0.5) * 0.5; // Very thin on Z axis
-          break;
+          // x and z form the star shape in the horizontal plane
+          const x = Math.cos(angle) * radius;
+          const z = Math.sin(angle) * radius;
           
-        case 'ring':
-          // More defined ring shape
+          // Add some randomness to y to create 3D effect
+          const y = (Math.random() - 0.5) * heightVariation;
+          
+          vertices.push(x, y, z);
+        }
+        
+        // Add some particles in the center to fill it out
+        for (let i = 0; i < 500; i++) {
           const angle = Math.random() * Math.PI * 2;
-          const radiusRing = 8 + Math.random() * 1; // More consistent radius
-          x = Math.cos(angle) * radiusRing;
-          y = Math.sin(angle) * radiusRing;
-          z = (Math.random() - 0.5) * 1; // Thinner depth
-          break;
+          const radius = Math.random() * innerRadius;
+          const x = Math.cos(angle) * radius;
+          const z = Math.sin(angle) * radius;
+          const y = (Math.random() - 0.5) * heightVariation * 0.5;
           
-        case 'sphere':
-        default:
-          // Better sphere distribution using spherical coordinates
-          const radius = 5 + Math.random() * 2;
-          const theta = Math.random() * Math.PI * 2;
-          const phi = Math.acos((Math.random() * 2) - 1);
-          
-          x = radius * Math.sin(phi) * Math.cos(theta);
-          y = radius * Math.sin(phi) * Math.sin(theta);
-          z = radius * Math.cos(phi);
-          break;
-      }
-      
-      this.positions[i3] = x;
-      this.positions[i3 + 1] = y;
-      this.positions[i3 + 2] = z;
-      
-      // Randomness for animation variation
-      this.randomness[i3] = Math.random() * 2 - 1;
-      this.randomness[i3 + 1] = Math.random() * 2 - 1;
-      this.randomness[i3 + 2] = Math.random() * 2 - 1;
-      
-      // Scale (size variation)
-      this.scales[i] = 0.5 + Math.random() * 0.5; // More consistent sizes
+          vertices.push(x, y, z);
+        }
+        
+        // Create position attribute from vertices
+        const positionAttribute = new THREE.Float32BufferAttribute(vertices, 3);
+        starGeometry.setAttribute('position', positionAttribute);
+        
+        this.geometry = starGeometry;
+        break;
     }
     
-    this.geometry.setAttribute('position', new THREE.BufferAttribute(this.positions, 3));
+    // Add randomness attribute for animation
+    const positionAttribute = this.geometry.getAttribute('position');
+    const particleCount = positionAttribute.count;
+    
+    // Create arrays for additional attributes
+    this.scales = new Float32Array(particleCount);
+    this.randomness = new Float32Array(particleCount * 3);
+    
+    // Generate randomness and scale values
+    for (let i = 0; i < particleCount; i++) {
+      // Create randomness for animation variation
+      this.randomness[i * 3] = (Math.random() * 2 - 1) * 0.3;
+      this.randomness[i * 3 + 1] = (Math.random() * 2 - 1) * 0.3;
+      this.randomness[i * 3 + 2] = (Math.random() * 2 - 1) * 0.3;
+      
+      // Create scale variation (size)
+      this.scales[i] = 0.5 + Math.random() * 0.5;
+    }
+    
+    // Add attributes to geometry
     this.geometry.setAttribute('aScale', new THREE.BufferAttribute(this.scales, 1));
     this.geometry.setAttribute('aRandomness', new THREE.BufferAttribute(this.randomness, 3));
     
@@ -250,27 +289,34 @@ class ParticleSystem {
   update(time, audioData, beatDetected) {
     if (!this.material) return;
     
-    // Update time uniform
-    this.uniforms.uTime.value = time;
+    // Update time uniform - make it responsive to low frequencies like in reference
+    const timeIncrement = audioData ? 
+      THREE.MathUtils.mapLinear(audioData.low, 0.4, 1, 0.01, 0.05) : 0.02;
+    this.uniforms.uTime.value += THREE.MathUtils.clamp(timeIncrement, 0.01, 0.05);
     
-    // Update audio data uniforms with reactivity multiplier
+    // Update audio data uniforms with enhanced mapping
     if (audioData) {
-      const reactivity = this.reactivityMultiplier;
+      // Map frequencies to visual parameters more deliberately
+      this.uniforms.uBassFrequency.value = audioData.low * this.reactivityMultiplier;
+      this.uniforms.uMidFrequency.value = audioData.mid * this.reactivityMultiplier;
+      this.uniforms.uHighFrequency.value = audioData.high * this.reactivityMultiplier;
       
-      // Apply with adjustable reactivity
-      this.uniforms.uBassFrequency.value = audioData.low * reactivity;
-      this.uniforms.uMidFrequency.value = audioData.mid * reactivity;
-      this.uniforms.uHighFrequency.value = audioData.high * reactivity;
+      // Use high frequencies for amplitude like in reference
+      this.uniforms.uAmplitude.value = 0.8 + THREE.MathUtils.mapLinear(
+        audioData.high * this.reactivityMultiplier, 
+        0, 0.6, 
+        -0.1, 0.3
+      );
       
-      // Update amplitude based on audio with reactivity
-      this.uniforms.uAmplitude.value = 0.5 + audioData.low * 2.0 * reactivity;
+      // Use mid frequencies for offset gain like in reference
+      this.uniforms.uOffsetGain.value = audioData.mid * 0.6 * this.reactivityMultiplier;
     }
     
-    // Handle beat detection with reactivity
+    // Handle beat detection with enhanced effect
     if (beatDetected) {
-      this.uniforms.uBeat.value = 1.5 * this.reactivityMultiplier;
+      this.uniforms.uBeat.value = 1.8 * this.reactivityMultiplier;
     } else {
-      this.uniforms.uBeat.value *= 0.9;
+      this.uniforms.uBeat.value *= 0.85; // Quicker decay for sharper beats
     }
   }
 
