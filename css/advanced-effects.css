@@ -16,17 +16,70 @@
     width: 100%;
     height: 400px;
     position: relative;
-    background: rgba(10, 10, 18, 0.8);
+    background: linear-gradient(to bottom, rgba(5, 12, 25, 0.9), rgba(8, 8, 30, 0.95));
     border-radius: 12px;
     overflow: hidden;
-    border: 1px solid rgba(0, 255, 255, 0.3);
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.15);
+}
+
+/* Add cyberpunk grid overlay */
+.model-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        linear-gradient(90deg, rgba(5, 15, 30, 0.5) 1px, transparent 1px) 0 0 / 20px 20px,
+        linear-gradient(0deg, rgba(5, 15, 30, 0.5) 1px, transparent 1px) 0 0 / 20px 20px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Add subtle scan line effect */
+.model-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(0, 255, 255, 0.05) 50%,
+        transparent 100%
+    );
+    background-size: 100% 4px;
+    pointer-events: none;
+    z-index: 2;
+    animation: scanLine 10s linear infinite;
+}
+
+/* Add glow at bottom */
+.model-container .model-glow {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70%;
+    height: 40px;
+    background: radial-gradient(ellipse at center, rgba(0, 255, 255, 0.3) 0%, transparent 70%);
+    border-radius: 50%;
+    filter: blur(10px);
+    z-index: 1;
+    opacity: 0.8;
+    animation: glowPulse 4s ease-in-out infinite alternate;
 }
 
 .model-container canvas {
     width: 100% !important;
     height: 100% !important;
     outline: none;
+    position: relative;
+    z-index: 2;
 }
 
 .model-controls {
@@ -37,11 +90,16 @@
     display: flex;
     gap: 1rem;
     z-index: 10;
+    background: rgba(5, 10, 20, 0.6);
+    padding: 10px 15px;
+    border-radius: 25px;
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.15);
 }
 
 .neon-button {
-    background: rgba(0, 20, 40, 0.8);
-    border: 1px solid rgba(0, 255, 255, 0.4);
+    background: rgba(5, 15, 30, 0.9);
+    border: 1px solid rgba(0, 255, 255, 0.5);
     color: #00ffff;
     width: 40px;
     height: 40px;
@@ -52,11 +110,38 @@
     cursor: pointer;
     font-size: 1.2em;
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Add subtle highlight effect on buttons */
+.neon-button::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent 0%,
+        rgba(0, 255, 255, 0.1) 50%,
+        transparent 100%
+    );
+    transform: rotate(45deg);
+    transition: all 0.4s ease;
+    opacity: 0;
 }
 
 .neon-button:hover {
     background: rgba(0, 255, 255, 0.2);
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.7);
+    transform: translateY(-2px);
+}
+
+.neon-button:hover::before {
+    opacity: 1;
+    animation: buttonGlint 1.5s linear;
 }
 
 .loading-text {
@@ -66,8 +151,29 @@
     transform: translate(-50%, -50%);
     color: #00ffff;
     font-family: 'Orbitron', sans-serif;
-    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
-    z-index: 1;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+    z-index: 10;
+    background: rgba(5, 10, 20, 0.7);
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    letter-spacing: 1px;
+}
+
+/* Animations */
+@keyframes scanLine {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 100%; }
+}
+
+@keyframes glowPulse {
+    0% { opacity: 0.5; width: 60%; }
+    100% { opacity: 0.9; width: 75%; }
+}
+
+@keyframes buttonGlint {
+    0% { transform: translateX(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) rotate(45deg); }
 }
 
 /* Add a glowing outline when the model container is in view */

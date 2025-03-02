@@ -56,6 +56,7 @@ function initializeModelViewer(containerId, modelUrl, progressCallback) {
     
     // Set up Three.js scene
     const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0a0a12);
     
     // Set up camera
     const camera = new THREE.PerspectiveCamera(
@@ -69,11 +70,10 @@ function initializeModelViewer(containerId, modelUrl, progressCallback) {
     // Set up renderer
     const renderer = new THREE.WebGLRenderer({ 
         antialias: true,
-        alpha: true // This is important for transparency
+        alpha: true 
     });
     renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.setClearColor(0x000000, 0); // Transparent background
-    renderer.outputEncoding = THREE.sRGBEncoding || THREE.LinearEncoding;
+    renderer.outputEncoding = THREE.sRGBEncoding || THREE.LinearEncoding; // Fallback for compatibility
     
     // Clear any existing canvas
     const existingCanvas = container.querySelector('canvas');
@@ -337,6 +337,9 @@ function initializeModelViewer(containerId, modelUrl, progressCallback) {
         }
     }
     
+    // Add glow effect
+    addGlowEffect(container);
+    
     // Return controller object for external control
     return {
         scene,
@@ -400,4 +403,14 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Make the function available globally
-window.initializeModelViewer = initializeModelViewer; 
+window.initializeModelViewer = initializeModelViewer;
+
+// Add a glowing element to the container
+function addGlowEffect(container) {
+    // Check if glow element already exists
+    if (!container.querySelector('.model-glow')) {
+        const glow = document.createElement('div');
+        glow.className = 'model-glow';
+        container.appendChild(glow);
+    }
+} 
