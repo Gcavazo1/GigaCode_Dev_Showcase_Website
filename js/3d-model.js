@@ -220,7 +220,7 @@ function initializeModelViewer(containerId, modelUrl, progressCallback) {
         scene.add(model);
     }
     
-    // Set up post-processing with bloom effect
+    // Set up post-processing
     const composer = setupPostProcessing(renderer, scene, camera);
     
     // Set up animation loop
@@ -298,22 +298,43 @@ function initializeModelViewer(containerId, modelUrl, progressCallback) {
     
     // Set up post-processing
     function setupPostProcessing(renderer, scene, camera) {
-        const composer = new THREE.EffectComposer(renderer);
+        // Check if all required components are available
+        if (!THREE.EffectComposer || !THREE.RenderPass || !THREE.UnrealBloomPass) {
+            console.warn('Post-processing libraries not fully loaded. Skipping post-processing.');
+            return {
+                render: function() {
+                    renderer.render(scene, camera);
+                }
+            };
+        }
         
-        // Add render pass
-        const renderPass = new THREE.RenderPass(scene, camera);
-        composer.addPass(renderPass);
-        
-        // Add bloom pass for glow effect
-        const bloomPass = new THREE.UnrealBloomPass(
-            new THREE.Vector2(container.clientWidth, container.clientHeight),
-            1.0,   // strength
-            0.8,   // radius
-            0.2    // threshold
-        );
-        composer.addPass(bloomPass);
-        
-        return composer;
+        try {
+            // Create composer
+            const composer = new THREE.EffectComposer(renderer);
+            
+            // Add render pass
+            const renderPass = new THREE.RenderPass(scene, camera);
+            composer.addPass(renderPass);
+            
+            // Add bloom pass for glow effect
+            const bloomPass = new THREE.UnrealBloomPass(
+                new THREE.Vector2(container.clientWidth, container.clientHeight),
+                1.0,   // strength
+                0.8,   // radius
+                0.2    // threshold
+            );
+            composer.addPass(bloomPass);
+            
+            return composer;
+        } catch (error) {
+            console.error('Error setting up post-processing:', error);
+            // Return a fallback renderer
+            return {
+                render: function() {
+                    renderer.render(scene, camera);
+                }
+            };
+        }
     }
     
     // Return controller object for external control
