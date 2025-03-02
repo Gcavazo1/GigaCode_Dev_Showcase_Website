@@ -181,6 +181,9 @@ class AudioVisualizer {
         if (this.audioContext) return; // Already initialized
         
         try {
+            // Create a new canvas
+            this.createNewCanvas();
+            
             // Create audio context
             this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
             
@@ -297,19 +300,15 @@ class AudioVisualizer {
             // Get frequency data
             this.analyser.getByteFrequencyData(this.dataArray);
             
-            // Clear both canvases
+            // Clear canvas
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            this.offscreenCtx.clearRect(0, 0, this.offscreenCanvas.width, this.offscreenCanvas.height);
             
-            // Draw background on main canvas
+            // Draw background
             this.ctx.fillStyle = this.colorScheme.background;
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
             
-            // Draw visualization on offscreen canvas
-            this.drawCircularVisualizerOffscreen();
-            
-            // Copy offscreen canvas to main canvas
-            this.ctx.drawImage(this.offscreenCanvas, 0, 0);
+            // Draw only the circular bars - no grid, no particles, no glow
+            this.drawSimpleCircularBars();
             
             // Animate equalizer
             this.animateEqualizer();
@@ -320,46 +319,49 @@ class AudioVisualizer {
         requestAnimationFrame(() => this.animate());
     }
     
-    drawBars() {
-        const barWidth = (this.canvas.width / this.dataArray.length) * 2.5;
-        let barHeight;
-        let x = 0;
+    drawSimpleCircularBars() {
+        const centerX = this.canvas.width / 2;
+        const centerY = this.canvas.height / 2;
+        const radius = Math.min(centerX, centerY) * 0.6;
         
-        for (let i = 0; i < this.dataArray.length; i++) {
-            barHeight = this.dataArray[i] * 1.5;
-            
-            // Select color based on frequency
-            const colorIndex = Math.floor(i / (this.dataArray.length / this.colorScheme.bars.length));
-            const color = this.colorScheme.bars[colorIndex];
-            
-            // Draw bar
-            this.ctx.fillStyle = `hsl(${color.hue}, ${color.saturation}%, ${color.lightness}%)`;
-            this.ctx.fillRect(x, this.canvas.height - barHeight, barWidth, barHeight);
-            
-            x += barWidth + 1;
-        }
-    }
-    
-    drawPlaceholderBars() {
-        const totalBars = 32;
-        const barWidth = (this.canvas.width / totalBars) * 2.5;
-        let x = 0;
+        // Draw base circle
+        this.ctx.beginPath();
+        this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        this.ctx.strokeStyle = 'rgba(0, 255, 255, 0.3)';
+        this.ctx.lineWidth = 2;
+        this.ctx.stroke();
         
-        for (let i = 0; i < totalBars; i++) {
-            // Create a pulsing effect
-            const time = Date.now() / 1000;
-            const pulse = Math.sin(time * 2 + i * 0.2) * 0.5 + 0.5;
-            const barHeight = pulse * 50 + 5;
+        // Draw frequency bars WITHOUT any effects
+        const segments = 120;
+        const angleStep = (Math.PI * 2) / segments;
+        
+        for (let i = 0; i < segments; i++) {
+            const angle = i * angleStep;
+            const dataIndex = Math.floor(i * this.dataArray.length / segments);
+            const value = this.dataArray[dataIndex] || 0;
+            const barHeight = (value / 255) * radius * 0.8;
             
-            // Select color
-            const colorIndex = Math.floor(i / (totalBars / this.colorScheme.bars.length));
-            const color = this.colorScheme.bars[colorIndex];
+            const x1 = centerX + Math.cos(angle) * radius;
+            const y1 = centerY + Math.sin(angle) * radius;
+            const x2 = centerX + Math.cos(angle) * (radius + barHeight);
+            const y2 = centerY + Math.sin(angle) * (radius + barHeight);
             
-            // Draw bar with reduced opacity
-            this.ctx.fillStyle = `hsla(${color.hue}, ${color.saturation}%, ${color.lightness}%, 0.5)`;
-            this.ctx.fillRect(x, this.canvas.height - barHeight, barWidth, barHeight);
+            // Calculate color based on frequency
+            const colorIndex = Math.floor((i / segments) * this.colorScheme.bars.length);
+            const color = this.colorScheme.bars[colorIndex % this.colorScheme.bars.length];
+            const intensity = value / 255;
+            const lightness = color.lightness + (intensity * 20);
             
-            x += barWidth + 1;
+            // Set color WITHOUT glow
+            const currentColor = `hsl(${color.hue}, ${color.saturation}%, ${lightness}%)`;
+            this.ctx.strokeStyle = currentColor;
+            
+            // Draw line without any effects
+            this.ctx.beginPath();
+            this.ctx.moveTo(x1, y1);
+            this.ctx.lineTo(x2, y2);
+            this.ctx.lineWidth = 2;
+            this.ctx.stroke();
         }
     }
     
@@ -948,6 +950,27 @@ class AudioVisualizer {
             this.offscreenCtx.moveTo(x1, y1);
             this.offscreenCtx.lineTo(x2, y2);
             this.offscreenCtx.stroke();
+        }
+    }
+
+    // Add this to the constructor
+    createNewCanvas() {
+        // Remove the old canvas
+        if (this.canvas && this.canvas.parentNode) {
+            const parent = this.canvas.parentNode;
+            const newCanvas = document.createElement('canvas');
+            newCanvas.id = 'audio-canvas';
+            newCanvas.width = this.canvas.width || this.canvas.offsetWidth;
+            newCanvas.height = this.canvas.height || this.canvas.offsetHeight;
+            
+            // Replace the old canvas
+            parent.replaceChild(newCanvas, this.canvas);
+            
+            // Update references
+            this.canvas = newCanvas;
+            this.ctx = this.canvas.getContext('2d');
+            
+            console.log('Created new canvas:', this.canvas);
         }
     }
 }
