@@ -21,18 +21,18 @@
     <link rel="stylesheet" href="css/audio-sphere-showcase.css">
     
     <!-- Three.js for 3D models -->
+    <!--
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
-    
-    <!-- Postprocessing for 3D models -->
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/postprocessing/EffectComposer.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/postprocessing/RenderPass.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/postprocessing/UnrealBloomPass.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/shaders/CopyShader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/shaders/LuminosityHighPassShader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/shaders/OutputShader.js"></script>
-
+    -->
+    
     <!-- Preload critical resources -->
     <link rel="preload" href="css/styles.css" as="style">
     <link rel="preload" href="css/animations.css" as="style">
@@ -768,5 +768,16 @@
     <script src="js/init.js"></script>
     <script src="js/nav.js"></script>
     <script src="js/audio-sphere-showcase.js"></script>
+
+    <!-- Update to Three.js 0.174.0 -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.174.0/build/three.min.js"></script>
+
+    <!-- Add the required modules -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.174.0/examples/js/postprocessing/EffectComposer.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.174.0/examples/js/postprocessing/RenderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.174.0/examples/js/postprocessing/ShaderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.174.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.174.0/examples/js/shaders/CopyShader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.174.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
 </body>
 </html>
