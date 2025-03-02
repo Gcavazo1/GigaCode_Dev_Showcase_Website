@@ -3,21 +3,37 @@
     position: relative;
     width: 100%;
     height: 500px;
-    background: rgba(10, 10, 18, 0.8);
+    background: url('../images/backgrounds/audioSphere_background.png') center center;
+    background-size: cover;
     border-radius: 15px;
     overflow: hidden;
     border: 1px solid rgba(0, 255, 255, 0.3);
     box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
 }
 
+/* Add an overlay to ensure the sphere is visible against the background */
+.sphere-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 10, 18, 0.7); /* Semi-transparent dark overlay */
+    z-index: 1;
+}
+
+/* Ensure the canvas is above the overlay */
 #sphere-canvas {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
+    z-index: 2;
 }
 
+/* Ensure controls are above the overlay */
 .sphere-controls {
     position: absolute;
     bottom: 20px;
@@ -28,7 +44,7 @@
     width: 300px;
     border: 1px solid rgba(0, 255, 255, 0.3);
     backdrop-filter: blur(5px);
-    z-index: 10;
+    z-index: 3;
 }
 
 .control-group {
