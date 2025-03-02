@@ -47,7 +47,6 @@ class AudioSphereVisualizer {
             alpha: true
         });
         this.renderer.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight);
-        this.renderer.outputColorSpace = THREE.SRGBColorSpace;
         
         // Create scene
         this.scene = new THREE.Scene();
@@ -83,46 +82,8 @@ class AudioSphereVisualizer {
         this.mesh = new THREE.Mesh(geometry, material);
         this.scene.add(this.mesh);
         
-        // Set up post-processing
-        this.setupPostProcessing();
-        
         // Set up clock for animation
         this.clock = new THREE.Clock();
-    }
-    
-    setupPostProcessing() {
-        try {
-            // Check if required components are available
-            if (typeof THREE.ShaderPass !== 'function') {
-                console.error('THREE.ShaderPass is not available');
-                throw new Error('THREE.ShaderPass is not available');
-            }
-            
-            // Create render pass
-            const renderScene = new THREE.RenderPass(this.scene, this.camera);
-            
-            // Create bloom pass
-            this.bloomPass = new THREE.UnrealBloomPass(
-                new THREE.Vector2(this.canvas.offsetWidth, this.canvas.offsetHeight),
-                this.params.strength,
-                this.params.radius,
-                this.params.threshold
-            );
-            
-            // Create composer
-            this.composer = new THREE.EffectComposer(this.renderer);
-            this.composer.addPass(renderScene);
-            this.composer.addPass(this.bloomPass);
-            
-            // Use ShaderPass with CopyShader for final pass
-            const finalPass = new THREE.ShaderPass(THREE.CopyShader);
-            finalPass.renderToScreen = true;
-            this.composer.addPass(finalPass);
-        } catch (error) {
-            console.error('Error setting up post-processing:', error);
-            // Fall back to basic rendering without post-processing
-            this.composer = null;
-        }
     }
     
     initAudio() {
@@ -210,12 +171,8 @@ class AudioSphereVisualizer {
             this.mesh.rotation.x += 0.001;
         }
         
-        // Render with post-processing if available, otherwise use basic rendering
-        if (this.composer) {
-            this.composer.render();
-        } else {
-            this.renderer.render(this.scene, this.camera);
-        }
+        // Basic rendering
+        this.renderer.render(this.scene, this.camera);
     }
     
     getVertexShader() {
