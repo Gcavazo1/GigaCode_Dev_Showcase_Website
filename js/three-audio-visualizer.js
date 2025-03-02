@@ -1,481 +1,311 @@
-// Three.js Audio Visualizer for Cyberpunk Portfolio
+// Three.js Audio Visualizer with Shader-based Blob Effect
 class ThreeAudioVisualizer {
     constructor(audioAnalyser, dataArray) {
         this.analyser = audioAnalyser;
         this.dataArray = dataArray;
         this.canvas = document.getElementById('audio-canvas');
         
-        if (!this.canvas) {
-            console.error('Canvas element not found');
-            return;
-        }
-        
-        // Ensure canvas has dimensions
-        if (this.canvas.offsetWidth === 0 || this.canvas.offsetHeight === 0) {
-            this.canvas.width = 800;
-            this.canvas.height = 300;
-        }
-        
         // Check for WebGL support
         if (!this.isWebGLSupported()) {
             console.warn('WebGL not supported, falling back to canvas visualization');
-            this.fallbackVisualization();
             return;
         }
         
-        // Delay Three.js initialization to ensure DOM is ready
-        setTimeout(() => {
-            try {
-                // Initialize Three.js components
-                this.initThree();
-                
-                // Start animation loop
-                this.animate();
-                console.log('Three.js visualization started');
-            } catch (error) {
-                console.error('Error initializing Three.js visualizer:', error);
-                this.fallbackVisualization();
-            }
-        }, 100);
+        // Initialize Three.js components
+        try {
+            this.initThree();
+            this.animate();
+            console.log('Three.js visualization started successfully');
+        } catch (error) {
+            console.error('Error initializing Three.js visualizer:', error);
+        }
     }
     
     isWebGLSupported() {
         try {
-            // Check if window.WebGLRenderingContext exists
-            if (!window.WebGLRenderingContext) {
-                console.warn('WebGL not supported: WebGLRenderingContext not available');
-                return false;
-            }
-            
-            // Try to get a WebGL context
             const canvas = document.createElement('canvas');
-            let gl = null;
-            
-            try {
-                gl = canvas.getContext('webgl') || 
-                     canvas.getContext('experimental-webgl');
-            } catch (e) {
-                console.warn('Error creating WebGL context:', e);
-                return false;
-            }
-            
-            if (!gl) {
-                console.warn('WebGL not supported: Failed to get WebGL context');
-                return false;
-            }
-            
-            return true;
+            return !!(window.WebGLRenderingContext && 
+                (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
         } catch (e) {
-            console.warn('WebGL support check failed:', e);
             return false;
         }
     }
     
-    fallbackVisualization() {
-        console.log('Using fallback 2D canvas visualization');
-        
-        try {
-            // Make sure we can get a 2D context
-            this.ctx = this.canvas.getContext('2d');
-            if (!this.ctx) {
-                console.error('Could not get 2D context for fallback visualization');
-                return;
-            }
-            
-            this.fallbackMode = true;
-            
-            // Set canvas dimensions
-            this.canvas.width = this.canvas.offsetWidth || 800;
-            this.canvas.height = this.canvas.offsetHeight || 300;
-            
-            // Add resize handler for fallback mode
-            window.addEventListener('resize', () => {
-                if (this.fallbackMode && this.canvas) {
-                    this.canvas.width = this.canvas.offsetWidth || 800;
-                    this.canvas.height = this.canvas.offsetHeight || 300;
-                }
-            });
-            
-            // Start fallback animation
-            this.animateFallback();
-        } catch (e) {
-            console.error('Error initializing fallback visualization:', e);
-        }
-    }
-    
     initThree() {
-        try {
-            // Create scene with explicit parameters
-            this.scene = new THREE.Scene();
-            
-            // Create camera with safe defaults
-            const width = this.canvas.offsetWidth || 800;
-            const height = this.canvas.offsetHeight || 600;
-            const aspect = width / height;
-            
-            this.camera = new THREE.PerspectiveCamera(
-                75, // Field of view
-                aspect, // Aspect ratio
-                0.1, // Near clipping plane
-                1000 // Far clipping plane
-            );
-            this.camera.position.z = 30;
-            
-            // Create renderer with explicit error handling
-            const contextAttributes = {
-                alpha: true,
-                antialias: true,
-                powerPreference: 'default',
-                failIfMajorPerformanceCaveat: false
-            };
-            
-            // Try to create renderer with more explicit options
-            this.renderer = new THREE.WebGLRenderer({
-                canvas: this.canvas,
-                ...contextAttributes
-            });
-            
-            if (!this.renderer) {
-                throw new Error('Failed to create WebGL renderer');
-            }
-            
-            // Set size with safe defaults
-            this.renderer.setSize(width, height, false);
-            this.renderer.setClearColor(0x000000, 0);
-            
-            // Add resize handler
-            window.addEventListener('resize', () => this.onResize());
-            
-            // Create visualization elements
-            this.createVisualization();
-            
-            // Add lighting
-            this.addLighting();
-            
-            console.log('Three.js initialization successful');
-        } catch (error) {
-            console.error('Error in initThree:', error);
-            throw error; // Re-throw to trigger fallback
-        }
-    }
-    
-    createVisualization() {
-        // Create a group to hold all visualization elements
-        this.visualizerGroup = new THREE.Group();
-        this.scene.add(this.visualizerGroup);
+        // Scene setup
+        this.scene = new THREE.Scene();
         
-        // Create circular audio reactive elements
-        this.createCircularVisualizer();
+        // Camera setup
+        const width = this.canvas.offsetWidth;
+        const height = this.canvas.offsetHeight;
+        this.camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+        this.camera.position.set(0, 0, 20);
         
-        // Create particle system
-        this.createParticleSystem();
+        // Renderer setup
+        this.renderer = new THREE.WebGLRenderer({ 
+            canvas: this.canvas,
+            alpha: true,
+            antialias: true
+        });
+        this.renderer.setSize(width, height);
+        this.renderer.setClearColor(0x0a0a14, 1); // Match our background color
         
-        // Create grid
-        this.createGrid();
-    }
-    
-    createCircularVisualizer() {
-        // Create a circular array of bars that react to audio
-        const segments = 128; // Number of bars
-        const radius = 15;
-        
-        this.audioBars = [];
-        
-        for (let i = 0; i < segments; i++) {
-            // Calculate position on circle
-            const angle = (i / segments) * Math.PI * 2;
-            const x = Math.cos(angle) * radius;
-            const y = Math.sin(angle) * radius;
-            
-            // Create geometry and material
-            const geometry = new THREE.BoxGeometry(0.2, 1, 0.2);
-            
-            // Use different colors based on position
-            let hue = (i / segments) * 360;
-            const material = new THREE.MeshPhongMaterial({
-                color: new THREE.Color(`hsl(${hue}, 100%, 60%)`),
-                emissive: new THREE.Color(`hsl(${hue}, 100%, 30%)`),
-                shininess: 100,
-                specular: new THREE.Color(0xffffff)
-            });
-            
-            // Create mesh
-            const bar = new THREE.Mesh(geometry, material);
-            bar.position.set(x, y, 0);
-            bar.rotation.z = angle;
-            
-            // Store original position for animation
-            bar.userData.originalPosition = { x, y };
-            bar.userData.index = i;
-            
-            this.audioBars.push(bar);
-            this.visualizerGroup.add(bar);
-        }
-    }
-    
-    createParticleSystem() {
-        // Create particles that react to audio
-        const particleCount = 2000;
-        const particleGeometry = new THREE.BufferGeometry();
-        const particlePositions = new Float32Array(particleCount * 3);
-        const particleSizes = new Float32Array(particleCount);
-        
-        for (let i = 0; i < particleCount; i++) {
-            // Random position in sphere
-            const radius = 20 + Math.random() * 10;
-            const theta = Math.random() * Math.PI * 2;
-            const phi = Math.random() * Math.PI;
-            
-            particlePositions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
-            particlePositions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
-            particlePositions[i * 3 + 2] = radius * Math.cos(phi);
-            
-            particleSizes[i] = Math.random() * 2;
-        }
-        
-        particleGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
-        particleGeometry.setAttribute('size', new THREE.BufferAttribute(particleSizes, 1));
+        // Create uniforms for shaders
+        this.uniforms = {
+            u_time: { value: 0.0 },
+            u_frequency: { value: 0.0 },
+            u_amplitude: { value: 0.0 },
+            u_red: { value: 0.0 },
+            u_green: { value: 1.0 },
+            u_blue: { value: 1.0 }
+        };
         
         // Create shader material
-        const particleMaterial = new THREE.ShaderMaterial({
-            uniforms: {
-                color: { value: new THREE.Color(0x00ffff) },
-                pointTexture: { value: this.createParticleTexture() }
-            },
-            vertexShader: `
-                attribute float size;
-                varying vec3 vColor;
-                void main() {
-                    vColor = vec3(0.0, 1.0, 1.0); // Cyan color
-                    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-                    gl_PointSize = size * (300.0 / -mvPosition.z);
-                    gl_Position = projectionMatrix * mvPosition;
-                }
-            `,
-            fragmentShader: `
-                uniform vec3 color;
-                uniform sampler2D pointTexture;
-                varying vec3 vColor;
-                void main() {
-                    gl_FragColor = vec4(color * vColor, 1.0) * texture2D(pointTexture, gl_PointCoord);
-                }
-            `,
-            blending: THREE.AdditiveBlending,
-            depthTest: false,
-            transparent: true
+        const material = new THREE.ShaderMaterial({
+            wireframe: true,
+            uniforms: this.uniforms,
+            vertexShader: this.getVertexShader(),
+            fragmentShader: this.getFragmentShader()
         });
         
-        this.particles = new THREE.Points(particleGeometry, particleMaterial);
-        this.scene.add(this.particles);
+        // Create geometry and mesh
+        const geometry = new THREE.IcosahedronGeometry(8, 30);
+        this.mesh = new THREE.Mesh(geometry, material);
+        this.scene.add(this.mesh);
+        
+        // Set up post-processing for glow effect
+        this.setupPostProcessing();
+        
+        // Set up resize handler
+        window.addEventListener('resize', () => this.onResize());
+        
+        // Set up clock for animation
+        this.clock = new THREE.Clock();
     }
     
-    createParticleTexture() {
-        const canvas = document.createElement('canvas');
-        canvas.width = 32;
-        canvas.height = 32;
+    setupPostProcessing() {
+        // Create render passes
+        const renderScene = new THREE.RenderPass(this.scene, this.camera);
         
-        const context = canvas.getContext('2d');
-        const gradient = context.createRadialGradient(
-            canvas.width / 2, canvas.height / 2, 0,
-            canvas.width / 2, canvas.height / 2, canvas.width / 2
+        // Create bloom pass
+        this.bloomPass = new THREE.UnrealBloomPass(
+            new THREE.Vector2(this.canvas.offsetWidth, this.canvas.offsetHeight),
+            0.5,  // strength
+            0.8,  // radius
+            0.4   // threshold
         );
         
-        gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
-        gradient.addColorStop(0.2, 'rgba(0, 255, 255, 1)');
-        gradient.addColorStop(0.4, 'rgba(0, 255, 255, 0.5)');
-        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        // Create composer
+        this.composer = new THREE.EffectComposer(this.renderer);
+        this.composer.addPass(renderScene);
+        this.composer.addPass(this.bloomPass);
         
-        context.fillStyle = gradient;
-        context.fillRect(0, 0, canvas.width, canvas.height);
-        
-        const texture = new THREE.Texture(canvas);
-        texture.needsUpdate = true;
-        return texture;
-    }
-    
-    createGrid() {
-        // Create a grid for the floor
-        const gridSize = 40;
-        const gridDivisions = 20;
-        const gridColor = 0x00ffff;
-        
-        const grid = new THREE.GridHelper(gridSize, gridDivisions, gridColor, gridColor);
-        grid.position.y = -10;
-        grid.material.opacity = 0.2;
-        grid.material.transparent = true;
-        
-        this.scene.add(grid);
-    }
-    
-    addLighting() {
-        // Add ambient light
-        const ambientLight = new THREE.AmbientLight(0x222222);
-        this.scene.add(ambientLight);
-        
-        // Add directional light
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-        directionalLight.position.set(1, 1, 1);
-        this.scene.add(directionalLight);
-        
-        // Add point lights
-        const pointLight1 = new THREE.PointLight(0x00ffff, 2, 50);
-        pointLight1.position.set(0, 15, 0);
-        this.scene.add(pointLight1);
-        
-        const pointLight2 = new THREE.PointLight(0xff00ff, 2, 50);
-        pointLight2.position.set(15, 0, 0);
-        this.scene.add(pointLight2);
+        // Add final pass
+        const outputPass = new THREE.ShaderPass(THREE.OutputShader);
+        outputPass.renderToScreen = true;
+        this.composer.addPass(outputPass);
     }
     
     onResize() {
-        // Update camera and renderer on window resize
-        this.camera.aspect = this.canvas.offsetWidth / this.canvas.offsetHeight;
+        const width = this.canvas.offsetWidth;
+        const height = this.canvas.offsetHeight;
+        
+        this.camera.aspect = width / height;
         this.camera.updateProjectionMatrix();
-        this.renderer.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight);
-    }
-    
-    updateVisualization() {
-        if (!this.analyser || !this.dataArray) return;
         
-        // Get frequency data
-        this.analyser.getByteFrequencyData(this.dataArray);
-        
-        // Update circular visualizer
-        if (this.audioBars) {
-            const segments = this.audioBars.length;
-            const step = Math.floor(this.dataArray.length / segments);
-            
-            for (let i = 0; i < segments; i++) {
-                const bar = this.audioBars[i];
-                const dataIndex = i * step;
-                
-                if (dataIndex < this.dataArray.length) {
-                    const value = this.dataArray[dataIndex];
-                    const scale = 1 + (value / 128) * 3; // Scale based on audio data
-                    
-                    // Scale the bar
-                    bar.scale.y = scale;
-                    
-                    // Move the bar outward based on audio intensity
-                    const { x, y } = bar.userData.originalPosition;
-                    const intensity = value / 255;
-                    const outwardFactor = 1 + intensity * 0.3;
-                    
-                    bar.position.x = x * outwardFactor;
-                    bar.position.y = y * outwardFactor;
-                    
-                    // Update color based on intensity
-                    const hue = (bar.userData.index / segments) * 360;
-                    const saturation = 100;
-                    const lightness = 50 + intensity * 30;
-                    
-                    bar.material.emissive.setHSL(hue / 360, saturation / 100, lightness / 200);
-                }
-            }
-        }
-        
-        // Update particles
-        if (this.particles) {
-            const positions = this.particles.geometry.attributes.position.array;
-            const sizes = this.particles.geometry.attributes.size.array;
-            const particleCount = sizes.length;
-            
-            // Get average frequency for overall intensity
-            let sum = 0;
-            for (let i = 0; i < this.dataArray.length; i++) {
-                sum += this.dataArray[i];
-            }
-            const averageFrequency = sum / this.dataArray.length;
-            const intensity = averageFrequency / 255;
-            
-            // Update particle positions and sizes
-            for (let i = 0; i < particleCount; i++) {
-                // Pulsate size based on audio
-                sizes[i] = (Math.random() * 2) + (intensity * 3);
-                
-                // Slightly move particles for dynamic effect
-                positions[i * 3] += Math.sin(Date.now() * 0.001 + i) * 0.02;
-                positions[i * 3 + 1] += Math.cos(Date.now() * 0.001 + i) * 0.02;
-                positions[i * 3 + 2] += Math.sin(Date.now() * 0.002 + i) * 0.02;
-            }
-            
-            this.particles.geometry.attributes.position.needsUpdate = true;
-            this.particles.geometry.attributes.size.needsUpdate = true;
-        }
-        
-        // Rotate the entire visualizer group
-        this.visualizerGroup.rotation.y += 0.002;
-        this.visualizerGroup.rotation.x = Math.sin(Date.now() * 0.0005) * 0.2;
+        this.renderer.setSize(width, height);
+        this.composer.setSize(width, height);
     }
     
     animate() {
-        // Update visualization
-        this.updateVisualization();
-        
-        // Render scene
-        this.renderer.render(this.scene, this.camera);
-        
-        // Continue animation loop
         requestAnimationFrame(() => this.animate());
-    }
-    
-    // Add a fallback animation method
-    animateFallback() {
-        if (!this.ctx || !this.fallbackMode) return;
         
-        // Clear canvas
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        // Update uniforms
+        this.uniforms.u_time.value = this.clock.getElapsedTime();
         
-        // Draw background
-        this.ctx.fillStyle = 'rgba(0, 10, 20, 0.2)';
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        
+        // Update frequency data
         if (this.analyser && this.dataArray) {
-            // Get frequency data
             this.analyser.getByteFrequencyData(this.dataArray);
             
-            // Draw circular visualization
-            const centerX = this.canvas.width / 2;
-            const centerY = this.canvas.height / 2;
-            const radius = Math.min(centerX, centerY) * 0.7;
+            // Calculate average frequency and amplitude
+            let sum = 0;
+            let peak = 0;
+            for (let i = 0; i < this.dataArray.length; i++) {
+                sum += this.dataArray[i];
+                peak = Math.max(peak, this.dataArray[i]);
+            }
+            const avgFrequency = sum / this.dataArray.length;
             
-            const segments = 128;
-            const angleStep = (Math.PI * 2) / segments;
+            // Update uniforms with audio data
+            this.uniforms.u_frequency.value = avgFrequency / 255;
+            this.uniforms.u_amplitude.value = peak / 255;
             
-            for (let i = 0; i < segments; i++) {
-                const angle = i * angleStep;
-                const dataIndex = Math.floor(i * this.dataArray.length / segments);
-                const value = this.dataArray[dataIndex] || 0;
-                
-                const barHeight = (value / 255) * radius * 0.5 + radius * 0.2;
-                
-                const x1 = centerX + Math.cos(angle) * radius;
-                const y1 = centerY + Math.sin(angle) * radius;
-                const x2 = centerX + Math.cos(angle) * (radius + barHeight);
-                const y2 = centerY + Math.sin(angle) * (radius + barHeight);
-                
-                // Calculate color based on frequency
-                const hue = (i / segments) * 360;
-                this.ctx.strokeStyle = `hsl(${hue}, 100%, 60%)`;
-                this.ctx.lineWidth = 2;
-                
-                // Draw line
-                this.ctx.beginPath();
-                this.ctx.moveTo(x1, y1);
-                this.ctx.lineTo(x2, y2);
-                this.ctx.stroke();
-                
-                // Draw glow
-                this.ctx.shadowBlur = 10;
-                this.ctx.shadowColor = `hsl(${hue}, 100%, 60%)`;
-                this.ctx.beginPath();
-                this.ctx.arc(x2, y2, 2, 0, Math.PI * 2);
-                this.ctx.fill();
-                this.ctx.shadowBlur = 0;
+            // Update color based on frequency ranges
+            // Bass affects red, mids affect green, highs affect blue
+            const bassRange = this.getFrequencyRangeValue(this.dataArray, 0, 10) / 255;
+            const midsRange = this.getFrequencyRangeValue(this.dataArray, 10, 100) / 255;
+            const highsRange = this.getFrequencyRangeValue(this.dataArray, 100, 255) / 255;
+            
+            this.uniforms.u_red.value = bassRange * 0.5 + 0.5;
+            this.uniforms.u_green.value = midsRange * 0.5 + 0.5;
+            this.uniforms.u_blue.value = highsRange * 0.5 + 0.5;
+            
+            // Update bloom intensity based on overall amplitude
+            if (this.bloomPass) {
+                this.bloomPass.strength = 0.5 + avgFrequency / 255;
             }
         }
         
-        // Continue animation
-        requestAnimationFrame(() => this.animateFallback());
+        // Add subtle rotation
+        if (this.mesh) {
+            this.mesh.rotation.y += 0.002;
+            this.mesh.rotation.x += 0.001;
+        }
+        
+        // Render with post-processing
+        this.composer.render();
+    }
+    
+    getFrequencyRangeValue(dataArray, startIndex, endIndex) {
+        let sum = 0;
+        let count = 0;
+        
+        for (let i = startIndex; i < endIndex && i < dataArray.length; i++) {
+            sum += dataArray[i];
+            count++;
+        }
+        
+        return count > 0 ? sum / count : 0;
+    }
+    
+    getVertexShader() {
+        return `
+            uniform float u_time;
+            uniform float u_frequency;
+            uniform float u_amplitude;
+            
+            // Perlin noise functions
+            vec3 mod289(vec3 x) {
+                return x - floor(x * (1.0 / 289.0)) * 289.0;
+            }
+            
+            vec4 mod289(vec4 x) {
+                return x - floor(x * (1.0 / 289.0)) * 289.0;
+            }
+            
+            vec4 permute(vec4 x) {
+                return mod289(((x*34.0)+10.0)*x);
+            }
+            
+            vec4 taylorInvSqrt(vec4 r) {
+                return 1.79284291400159 - 0.85373472095314 * r;
+            }
+            
+            vec3 fade(vec3 t) {
+                return t*t*t*(t*(t*6.0-15.0)+10.0);
+            }
+            
+            float pnoise(vec3 P, vec3 rep) {
+                vec3 Pi0 = mod(floor(P), rep);
+                vec3 Pi1 = mod(Pi0 + vec3(1.0), rep);
+                Pi0 = mod289(Pi0);
+                Pi1 = mod289(Pi1);
+                vec3 Pf0 = fract(P);
+                vec3 Pf1 = Pf0 - vec3(1.0);
+                vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
+                vec4 iy = vec4(Pi0.yy, Pi1.yy);
+                vec4 iz0 = Pi0.zzzz;
+                vec4 iz1 = Pi1.zzzz;
+                
+                vec4 ixy = permute(permute(ix) + iy);
+                vec4 ixy0 = permute(ixy + iz0);
+                vec4 ixy1 = permute(ixy + iz1);
+                
+                vec4 gx0 = ixy0 * (1.0 / 7.0);
+                vec4 gy0 = fract(floor(gx0) * (1.0 / 7.0)) - 0.5;
+                gx0 = fract(gx0);
+                vec4 gz0 = vec4(0.5) - abs(gx0) - abs(gy0);
+                vec4 sz0 = step(gz0, vec4(0.0));
+                gx0 -= sz0 * (step(0.0, gx0) - 0.5);
+                gy0 -= sz0 * (step(0.0, gy0) - 0.5);
+                
+                vec4 gx1 = ixy1 * (1.0 / 7.0);
+                vec4 gy1 = fract(floor(gx1) * (1.0 / 7.0)) - 0.5;
+                gx1 = fract(gx1);
+                vec4 gz1 = vec4(0.5) - abs(gx1) - abs(gy1);
+                vec4 sz1 = step(gz1, vec4(0.0));
+                gx1 -= sz1 * (step(0.0, gx1) - 0.5);
+                gy1 -= sz1 * (step(0.0, gy1) - 0.5);
+                
+                vec3 g000 = vec3(gx0.x,gy0.x,gz0.x);
+                vec3 g100 = vec3(gx0.y,gy0.y,gz0.y);
+                vec3 g010 = vec3(gx0.z,gy0.z,gz0.z);
+                vec3 g110 = vec3(gx0.w,gy0.w,gz0.w);
+                vec3 g001 = vec3(gx1.x,gy1.x,gz1.x);
+                vec3 g101 = vec3(gx1.y,gy1.y,gz1.y);
+                vec3 g011 = vec3(gx1.z,gy1.z,gz1.z);
+                vec3 g111 = vec3(gx1.w,gy1.w,gz1.w);
+                
+                vec4 norm0 = taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));
+                g000 *= norm0.x;
+                g010 *= norm0.y;
+                g100 *= norm0.z;
+                g110 *= norm0.w;
+                vec4 norm1 = taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));
+                g001 *= norm1.x;
+                g011 *= norm1.y;
+                g101 *= norm1.z;
+                g111 *= norm1.w;
+                
+                float n000 = dot(g000, Pf0);
+                float n100 = dot(g100, vec3(Pf1.x, Pf0.yz));
+                float n010 = dot(g010, vec3(Pf0.x, Pf1.y, Pf0.z));
+                float n110 = dot(g110, vec3(Pf1.xy, Pf0.z));
+                float n001 = dot(g001, vec3(Pf0.xy, Pf1.z));
+                float n101 = dot(g101, vec3(Pf1.x, Pf0.y, Pf1.z));
+                float n011 = dot(g011, vec3(Pf0.x, Pf1.yz));
+                float n111 = dot(g111, Pf1);
+                
+                vec3 fade_xyz = fade(Pf0);
+                vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);
+                vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);
+                float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x); 
+                return 2.2 * n_xyz;
+            }
+            
+            void main() {
+                // Generate noise based on position and time
+                float noise = 3.0 * pnoise(position + u_time * 0.5, vec3(10.0));
+                
+                // Calculate displacement based on noise and audio frequency
+                float displacement = (u_frequency * 2.0 + u_amplitude * 3.0) * (noise / 10.0);
+                
+                // Apply displacement along normal direction
+                vec3 newPosition = position + normal * displacement;
+                
+                // Calculate final position
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
+            }
+        `;
+    }
+    
+    getFragmentShader() {
+        return `
+            uniform float u_red;
+            uniform float u_green;
+            uniform float u_blue;
+            uniform float u_frequency;
+            uniform float u_amplitude;
+            
+            void main() {
+                // Create color that reacts to audio frequency
+                vec3 color = vec3(u_red, u_green, u_blue);
+                
+                // Add intensity based on frequency
+                float intensity = 0.7 + u_frequency * 0.3 + u_amplitude * 0.2;
+                
+                gl_FragColor = vec4(color * intensity, 1.0);
+            }
+        `;
     }
 } 
