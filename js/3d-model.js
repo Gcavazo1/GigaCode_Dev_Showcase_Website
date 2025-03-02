@@ -491,16 +491,10 @@ function showModelPlaceholder() {
 
 // Add this check before trying to create a GLTFLoader
 function initializeModelViewer() {
-    // Check if THREE is available
-    if (typeof THREE === 'undefined') {
-        console.error('THREE is not defined. Make sure Three.js is loaded.');
-        return;
-    }
-    
-    // Check if GLTFLoader is available
-    if (typeof THREE.GLTFLoader !== 'function') {
+    // Check if THREE.GLTFLoader exists
+    if (typeof THREE === 'undefined' || typeof THREE.GLTFLoader !== 'function') {
         console.error('THREE.GLTFLoader not available. Falling back to placeholder.');
-        // Show a placeholder or fallback
+        showModelPlaceholder();
         return;
     }
     

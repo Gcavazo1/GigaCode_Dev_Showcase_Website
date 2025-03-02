@@ -18,32 +18,20 @@
     <link rel="stylesheet" href="css/tagline.css">
     <link rel="stylesheet" href="css/nav.css">
     <link rel="stylesheet" href="css/audio-player.css">
-    <link rel="stylesheet" href="css/audio-sphere-showcase.css">
     
     <!-- Three.js for 3D models -->
-    <!--
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+    
+    <!-- Postprocessing for 3D models -->
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/postprocessing/EffectComposer.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/postprocessing/RenderPass.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/postprocessing/UnrealBloomPass.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/shaders/CopyShader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/shaders/LuminosityHighPassShader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/shaders/OutputShader.js"></script>
-    -->
-    
-    <!-- Add the Three.js scripts here -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.174.0/build/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.174.0/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.174.0/examples/js/loaders/GLTFLoader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.174.0/examples/js/postprocessing/EffectComposer.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.174.0/examples/js/postprocessing/RenderPass.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.174.0/examples/js/postprocessing/ShaderPass.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.174.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.174.0/examples/js/shaders/CopyShader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.174.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
-    
+
     <!-- Preload critical resources -->
     <link rel="preload" href="css/styles.css" as="style">
     <link rel="preload" href="css/animations.css" as="style">
@@ -627,49 +615,6 @@
             </div>
         </section>
 
-        <!-- Audio Sphere Showcase Section -->
-        <section id="audio-sphere-showcase" class="section">
-            <div class="sphere-container">
-                <canvas id="sphere-canvas"></canvas>
-                <div class="sphere-controls">
-                    <div class="control-group">
-                        <label>Colors</label>
-                        <div class="color-controls">
-                            <div class="color-slider">
-                                <span>Red</span>
-                                <input type="range" id="red-slider" min="0" max="1" step="0.01" value="0">
-                            </div>
-                            <div class="color-slider">
-                                <span>Green</span>
-                                <input type="range" id="green-slider" min="0" max="1" step="0.01" value="1">
-                            </div>
-                            <div class="color-slider">
-                                <span>Blue</span>
-                                <input type="range" id="blue-slider" min="0" max="1" step="0.01" value="1">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label>Bloom</label>
-                        <div class="bloom-controls">
-                            <div class="bloom-slider">
-                                <span>Strength</span>
-                                <input type="range" id="bloom-strength" min="0" max="3" step="0.1" value="0.4">
-                            </div>
-                            <div class="bloom-slider">
-                                <span>Radius</span>
-                                <input type="range" id="bloom-radius" min="0" max="1" step="0.01" value="0.8">
-                            </div>
-                            <div class="bloom-slider">
-                                <span>Threshold</span>
-                                <input type="range" id="bloom-threshold" min="0" max="1" step="0.01" value="0.5">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
         <!-- Donation Section -->
         <section id="donate" class="section">
             <div class="section-header">
@@ -778,6 +723,5 @@
     <script src="js/ai-loading.js"></script>
     <script src="js/init.js"></script>
     <script src="js/nav.js"></script>
-    <script src="js/audio-sphere-showcase.js"></script>
 </body>
 </html>
