@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>GigaCode Developer Showcase  | Cyberpunk Portfolio</title>
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="css/styles.css" as="style">
+    <link rel="preload" href="css/animations.css" as="style">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js" as="script">
+    <link rel="preload" href="js/3d-model.js" as="script">
+    <link rel="preload" href="js/main.js" as="script">
+    
+    <!-- CSS files -->
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/animations.css">
     <link rel="stylesheet" href="css/advanced-effects.css">
@@ -19,23 +28,18 @@
     <link rel="stylesheet" href="css/nav.css">
     <link rel="stylesheet" href="css/audio-player.css">
     
-    <!-- Three.js for 3D models -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+    <!-- Three.js for 3D models - Add defer to load in parallel but execute in order -->
+    <script defer src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
     
-    <!-- Postprocessing for 3D models -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/postprocessing/EffectComposer.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/postprocessing/RenderPass.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/postprocessing/UnrealBloomPass.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/shaders/CopyShader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/shaders/LuminosityHighPassShader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/shaders/OutputShader.js"></script>
-
-    <!-- Preload critical resources -->
-    <link rel="preload" href="css/styles.css" as="style">
-    <link rel="preload" href="css/animations.css" as="style">
-    <link rel="preload" href="js/main.js" as="script">
+    <!-- Postprocessing for 3D models - Add defer -->
+    <script defer src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/postprocessing/EffectComposer.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/postprocessing/RenderPass.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/postprocessing/UnrealBloomPass.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/shaders/CopyShader.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/shaders/LuminosityHighPassShader.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/shaders/OutputShader.js"></script>
 
     <!-- Add these in the head section -->
     <meta name="description" content="GigaCode Developer Portfolio - Showcasing mobile apps, Roblox games, 3D models, and interactive web experiences">
@@ -413,7 +417,12 @@
                 <div class="neon-separator"></div>
             </div>
             <div id="model-container" class="model-container">
-                <!-- Loading text will be added here by JavaScript -->
+                <!-- Loading text will be added by JavaScript -->
+                <div class="model-controls">
+                    <button id="model-container-rotate-left" class="neon-button">⟲</button>
+                    <button id="model-container-reset-view" class="neon-button">Reset</button>
+                    <button id="model-container-rotate-right" class="neon-button">⟳</button>
+                </div>
             </div>
         </section>
 
@@ -702,21 +711,60 @@
         </div>
     </div>
 
-    <!-- Scripts -->
+    <!-- Scripts - Restructured order for better initialization -->
+    <!-- Load GSAP first -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
+    
+    <!-- Core initialization scripts -->
+    <script src="js/init.js"></script>
+    
+    <!-- Three.js dependent scripts -->
+    <script src="js/3d-model.js"></script>
+    
+    <!-- UI and animation scripts -->
     <script src="js/main.js"></script>
     <script src="js/animations.js"></script>
     <script src="js/particles.js"></script>
-    <script src="js/3d-model.js"></script>
     <script src="js/holographic-ui.js"></script>
+    <script src="js/gan-showcase.js"></script>
+    
+    <!-- Additional UI scripts -->
     <script src="js/audio-player.js"></script>
     <script src="js/mobile-menu.js"></script>
     <script src="js/ai-assistant.js"></script>
-    <script src="js/gan-showcase.js"></script>
     <script src="js/terminal.js"></script>
     <script src="js/ai-loading.js"></script>
-    <script src="js/init.js"></script>
     <script src="js/nav.js"></script>
+    
+    <!-- Script to ensure Three.js is loaded before initializing -->
+    <script>
+    // Ensure Three.js is fully loaded before initializing model
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check if Three.js is loaded
+        if (typeof THREE === 'undefined') {
+            console.warn('THREE is not yet loaded, waiting...');
+            
+            // Set a timeout to check again
+            const checkThree = setInterval(function() {
+                if (typeof THREE !== 'undefined') {
+                    clearInterval(checkThree);
+                    console.log('THREE is now loaded, initializing model');
+                    
+                    // Initialize model once Three.js is available
+                    if (window.initializeModelViewer) {
+                        window.initializeModelViewer('model-container');
+                    }
+                }
+            }, 100);
+        } else {
+            // Three.js is already loaded
+            console.log('THREE is already loaded, initializing model');
+            if (window.initializeModelViewer) {
+                window.initializeModelViewer('model-container');
+            }
+        }
+    });
+    </script>
 </body>
 </html>
