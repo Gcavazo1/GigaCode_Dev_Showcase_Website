@@ -268,13 +268,13 @@ class ParticleSystem {
       case 'cylinder':
         // Match the reference's high segment counts for cylinder
         const radialSegments = 92; // Higher count for smoother cylinder
-        const heightSegments = 180; // Higher count for more particles
+        const cylinderHeightSegments = 180; // Renamed to avoid conflict
         this.geometry = new THREE.CylinderGeometry(
           5, // radius top
           5, // radius bottom
           10, // height
           radialSegments,
-          heightSegments,
+          cylinderHeightSegments, // Use renamed variable
           true // open-ended
         );
         // Important: rotate cylinder to match reference
