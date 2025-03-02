@@ -56,7 +56,7 @@ function initializeModelViewer(containerId, modelUrl, progressCallback) {
     
     // Set up Three.js scene
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0a0a12);
+    scene.background = null;
     
     // Set up camera
     const camera = new THREE.PerspectiveCamera(
@@ -70,10 +70,12 @@ function initializeModelViewer(containerId, modelUrl, progressCallback) {
     // Set up renderer
     const renderer = new THREE.WebGLRenderer({ 
         antialias: true,
-        alpha: true 
+        alpha: true,
+        premultipliedAlpha: false
     });
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.outputEncoding = THREE.sRGBEncoding || THREE.LinearEncoding; // Fallback for compatibility
+    renderer.setClearColor(0x000000, 0);
     
     // Clear any existing canvas
     const existingCanvas = container.querySelector('canvas');
