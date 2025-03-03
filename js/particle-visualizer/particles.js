@@ -12,8 +12,8 @@ class ParticleSystem {
       time: { value: 0 },
       offsetSize: { value: 1.7 },
       size: { value: 1.2 },
-      frequency: { value: 0.5 },
-      amplitude: { value: 2 },
+      frequency: { value: 2.5 },
+      amplitude: { value: 0.8 },
       offsetGain: { value: 0.4 },
       maxDistance: { value: 1.5 },
       startColor: { value: new THREE.Color(0xff00ff) }, // Magenta
@@ -236,7 +236,7 @@ class ParticleSystem {
         break;
       
       case 'torusKnot':
-        this.geometry = new THREE.TorusKnotGeometry(15, 8, 250, 40, 3, 4);
+        this.geometry = new THREE.TorusKnotGeometry(12, 8, 450, 120, 5, 3);
         this.uniforms.offsetSize.value = 55;
         this.currentShape = 'torusKnot';
         break;
