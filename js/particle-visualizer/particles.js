@@ -214,7 +214,7 @@ class ParticleSystem {
         const cubeDepthSeg = Math.floor(THREE.MathUtils.randInt(20, 120));  // Renamed for clarity
         
         this.geometry = new THREE.BoxGeometry(
-          14, 14, 14, cubeWidthSeg, cubeHeightSeg, cubeDepthSeg
+          16, 16, 16, cubeWidthSeg, cubeHeightSeg, cubeDepthSeg
         );
     
         // Higher offset size like reference
@@ -227,10 +227,10 @@ class ParticleSystem {
         const planeHeightSeg = Math.floor(THREE.MathUtils.randInt(80, 150)); // Renamed for clarity
         
         this.geometry = new THREE.PlaneGeometry(
-          20, 20, planeWidthSeg, planeHeightSeg
+          30, 30, planeWidthSeg, planeHeightSeg
         );
     
-        this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(25, 40));
+        this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(25, 50));
         break;
     
       case 'ring':
