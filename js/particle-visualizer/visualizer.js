@@ -38,48 +38,60 @@ class ParticleVisualizer {
   }
 
   async init() {
-    // Create scene
-    this.scene = new THREE.Scene();
-    
-    // Create camera
-    this.camera = new THREE.PerspectiveCamera(
-      70, 
-      window.innerWidth / window.innerHeight, 
-      0.1, 
-      1000
-    );
-    this.camera.position.z = 12;
-    
-    // Create renderer
-    this.renderer = new THREE.WebGLRenderer({
-      canvas: this.canvas,
-      alpha: true,
-      antialias: true
-    });
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    this.renderer.setClearColor(0x000000, 0);
-    
-    // Configure beat detector
-    this.beatDetector.onBeat = () => {
-      console.log('Beat detected!');
-      // You could add additional beat reactions here
-    };
-    
-    // Load and create particle system
-    await this.particleSystem.load();
-    const particles = this.particleSystem.create();
-    this.scene.add(particles);
-    
-    // Set up listeners
-    window.addEventListener('resize', this.resize.bind(this));
-    
-    if (this.debugMode) {
-      console.log('[Visualizer] Initializing particle visualizer');
-      console.log('[Visualizer] Canvas dimensions:', window.innerWidth, window.innerHeight);
+    try {
+      // Create scene
+      this.scene = new THREE.Scene();
+      
+      // Create camera
+      this.camera = new THREE.PerspectiveCamera(
+        70, 
+        window.innerWidth / window.innerHeight, 
+        0.1, 
+        1000
+      );
+      this.camera.position.z = 12;
+      
+      // Create renderer
+      if (!this.canvas) {
+        console.error('[Visualizer] Canvas element not found! Creating fallback.');
+        this.canvas = document.createElement('canvas');
+        document.body.appendChild(this.canvas);
+      }
+      
+      this.renderer = new THREE.WebGLRenderer({
+        canvas: this.canvas,
+        alpha: true,
+        antialias: true
+      });
+      this.renderer.setSize(window.innerWidth, window.innerHeight);
+      this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      this.renderer.setClearColor(0x000000, 0);
+      
+      // Configure beat detector
+      this.beatDetector.onBeat = () => {
+        console.log('[BeatDetector] Beat detected!');
+      };
+      
+      // Load and create particle system
+      await this.particleSystem.load();
+      const particles = this.particleSystem.create();
+      
+      // SAFETY CHECK: Make sure particles were created
+      if (particles) {
+        this.scene.add(particles);
+        console.log('[Visualizer] Particles added to scene');
+      } else {
+        console.error('[Visualizer] Failed to create particles');
+      }
+      
+      // Set up listeners
+      window.addEventListener('resize', this.resize.bind(this));
+      
+      console.log('[Visualizer] Initialization complete');
+      this.isInitialized = true;
+    } catch (error) {
+      console.error('[Visualizer] Initialization error:', error);
     }
-    
-    this.isInitialized = true;
   }
 
   connectToAudioPlayer(audioElement) {
@@ -104,34 +116,54 @@ class ParticleVisualizer {
   animate() {
     requestAnimationFrame(this.animate.bind(this));
     
+    // Skip if not initialized
     if (!this.isInitialized) return;
     
     const elapsedTime = this.clock.getElapsedTime();
     
+    // SAFETY CHECK: Ensure all objects exist before updating
+    if (!this.scene || !this.camera || !this.renderer) {
+      console.warn('[Visualizer] Scene, camera or renderer not initialized');
+      return;
+    }
+    
     // Update audio analyzer
     if (this.isPlaying) {
       const audioData = this.audioAnalyzer.update();
+      
+      // Enhanced debug logging
+      if (this.debugMode) {
+        console.log("Audio levels - Low:", audioData.low.toFixed(3), 
+                   "Mid:", audioData.mid.toFixed(3), 
+                   "High:", audioData.high.toFixed(3));
+      }
+      
       const beatDetected = this.beatDetector.update(audioData, elapsedTime * 1000);
       
-      // Update particle system
-      this.particleSystem.update(elapsedTime, audioData, beatDetected);
+      // SAFETY CHECK: Make sure particle system exists before updating
+      if (this.particleSystem) {
+        this.particleSystem.update(elapsedTime, audioData, beatDetected);
+      }
     } else {
-      // Update with default values when not playing
-      this.particleSystem.update(elapsedTime);
+      // SAFETY CHECK: Make sure particle system exists before updating
+      if (this.particleSystem) {
+        this.particleSystem.update(elapsedTime);
+      }
     }
     
-    // Add rotation when autoRotate is enabled
+    // SAFETY CHECK: Make sure points exist before rotating
     if (this.autoRotate && this.particleSystem && this.particleSystem.points) {
       this.particleSystem.points.rotation.x += this.rotationSpeed;
       this.particleSystem.points.rotation.y += this.rotationSpeed;
     }
     
-    // Render
-    this.renderer.render(this.scene, this.camera);
-    
-    if (this.debugMode && this.isPlaying && this.clock.getElapsedTime() % 5 < 0.1) {
-      console.log('[Visualizer] Audio data:', this.audioAnalyzer.frequencyData);
-      console.log('[Visualizer] FPS:', Math.round(1 / this.clock.getDelta()));
+    // SAFETY CHECK: Make sure scene and camera exist before rendering
+    if (this.scene && this.camera) {
+      try {
+        this.renderer.render(this.scene, this.camera);
+      } catch (error) {
+        console.error('[Visualizer] Error during rendering:', error);
+      }
     }
   }
 
