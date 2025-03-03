@@ -260,14 +260,14 @@ class ParticleSystem {
       case 'torusKnot':
         // More detailed torus knot with some randomness
         const tubularSegments = Math.floor(THREE.MathUtils.randInt(100, 200)); // More detail
-        const radialSegments = Math.floor(THREE.MathUtils.randInt(16, 30));
+        const torusKnotRadialSegments = Math.floor(THREE.MathUtils.randInt(16, 30)); // Renamed to avoid conflict
         
         // Use random p,q values for different knot patterns (within reasonable ranges)
         const p = THREE.MathUtils.randInt(2, 3);
         const q = THREE.MathUtils.randInt(3, 5);
         
         this.geometry = new THREE.TorusKnotGeometry(
-          6, 1.8, tubularSegments, radialSegments, p, q
+          6, 1.8, tubularSegments, torusKnotRadialSegments, p, q // Use renamed variable
         );
 
         this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(35, 55));
