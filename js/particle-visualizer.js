@@ -144,9 +144,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const size = parseFloat(sizeSlider.value);
         sizeValue.textContent = size;
         
-        // Apply size change
+        // Apply size change - update to use the new uniform name
         if (window.particleVisualizer && window.particleVisualizer.particleSystem) {
-          window.particleVisualizer.particleSystem.uniforms.uSize.value = size;
+          window.particleVisualizer.particleSystem.uniforms.size.value = size;
         }
       });
     }

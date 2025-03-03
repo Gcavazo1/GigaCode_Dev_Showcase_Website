@@ -332,6 +332,11 @@ class ParticleSystem {
     this.geometry.setAttribute('aScale', new THREE.BufferAttribute(this.scales, 1));
     this.geometry.setAttribute('aRandomness', new THREE.BufferAttribute(this.randomness, 3));
     
+    // After creating each geometry in createShapedGeometry
+    if (!this.geometry.getAttribute('normal')) {
+      this.geometry.computeVertexNormals();
+    }
+    
     return this.geometry;
   }
 
@@ -359,13 +364,18 @@ class ParticleSystem {
   update(time, audioData, beatDetected) {
     if (!this.material) return;
     
-    // Update time uniform (renamed from uTime to time)
+    // Update time uniform
     const timeIncrement = audioData ? 
       THREE.MathUtils.mapLinear(audioData.low, 0.4, 1, 0.01, 0.05) : 0.02;
     this.uniforms.time.value += THREE.MathUtils.clamp(timeIncrement, 0.01, 0.05);
     
     // Update audio-reactive parameters
     if (audioData) {
+      // Store frequencies for other uses
+      this.uniforms.uBassFrequency.value = audioData.low * this.reactivityMultiplier;
+      this.uniforms.uMidFrequency.value = audioData.mid * this.reactivityMultiplier;
+      this.uniforms.uHighFrequency.value = audioData.high * this.reactivityMultiplier;
+      
       // Update amplitude based on high frequencies
       this.uniforms.amplitude.value = 0.8 + THREE.MathUtils.mapLinear(
         audioData.high * this.reactivityMultiplier, 
@@ -375,13 +385,21 @@ class ParticleSystem {
       
       // Update offset gain based on mid frequencies
       this.uniforms.offsetGain.value = audioData.mid * 0.6 * this.reactivityMultiplier;
+      
+      // Update frequency based on low frequencies - makes particles move more with bass
+      this.uniforms.frequency.value = 2.0 + audioData.low * this.reactivityMultiplier;
     }
     
     // Handle beat detection with enhanced effect
     if (beatDetected) {
       this.uniforms.uBeat.value = 1.8 * this.reactivityMultiplier;
+      // Also increase size momentarily on beats
+      this.uniforms.size.value += 5.0 * this.reactivityMultiplier;
     } else {
       this.uniforms.uBeat.value *= 0.85; // Quicker decay for sharper beats
+      // Return size to base value
+      this.uniforms.size.value = Math.max(this.particleSize, 
+        this.uniforms.size.value * 0.95);
     }
   }
 
