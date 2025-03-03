@@ -205,83 +205,94 @@ class ParticleSystem {
       this.geometry.dispose();
     }
     
-    // Create geometry based on shape
+    // Create geometry based on shape - with more dynamic segmentation like the reference
     switch (shape) {
       case 'cube':
-        const widthSeg = Math.floor(THREE.MathUtils.randInt(10, 40));
-        const heightSeg = Math.floor(THREE.MathUtils.randInt(5, 80)); 
-        const depthSeg = Math.floor(THREE.MathUtils.randInt(10, 100));
+        // More dynamic segment ranges like the reference
+        const widthSeg = Math.floor(THREE.MathUtils.randInt(20, 60));  // Increased from 10-40
+        const heightSeg = Math.floor(THREE.MathUtils.randInt(10, 100)); // Increased from 5-80
+        const depthSeg = Math.floor(THREE.MathUtils.randInt(20, 120));  // Increased from 10-100
         
-        // Increased cube size
         this.geometry = new THREE.BoxGeometry(
           14, 14, 14, widthSeg, heightSeg, depthSeg
         );
     
-        // Adjusted offset size
-        this.uniforms.offsetSize.value = 50;
+        // Higher offset size like reference
+        this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(40, 70)); // Randomized for variety
         break;
     
       case 'plane':
-        // Increased plane dimensions
+        // More dynamic segmentation
+        const planeWidth = Math.floor(THREE.MathUtils.randInt(80, 150)); // Increased from 100
+        const planeHeight = Math.floor(THREE.MathUtils.randInt(80, 150)); // Increased from 100
+        
         this.geometry = new THREE.PlaneGeometry(
-          20, 20, 100, 100
+          20, 20, planeWidth, planeHeight
         );
     
-        // Adjusted offset size
-        this.uniforms.offsetSize.value = 30;
+        this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(25, 40));
         break;
     
       case 'ring':
-        // Increased torus size
+        // More detailed torus with random segments
+        const torusSegments = Math.floor(THREE.MathUtils.randInt(180, 300)); // Increased from 180
+        const torusTubularSegments = Math.floor(THREE.MathUtils.randInt(20, 50)); // Increased from 30
+        
         this.geometry = new THREE.TorusGeometry(
-          10, 1.5, 30, 180
+          10, 1.5, torusTubularSegments, torusSegments
         );
     
-        // Adjusted offset size
-        this.uniforms.offsetSize.value = 40;
+        this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(35, 55));
         break;
     
       case 'cylinder':
-        const radialSegments = 80;
-        const heightSegments = 80;
+        // More detailed cylinder with random segments
+        const radialSegments = Math.floor(THREE.MathUtils.randInt(64, 128)); // Increased from 80
+        const heightSegments = Math.floor(THREE.MathUtils.randInt(64, 128)); // Increased from 80
     
-        // Increased cylinder size
         this.geometry = new THREE.CylinderGeometry(
           8, 8, 16, radialSegments, heightSegments, true
         );
     
-        // Adjusted offset size
-        this.uniforms.offsetSize.value = 50;
+        this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(45, 65));
         break;
       
       case 'torusKnot':
-        // Adjusted TorusKnot dimensions - scaled back slightly
+        // More detailed torus knot with some randomness
+        const tubularSegments = Math.floor(THREE.MathUtils.randInt(100, 200)); // More detail
+        const radialSegments = Math.floor(THREE.MathUtils.randInt(16, 30));
+        
+        // Use random p,q values for different knot patterns (within reasonable ranges)
+        const p = THREE.MathUtils.randInt(2, 3);
+        const q = THREE.MathUtils.randInt(3, 5);
+        
         this.geometry = new THREE.TorusKnotGeometry(
-          6, 1.8, 100, 20, 2, 3
+          6, 1.8, tubularSegments, radialSegments, p, q
         );
 
-        // Offset size for spacing
-        this.uniforms.offsetSize.value = 40;
+        this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(35, 55));
         break;
     
       case 'sphere':
       default:
-        // Increased sphere size
+        // More detailed sphere
+        const sphereWidthSegments = Math.floor(THREE.MathUtils.randInt(40, 80)); // Increased from 60
+        const sphereHeightSegments = Math.floor(THREE.MathUtils.randInt(40, 80)); // Increased from 60
+        
         this.geometry = new THREE.SphereGeometry(
-          10, 60, 60
+          10, sphereWidthSegments, sphereHeightSegments
         );
     
-        // Adjusted offset size
-        this.uniforms.offsetSize.value = 40;
+        this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(35, 55));
         break;
     }
     
-    
-    // Compute normals - CRITICAL for the shader
+    // Compute normals for shader
     if (!this.geometry.getAttribute('normal')) {
       this.geometry.computeVertexNormals();
     }
     
+    console.log(`[Particles] Created ${shape} with offset size: ${this.uniforms.offsetSize.value}`);
     return this.geometry;
   }
 
@@ -312,24 +323,24 @@ class ParticleSystem {
   update(time, audioData, beatDetected) {
     if (!this.material) return;
     
-    // Simple time increment like reference
-    this.time += 0.1;
+    // Slightly faster time increment for more motion
+    this.time += 0.15; // Increased from 0.1
     this.uniforms.time.value = this.time;
     
-    // Apply audio data to key uniforms
+    // Apply audio data to key uniforms with higher multipliers
     if (audioData) {
-      // Enhanced amplitude reactivity - more dramatic range
+      // Even more dramatic amplitude reactivity (like reference)
       this.uniforms.amplitude.value = 0.8 + THREE.MathUtils.mapLinear(
         audioData.high * this.reactivityMultiplier, 
         0, 0.6, 
-        -0.1, 0.6  // Increased upper range from 0.3 to 0.6
+        -0.1, 1.0  // Dramatically increased upper range from 0.6 to 1.0
       );
       
-      // More dramatic offset gain based on mid frequencies
-      this.uniforms.offsetGain.value = audioData.mid * 1.5 * this.reactivityMultiplier;
+      // Significantly more dramatic offset gain based on mid frequencies
+      this.uniforms.offsetGain.value = audioData.mid * 2.5 * this.reactivityMultiplier; // Increased from 1.5
       
-      // Add frequency modulation based on low frequencies 
-      this.uniforms.frequency.value = 2.0 + (audioData.low * 3.0 * this.reactivityMultiplier);
+      // Much more aggressive frequency modulation based on low frequencies
+      this.uniforms.frequency.value = 2.0 + (audioData.low * 4.5 * this.reactivityMultiplier); // Increased from 3.0
     } else {
       // Default values when no audio
       this.uniforms.amplitude.value = 0.8;
@@ -337,17 +348,17 @@ class ParticleSystem {
       this.uniforms.frequency.value = 2.0;
     }
     
-    // Handle beat detection with more dramatic effect
+    // Handle beat detection with even more dramatic effect
     if (beatDetected) {
-      // Pulse the size on beat - more dramatic
-      this.uniforms.size.value = 5 * this.reactivityMultiplier;
+      // More dramatic size pulse on beat
+      this.uniforms.size.value = 7 * this.reactivityMultiplier; // Increased from 5
       
-      // Also pulse the maxDistance for more dramatic effect on beat
-      this.uniforms.maxDistance.value = 2.2;
+      // More dramatic maxDistance pulse for bigger effect
+      this.uniforms.maxDistance.value = 2.5; // Increased from 2.2
     } else {
-      // Return to normal size with smoother transition
-      this.uniforms.size.value = Math.max(2, this.uniforms.size.value * 0.95);
-      this.uniforms.maxDistance.value = Math.max(1.8, this.uniforms.maxDistance.value * 0.97);
+      // Faster return to normal size with smoother transition
+      this.uniforms.size.value = Math.max(2, this.uniforms.size.value * 0.93); // Faster decay (0.93 vs 0.95)
+      this.uniforms.maxDistance.value = Math.max(1.8, this.uniforms.maxDistance.value * 0.95);
     }
   }
   

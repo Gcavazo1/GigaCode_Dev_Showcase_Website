@@ -56,9 +56,9 @@ class ParticleVisualizer {
     this.clock = new THREE.Clock();
     this.isPlaying = false;
     
-    // Add rotation properties
+    // Add rotation properties - slower rotation speed
     this.autoRotate = true;
-    this.rotationSpeed = 0.01;
+    this.rotationSpeed = 0.004; // Reduced from 0.01 to make rotation more subtle
     
     // Initialize
     this.init();
