@@ -7,7 +7,7 @@ const fragmentShaderPath = '/GigaCode_Dev_Showcase_Website/js/particle-visualize
 class ParticleSystem {
   constructor() {
     this.particleCount = 15000;
-    this.particleSize = 30.0;
+    this.particleSize = 2.0;
     this.positions = null;
     this.scales = null;
     this.randomness = null;
@@ -74,6 +74,10 @@ class ParticleSystem {
           uniform float amplitude;
           uniform float frequency;
           uniform float maxDistance;
+          
+          // Add our attributes
+          attribute float aScale;
+          attribute vec3 aRandomness;
 
           vec3 mod289(vec3 x){
             return x-floor(x*(1./289.))*289.;
@@ -178,6 +182,9 @@ class ParticleSystem {
 
           void main() {
             vec3 newpos = position;
+            // Add randomness to position
+            newpos += aRandomness * 0.1;
+            
             vec3 target = position + (normal*.1) + curl(newpos.x * frequency, newpos.y * frequency, newpos.z * frequency) * amplitude;
             
             float d = length(newpos - target) / maxDistance;
@@ -185,7 +192,7 @@ class ParticleSystem {
             newpos.z += sin(time) * (.1 * offsetGain);
             
             vec4 mvPosition = modelViewMatrix * vec4(newpos, 1.);
-            gl_PointSize = size + (pow(d,3.) * offsetSize) * (1./-mvPosition.z);
+            gl_PointSize = (size + (pow(d,3.) * offsetSize)) * (1./-mvPosition.z) * aScale; // Apply scale attribute
             gl_Position = projectionMatrix * mvPosition;
             
             vDistance = d;
@@ -364,42 +371,19 @@ class ParticleSystem {
   update(time, audioData, beatDetected) {
     if (!this.material) return;
     
-    // Update time uniform
-    const timeIncrement = audioData ? 
-      THREE.MathUtils.mapLinear(audioData.low, 0.4, 1, 0.01, 0.05) : 0.02;
-    this.uniforms.time.value += THREE.MathUtils.clamp(timeIncrement, 0.01, 0.05);
+    // Simple time increment like reference
+    this.uniforms.time.value += 0.1;
     
-    // Update audio-reactive parameters
+    // Only modify a few parameters with audio
     if (audioData) {
-      // Store frequencies for other uses
-      this.uniforms.uBassFrequency.value = audioData.low * this.reactivityMultiplier;
-      this.uniforms.uMidFrequency.value = audioData.mid * this.reactivityMultiplier;
-      this.uniforms.uHighFrequency.value = audioData.high * this.reactivityMultiplier;
+      // Store base values affected by reactivity multiplier
+      const baseFrequency = 2.0 * this.reactivityMultiplier;
+      const baseAmplitude = 0.8 * this.reactivityMultiplier;
       
-      // Update amplitude based on high frequencies
-      this.uniforms.amplitude.value = 0.8 + THREE.MathUtils.mapLinear(
-        audioData.high * this.reactivityMultiplier, 
-        0, 0.6, 
-        -0.1, 0.3
-      );
-      
-      // Update offset gain based on mid frequencies
-      this.uniforms.offsetGain.value = audioData.mid * 0.6 * this.reactivityMultiplier;
-      
-      // Update frequency based on low frequencies - makes particles move more with bass
-      this.uniforms.frequency.value = 2.0 + audioData.low * this.reactivityMultiplier;
-    }
-    
-    // Handle beat detection with enhanced effect
-    if (beatDetected) {
-      this.uniforms.uBeat.value = 1.8 * this.reactivityMultiplier;
-      // Also increase size momentarily on beats
-      this.uniforms.size.value += 5.0 * this.reactivityMultiplier;
-    } else {
-      this.uniforms.uBeat.value *= 0.85; // Quicker decay for sharper beats
-      // Return size to base value
-      this.uniforms.size.value = Math.max(this.particleSize, 
-        this.uniforms.size.value * 0.95);
+      // Apply audio data to key parameters
+      this.uniforms.frequency.value = baseFrequency + (audioData.low * 3.0 * this.reactivityMultiplier);
+      this.uniforms.amplitude.value = baseAmplitude + (audioData.high * 1.5 * this.reactivityMultiplier);
+      this.uniforms.offsetGain.value = 0.5 + (audioData.mid * 2.0 * this.reactivityMultiplier);
     }
   }
 
