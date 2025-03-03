@@ -41,7 +41,7 @@ class ParticleSystem {
       offsetSize: { value: 1.2 },
       size: { value: 1.2 },
       frequency: { value: 2 },
-      amplitude: { value: 0.5 },
+      amplitude: { value: 0.1 },
       offsetGain: { value: 0.5 },
       maxDistance: { value: 2 },
       startColor: { value: new THREE.Color(0x00ffff) }, // Cyan
