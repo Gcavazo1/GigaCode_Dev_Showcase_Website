@@ -271,10 +271,10 @@ class ParticleSystem {
       case 'torusKnot':
         // Significantly more detailed torus knot for more particles
         const knotTubularSeg = Math.floor(THREE.MathUtils.randInt(200, 400)); // Doubled for more particles
-        const knotRadialSeg = Math.floor(THREE.MathUtils.randInt(30, 60)); // Doubled for more particles
+        const knotRadialSeg = Math.floor(THREE.MathUtils.randInt(30, 120)); // Doubled for more particles
         
         // Dynamic p,q values with wider range for more interesting patterns
-        const knotP = THREE.MathUtils.randInt(3, 5); // Extended range (was 2-3)
+        const knotP = THREE.MathUtils.randInt(2, 6); // Extended range (was 2-3)
         const knotQ = THREE.MathUtils.randInt(3, 6); // Extended range (was 3-5)
         
         // Create a larger knot
