@@ -214,11 +214,11 @@ class ParticleSystem {
         const cubeDepthSeg = Math.floor(THREE.MathUtils.randInt(20, 120));  // Renamed for clarity
         
         this.geometry = new THREE.BoxGeometry(
-          18, 18, 18, cubeWidthSeg, cubeHeightSeg, cubeDepthSeg
+          22, 22, 22, cubeWidthSeg, cubeHeightSeg, cubeDepthSeg
         );
     
         // Higher offset size like reference
-        this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(40, 70));
+        this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(50, 90));
         this.currentShape = 'cube';
         break;
     
@@ -228,10 +228,10 @@ class ParticleSystem {
         const planeHeightSeg = Math.floor(THREE.MathUtils.randInt(80, 150)); // Renamed for clarity
         
         this.geometry = new THREE.PlaneGeometry(
-          40, 40, planeWidthSeg, planeHeightSeg
+          50, 50, planeWidthSeg, planeHeightSeg
         );
     
-        this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(25, 50));
+        this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(35, 70));
         this.currentShape = 'plane';
         break;
     
@@ -241,7 +241,7 @@ class ParticleSystem {
         const torusTubularSeg = Math.floor(THREE.MathUtils.randInt(20, 50));
         
         this.geometry = new THREE.TorusGeometry(
-          10, 1.5, torusTubularSeg, torusSegments
+          12, 2, torusTubularSeg, torusSegments
         );
     
         this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(35, 55));
@@ -272,7 +272,7 @@ class ParticleSystem {
         
         // Create a larger knot
         this.geometry = new THREE.TorusKnotGeometry(
-          12, 4.8, knotTubularSeg, knotRadialSeg, knotP, knotQ
+          15, 6, knotTubularSeg, knotRadialSeg, knotP, knotQ
         );
 
         // Higher offset size for more dramatic effect
