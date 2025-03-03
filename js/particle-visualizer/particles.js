@@ -209,25 +209,25 @@ class ParticleSystem {
     switch (shape) {
       case 'cube':
         // More dynamic segment ranges like the reference
-        const widthSeg = Math.floor(THREE.MathUtils.randInt(20, 60));  // Increased from 10-40
-        const heightSeg = Math.floor(THREE.MathUtils.randInt(10, 100)); // Increased from 5-80
-        const depthSeg = Math.floor(THREE.MathUtils.randInt(20, 120));  // Increased from 10-100
+        const cubeWidthSeg = Math.floor(THREE.MathUtils.randInt(20, 60));  // Renamed for clarity
+        const cubeHeightSeg = Math.floor(THREE.MathUtils.randInt(10, 100)); // Renamed for clarity
+        const cubeDepthSeg = Math.floor(THREE.MathUtils.randInt(20, 120));  // Renamed for clarity
         
         this.geometry = new THREE.BoxGeometry(
-          14, 14, 14, widthSeg, heightSeg, depthSeg
+          14, 14, 14, cubeWidthSeg, cubeHeightSeg, cubeDepthSeg
         );
     
         // Higher offset size like reference
-        this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(40, 70)); // Randomized for variety
+        this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(40, 70));
         break;
     
       case 'plane':
         // More dynamic segmentation
-        const planeWidth = Math.floor(THREE.MathUtils.randInt(80, 150)); // Increased from 100
-        const planeHeight = Math.floor(THREE.MathUtils.randInt(80, 150)); // Increased from 100
+        const planeWidthSeg = Math.floor(THREE.MathUtils.randInt(80, 150)); // Renamed for clarity
+        const planeHeightSeg = Math.floor(THREE.MathUtils.randInt(80, 150)); // Renamed for clarity
         
         this.geometry = new THREE.PlaneGeometry(
-          20, 20, planeWidth, planeHeight
+          20, 20, planeWidthSeg, planeHeightSeg
         );
     
         this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(25, 40));
@@ -235,11 +235,11 @@ class ParticleSystem {
     
       case 'ring':
         // More detailed torus with random segments
-        const torusSegments = Math.floor(THREE.MathUtils.randInt(180, 300)); // Increased from 180
-        const torusTubularSegments = Math.floor(THREE.MathUtils.randInt(20, 50)); // Increased from 30
+        const torusSegments = Math.floor(THREE.MathUtils.randInt(180, 300));
+        const torusTubularSeg = Math.floor(THREE.MathUtils.randInt(20, 50));
         
         this.geometry = new THREE.TorusGeometry(
-          10, 1.5, torusTubularSegments, torusSegments
+          10, 1.5, torusTubularSeg, torusSegments
         );
     
         this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(35, 55));
@@ -247,11 +247,11 @@ class ParticleSystem {
     
       case 'cylinder':
         // More detailed cylinder with random segments
-        const radialSegments = Math.floor(THREE.MathUtils.randInt(64, 128)); // Increased from 80
-        const heightSegments = Math.floor(THREE.MathUtils.randInt(64, 128)); // Increased from 80
+        const cylinderRadialSeg = Math.floor(THREE.MathUtils.randInt(64, 128)); // Renamed for clarity
+        const cylinderHeightSeg = Math.floor(THREE.MathUtils.randInt(64, 128)); // Renamed for clarity
     
         this.geometry = new THREE.CylinderGeometry(
-          8, 8, 16, radialSegments, heightSegments, true
+          8, 8, 16, cylinderRadialSeg, cylinderHeightSeg, true
         );
     
         this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(45, 65));
@@ -259,15 +259,15 @@ class ParticleSystem {
       
       case 'torusKnot':
         // More detailed torus knot with some randomness
-        const tubularSegments = Math.floor(THREE.MathUtils.randInt(100, 200)); // More detail
-        const torusKnotRadialSegments = Math.floor(THREE.MathUtils.randInt(16, 30)); // Renamed to avoid conflict
+        const knotTubularSeg = Math.floor(THREE.MathUtils.randInt(100, 200)); // Renamed for clarity
+        const knotRadialSeg = Math.floor(THREE.MathUtils.randInt(16, 30)); // Renamed for clarity
         
         // Use random p,q values for different knot patterns (within reasonable ranges)
-        const p = THREE.MathUtils.randInt(2, 3);
-        const q = THREE.MathUtils.randInt(3, 5);
+        const knotP = THREE.MathUtils.randInt(2, 3); // Renamed for clarity
+        const knotQ = THREE.MathUtils.randInt(3, 5); // Renamed for clarity
         
         this.geometry = new THREE.TorusKnotGeometry(
-          6, 1.8, tubularSegments, torusKnotRadialSegments, p, q // Use renamed variable
+          6, 1.8, knotTubularSeg, knotRadialSeg, knotP, knotQ
         );
 
         this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(35, 55));
@@ -276,11 +276,11 @@ class ParticleSystem {
       case 'sphere':
       default:
         // More detailed sphere
-        const sphereWidthSegments = Math.floor(THREE.MathUtils.randInt(40, 80)); // Increased from 60
-        const sphereHeightSegments = Math.floor(THREE.MathUtils.randInt(40, 80)); // Increased from 60
+        const sphereWidthSeg = Math.floor(THREE.MathUtils.randInt(40, 80)); // Renamed for clarity
+        const sphereHeightSeg = Math.floor(THREE.MathUtils.randInt(40, 80)); // Renamed for clarity
         
         this.geometry = new THREE.SphereGeometry(
-          10, sphereWidthSegments, sphereHeightSegments
+          10, sphereWidthSeg, sphereHeightSeg
         );
     
         this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(35, 55));
