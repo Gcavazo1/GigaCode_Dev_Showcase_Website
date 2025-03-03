@@ -1,21 +1,38 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.module.js';
 
 class ParticleSystem {
-  constructor() {
+  constructor(gui) {
     this.name = 'ParticleSystem';
     this.time = 0;
     this.reactivityMultiplier = 0.5;
     this.currentShape = 'torusKnot';
     
-    // Shader uniforms setup - with reduced size value
+    // Store the GUI instance
+    this.gui = gui || {
+      addFolder: () => ({
+        add: () => ({ onChange: () => {} }),
+        destroy: () => {}
+      })
+    };
+    
+    // Initialize properties for GUI
+    this.guiProperties = {
+      randomizeSegments: () => this.randomizeCurrentShape()
+    };
+    
+    // Create a holder for all shapes
+    this.holder = new THREE.Object3D();
+    this.holder.name = 'particle-holder';
+    
+    // Shader uniforms setup
     this.uniforms = {
       time: { value: 0 },
       offsetSize: { value: 1.7 },
-      size: { value: 1.5},
+      size: { value: 1.5 },
       frequency: { value: 2.5 },
-      amplitude: { value: 0.4},
+      amplitude: { value: 0.4 },
       offsetGain: { value: 0.4 },
-      maxDistance: { value: 1.0},
+      maxDistance: { value: 1.0 },
       startColor: { value: new THREE.Color(0xff00ff) }, // Magenta
       endColor: { value: new THREE.Color(0x00ffff) },   // Cyan
     };
@@ -169,8 +186,6 @@ class ParticleSystem {
     
     // Create material immediately so it's ready
     this.createMaterial();
-    // Create default geometry
-    this.createShapedGeometry('torusKnot');
   }
 
   async load() {
@@ -179,9 +194,7 @@ class ParticleSystem {
       console.log('[ParticleSystem] Using reference shader implementation');
       this.createMaterial();
       
-      // Create torusKnot geometry as default
-      this.createShapedGeometry('torusKnot');
-      
+      // We'll initialize with a shape later
       return true;
     } catch (error) {
       console.error('[ParticleSystem] Error loading shaders:', error);
@@ -202,84 +215,346 @@ class ParticleSystem {
     console.log("[ParticleSystem] Material created successfully");
   }
 
-  createShapedGeometry(shape = 'torusKnot') {
-    if (this.geometry) {
-      this.geometry.dispose();
-    }
-    
-    // Create geometry based on shape with consistent parameters
-    switch (shape) {
+  randomizeCurrentShape() {
+    // Call the appropriate shape creation method based on current shape
+    switch (this.currentShape) {
       case 'cube':
-        const cubeSegments = 30;
-        this.geometry = new THREE.BoxGeometry(22, 22, 22, cubeSegments, cubeSegments, cubeSegments);
-        this.uniforms.offsetSize.value = 30;
-        this.currentShape = 'cube';
+        this.createCube();
         break;
-    
       case 'plane':
-        const planeSegments = 100;
-        this.geometry = new THREE.PlaneGeometry(50, 50, planeSegments, planeSegments);
-        this.uniforms.offsetSize.value = 25;
-        this.currentShape = 'plane';
+        this.createPlane();
         break;
-    
       case 'ring':
-        this.geometry = new THREE.TorusGeometry(12, 2, 30, 200);
-        this.uniforms.offsetSize.value = 35;
-        this.currentShape = 'ring';
+        this.createRing();
         break;
-    
       case 'cylinder':
-        this.geometry = new THREE.CylinderGeometry(12, 12, 48,120, 80, true);
-        this.uniforms.offsetSize.value = 25;
-        this.currentShape = 'cylinder';
+        this.createCylinder();
         break;
-      
       case 'torusKnot':
-        this.geometry = new THREE.TorusKnotGeometry(8, 5, 150,250, 3, 4  );
-        this.uniforms.offsetSize.value = 35;
-        this.currentShape = 'torusKnot';
+        this.createTorusKnot();
         break;
-    
       case 'sphere':
-      default:
-        this.geometry = new THREE.SphereGeometry(15, 100,50,125,);
-        this.uniforms.offsetSize.value = 35;
-        this.currentShape = 'sphere';
+        this.createSphere();
         break;
     }
-    
-    // Compute normals for shader
-    if (!this.geometry.getAttribute('normal')) {
-      this.geometry.computeVertexNormals();
-    }
-    
-    console.log(`[Particles] Created ${shape} with offset size: ${this.uniforms.offsetSize.value}`);
-    return this.geometry;
   }
 
-  create() {
-    // Safety check - make sure we have geometry and material
-    if (!this.geometry) {
-      this.createShapedGeometry('torusKnot');
-    }
+  createCube() {
+    let widthSeg = Math.floor(THREE.MathUtils.randInt(5, 20));
+    let heightSeg = Math.floor(THREE.MathUtils.randInt(1, 40));
+    let depthSeg = Math.floor(THREE.MathUtils.randInt(5, 80));
     
-    if (!this.material) {
-      this.createMaterial();
-    }
+    this.geometry = new THREE.BoxGeometry(
+      1,
+      1,
+      1,
+      widthSeg,
+      heightSeg,
+      depthSeg
+    );
     
+    this.pointsMesh = new THREE.Points(this.geometry, this.material);
+    this.holder.add(this.pointsMesh);
+    
+    this.segmentsFolder?.destroy();
+    this.segmentsFolder = this.gui.addFolder("Segments");
+    
+    this.guiProperties.segments = {
+      width: widthSeg,
+      height: heightSeg,
+      depth: depthSeg,
+    };
+    
+    this.segmentsFolder.add(this.guiProperties.segments, "width", 5, 20);
+    this.segmentsFolder.add(this.guiProperties.segments, "height", 1, 40);
+    this.segmentsFolder.add(this.guiProperties.segments, "depth", 5, 80);
+    this.segmentsFolder
+      .add(this.guiProperties, "randomizeSegments")
+      .name("Randomize Segments");
+    
+    this.segmentsFolder.onChange(() => {
+      this.holder.remove(this.pointsMesh);
+      this.geometry = new THREE.BoxGeometry(
+        1,
+        1,
+        1,
+        this.guiProperties.segments.width,
+        this.guiProperties.segments.height,
+        this.guiProperties.segments.depth
+      );
+      this.pointsMesh = new THREE.Points(this.geometry, this.material);
+      this.holder.add(this.pointsMesh);
+    });
+    
+    this.currentShape = 'cube';
+    this.uniforms.offsetSize.value = 30;
+  }
+
+  createCylinder() {
+    let radialSeg = Math.floor(THREE.MathUtils.randInt(64, 192));
+    let heightSeg = Math.floor(THREE.MathUtils.randInt(64, 320));
+    
+    this.geometry = new THREE.CylinderGeometry(
+      1,
+      1,
+      4,
+      radialSeg,
+      heightSeg,
+      true
+    );
+    
+    this.pointsMesh = new THREE.Points(this.geometry, this.material);
+    this.pointsMesh.rotation.set(Math.PI / 2, 0, 0);
+    this.holder.add(this.pointsMesh);
+    
+    this.segmentsFolder?.destroy();
+    this.segmentsFolder = this.gui.addFolder("Segments");
+    
+    this.guiProperties.segments = {
+      height: heightSeg,
+      radial: radialSeg,
+    };
+    
+    this.segmentsFolder.add(this.guiProperties.segments, "height", 32, 192);
+    this.segmentsFolder.add(this.guiProperties.segments, "radial", 32, 320);
+    this.segmentsFolder
+      .add(this.guiProperties, "randomizeSegments")
+      .name("Randomize Segments");
+    
+    this.segmentsFolder.onChange(() => {
+      this.holder.remove(this.pointsMesh);
+      this.geometry = new THREE.CylinderGeometry(
+        1,
+        1,
+        4,
+        this.guiProperties.segments.radial,
+        this.guiProperties.segments.height,
+        true
+      );
+      this.pointsMesh = new THREE.Points(this.geometry, this.material);
+      this.pointsMesh.rotation.set(Math.PI / 2, 0, 0);
+      this.holder.add(this.pointsMesh);
+    });
+    
+    this.currentShape = 'cylinder';
+    this.uniforms.offsetSize.value = 25;
+  }
+
+  createSphere() {
+    let widthSeg = Math.floor(THREE.MathUtils.randInt(30, 100));
+    let heightSeg = Math.floor(THREE.MathUtils.randInt(20, 100));
+    
+    this.geometry = new THREE.SphereGeometry(
+      1,
+      widthSeg,
+      heightSeg
+    );
+    
+    this.pointsMesh = new THREE.Points(this.geometry, this.material);
+    this.holder.add(this.pointsMesh);
+    
+    this.segmentsFolder?.destroy();
+    this.segmentsFolder = this.gui.addFolder("Segments");
+    
+    this.guiProperties.segments = {
+      width: widthSeg,
+      height: heightSeg
+    };
+    
+    this.segmentsFolder.add(this.guiProperties.segments, "width", 20, 100);
+    this.segmentsFolder.add(this.guiProperties.segments, "height", 20, 100);
+    this.segmentsFolder
+      .add(this.guiProperties, "randomizeSegments")
+      .name("Randomize Segments");
+    
+    this.segmentsFolder.onChange(() => {
+      this.holder.remove(this.pointsMesh);
+      this.geometry = new THREE.SphereGeometry(
+        1,
+        this.guiProperties.segments.width,
+        this.guiProperties.segments.height
+      );
+      this.pointsMesh = new THREE.Points(this.geometry, this.material);
+      this.holder.add(this.pointsMesh);
+    });
+    
+    this.currentShape = 'sphere';
+    this.uniforms.offsetSize.value = 35;
+  }
+
+  createPlane() {
+    let widthSeg = Math.floor(THREE.MathUtils.randInt(50, 150));
+    let heightSeg = Math.floor(THREE.MathUtils.randInt(50, 150));
+    
+    this.geometry = new THREE.PlaneGeometry(
+      2,
+      2,
+      widthSeg,
+      heightSeg
+    );
+    
+    this.pointsMesh = new THREE.Points(this.geometry, this.material);
+    this.holder.add(this.pointsMesh);
+    
+    this.segmentsFolder?.destroy();
+    this.segmentsFolder = this.gui.addFolder("Segments");
+    
+    this.guiProperties.segments = {
+      width: widthSeg,
+      height: heightSeg
+    };
+    
+    this.segmentsFolder.add(this.guiProperties.segments, "width", 20, 150);
+    this.segmentsFolder.add(this.guiProperties.segments, "height", 20, 150);
+    this.segmentsFolder
+      .add(this.guiProperties, "randomizeSegments")
+      .name("Randomize Segments");
+    
+    this.segmentsFolder.onChange(() => {
+      this.holder.remove(this.pointsMesh);
+      this.geometry = new THREE.PlaneGeometry(
+        2,
+        2,
+        this.guiProperties.segments.width,
+        this.guiProperties.segments.height
+      );
+      this.pointsMesh = new THREE.Points(this.geometry, this.material);
+      this.holder.add(this.pointsMesh);
+    });
+    
+    this.currentShape = 'plane';
+    this.uniforms.offsetSize.value = 25;
+  }
+
+  createRing() {
+    let tubeSeg = Math.floor(THREE.MathUtils.randInt(3, 20));
+    let radialSeg = Math.floor(THREE.MathUtils.randInt(50, 200));
+    
+    this.geometry = new THREE.TorusGeometry(
+      1,
+      0.3,
+      tubeSeg,
+      radialSeg
+    );
+    
+    this.pointsMesh = new THREE.Points(this.geometry, this.material);
+    this.holder.add(this.pointsMesh);
+    
+    this.segmentsFolder?.destroy();
+    this.segmentsFolder = this.gui.addFolder("Segments");
+    
+    this.guiProperties.segments = {
+      tube: tubeSeg,
+      radial: radialSeg
+    };
+    
+    this.segmentsFolder.add(this.guiProperties.segments, "tube", 3, 20);
+    this.segmentsFolder.add(this.guiProperties.segments, "radial", 50, 200);
+    this.segmentsFolder
+      .add(this.guiProperties, "randomizeSegments")
+      .name("Randomize Segments");
+    
+    this.segmentsFolder.onChange(() => {
+      this.holder.remove(this.pointsMesh);
+      this.geometry = new THREE.TorusGeometry(
+        1,
+        0.3,
+        this.guiProperties.segments.tube,
+        this.guiProperties.segments.radial
+      );
+      this.pointsMesh = new THREE.Points(this.geometry, this.material);
+      this.holder.add(this.pointsMesh);
+    });
+    
+    this.currentShape = 'ring';
+    this.uniforms.offsetSize.value = 35;
+  }
+
+  createTorusKnot() {
+    let tubeSeg = Math.floor(THREE.MathUtils.randInt(30, 150));
+    let radialSeg = Math.floor(THREE.MathUtils.randInt(100, 250));
+    let p = Math.floor(THREE.MathUtils.randInt(2, 5));
+    let q = Math.floor(THREE.MathUtils.randInt(3, 7));
+    
+    this.geometry = new THREE.TorusKnotGeometry(
+      1,
+      0.3,
+      tubeSeg,
+      radialSeg,
+      p,
+      q
+    );
+    
+    this.pointsMesh = new THREE.Points(this.geometry, this.material);
+    this.holder.add(this.pointsMesh);
+    
+    this.segmentsFolder?.destroy();
+    this.segmentsFolder = this.gui.addFolder("Segments");
+    
+    this.guiProperties.segments = {
+      tube: tubeSeg,
+      radial: radialSeg,
+      p: p,
+      q: q
+    };
+    
+    this.segmentsFolder.add(this.guiProperties.segments, "tube", 20, 150);
+    this.segmentsFolder.add(this.guiProperties.segments, "radial", 50, 250);
+    this.segmentsFolder.add(this.guiProperties.segments, "p", 1, 5, 1);
+    this.segmentsFolder.add(this.guiProperties.segments, "q", 1, 7, 1);
+    this.segmentsFolder
+      .add(this.guiProperties, "randomizeSegments")
+      .name("Randomize Segments");
+    
+    this.segmentsFolder.onChange(() => {
+      this.holder.remove(this.pointsMesh);
+      this.geometry = new THREE.TorusKnotGeometry(
+        1,
+        0.3,
+        this.guiProperties.segments.tube,
+        this.guiProperties.segments.radial,
+        this.guiProperties.segments.p,
+        this.guiProperties.segments.q
+      );
+      this.pointsMesh = new THREE.Points(this.geometry, this.material);
+      this.holder.add(this.pointsMesh);
+    });
+    
+    this.currentShape = 'torusKnot';
+    this.uniforms.offsetSize.value = 35;
+  }
+
+  create(shapeType = 'torusKnot') {
     // Clean up previous points
-    if (this.points) {
-      this.points.geometry.dispose();
+    if (this.pointsMesh) {
+      this.holder.remove(this.pointsMesh);
     }
     
-    // Create new points with material and geometry
-    this.points = new THREE.Points(this.geometry, this.material);
+    // Create new shape based on type
+    switch (shapeType) {
+      case 'cube':
+        this.createCube();
+        break;
+      case 'plane':
+        this.createPlane();
+        break;
+      case 'ring':
+        this.createRing();
+        break;
+      case 'cylinder':
+        this.createCylinder();
+        break;
+      case 'torusKnot':
+        this.createTorusKnot();
+        break;
+      case 'sphere':
+      default:
+        this.createSphere();
+        break;
+    }
     
-    // Ensure the points are visible
-    this.points.visible = true;
-    
-    return this.points;
+    // Return the holder containing the points
+    return this.holder;
   }
 
   update(time, audioData, beatDetected) {
@@ -311,6 +586,23 @@ class ParticleSystem {
       this.uniforms.size.value = Math.max(1.5, this.uniforms.size.value * 0.95);
       this.uniforms.maxDistance.value = Math.max(1.0, this.uniforms.maxDistance.value * 0.95);
     }
+  }
+  
+  // Method to dispose of resources
+  dispose() {
+    if (this.geometry) {
+      this.geometry.dispose();
+    }
+    
+    if (this.material) {
+      this.material.dispose();
+    }
+    
+    if (this.pointsMesh) {
+      this.holder.remove(this.pointsMesh);
+    }
+    
+    this.segmentsFolder?.destroy();
   }
   
   // Simplified resize method

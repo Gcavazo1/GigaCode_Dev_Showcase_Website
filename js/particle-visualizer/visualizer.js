@@ -49,8 +49,49 @@ class ParticleVisualizer {
     this.audioAnalyzer = new AudioAnalyzer();
     this.beatDetector = new BeatDetector();
     
-    // Particle system 
-    this.particleSystem = new ParticleSystem();
+    // Create the GUI instance for particles
+    this.gui = null;
+    try {
+      // Check if dat.GUI is available, use a minimal version if not
+      if (window.dat && window.dat.GUI) {
+        this.gui = new dat.GUI({ autoPlace: false });
+        this.gui.close(); // Keep it closed by default
+      } else {
+        // Create a minimal GUI-like interface that supports the particles.js structure
+        this.gui = {
+          addFolder: (name) => {
+            console.log(`Creating GUI folder: ${name}`);
+            return {
+              add: (obj, prop, min, max) => {
+                console.log(`Added GUI control for ${prop}`);
+                return { onChange: (fn) => {} };
+              },
+              onChange: (fn) => {},
+              destroy: () => {}
+            };
+          },
+          add: (obj, prop, min, max) => {
+            console.log(`Added GUI control for ${prop}`);
+            return { onChange: (fn) => {} };
+          },
+          onChange: (fn) => {},
+          destroy: () => {}
+        };
+      }
+    } catch (e) {
+      console.warn("Could not create GUI, using minimal version:", e);
+      // Create minimal GUI
+      this.gui = {
+        addFolder: () => ({
+          add: () => ({ onChange: () => {} }),
+          onChange: () => {},
+          destroy: () => {}
+        })
+      };
+    }
+    
+    // Initialize particle system with GUI
+    this.particleSystem = new ParticleSystem(this.gui);
     
     // Animation
     this.clock = new THREE.Clock();
@@ -75,11 +116,20 @@ class ParticleVisualizer {
       // Load particle system
       await this.particleSystem.load();
       
-      // Create particles and add to holder (torusKnot is already set as default in particles.js)
-      const particles = this.particleSystem.create();
+      // Ensure the GUI is properly set up
+      if (this.gui) {
+        // Set up any common GUI controls if needed
+        this.gui.add(this.particleSystem, 'reactivityMultiplier', 0.1, 3.0)
+          .name('Audio Reactivity')
+          .onChange(() => {
+            console.log("Reactivity changed via GUI:", this.particleSystem.reactivityMultiplier);
+          });
+      }
       
-      if (particles) {
-        this.holder.add(particles);
+      // Create particles with torusKnot as default and add to scene
+      const particleHolder = this.particleSystem.create('torusKnot');
+      if (particleHolder) {
+        this.holder.add(particleHolder);
         console.log('[Visualizer] Particles added to holder');
         
         // Mark as initialized
@@ -131,7 +181,7 @@ class ParticleVisualizer {
       // Update beat detector
       const beatDetected = this.beatDetector.update(audioData, elapsedTime * 1000);
       
-      // Update particle system 
+      // Update particle system with the updated interface
       if (this.particleSystem) {
         this.particleSystem.update(elapsedTime, audioData, beatDetected);
       }
@@ -142,8 +192,8 @@ class ParticleVisualizer {
       }
     }
     
-    // Rotate holder
-    if (this.autoRotate && this.holder) {
+    // Rotate holder - auto-rotate is always enabled now
+    if (this.holder) {
       this.holder.rotation.x += this.rotationSpeed;
       this.holder.rotation.y += this.rotationSpeed;
     }

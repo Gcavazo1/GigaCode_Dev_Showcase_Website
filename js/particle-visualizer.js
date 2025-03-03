@@ -143,22 +143,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         endColorPicker.addEventListener('input', updateColors);
       }
       
-      // Particle size control
-      const sizeSlider = document.getElementById('size-control');
-      const sizeValue = document.getElementById('size-value');
-      
-      if (sizeSlider && sizeValue) {
-        sizeSlider.addEventListener('input', () => {
-          const size = parseFloat(sizeSlider.value);
-          sizeValue.textContent = size;
-          
-          if (window.particleVisualizer && window.particleVisualizer.particleSystem) {
-            // Directly set the size uniform value (divide by 10 to match reference scale)
-            window.particleVisualizer.particleSystem.uniforms.size.value = size / 10;
-          }
-        });
-      }
-      
       // Reactivity control
       const reactivitySlider = document.getElementById('reactivity-control');
       const reactivityValue = document.getElementById('reactivity-value');
@@ -184,13 +168,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.querySelector('[data-shape="torusKnot"]').classList.add('active');
       
       // Update slider values to match new defaults
-      const sliderSize = document.getElementById('size-control');
-      const sizeDisplay = document.getElementById('size-value');
-      if (sliderSize && sizeDisplay) {
-        sliderSize.value = "25"; // Default to 25 instead of 30
-        sizeDisplay.textContent = "25";
-      }
-      
       const sliderReactivity = document.getElementById('reactivity-control');
       const reactivityDisplay = document.getElementById('reactivity-value');
       if (sliderReactivity && reactivityDisplay) {
@@ -586,11 +563,11 @@ function showVisualizerControls() {
   }, 1500);
 }
 
-// New function to setup all control event handlers
+// Update setupVisualizerControls to work with the new particles.js structure
 function setupVisualizerControls() {
-  console.log("Setting up visualizer control event handlers");
+  console.log("Setting up visualizer control event handlers for updated particle system");
   
-  // Setup shape buttons
+  // Setup shape buttons with the new approach
   const shapeButtons = document.querySelectorAll('.visualizer-terminal .control-buttons [data-shape]');
   console.log(`Found ${shapeButtons.length} shape buttons`);
   
@@ -599,7 +576,7 @@ function setupVisualizerControls() {
     const newBtn = btn.cloneNode(true);
     btn.parentNode.replaceChild(newBtn, btn);
     
-    // Add new click handler
+    // Add new click handler for updated particle system
     newBtn.addEventListener('click', () => {
       const shape = newBtn.getAttribute('data-shape');
       console.log(`Shape button clicked: ${shape}`);
@@ -608,26 +585,48 @@ function setupVisualizerControls() {
       shapeButtons.forEach(b => b.classList.remove('active'));
       newBtn.classList.add('active');
       
-      // Apply shape change if visualizer exists
-      if (window.particleVisualizer && window.particleVisualizer.particleSystem) {
-        console.log(`Applying shape change to: ${shape}`);
-        
-        // First remove old points from holder
-        if (window.particleVisualizer.particleSystem.points) {
-          window.particleVisualizer.holder.remove(window.particleVisualizer.particleSystem.points);
+      // Apply shape change with the new pattern
+      if (window.particleVisualizer) {
+        try {
+          // First clean up existing particles
+          window.particleVisualizer.holder.remove(window.particleVisualizer.particleSystem.holder);
+          
+          // Create new particles with selected shape
+          const particles = window.particleVisualizer.particleSystem.create(shape);
+          
+          // Add to scene if successful
+          if (particles) {
+            window.particleVisualizer.holder.add(particles);
+            console.log(`Created new ${shape} particles`);
+          }
+        } catch (error) {
+          console.error("Error changing particle shape:", error);
         }
-        
-        // Create new geometry with selected shape
-        window.particleVisualizer.particleSystem.createShapedGeometry(shape);
-        
-        // Create new points and add to holder
-        const particles = window.particleVisualizer.particleSystem.create();
-        window.particleVisualizer.holder.add(particles);
       }
     });
   });
   
-  // Setup color pickers
+  // Setup for randomize segments button
+  const randomizeButton = document.getElementById('randomize-segments');
+  if (randomizeButton) {
+    // Remove existing listeners
+    const newRandomizeButton = randomizeButton.cloneNode(true);
+    randomizeButton.parentNode.replaceChild(newRandomizeButton, randomizeButton);
+    
+    newRandomizeButton.addEventListener('click', () => {
+      console.log("Randomize segments button clicked");
+      if (window.particleVisualizer && window.particleVisualizer.particleSystem) {
+        try {
+          window.particleVisualizer.particleSystem.randomizeCurrentShape();
+          console.log("Segments randomized for current shape");
+        } catch (error) {
+          console.error("Error randomizing segments:", error);
+        }
+      }
+    });
+  }
+  
+  // Setup color pickers (unchanged)
   const startColorPicker = document.getElementById('start-color-picker');
   const endColorPicker = document.getElementById('end-color-picker');
   
@@ -650,23 +649,7 @@ function setupVisualizerControls() {
     endColorPicker.addEventListener('input', updateColors);
   }
   
-  // Setup size slider
-  const sizeSlider = document.getElementById('size-control');
-  const sizeValue = document.getElementById('size-value');
-  
-  if (sizeSlider && sizeValue) {
-    sizeSlider.addEventListener('input', () => {
-      const size = parseFloat(sizeSlider.value);
-      sizeValue.textContent = size;
-      
-      if (window.particleVisualizer && window.particleVisualizer.particleSystem) {
-        console.log(`Setting particle size to: ${size}`);
-        window.particleVisualizer.particleSystem.uniforms.size.value = size / 10;
-      }
-    });
-  }
-  
-  // Setup reactivity slider
+  // Setup reactivity slider (unchanged)
   const reactivitySlider = document.getElementById('reactivity-control');
   const reactivityValue = document.getElementById('reactivity-value');
   
@@ -678,19 +661,6 @@ function setupVisualizerControls() {
       if (window.particleVisualizer && window.particleVisualizer.particleSystem) {
         console.log(`Setting reactivity to: ${reactivity}`);
         window.particleVisualizer.particleSystem.reactivityMultiplier = reactivity;
-      }
-    });
-  }
-  
-  // Setup rotation toggle
-  const rotationToggle = document.getElementById('toggle-rotation');
-  if (rotationToggle) {
-    rotationToggle.addEventListener('click', () => {
-      rotationToggle.classList.toggle('active');
-      if (window.particleVisualizer) {
-        const isActive = rotationToggle.classList.contains('active');
-        console.log(`Setting auto-rotate to: ${isActive}`);
-        window.particleVisualizer.autoRotate = isActive;
       }
     });
   }
