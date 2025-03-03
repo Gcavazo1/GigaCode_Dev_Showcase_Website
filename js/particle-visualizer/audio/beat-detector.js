@@ -13,34 +13,33 @@ class BeatDetector {
     this.onBeat = null; // Callback for beat detection
   }
 
-  update(frequencyData, time) {
-    if (!frequencyData) return false;
+  update(audioData, currentTime) {
+    if (!audioData) return false;
     
-    const { low } = frequencyData;
+    // Focus on low frequencies for better beat detection
+    const value = audioData.low;
     
-    // Add current energy to history
-    this.energyHistory[this.energyIndex] = low;
-    this.energyIndex = (this.energyIndex + 1) % this.energyHistory.length;
+    // Calculate energy with a higher weight
+    this.energy = value * value * 1.5;
     
-    // Calculate average energy
-    const avgEnergy = this.energyHistory.reduce((a, b) => a + b, 0) / this.energyHistory.length;
+    // Lower threshold for more responsiveness
+    this.threshold = 0.15; 
     
-    // Beat detected if current energy is above average by threshold
-    const isBeat = low > avgEnergy * this.sensitivity && 
-                   low > this.threshold && 
-                   low - this.prevLowValue > this.threshold;
+    // More sensitive beat detection
+    const isBeat = this.energy > this.threshold && 
+                   this.energy > this.lastEnergy * 1.1 && 
+                   currentTime > this.lastBeatTime + this.minBeatInterval;
     
-    // Ensure minimum time between beats
-    const timeSinceLastBeat = time - this.lastBeatTime;
-    const beatDetected = isBeat && timeSinceLastBeat > this.minBeatInterval;
+    // Update values
+    this.lastEnergy = this.energy;
     
-    if (beatDetected) {
-      this.lastBeatTime = time;
-      if (this.onBeat) this.onBeat(frequencyData);
+    if (isBeat) {
+      this.lastBeatTime = currentTime;
+      if (this.onBeat) this.onBeat();
+      console.log('[BeatDetector] Beat detected!', this.energy);
     }
     
-    this.prevLowValue = low;
-    return beatDetected;
+    return isBeat;
   }
 }
 

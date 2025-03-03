@@ -5,7 +5,7 @@ class AudioAnalyzer {
       mid: 0,
       high: 0
     };
-    this.smoothingFactor = 0.6; // Less smoothing = more responsive (was 0.8)
+    this.smoothingFactor = 0.4; // Less smoothing = more responsive (was 0.6)
     this.audioContext = null;
     this.analyser = null;
     this.dataArray = null;
@@ -28,12 +28,12 @@ class AudioAnalyzer {
         console.log('[AudioAnalyzer] Using existing AudioContext from audio player');
         this.audioContext = window.audioPlayerInstance.audioContext;
         
-        // Create analyzer node
+        // Create analyzer node with more sensitive settings
         this.analyser = this.audioContext.createAnalyser();
-        this.analyser.fftSize = 1024;
-        this.analyser.smoothingTimeConstant = 0.5; // More responsive (default is 0.8)
-        this.analyser.minDecibels = -100; // Detect quieter sounds (default is -100)
-        this.analyser.maxDecibels = -30; // Better dynamic range (default is -30)
+        this.analyser.fftSize = 2048; // Increased from 1024
+        this.analyser.smoothingTimeConstant = 0.3; // More responsive
+        this.analyser.minDecibels = -90; // Detect quieter sounds
+        this.analyser.maxDecibels = -10; // Better dynamic range
         this.bufferLength = this.analyser.frequencyBinCount;
         this.dataArray = new Uint8Array(this.bufferLength);
         
@@ -46,12 +46,12 @@ class AudioAnalyzer {
         // Continue with original code to create a new context
         this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
         
-        // Create analyzer node
+        // Create analyzer node with more sensitive settings
         this.analyser = this.audioContext.createAnalyser();
-        this.analyser.fftSize = 1024;
-        this.analyser.smoothingTimeConstant = 0.5; // More responsive (default is 0.8)
-        this.analyser.minDecibels = -100; // Detect quieter sounds (default is -100)
-        this.analyser.maxDecibels = -30; // Better dynamic range (default is -30)
+        this.analyser.fftSize = 2048; // Increased from 1024
+        this.analyser.smoothingTimeConstant = 0.3; // More responsive
+        this.analyser.minDecibels = -90; // Detect quieter sounds
+        this.analyser.maxDecibels = -10; // Better dynamic range
         this.bufferLength = this.analyser.frequencyBinCount;
         this.dataArray = new Uint8Array(this.bufferLength);
         
