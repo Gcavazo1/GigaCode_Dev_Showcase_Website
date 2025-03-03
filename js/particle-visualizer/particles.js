@@ -214,7 +214,7 @@ class ParticleSystem {
         
         // Increased cube size
         this.geometry = new THREE.BoxGeometry(
-          10, 10, 10, widthSeg, heightSeg, depthSeg
+          14, 14, 14, widthSeg, heightSeg, depthSeg
         );
     
         // Adjusted offset size
@@ -252,6 +252,24 @@ class ParticleSystem {
     
         // Adjusted offset size
         this.uniforms.offsetSize.value = 50;
+        break;
+      
+      case 'torusKnot':
+        // Twisted, dynamic torus shape
+        this.geometry = new THREE.TorusKnotGeometry(
+          8, 2, 100, 20, 2, 3
+        );
+
+        // Offset size for spacing
+        this.uniforms.offsetSize.value = 45;
+        break;
+
+      case 'icosahedron':
+        // 20-sided geometric shape for sharp reflections
+        this.geometry = new THREE.IcosahedronGeometry(10, 2);
+
+        // Offset size for balanced spacing
+        this.uniforms.offsetSize.value = 40;
         break;
     
       case 'sphere':
