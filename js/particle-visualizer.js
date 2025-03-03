@@ -198,9 +198,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Add new shape buttons to the control panel
-  // Find where the existing shape buttons are created and add:
-
-  // Add after the existing shape buttons
   const shapeButtonsContainer = document.querySelector('.control-buttons');
   if (shapeButtonsContainer) {
     // Create TorusKnot button
@@ -217,35 +214,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     icosahedronButton.className = 'control-button';
     shapeButtonsContainer.appendChild(icosahedronButton);
     
-    // Update the shapeButtons collection to include new buttons
-    const shapeButtons = document.querySelectorAll('.control-buttons [data-shape]');
-    
-    // Re-attach event listeners to all buttons including new ones
-    shapeButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const shape = btn.getAttribute('data-shape');
-        
-        // Remove active class from all buttons
-        shapeButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        
-        // Apply shape change
-        if (window.particleVisualizer && window.particleVisualizer.particleSystem) {
-          // First remove old points from holder
-          if (window.particleVisualizer.particleSystem.points) {
-            window.particleVisualizer.holder.remove(window.particleVisualizer.particleSystem.points);
-          }
-          
-          // Create new geometry with selected shape
-          window.particleVisualizer.particleSystem.createShapedGeometry(shape);
-          
-          // Create new points and add to holder
-          const particles = window.particleVisualizer.particleSystem.create();
-          window.particleVisualizer.holder.add(particles);
-          
-          console.log(`[Visualizer] Shape changed to ${shape}`);
-        }
-      });
-    });
+    // Create Klein bottle button
+    const kleinBottleButton = document.createElement('button');
+    kleinBottleButton.setAttribute('data-shape', 'kleinBottle');
+    kleinBottleButton.innerHTML = '<i class="fas fa-infinity"></i><span>Klein</span>';
+    kleinBottleButton.className = 'control-button';
+    shapeButtonsContainer.appendChild(kleinBottleButton);
   }
 });

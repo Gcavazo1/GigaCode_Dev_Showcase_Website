@@ -282,6 +282,12 @@ class ParticleSystem {
         // Adjusted offset size
         this.uniforms.offsetSize.value = 40;
         break;
+
+      case 'kleinBottle':
+        // Klein bottle - complex non-orientable surface
+        this.geometry = new THREE.KleinBottleGeometry(8, 45, 45);
+        this.uniforms.offsetSize.value = 45;
+        break;
     }
     
     
