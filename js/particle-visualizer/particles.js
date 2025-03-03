@@ -34,12 +34,12 @@ class ParticleSystem {
     // Shader uniforms setup
     this.uniforms = {
       time: { value: 0 },
-      offsetSize: { value: 1.7 },
-      size: { value: 1.5 },
-      frequency: { value: 2.5 },
-      amplitude: { value: 0.4 },
+      offsetSize: { value: 2 },
+      size: { value: 2 },
+      frequency: { value: 2 },
+      amplitude: { value: 0.8 },
       offsetGain: { value: 0.4 },
-      maxDistance: { value: 1.0 },
+      maxDistance: { value: 1.8 },
       startColor: { value: new THREE.Color(0xff00ff) }, // Magenta
       endColor: { value: new THREE.Color(0x00ffff) },   // Cyan
     };
@@ -252,9 +252,9 @@ class ParticleSystem {
     let depthSeg = Math.floor(THREE.MathUtils.randInt(5, 80));
     
     this.geometry = new THREE.BoxGeometry(
-      20,
-      20,
-      20,
+      30,
+      30,
+      30,
       widthSeg,
       heightSeg,
       depthSeg
@@ -282,9 +282,9 @@ class ParticleSystem {
     this.segmentsFolder.onChange(() => {
       this.holder.remove(this.pointsMesh);
       this.geometry = new THREE.BoxGeometry(
-        20,
-        20,
-        20,
+        30,
+        30,
+        30,
         this.guiProperties.segments.width,
         this.guiProperties.segments.height,
         this.guiProperties.segments.depth
@@ -302,9 +302,9 @@ class ParticleSystem {
     let heightSeg = Math.floor(THREE.MathUtils.randInt(64, 320));
     
     this.geometry = new THREE.CylinderGeometry(
-      8,
-      8,
-      42,
+      16,
+      16,
+      56,
       radialSeg,
       heightSeg,
       true
@@ -331,9 +331,9 @@ class ParticleSystem {
     this.segmentsFolder.onChange(() => {
       this.holder.remove(this.pointsMesh);
       this.geometry = new THREE.CylinderGeometry(
-        8,
-        8,
-        42,
+        16,
+        16,
+        56,
         this.guiProperties.segments.radial,
         this.guiProperties.segments.height,
         true
@@ -352,7 +352,7 @@ class ParticleSystem {
     let heightSeg = Math.floor(THREE.MathUtils.randInt(20, 100));
     
     this.geometry = new THREE.SphereGeometry(
-      15,
+      30,
       widthSeg,
       heightSeg
     );
@@ -377,7 +377,7 @@ class ParticleSystem {
     this.segmentsFolder.onChange(() => {
       this.holder.remove(this.pointsMesh);
       this.geometry = new THREE.SphereGeometry(
-        15,
+        30,
         this.guiProperties.segments.width,
         this.guiProperties.segments.height
       );
@@ -394,8 +394,8 @@ class ParticleSystem {
     let heightSeg = Math.floor(THREE.MathUtils.randInt(50, 150));
     
     this.geometry = new THREE.PlaneGeometry(
-      50,
-      50,
+      80,
+      80,
       widthSeg,
       heightSeg
     );
@@ -420,8 +420,8 @@ class ParticleSystem {
     this.segmentsFolder.onChange(() => {
       this.holder.remove(this.pointsMesh);
       this.geometry = new THREE.PlaneGeometry(
-        50,
-        50,
+        80,
+        80,
         this.guiProperties.segments.width,
         this.guiProperties.segments.height
       );
@@ -438,8 +438,8 @@ class ParticleSystem {
     let radialSeg = Math.floor(THREE.MathUtils.randInt(50, 200));
     
     this.geometry = new THREE.TorusGeometry(
-      14,
-      5,
+      20,
+      8,
       tubeSeg,
       radialSeg
     );
@@ -464,8 +464,8 @@ class ParticleSystem {
     this.segmentsFolder.onChange(() => {
       this.holder.remove(this.pointsMesh);
       this.geometry = new THREE.TorusGeometry(
-        14,
-        5,
+        20,
+        8,
         this.guiProperties.segments.tube,
         this.guiProperties.segments.radial
       );
@@ -484,8 +484,8 @@ class ParticleSystem {
     let q = Math.floor(THREE.MathUtils.randInt(3, 7));
     
     this.geometry = new THREE.TorusKnotGeometry(
-      12,
-      5,
+      20,
+      8,
       tubeSeg,
       radialSeg,
       p,
@@ -516,8 +516,8 @@ class ParticleSystem {
     this.segmentsFolder.onChange(() => {
       this.holder.remove(this.pointsMesh);
       this.geometry = new THREE.TorusKnotGeometry(
-        12,
-        5,
+        20,
+        8,
         this.guiProperties.segments.tube,
         this.guiProperties.segments.radial,
         this.guiProperties.segments.p,
