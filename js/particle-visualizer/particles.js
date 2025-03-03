@@ -369,22 +369,8 @@ class ParticleSystem {
   }
 
   update(time, audioData, beatDetected) {
-    if (!this.material) return;
-    
-    // Simple time increment like reference
-    this.uniforms.time.value += 0.1;
-    
-    // Only modify a few parameters with audio
-    if (audioData) {
-      // Store base values affected by reactivity multiplier
-      const baseFrequency = 2.0 * this.reactivityMultiplier;
-      const baseAmplitude = 0.8 * this.reactivityMultiplier;
-      
-      // Apply audio data to key parameters
-      this.uniforms.frequency.value = baseFrequency + (audioData.low * 3.0 * this.reactivityMultiplier);
-      this.uniforms.amplitude.value = baseAmplitude + (audioData.high * 1.5 * this.reactivityMultiplier);
-      this.uniforms.offsetGain.value = 0.5 + (audioData.mid * 2.0 * this.reactivityMultiplier);
-    }
+    // This method is essentially a no-op now, as we're handling updates in visualizer.js
+    console.log("Update called in particles.js", time, audioData);
   }
 
   resize(width, height) {

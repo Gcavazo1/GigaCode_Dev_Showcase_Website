@@ -108,19 +108,36 @@ class ParticleVisualizer {
     
     const elapsedTime = this.clock.getElapsedTime();
     
-    // Update audio analyzer
+    // IMPORTANT: Add debug logging to see if this is being called
+    console.log("Animate frame, audio playing:", this.isPlaying);
+    
+    // Update audio analyzer only if playing
     if (this.isPlaying) {
       const audioData = this.audioAnalyzer.update();
       const beatDetected = this.beatDetector.update(audioData, elapsedTime * 1000);
       
-      // Update particle system
-      this.particleSystem.update(elapsedTime, audioData, beatDetected);
+      // Debug the audio data to see what values we're getting
+      console.log("Audio data:", audioData);
+      
+      // Update time with constant increment (more reliable)
+      if (this.particleSystem) {
+        this.particleSystem.uniforms.time.value += 0.1;
+        
+        // Set direct values from audio
+        if (audioData) {
+          this.particleSystem.uniforms.amplitude.value = 0.8 + (audioData.high * 2.0);
+          this.particleSystem.uniforms.frequency.value = 2.0 + (audioData.low * 3.0);
+          this.particleSystem.uniforms.offsetGain.value = 0.5 + (audioData.mid * 2.0);
+        }
+      }
     } else {
-      // Update with default values when not playing
-      this.particleSystem.update(elapsedTime);
+      // Just update time when not playing
+      if (this.particleSystem) {
+        this.particleSystem.uniforms.time.value += 0.1;
+      }
     }
     
-    // Add rotation when autoRotate is enabled
+    // Apply auto-rotation
     if (this.autoRotate && this.particleSystem && this.particleSystem.points) {
       this.particleSystem.points.rotation.x += this.rotationSpeed;
       this.particleSystem.points.rotation.y += this.rotationSpeed;
@@ -128,11 +145,6 @@ class ParticleVisualizer {
     
     // Render
     this.renderer.render(this.scene, this.camera);
-    
-    if (this.debugMode && this.isPlaying && this.clock.getElapsedTime() % 5 < 0.1) {
-      console.log('[Visualizer] Audio data:', this.audioAnalyzer.frequencyData);
-      console.log('[Visualizer] FPS:', Math.round(1 / this.clock.getDelta()));
-    }
   }
 
   resize() {
