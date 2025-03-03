@@ -163,9 +163,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
       }
       
-      // Set initial active shape button to torusKnot instead of sphere
-      document.querySelector('[data-shape="sphere"]').classList.remove('active');
-      document.querySelector('[data-shape="torusKnot"]').classList.add('active');
+      // Set initial active shape button to ring instead of torusKnot
+      document.querySelector('[data-shape="torusKnot"]').classList.remove('active');
+      document.querySelector('[data-shape="ring"]').classList.add('active');
       
       // Update slider values to match new defaults
       const sliderReactivity = document.getElementById('reactivity-control');
@@ -346,8 +346,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // REPLACE makeDraggable with a simpler setup function
 function setupTerminal(element) {
-  // Set the terminal to position absolute so it scrolls with the page
-  element.style.position = 'absolute';
+  // Set the terminal to position fixed so it's locked in the viewport
+  element.style.position = 'fixed';
   element.style.right = '20px';
   element.style.top = '50%';
   element.style.transform = 'translateY(-50%)';
@@ -447,22 +447,13 @@ function showVisualizerControls() {
   // Setup all controls
   setupVisualizerControls();
   
-  // Highlight the active shape button based on current shape
-  setTimeout(() => {
-    if (window.particleVisualizer && window.particleVisualizer.particleSystem) {
-      const currentShape = window.particleVisualizer.particleSystem.currentShape;
-      console.log(`Initial shape is: ${currentShape}`);
-      
-      // Clear any existing active classes
-      document.querySelectorAll('[data-shape]').forEach(btn => btn.classList.remove('active'));
-      
-      // Set the active class on the current shape button
-      const activeButton = document.querySelector(`[data-shape="${currentShape}"]`);
-      if (activeButton) {
-        activeButton.classList.add('active');
-      }
-    }
-  }, 1500);
+  // Make sure reactivity slider shows correct value
+  const reactivitySlider = document.getElementById('reactivity-control');
+  const reactivityValue = document.getElementById('reactivity-value');
+  if (reactivitySlider && reactivityValue) {
+    reactivitySlider.value = "0.8";
+    reactivityValue.textContent = "0.8";
+  }
 }
 
 // Update setupVisualizerControls to work with the new particles.js structure
@@ -473,24 +464,7 @@ function setupVisualizerControls() {
   const shapeButtons = document.querySelectorAll('.visualizer-terminal .control-buttons [data-shape]');
   console.log(`Found ${shapeButtons.length} shape buttons`);
   
-  // Define a function to update the active button based on current shape
-  function updateActiveShapeButton() {
-    if (window.particleVisualizer && window.particleVisualizer.particleSystem) {
-      const currentShape = window.particleVisualizer.particleSystem.currentShape;
-      console.log(`Updating active button to: ${currentShape}`);
-      
-      // Clear all active classes first
-      shapeButtons.forEach(btn => btn.classList.remove('active'));
-      
-      // Find and highlight the correct button
-      const activeButton = document.querySelector(`.visualizer-terminal .control-buttons [data-shape="${currentShape}"]`);
-      if (activeButton) {
-        activeButton.classList.add('active');
-      }
-    }
-  }
-  
-  // Call this whenever the shape changes
+  // Keep the shape button click handlers, but remove the active class toggling
   shapeButtons.forEach(btn => {
     // Remove old listeners by cloning
     const newBtn = btn.cloneNode(true);
@@ -507,10 +481,6 @@ function setupVisualizerControls() {
           // Create new particles with selected shape
           window.particleVisualizer.particleSystem.create(shape);
           console.log(`Created new ${shape} particles`);
-          
-          // Update button highlighting AFTER the shape is created
-          // This ensures we use the actual current shape
-          setTimeout(updateActiveShapeButton, 100);
         } catch (error) {
           console.error("Error changing particle shape:", error);
         }
@@ -518,7 +488,7 @@ function setupVisualizerControls() {
     });
   });
   
-  // Also update the button highlighting when the randomize button is clicked
+  // For the randomize button, also remove the active class update
   const randomizeButton = document.getElementById('randomize-segments');
   if (randomizeButton) {
     // Remove existing listeners
@@ -531,9 +501,6 @@ function setupVisualizerControls() {
         try {
           window.particleVisualizer.particleSystem.randomizeCurrentShape();
           console.log("Segments randomized for current shape");
-          
-          // Update button highlighting after randomization
-          updateActiveShapeButton();
         } catch (error) {
           console.error("Error randomizing segments:", error);
         }

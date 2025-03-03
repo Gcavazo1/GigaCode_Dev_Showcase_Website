@@ -184,7 +184,7 @@
 
 /* Add to your terminal.css */
 .visualizer-terminal {
-    position: absolute;
+    position: fixed;
     right: 20px;
     top: 50%;
     transform: translateY(-50%);
@@ -258,10 +258,12 @@
     text-shadow: 0 0 5px var(--primary-color);
 }
 
-.terminal-buttons-grid button.active {
+/* Make all buttons glow by default - no need for active class */
+.terminal-buttons-grid button {
+    box-shadow: 0 0 15px var(--primary-color);
+    text-shadow: 0 0 5px var(--primary-color);
     background: var(--primary-color);
     color: #000;
-    box-shadow: 0 0 20px var(--primary-color);
 }
 
 /* Fancier range sliders with glow effect */

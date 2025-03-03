@@ -5,7 +5,7 @@ class ParticleSystem {
     this.name = 'ParticleSystem';
     this.time = 0;
     this.reactivityMultiplier = 0.1
-    this.currentShape = 'ring';
+    this.currentShape = 'torusKnot';
     
     // Add counter for randomization
     this.randomizeCounter = 0;

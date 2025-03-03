@@ -138,8 +138,8 @@ class ParticleVisualizer {
           });
       }
       
-      // Create particles with torusKnot as default and add to scene
-      const particleHolder = this.particleSystem.create('torusKnot');
+      // Create particles with ring as default instead of torusKnot
+      const particleHolder = this.particleSystem.create('ring');
       if (particleHolder) {
         this.holder.add(particleHolder);
         console.log('[Visualizer] Particles added to holder');
