@@ -206,65 +206,66 @@ class ParticleSystem {
     }
     
     // Create geometry based on shape
-    switch(shape) {
+    switch (shape) {
       case 'cube':
-        const widthSeg = Math.floor(THREE.MathUtils.randInt(5, 20));
-        const heightSeg = Math.floor(THREE.MathUtils.randInt(1, 40)); 
-        const depthSeg = Math.floor(THREE.MathUtils.randInt(5, 80));
+        const widthSeg = Math.floor(THREE.MathUtils.randInt(10, 40));
+        const heightSeg = Math.floor(THREE.MathUtils.randInt(5, 80)); 
+        const depthSeg = Math.floor(THREE.MathUtils.randInt(10, 100));
         
-        // Increase the size to 5 (from 1) to match other shapes' scale
+        // Increased cube size
         this.geometry = new THREE.BoxGeometry(
-          7, 7, 7, widthSeg, heightSeg, depthSeg
+          10, 10, 10, widthSeg, heightSeg, depthSeg
         );
-        
-        // Set appropriate offset size for cube
-        this.uniforms.offsetSize.value = 30;
+    
+        // Adjusted offset size
+        this.uniforms.offsetSize.value = 50;
         break;
-        
+    
       case 'plane':
-        // Increase segments for more detail
+        // Increased plane dimensions
         this.geometry = new THREE.PlaneGeometry(
-          10, 10, 50, 50
+          20, 20, 100, 100
         );
-        
-        // Set appropriate offset size for plane
-        this.uniforms.offsetSize.value = 15;
-        break;
-        
-      case 'ring':
-        // Increase tube radius slightly for better visibility
-        this.geometry = new THREE.TorusGeometry(
-          7, 0.8, 20, 120
-        );
-        
-        // Set appropriate offset size for ring
-        this.uniforms.offsetSize.value = 20;
-        break;
-        
-      case 'cylinder':
-        const radialSegments = 64;
-        const heightSegments = 64;
-        
-        // Increase radius and height to match other shapes
-        this.geometry = new THREE.CylinderGeometry(
-          7, 7, 10, radialSegments, heightSegments, true
-        );
-        
-        // Set appropriate offset size for cylinder
+    
+        // Adjusted offset size
         this.uniforms.offsetSize.value = 30;
         break;
-        
+    
+      case 'ring':
+        // Increased torus size
+        this.geometry = new THREE.TorusGeometry(
+          10, 1.5, 30, 180
+        );
+    
+        // Adjusted offset size
+        this.uniforms.offsetSize.value = 40;
+        break;
+    
+      case 'cylinder':
+        const radialSegments = 80;
+        const heightSegments = 80;
+    
+        // Increased cylinder size
+        this.geometry = new THREE.CylinderGeometry(
+          8, 8, 16, radialSegments, heightSegments, true
+        );
+    
+        // Adjusted offset size
+        this.uniforms.offsetSize.value = 50;
+        break;
+    
       case 'sphere':
       default:
-        // Increase detail for sphere
+        // Increased sphere size
         this.geometry = new THREE.SphereGeometry(
-          7, 50, 50
+          10, 60, 60
         );
-        
-        // Set appropriate offset size for sphere
-        this.uniforms.offsetSize.value = 20;
+    
+        // Adjusted offset size
+        this.uniforms.offsetSize.value = 40;
         break;
     }
+    
     
     // Compute normals - CRITICAL for the shader
     if (!this.geometry.getAttribute('normal')) {
