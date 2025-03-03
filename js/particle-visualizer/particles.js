@@ -44,8 +44,8 @@ class ParticleSystem {
       amplitude: { value: 0.5 },
       offsetGain: { value: 0.5 },
       maxDistance: { value: 2 },
-      startColor: { value: new THREE.Color(0xff00ff) }, // Magenta
-      endColor: { value: new THREE.Color(0x00ffff) },   // Cyan
+      startColor: { value: new THREE.Color(0x00ffff) }, // Cyan
+      endColor: { value: new THREE.Color(0xff00ff) },   // Magenta
     };
     
     // Reference shader implementations
