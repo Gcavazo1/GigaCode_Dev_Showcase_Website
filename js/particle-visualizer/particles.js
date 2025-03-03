@@ -214,7 +214,7 @@ class ParticleSystem {
         
         // Increase the size to 5 (from 1) to match other shapes' scale
         this.geometry = new THREE.BoxGeometry(
-          5, 5, 5, widthSeg, heightSeg, depthSeg
+          7, 7, 7, widthSeg, heightSeg, depthSeg
         );
         
         // Set appropriate offset size for cube
@@ -234,7 +234,7 @@ class ParticleSystem {
       case 'ring':
         // Increase tube radius slightly for better visibility
         this.geometry = new THREE.TorusGeometry(
-          5, 0.8, 20, 120
+          7, 0.8, 20, 120
         );
         
         // Set appropriate offset size for ring
@@ -247,7 +247,7 @@ class ParticleSystem {
         
         // Increase radius and height to match other shapes
         this.geometry = new THREE.CylinderGeometry(
-          4, 4, 8, radialSegments, heightSegments, true
+          7, 7, 10, radialSegments, heightSegments, true
         );
         
         // Set appropriate offset size for cylinder
@@ -258,7 +258,7 @@ class ParticleSystem {
       default:
         // Increase detail for sphere
         this.geometry = new THREE.SphereGeometry(
-          5, 40, 40
+          7, 50, 50
         );
         
         // Set appropriate offset size for sphere
