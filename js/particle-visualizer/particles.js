@@ -255,21 +255,13 @@ class ParticleSystem {
         break;
       
       case 'torusKnot':
-        // Twisted, dynamic torus shape
+        // Adjusted TorusKnot dimensions - scaled back slightly
         this.geometry = new THREE.TorusKnotGeometry(
-          8, 2, 100, 20, 2, 3
+          6, 1.8, 100, 20, 2, 3
         );
 
         // Offset size for spacing
-        this.uniforms.offsetSize.value = 45;
-        break;
-
-      case 'icosahedron':
-        // Smaller 20-sided geometric shape for sharper reflections
-        this.geometry = new THREE.IcosahedronGeometry(5, 2);  // Reduced size from 10 to 5
-        
-        // Offset size for balanced spacing
-        this.uniforms.offsetSize.value = 35;
+        this.uniforms.offsetSize.value = 40;
         break;
     
       case 'sphere':
@@ -281,12 +273,6 @@ class ParticleSystem {
     
         // Adjusted offset size
         this.uniforms.offsetSize.value = 40;
-        break;
-
-      case 'kleinBottle':
-        // Klein bottle - complex non-orientable surface
-        this.geometry = new THREE.KleinBottleGeometry(8, 45, 45);
-        this.uniforms.offsetSize.value = 45;
         break;
     }
     
