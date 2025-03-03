@@ -38,8 +38,8 @@ class ParticleSystem {
     // Shader uniforms setup
     this.uniforms = {
       time: { value: 0 },
-      offsetSize: { value: 1.2 },
-      size: { value: 1.2 },
+      offsetSize: { value: 1 },
+      size: { value: .8},
       frequency: { value: 2 },
       amplitude: { value: 0.1 },
       offsetGain: { value: 0.5 },
