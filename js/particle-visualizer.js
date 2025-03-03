@@ -227,21 +227,51 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     }
     
-    // Find the correct music button by trying various common selectors
-    const musicButtons = document.querySelectorAll('.Enable-Music, #enable-music, .enable-music, [id*="music"], [class*="music-enable"], [class*="enable-music"]');
-
-    if (musicButtons.length > 0) {
-      console.log('Found music buttons:', musicButtons);
-      
-      // Add click listeners to all potential buttons
-      musicButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-          console.log('Music button clicked:', btn);
-          setTimeout(showVisualizerControls, 1200);
-        });
+    // Look specifically for the PowerShell music module enable button
+    const musicEnableButton = document.querySelector('.Enable-Music, button[class*="Enable-Music"], #powershell-enable-music');
+    
+    if (musicEnableButton) {
+      console.log('Found music enable button:', musicEnableButton);
+      musicEnableButton.addEventListener('click', () => {
+        console.log('Music enable button clicked!');
+        setTimeout(showVisualizerControls, 1200);
       });
     } else {
-      console.warn('No music enable button found with common selectors');
+      // Wait for dynamic content to load
+      console.log('Music enable button not found initially, setting up observer');
+      
+      // Set up a mutation observer to detect when the button might be added to the DOM
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.addedNodes && mutation.addedNodes.length > 0) {
+            for (let i = 0; i < mutation.addedNodes.length; i++) {
+              const node = mutation.addedNodes[i];
+              if (node.classList && (node.classList.contains('Enable-Music') || node.id === 'powershell-enable-music')) {
+                console.log('Music enable button found after DOM change:', node);
+                node.addEventListener('click', () => {
+                  setTimeout(showVisualizerControls, 1200);
+                });
+                observer.disconnect();
+                return;
+              }
+              
+              // Also check inside the added node
+              const button = node.querySelector?.('.Enable-Music, button[class*="Enable-Music"], #powershell-enable-music');
+              if (button) {
+                console.log('Music enable button found inside added content:', button);
+                button.addEventListener('click', () => {
+                  setTimeout(showVisualizerControls, 1200);
+                });
+                observer.disconnect();
+                return;
+              }
+            }
+          }
+        });
+      });
+      
+      // Start observing
+      observer.observe(document.body, { childList: true, subtree: true });
     }
     
     // Handle audio play button with similar robustness
@@ -255,28 +285,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
     
-    // Add minimize functionality to the terminal
-    const minimizeButton = document.querySelector('.visualizer-terminal .terminal-button.minimize');
-    if (minimizeButton) {
-      minimizeButton.addEventListener('click', () => {
-        const terminal = document.querySelector('.visualizer-terminal');
-        if (terminal.classList.contains('minimized')) {
-          terminal.classList.remove('minimized');
-        } else {
-          terminal.classList.add('minimized');
-        }
-      });
-    }
+    // Updated minimize button functionality
+    setupMinimizeButton();
     
   } catch (error) {
     console.error("Error initializing visualizer:", error);
   }
-
-  // Show visualizer controls automatically after a delay
-  setTimeout(() => {
-    console.log("Auto-showing visualizer controls");
-    showVisualizerControls();
-  }, 2000); // Show after 2 seconds
 });
 
 // Make the terminal draggable for better user experience
@@ -356,9 +370,26 @@ function addTerminalTypingEffect() {
   });
 }
 
-// Enhanced show function with typing effect
+// Updated minimize button functionality
+function setupMinimizeButton() {
+  const minimizeButton = document.querySelector('.visualizer-terminal .terminal-button.minimize');
+  if (minimizeButton) {
+    console.log('Found minimize button, adding event listener');
+    minimizeButton.addEventListener('click', () => {
+      console.log('Minimize button clicked');
+      const terminal = document.querySelector('.visualizer-terminal');
+      terminal.classList.toggle('minimized');
+    });
+  }
+}
+
+// Update the showVisualizerControls function to use our fixed minimize
 function showVisualizerControls() {
   const terminal = document.querySelector('.visualizer-terminal');
+  if (!terminal) {
+    console.error('Terminal not found');
+    return;
+  }
   
   // Hide content initially for typing effect
   const contentAreas = terminal.querySelectorAll('.terminal-buttons-grid, .terminal-colors, .terminal-sliders, .terminal-options');
@@ -369,12 +400,16 @@ function showVisualizerControls() {
   
   // Show terminal
   terminal.classList.add('active');
+  terminal.classList.remove('minimized'); // Ensure it's not minimized when shown
   
   // Make it draggable
   makeDraggable(terminal);
   
   // Add typing effect
   setTimeout(addTerminalTypingEffect, 300);
+  
+  // Set up minimize functionality
+  setupMinimizeButton();
   
   // Highlight the active shape button (should be torusKnot by default)
   setTimeout(() => {

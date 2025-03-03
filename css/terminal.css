@@ -204,8 +204,18 @@
 }
 
 .visualizer-terminal.minimized {
-    height: 30px;
+    height: auto;
+    max-height: 30px;
     overflow: hidden;
+}
+
+.visualizer-terminal.minimized .terminal-content {
+    display: none;
+}
+
+.visualizer-terminal.minimized .terminal-header {
+    margin-bottom: 0;
+    border-radius: 8px;
 }
 
 .visualizer-terminal .terminal-header {
