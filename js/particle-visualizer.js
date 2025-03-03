@@ -306,20 +306,72 @@ document.addEventListener('DOMContentLoaded', async () => {
     observeMusicTerminalClose();
 
     // Updated minimize button functionality
-    document.querySelector('.visualizer-terminal .terminal-button.minimize').remove();
-    
-    // Setting up visualizer nav button - improved version
-    console.log("Setting up visualizer nav button - improved version");
-    const visualizerNavItem = document.querySelector('a[href="#visualizer"]');
-    if (visualizerNavItem) {
-      console.log("Found visualizer nav button, adding direct click handler");
-      visualizerNavItem.addEventListener('click', function(e) {
-        e.preventDefault();
-        console.log("Visualizer nav button clicked - direct handler");
-        showVisualizerControls();
-      });
+    const minimizeButton = document.querySelector('.visualizer-terminal .terminal-button.minimize');
+    if (minimizeButton) {
+      minimizeButton.remove();
     }
     
+    // Setting up visualizer nav button - improved version
+    console.log("Setting up visualizer nav button (improved)");
+    function setupVisualizerNavButton() {
+      console.log("Setting up visualizer nav button (improved)");
+      
+      // Use direct ID selector and attach once
+      const navButton = document.getElementById('visualizer-nav-button');
+      
+      if (navButton) {
+        console.log("Found visualizer nav button by ID");
+        
+        // Remove any existing listeners by cloning
+        const newNavButton = navButton.cloneNode(true);
+        navButton.parentNode.replaceChild(newNavButton, navButton);
+        
+        // Add new click listener
+        newNavButton.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log("Visualizer nav button clicked directly");
+          showVisualizerControls();
+          return false;
+        });
+      } else {
+        console.warn("Visualizer nav button not found by ID, trying alternate selectors");
+        
+        // Fallback to other selectors
+        const altNavButton = document.querySelector('a[href="#visualizer"]');
+        if (altNavButton) {
+          console.log("Found visualizer nav button by href");
+          
+          // Remove existing listeners
+          const newAltButton = altNavButton.cloneNode(true);
+          altNavButton.parentNode.replaceChild(newAltButton, altNavButton);
+          
+          newAltButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log("Visualizer nav button clicked (alternate)");
+            showVisualizerControls();
+            return false;
+          });
+        } else {
+          console.error("Visualizer nav button could not be found with any selector");
+        }
+      }
+    }
+
+    // Add this to your DOMContentLoaded event, where other setup functions are called
+    setupVisualizerNavButton();
+
+    // And make sure to add a call to re-setup the nav button after the terminal is closed
+    // Modify the close button event handler in showVisualizerControls:
+    newCloseButton.addEventListener('click', () => {
+      console.log("Close button clicked");
+      terminal.classList.remove('active');
+      
+      // Re-setup the nav button to ensure it works after closing
+      setTimeout(setupVisualizerNavButton, 100);
+    });
+
   } catch (error) {
     console.error("Error initializing visualizer:", error);
   }
@@ -327,23 +379,26 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Make the terminal draggable for better user experience
 function makeDraggable(element) {
+  // Reset any existing inline styles that might interfere
+  element.style.position = 'fixed';
+  element.style.right = '20px';
+  element.style.top = '50%';
+  element.style.transform = 'translateY(-50%)';
+  
   let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
   let isDragging = false;
   
-  // Store original position to restore if needed
-  let originalTop = null;
-  let originalLeft = null;
-  let originalTransform = null;
+  // Store original position for reset
+  const originalPosition = {
+    top: '50%',
+    right: '20px',
+    transform: 'translateY(-50%)'
+  };
   
   const header = element.querySelector('.terminal-header');
   if (header) {
     console.log("Setting up draggable on terminal header");
     header.style.cursor = 'grab'; // Better cursor
-    
-    // Save the original position when the terminal is shown
-    originalTop = element.style.top;
-    originalLeft = element.style.left;
-    originalTransform = element.style.transform;
     
     header.addEventListener('mousedown', dragMouseDown);
   }
@@ -416,14 +471,14 @@ function makeDraggable(element) {
       console.log("Resetting terminal position");
       
       // Restore original position
-      if (originalTransform) {
-        element.style.transform = originalTransform;
+      if (originalPosition.transform) {
+        element.style.transform = originalPosition.transform;
       } else {
         element.style.transform = 'translateY(-50%)';
       }
       
-      element.style.top = '50%';
-      element.style.left = originalLeft || '20px';
+      element.style.top = originalPosition.top;
+      element.style.left = originalPosition.right || '20px';
       element.style.right = 'auto';
     });
     
@@ -515,6 +570,9 @@ function showVisualizerControls() {
     newCloseButton.addEventListener('click', () => {
       console.log("Close button clicked");
       terminal.classList.remove('active');
+      
+      // Re-setup the nav button to ensure it works after closing
+      setTimeout(setupVisualizerNavButton, 100);
     });
   }
   

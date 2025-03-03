@@ -230,20 +230,20 @@ class ParticleSystem {
         break;
     
       case 'cylinder':
-        this.geometry = new THREE.CylinderGeometry(12, 12, 56,120, 80, true);
+        this.geometry = new THREE.CylinderGeometry(12, 12, 48,120, 80, true);
         this.uniforms.offsetSize.value = 25;
         this.currentShape = 'cylinder';
         break;
       
       case 'torusKnot':
-        this.geometry = new THREE.TorusKnotGeometry(10, 6, 150,250, 3, 4  );
+        this.geometry = new THREE.TorusKnotGeometry(8, 5, 150,250, 3, 4  );
         this.uniforms.offsetSize.value = 35;
         this.currentShape = 'torusKnot';
         break;
     
       case 'sphere':
       default:
-        this.geometry = new THREE.SphereGeometry(15, 50, 50);
+        this.geometry = new THREE.SphereGeometry(15, 100,50,125,);
         this.uniforms.offsetSize.value = 35;
         this.currentShape = 'sphere';
         break;
