@@ -4,7 +4,7 @@ class ParticleSystem {
   constructor(gui) {
     this.name = 'ParticleSystem';
     this.time = 0;
-    this.reactivityMultiplier = 0.01;
+    this.reactivityMultiplier = 0.01
     this.currentShape = 'torusKnot';
     
     // Store the GUI instance
@@ -247,9 +247,9 @@ class ParticleSystem {
   }
 
   createCube() {
-    let widthSeg = Math.floor(THREE.MathUtils.randInt(5, 20));
-    let heightSeg = Math.floor(THREE.MathUtils.randInt(1, 40));
-    let depthSeg = Math.floor(THREE.MathUtils.randInt(5, 80));
+    let widthSeg = Math.floor(THREE.MathUtils.randInt(15,20));
+    let heightSeg = Math.floor(THREE.MathUtils.randInt(20, 40));
+    let depthSeg = Math.floor(THREE.MathUtils.randInt(10, 60));
     
     this.geometry = new THREE.BoxGeometry(
       30,
@@ -273,7 +273,7 @@ class ParticleSystem {
     };
     
     this.segmentsFolder.add(this.guiProperties.segments, "width", 5, 20);
-    this.segmentsFolder.add(this.guiProperties.segments, "height", 1, 40);
+    this.segmentsFolder.add(this.guiProperties.segments, "height", 5, 40);
     this.segmentsFolder.add(this.guiProperties.segments, "depth", 5, 80);
     this.segmentsFolder
       .add(this.guiProperties, "randomizeSegments")
@@ -294,12 +294,12 @@ class ParticleSystem {
     });
     
     this.currentShape = 'cube';
-    this.uniforms.offsetSize.value = 60;
+    this.uniforms.offsetSize.value = 40;
   }
 
   createCylinder() {
     let radialSeg = Math.floor(THREE.MathUtils.randInt(64, 192));
-    let heightSeg = Math.floor(THREE.MathUtils.randInt(64, 320));
+    let heightSeg = Math.floor(THREE.MathUtils.randInt(64, 192));
     
     this.geometry = new THREE.CylinderGeometry(
       16,
@@ -344,12 +344,12 @@ class ParticleSystem {
     });
     
     this.currentShape = 'cylinder';
-    this.uniforms.offsetSize.value = 50;
+    this.uniforms.offsetSize.value = 30;
   }
 
   createSphere() {
-    let widthSeg = Math.floor(THREE.MathUtils.randInt(30, 100));
-    let heightSeg = Math.floor(THREE.MathUtils.randInt(20, 100));
+    let widthSeg = Math.floor(THREE.MathUtils.randInt(60,90));
+    let heightSeg = Math.floor(THREE.MathUtils.randInt(40,60));
     
     this.geometry = new THREE.SphereGeometry(
       30,
@@ -386,7 +386,7 @@ class ParticleSystem {
     });
     
     this.currentShape = 'sphere';
-    this.uniforms.offsetSize.value = 70;
+    this.uniforms.offsetSize.value = 40;
   }
 
   createPlane() {
@@ -430,12 +430,12 @@ class ParticleSystem {
     });
     
     this.currentShape = 'plane';
-    this.uniforms.offsetSize.value = 50;
+    this.uniforms.offsetSize.value = 30;
   }
 
   createRing() {
-    let tubeSeg = Math.floor(THREE.MathUtils.randInt(3, 20));
-    let radialSeg = Math.floor(THREE.MathUtils.randInt(50, 200));
+    let tubeSeg = Math.floor(THREE.MathUtils.randInt(20, 30));
+    let radialSeg = Math.floor(THREE.MathUtils.randInt(150, 200));
     
     this.geometry = new THREE.TorusGeometry(
       20,
@@ -455,8 +455,8 @@ class ParticleSystem {
       radial: radialSeg
     };
     
-    this.segmentsFolder.add(this.guiProperties.segments, "tube", 3, 20);
-    this.segmentsFolder.add(this.guiProperties.segments, "radial", 50, 200);
+    this.segmentsFolder.add(this.guiProperties.segments, "tube", 5, 20);
+    this.segmentsFolder.add(this.guiProperties.segments, "radial", 50, 70);
     this.segmentsFolder
       .add(this.guiProperties, "randomizeSegments")
       .name("Randomize Segments");
@@ -474,12 +474,12 @@ class ParticleSystem {
     });
     
     this.currentShape = 'ring';
-    this.uniforms.offsetSize.value = 70;
+    this.uniforms.offsetSize.value = 50;
   }
 
   createTorusKnot() {
-    let tubeSeg = Math.floor(THREE.MathUtils.randInt(30, 150));
-    let radialSeg = Math.floor(THREE.MathUtils.randInt(100, 250));
+    let tubeSeg = Math.floor(THREE.MathUtils.randInt(50, 80));
+    let radialSeg = Math.floor(THREE.MathUtils.randInt(100, 150));
     let p = Math.floor(THREE.MathUtils.randInt(2, 5));
     let q = Math.floor(THREE.MathUtils.randInt(3, 7));
     
