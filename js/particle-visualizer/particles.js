@@ -265,11 +265,11 @@ class ParticleSystem {
         break;
 
       case 'icosahedron':
-        // 20-sided geometric shape for sharp reflections
-        this.geometry = new THREE.IcosahedronGeometry(10, 2);
-
+        // Smaller 20-sided geometric shape for sharper reflections
+        this.geometry = new THREE.IcosahedronGeometry(5, 2);  // Reduced size from 10 to 5
+        
         // Offset size for balanced spacing
-        this.uniforms.offsetSize.value = 40;
+        this.uniforms.offsetSize.value = 35;
         break;
     
       case 'sphere':
