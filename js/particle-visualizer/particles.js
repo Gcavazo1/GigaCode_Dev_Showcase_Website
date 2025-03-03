@@ -12,10 +12,10 @@ class ParticleSystem {
       time: { value: 0 },
       offsetSize: { value: 2 },
       size: { value: 1.5 },
-      frequency: { value: 1.0 },
-      amplitude: { value: 0.8 },
-      offsetGain: { value: 0.5 },
-      maxDistance: { value: 2.8 },
+      frequency: { value: 0.8 },
+      amplitude: { value: 1.0 },
+      offsetGain: { value: 0.7 },
+      maxDistance: { value: 3.0 },
       startColor: { value: new THREE.Color(0xff00ff) }, // Magenta
       endColor: { value: new THREE.Color(0x00ffff) },   // Cyan
     };
@@ -274,12 +274,12 @@ class ParticleSystem {
         const knotRadialSeg = Math.floor(THREE.MathUtils.randInt(30, 120)); // Doubled for more particles
         
         // Dynamic p,q values with wider range for more interesting patterns
-        const knotP = THREE.MathUtils.randInt(2, 6); // Extended range (was 2-3)
-        const knotQ = THREE.MathUtils.randInt(3, 6); // Extended range (was 3-5)
+        const knotP = THREE.MathUtils.randInt(3, 5); // Extended range (was 2-3)
+        const knotQ = THREE.MathUtils.randInt(3, 5); // Extended range (was 3-5)
         
         // Create a larger knot
         this.geometry = new THREE.TorusKnotGeometry(
-          15, 6, knotTubularSeg, knotRadialSeg, knotP, knotQ
+          15, 8, knotTubularSeg, knotRadialSeg, knotP, knotQ
         );
 
         // Higher offset size for more dramatic effect

@@ -383,11 +383,16 @@ function setupMinimizeButton() {
   }
 }
 
-// Update the showVisualizerControls function to use our fixed minimize
+// Update the showVisualizerControls function
 function showVisualizerControls() {
   const terminal = document.querySelector('.visualizer-terminal');
   if (!terminal) {
     console.error('Terminal not found');
+    return;
+  }
+  
+  // If already active, don't show again
+  if (terminal.classList.contains('active')) {
     return;
   }
   
@@ -400,7 +405,6 @@ function showVisualizerControls() {
   
   // Show terminal
   terminal.classList.add('active');
-  terminal.classList.remove('minimized'); // Ensure it's not minimized when shown
   
   // Make it draggable
   makeDraggable(terminal);
@@ -408,8 +412,8 @@ function showVisualizerControls() {
   // Add typing effect
   setTimeout(addTerminalTypingEffect, 300);
   
-  // Set up minimize functionality
-  setupMinimizeButton();
+  // Set up close button
+  updateVisualizerControls();
   
   // Highlight the active shape button (should be torusKnot by default)
   setTimeout(() => {
@@ -419,4 +423,69 @@ function showVisualizerControls() {
       torusKnotButton.classList.add('active');
     }
   }, 1500);
+}
+
+// Add event listener for visualizer nav button
+document.addEventListener('DOMContentLoaded', () => {
+  // Add click handler for the new nav button
+  const visualizerNavButton = document.getElementById('visualizer-nav-button');
+  if (visualizerNavButton) {
+    visualizerNavButton.addEventListener('click', () => {
+      showVisualizerControls();
+    });
+  }
+  
+  // Observe the audio terminal to detect when it closes
+  const audioTerminalObserver = new MutationObserver((mutations) => {
+    mutations.forEach(mutation => {
+      // Look for removed nodes that might be the audio terminal
+      if (mutation.removedNodes && mutation.removedNodes.length) {
+        for (let i = 0; i < mutation.removedNodes.length; i++) {
+          const node = mutation.removedNodes[i];
+          if (node.classList && (
+              node.classList.contains('music-terminal') || 
+              node.classList.contains('powershell-music') || 
+              node.classList.contains('audio-terminal')) {
+            console.log('Audio terminal closed, showing visualizer');
+            // Audio terminal was closed, show our visualizer with slight delay
+            setTimeout(showVisualizerControls, 600);
+          }
+        }
+      }
+      
+      // Look for class changes that might indicate terminal closing
+      if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+        const target = mutation.target;
+        if (target.classList && 
+            (target.classList.contains('music-terminal') || 
+             target.classList.contains('powershell-music') || 
+             target.classList.contains('audio-terminal')) && 
+            !target.classList.contains('active')) {
+          console.log('Audio terminal inactive, showing visualizer');
+          // Audio terminal was hidden, show our visualizer
+          setTimeout(showVisualizerControls, 600);
+        }
+      }
+    });
+  });
+
+  // Start observing the document for audio terminal changes
+  audioTerminalObserver.observe(document.body, { 
+    childList: true, 
+    subtree: true,
+    attributes: true,
+    attributeFilter: ['class']
+  });
+});
+
+// Remove the old play button handler and update the close button handler
+function updateVisualizerControls() {
+  // Update close button to fully close the terminal instead of minimizing
+  const closeButton = document.querySelector('.visualizer-terminal .terminal-button.close');
+  if (closeButton) {
+    closeButton.addEventListener('click', () => {
+      const terminal = document.querySelector('.visualizer-terminal');
+      terminal.classList.remove('active');
+    });
+  }
 }

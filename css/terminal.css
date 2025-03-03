@@ -333,4 +333,20 @@
         opacity: 1;
         transform: translateY(-50%) scale(1);
     }
+}
+
+/* Update terminal styling for better close button */
+.visualizer-terminal .terminal-button.close {
+  background-color: #ff3344;
+  box-shadow: 0 0 5px rgba(255, 51, 68, 0.7);
+}
+
+.visualizer-terminal .terminal-button.close:hover {
+  background-color: #ff5566;
+  box-shadow: 0 0 10px rgba(255, 51, 68, 0.9);
+}
+
+/* Hide the minimize button since we're not using it */
+.visualizer-terminal .terminal-button.minimize {
+  display: none;
 } 
