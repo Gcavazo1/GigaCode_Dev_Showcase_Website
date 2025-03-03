@@ -295,14 +295,14 @@ class ParticleSystem {
     }
     
     // Now create the new geometry
-    let widthSeg = Math.floor(THREE.MathUtils.randInt(15,20));
-    let heightSeg = Math.floor(THREE.MathUtils.randInt(20, 40));
-    let depthSeg = Math.floor(THREE.MathUtils.randInt(10, 60));
+    let widthSeg = Math.floor(THREE.MathUtils.randInt(15,30));
+    let heightSeg = Math.floor(THREE.MathUtils.randInt(30, 80));
+    let depthSeg = Math.floor(THREE.MathUtils.randInt(15, 30));
     
     this.geometry = new THREE.BoxGeometry(
-      30,
-      30,
-      30,
+      34,
+      34,
+      34,
       widthSeg,
       heightSeg,
       depthSeg
@@ -320,9 +320,9 @@ class ParticleSystem {
       depth: depthSeg,
     };
     
-    this.segmentsFolder.add(this.guiProperties.segments, "width", 5, 20);
-    this.segmentsFolder.add(this.guiProperties.segments, "height", 5, 40);
-    this.segmentsFolder.add(this.guiProperties.segments, "depth", 5, 80);
+    this.segmentsFolder.add(this.guiProperties.segments, "width", 5, 30);
+    this.segmentsFolder.add(this.guiProperties.segments, "height", 5, 80);
+    this.segmentsFolder.add(this.guiProperties.segments, "depth", 5, 30);
     this.segmentsFolder
       .add(this.guiProperties, "randomizeSegments")
       .name("Randomize Segments");
@@ -330,9 +330,9 @@ class ParticleSystem {
     this.segmentsFolder.onChange(() => {
       this.holder.remove(this.pointsMesh);
       this.geometry = new THREE.BoxGeometry(
-        30,
-        30,
-        30,
+        34,
+        34,
+        34,
         this.guiProperties.segments.width,
         this.guiProperties.segments.height,
         this.guiProperties.segments.depth
@@ -396,7 +396,7 @@ class ParticleSystem {
   }
 
   createSphere() {
-    let widthSeg = Math.floor(THREE.MathUtils.randInt(60,90));
+    let widthSeg = Math.floor(THREE.MathUtils.randInt(80,140));
     let heightSeg = Math.floor(THREE.MathUtils.randInt(40,60));
     
     this.geometry = new THREE.SphereGeometry(
@@ -438,8 +438,8 @@ class ParticleSystem {
   }
 
   createPlane() {
-    let widthSeg = Math.floor(THREE.MathUtils.randInt(50, 150));
-    let heightSeg = Math.floor(THREE.MathUtils.randInt(50, 150));
+    let widthSeg = Math.floor(THREE.MathUtils.randInt(45, 100));
+    let heightSeg = Math.floor(THREE.MathUtils.randInt(75, 180));
     
     this.geometry = new THREE.PlaneGeometry(
       80,
@@ -482,11 +482,11 @@ class ParticleSystem {
   }
 
   createRing() {
-    let tubeSeg = Math.floor(THREE.MathUtils.randInt(20, 30));
-    let radialSeg = Math.floor(THREE.MathUtils.randInt(150, 200));
+    let tubeSeg = Math.floor(THREE.MathUtils.randInt(30, 60));
+    let radialSeg = Math.floor(THREE.MathUtils.randInt(120, 160));
     
     this.geometry = new THREE.TorusGeometry(
-      20,
+      18,
       8,
       tubeSeg,
       radialSeg
@@ -526,14 +526,14 @@ class ParticleSystem {
   }
 
   createTorusKnot() {
-    let tubeSeg = Math.floor(THREE.MathUtils.randInt(50, 80));
+    let tubeSeg = Math.floor(THREE.MathUtils.randInt(150,250));
     let radialSeg = Math.floor(THREE.MathUtils.randInt(100, 150));
-    let p = Math.floor(THREE.MathUtils.randInt(2, 5));
-    let q = Math.floor(THREE.MathUtils.randInt(3, 7));
+    let p = Math.floor(THREE.MathUtils.randInt(2, 3));
+    let q = Math.floor(THREE.MathUtils.randInt(3, 2));
     
     this.geometry = new THREE.TorusKnotGeometry(
-      20,
-      8,
+      17,
+      5,
       tubeSeg,
       radialSeg,
       p,
@@ -576,7 +576,7 @@ class ParticleSystem {
     });
     
     this.currentShape = 'torusKnot';
-    this.uniforms.offsetSize.value = 70;
+    this.uniforms.offsetSize.value = 40;
   }
 
   create(shapeType = 'torusKnot') {
@@ -679,7 +679,9 @@ class ParticleSystem {
 
   // Add a more thorough cleanup method
   fullCleanup() {
-    // Remove all children from holder
+    console.log("Performing full cleanup");
+    
+    // Remove all children from holder while keeping the holder reference intact
     while(this.holder.children.length > 0) {
       const child = this.holder.children[0];
       if (child.geometry) {
@@ -690,10 +692,6 @@ class ParticleSystem {
       }
       this.holder.remove(child);
     }
-    
-    // Reset holder
-    this.holder = new THREE.Object3D();
-    this.holder.name = 'particle-holder';
     
     // Reset pointsMesh reference
     this.pointsMesh = null;
@@ -706,6 +704,35 @@ class ParticleSystem {
     
     // Create fresh material
     this.createMaterial();
+    
+    // After cleanup, make sure to recreate the shape
+    console.log("Recreating current shape after cleanup");
+    
+    // Store the current shape before cleanup
+    const currentShape = this.currentShape;
+    
+    // Recreate the current shape with fresh parameters
+    switch (currentShape) {
+      case 'cube':
+        this.createCube();
+        break;
+      case 'plane':
+        this.createPlane();
+        break;
+      case 'ring':
+        this.createRing();
+        break;
+      case 'cylinder':
+        this.createCylinder();
+        break;
+      case 'torusKnot':
+        this.createTorusKnot();
+        break;
+      case 'sphere':
+      default:
+        this.createSphere();
+        break;
+    }
   }
 }
 
