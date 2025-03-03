@@ -38,7 +38,7 @@ class ParticleVisualizer {
       0.1, 
       1000
     );
-    this.camera.position.z = 30;
+    this.camera.position.z = 20;
     
     // Create holder object like in reference
     this.holder = new THREE.Object3D();

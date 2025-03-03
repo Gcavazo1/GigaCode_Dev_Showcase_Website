@@ -4,7 +4,7 @@ class ParticleSystem {
   constructor(gui) {
     this.name = 'ParticleSystem';
     this.time = 0;
-    this.reactivityMultiplier = 0.1;
+    this.reactivityMultiplier = 0.01;
     this.currentShape = 'torusKnot';
     
     // Store the GUI instance
