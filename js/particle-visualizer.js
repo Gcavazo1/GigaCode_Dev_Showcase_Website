@@ -13,25 +13,39 @@ document.addEventListener('DOMContentLoaded', async () => {
     const audioElement = document.getElementById('background-audio');
     
     if (audioElement) {
-      console.log("Connecting to audio element:", audioElement);
-      console.log("Audio element state:", audioElement.paused ? "paused" : "playing");
+      visualizer.connectToAudioPlayer(audioElement);
       
-      const connected = visualizer.connectToAudioPlayer(audioElement);
-      console.log("Connection successful:", connected);
+      // Listen for play/pause events
+      audioElement.addEventListener('play', () => {
+        visualizer.isPlaying = true;
+        visualizer.show();
+      });
       
-      if (connected) {
-        visualizer.isPlaying = !audioElement.paused;
-        if (visualizer.isPlaying) {
+      audioElement.addEventListener('pause', () => {
+        visualizer.isPlaying = false;
+        visualizer.hide();
+      });
+      
+      // Also connect to audio player instance if it exists
+      if (window.audioPlayerInstance) {
+        // Override the play method to show visualizer
+        const originalPlayMethod = window.audioPlayerInstance.playAudio;
+        window.audioPlayerInstance.playAudio = function() {
+          originalPlayMethod.apply(this);
+          visualizer.isPlaying = true;
           visualizer.show();
-        }
-        // Force-set initial values
-        visualizer.particleSystem.uniforms.size.value = 2.0;
-        visualizer.particleSystem.uniforms.amplitude.value = 0.8;
-        visualizer.particleSystem.uniforms.frequency.value = 2.0;
-        visualizer.particleSystem.uniforms.offsetGain.value = 0.5;
+        };
+        
+        // Override the pause method to hide visualizer
+        const originalPauseMethod = window.audioPlayerInstance.pauseAudio;
+        window.audioPlayerInstance.pauseAudio = function() {
+          originalPauseMethod.apply(this);
+          visualizer.isPlaying = false;
+          visualizer.hide();
+        };
       }
       
-      return connected;
+      return true;
     }
     
     return false;

@@ -71,26 +71,24 @@ class AudioAnalyzer {
   }
 
   update() {
-    if (!this.analyser || !this.audioContext) {
-      return null;
-    }
+    if (!this.analyser || !this.dataArray) return this.frequencyData;
     
     // Get frequency data
-    this.analyser.getByteFrequencyData(this.frequencyData);
+    this.analyser.getByteFrequencyData(this.dataArray);
     
-    // Calculate average levels for low, mid, and high frequencies
-    const bass = this.getAverageFrequency(0, 10) / 255.0;
-    const mid = this.getAverageFrequency(10, 100) / 255.0;
-    const high = this.getAverageFrequency(100, 255) / 255.0;
-    
-    console.log("Audio levels - Bass:", bass, "Mid:", mid, "High:", high);
-    
-    return {
-      frequencyData: this.frequencyData,
-      low: bass,
-      mid: mid,
-      high: high
+    // Calculate the values for low, mid, and high frequency ranges
+    const newData = {
+      low: this.calculateBandValue(this.frequencyRanges.low),
+      mid: this.calculateBandValue(this.frequencyRanges.mid),
+      high: this.calculateBandValue(this.frequencyRanges.high)
     };
+    
+    // Apply smoothing
+    this.frequencyData.low = this.smooth(this.frequencyData.low, newData.low);
+    this.frequencyData.mid = this.smooth(this.frequencyData.mid, newData.mid);
+    this.frequencyData.high = this.smooth(this.frequencyData.high, newData.high);
+    
+    return this.frequencyData;
   }
 
   calculateBandValue(range) {
@@ -114,16 +112,6 @@ class AudioAnalyzer {
 
   smooth(oldValue, newValue) {
     return oldValue * this.smoothingFactor + newValue * (1 - this.smoothingFactor);
-  }
-
-  getAverageFrequency(startIndex, endIndex) {
-    let sum = 0;
-    let count = 0;
-    for (let i = startIndex; i <= endIndex && i < this.bufferLength; i++) {
-      sum += this.dataArray[i];
-      count++;
-    }
-    return sum / count;
   }
 }
 
