@@ -121,9 +121,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     function updateColors() {
       if (window.particleVisualizer && window.particleVisualizer.particleSystem) {
         const uniforms = window.particleVisualizer.particleSystem.uniforms;
+        const startColor = new THREE.Color(htmlColorToHex(startColorPicker.value));
+        const endColor = new THREE.Color(htmlColorToHex(endColorPicker.value));
         
-        uniforms.startColor.value.setHex(htmlColorToHex(startColorPicker.value));
-        uniforms.endColor.value.setHex(htmlColorToHex(endColorPicker.value));
+        uniforms.startColor.value.copy(startColor);
+        uniforms.endColor.value.copy(endColor);
       }
     }
     

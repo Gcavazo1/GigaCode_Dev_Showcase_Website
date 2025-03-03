@@ -32,8 +32,8 @@ class ParticleSystem {
       uMaxDistance: { value: 1.8 },
       uOffsetSize: { value: 2.0 },
       uOffsetGain: { value: 0.0 },
-      startColor: { value: new THREE.Color(0x0a2463) },
-      endColor: { value: new THREE.Color(0x00ff99) },
+      startColor: { value: new THREE.Color(0xff00ff) }, // Magenta
+      endColor: { value: new THREE.Color(0x00ffff) },   // Cyan
     };
   }
 
@@ -112,13 +112,8 @@ class ParticleSystem {
         fragmentShader = `
           uniform vec3 startColor;
           uniform vec3 endColor;
-          uniform float uBassFrequency;
-          uniform float uMidFrequency;
-          uniform float uHighFrequency;
           
-          varying vec3 vPosition;
           varying float vDistance;
-          varying float vScale;
           
           float circle(in vec2 _st, in float _radius) {
             vec2 dist = _st - vec2(0.5);
@@ -128,24 +123,10 @@ class ParticleSystem {
           }
           
           void main() {
-            // Create soft circle with feathered edge
             vec2 uv = vec2(gl_PointCoord.x, 1.0 - gl_PointCoord.y);
-            float circ = circle(uv, 1.0);
-            
-            // Clear color interpolation based on distance
+            vec3 circ = vec3(circle(uv, 1.));
             vec3 color = mix(startColor, endColor, vDistance);
-            
-            // Apply subtle audio reactivity
-            color += vec3(
-              uHighFrequency * 0.2,
-              uMidFrequency * 0.2,
-              uBassFrequency * 0.2
-            );
-            
-            // Distance-based alpha with strong falloff at edges
-            float alpha = circ * (vDistance * 0.6 + 0.4);
-            
-            gl_FragColor = vec4(color, alpha);
+            gl_FragColor = vec4(color, circ.r * vDistance);
           }
         `;
       }
@@ -166,7 +147,7 @@ class ParticleSystem {
       fragmentShader,
       transparent: true,
       depthWrite: false,
-      blending: THREE.AdditiveBlending
+      blending: THREE.AdditiveBlending,
     });
   }
 
