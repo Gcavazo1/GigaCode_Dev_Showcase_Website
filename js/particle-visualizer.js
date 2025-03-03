@@ -196,29 +196,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.particleVisualizer.particleSystem.uniforms.size.value = 2.0;
     window.particleVisualizer.particleSystem.uniforms.offsetSize.value = 2.0;
   }
-
-  // Add new shape buttons to the control panel
-  const shapeButtonsContainer = document.querySelector('.control-buttons');
-  if (shapeButtonsContainer) {
-    // Create TorusKnot button
-    const torusKnotButton = document.createElement('button');
-    torusKnotButton.setAttribute('data-shape', 'torusKnot');
-    torusKnotButton.innerHTML = '<i class="fas fa-atom"></i><span>Knot</span>';
-    torusKnotButton.className = 'control-button';
-    shapeButtonsContainer.appendChild(torusKnotButton);
-    
-    // Create Icosahedron button
-    const icosahedronButton = document.createElement('button');
-    icosahedronButton.setAttribute('data-shape', 'icosahedron');
-    icosahedronButton.innerHTML = '<i class="fas fa-dice-d20"></i><span>Icosa</span>';
-    icosahedronButton.className = 'control-button';
-    shapeButtonsContainer.appendChild(icosahedronButton);
-    
-    // Create Klein bottle button
-    const kleinBottleButton = document.createElement('button');
-    kleinBottleButton.setAttribute('data-shape', 'kleinBottle');
-    kleinBottleButton.innerHTML = '<i class="fas fa-infinity"></i><span>Klein</span>';
-    kleinBottleButton.className = 'control-button';
-    shapeButtonsContainer.appendChild(kleinBottleButton);
-  }
 });
