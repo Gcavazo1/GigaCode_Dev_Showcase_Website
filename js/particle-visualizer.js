@@ -241,23 +241,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Music Enable Button Handler - be very specific about the selector
     function setupMusicEnableButton() {
-      console.log("Setting up music enable button detection");
+      console.log("Setting up music enable button detection - fixed version");
       
-      // Look for the button in the PowerShell terminal
+      // Use a more general approach to catch all possible Enable-Music buttons
       document.addEventListener('click', (e) => {
-        // More specific targeting of the PowerShell button
-        if (e.target.matches('.powershell-buttons .Enable-Music')) {
-          console.log('Enable-Music button clicked in PowerShell terminal!');
+        console.log("Click detected, checking if Enable-Music button:", e.target);
+        
+        // Check using multiple methods to be sure we catch it
+        if ((e.target.textContent === 'Enable-Music') || 
+            (e.target.className && e.target.className.includes('Enable-Music')) ||
+            (e.target.classList && e.target.classList.contains('Enable-Music'))) {
+          
+          console.log('Enable-Music button detected and clicked!');
           musicEnabled = true;
           
-          // Wait for PowerShell terminal to close
+          // Longer delay to ensure terminal has time to close
           setTimeout(() => {
-            const musicTerminal = document.querySelector('.powershell-music');
-            if (!musicTerminal || !musicTerminal.classList.contains('active')) {
-              console.log("Music terminal closed, showing visualizer");
-              showVisualizerControls();
-            }
-          }, 800); // Increased delay to ensure terminal closes first
+            console.log("Attempting to show visualizer after Enable-Music");
+            showVisualizerControls();
+          }, 1200);
         }
       });
     }
@@ -303,16 +305,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupMusicEnableButton();
     observeMusicTerminalClose();
 
-    // Audio player play button integration
-    document.addEventListener('click', (e) => {
-      if (e.target.id === 'play-audio' || e.target.closest('#play-audio')) {
-        console.log('Play audio button clicked');
-        if (!document.querySelector('.visualizer-terminal').classList.contains('active')) {
-          showVisualizerControls();
-        }
-      }
-    });
-    
     // Updated minimize button functionality
     document.querySelector('.visualizer-terminal .terminal-button.minimize').remove();
     
@@ -321,10 +313,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     const visualizerNavButton = document.getElementById('visualizer-nav-button');
     if (visualizerNavButton) {
       console.log("Found visualizer nav button");
-      visualizerNavButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        console.log("Visualizer nav button clicked");
-        showVisualizerControls();
+      document.addEventListener('click', (e) => {
+        // Log all clicks for debugging
+        console.log("Click detected on:", e.target);
+        
+        // Check if the click was on the visualizer nav button
+        if (e.target.closest('#visualizer-nav-button') || 
+            (e.target.id === 'visualizer-nav-button') ||
+            e.target.closest('[href="#visualizer"]')) {
+          
+          console.log("Visualizer nav button clicked directly!");
+          e.preventDefault();
+          showVisualizerControls();
+        }
       });
     }
     
@@ -442,6 +443,9 @@ function showVisualizerControls() {
   // Add typing effect
   setTimeout(addTerminalTypingEffect, 300);
   
+  // Add this new section - Setup all controls
+  setupVisualizerControls();
+  
   // Set up close button
   const closeButton = terminal.querySelector('.terminal-button.close');
   if (closeButton) {
@@ -464,4 +468,114 @@ function showVisualizerControls() {
       torusKnotButton.classList.add('active');
     }
   }, 1500);
+}
+
+// New function to setup all control event handlers
+function setupVisualizerControls() {
+  console.log("Setting up visualizer control event handlers");
+  
+  // Setup shape buttons
+  const shapeButtons = document.querySelectorAll('.visualizer-terminal .control-buttons [data-shape]');
+  console.log(`Found ${shapeButtons.length} shape buttons`);
+  
+  shapeButtons.forEach(btn => {
+    // Remove old listeners by cloning
+    const newBtn = btn.cloneNode(true);
+    btn.parentNode.replaceChild(newBtn, btn);
+    
+    // Add new click handler
+    newBtn.addEventListener('click', () => {
+      const shape = newBtn.getAttribute('data-shape');
+      console.log(`Shape button clicked: ${shape}`);
+      
+      // Remove active class from all buttons
+      shapeButtons.forEach(b => b.classList.remove('active'));
+      newBtn.classList.add('active');
+      
+      // Apply shape change if visualizer exists
+      if (window.particleVisualizer && window.particleVisualizer.particleSystem) {
+        console.log(`Applying shape change to: ${shape}`);
+        
+        // First remove old points from holder
+        if (window.particleVisualizer.particleSystem.points) {
+          window.particleVisualizer.holder.remove(window.particleVisualizer.particleSystem.points);
+        }
+        
+        // Create new geometry with selected shape
+        window.particleVisualizer.particleSystem.createShapedGeometry(shape);
+        
+        // Create new points and add to holder
+        const particles = window.particleVisualizer.particleSystem.create();
+        window.particleVisualizer.holder.add(particles);
+      }
+    });
+  });
+  
+  // Setup color pickers
+  const startColorPicker = document.getElementById('start-color-picker');
+  const endColorPicker = document.getElementById('end-color-picker');
+  
+  function updateColors() {
+    if (window.particleVisualizer && window.particleVisualizer.particleSystem) {
+      console.log("Updating colors");
+      const uniforms = window.particleVisualizer.particleSystem.uniforms;
+      
+      // Convert HTML color to THREE.Color
+      const startColorHex = startColorPicker.value.replace('#', '0x');
+      const endColorHex = endColorPicker.value.replace('#', '0x');
+      
+      uniforms.startColor.value.set(parseInt(startColorHex));
+      uniforms.endColor.value.set(parseInt(endColorHex));
+    }
+  }
+  
+  if (startColorPicker && endColorPicker) {
+    startColorPicker.addEventListener('input', updateColors);
+    endColorPicker.addEventListener('input', updateColors);
+  }
+  
+  // Setup size slider
+  const sizeSlider = document.getElementById('size-control');
+  const sizeValue = document.getElementById('size-value');
+  
+  if (sizeSlider && sizeValue) {
+    sizeSlider.addEventListener('input', () => {
+      const size = parseFloat(sizeSlider.value);
+      sizeValue.textContent = size;
+      
+      if (window.particleVisualizer && window.particleVisualizer.particleSystem) {
+        console.log(`Setting particle size to: ${size}`);
+        window.particleVisualizer.particleSystem.uniforms.size.value = size / 10;
+      }
+    });
+  }
+  
+  // Setup reactivity slider
+  const reactivitySlider = document.getElementById('reactivity-control');
+  const reactivityValue = document.getElementById('reactivity-value');
+  
+  if (reactivitySlider && reactivityValue) {
+    reactivitySlider.addEventListener('input', () => {
+      const reactivity = parseFloat(reactivitySlider.value);
+      reactivityValue.textContent = reactivity.toFixed(1);
+      
+      if (window.particleVisualizer && window.particleVisualizer.particleSystem) {
+        console.log(`Setting reactivity to: ${reactivity}`);
+        window.particleVisualizer.particleSystem.reactivityMultiplier = reactivity;
+      }
+    });
+  }
+  
+  // Setup rotation toggle
+  const rotationToggle = document.getElementById('toggle-rotation');
+  if (rotationToggle) {
+    rotationToggle.addEventListener('click', () => {
+      rotationToggle.classList.toggle('active');
+      if (window.particleVisualizer) {
+        const isActive = rotationToggle.classList.contains('active');
+        console.log(`Setting auto-rotate to: ${isActive}`);
+        window.particleVisualizer.autoRotate = isActive;
+      }
+    });
+  }
 }

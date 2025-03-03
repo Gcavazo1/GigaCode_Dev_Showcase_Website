@@ -52,12 +52,7 @@ class ParticleSystem {
         
         // Other corners
         vec2 i1;
-        //i1.x = step( x0.y, x0.x ); // x0.x > x0.y ? 1.0 : 0.0
-        //i1.y = 1.0 - i1.x;
         i1=(x0.x>x0.y)?vec2(1.,0.):vec2(0.,1.);
-        // x0 = x0 - 0.0 + 0.0 * C.xx ;
-        // x1 = x0 - i1 + 1.0 * C.xx ;
-        // x2 = x0 - 1.0 + 2.0 * C.xx ;
         vec4 x12=x0.xyxy+C.xxzz;
         x12.xy-=i1;
         
@@ -212,94 +207,44 @@ class ParticleSystem {
       this.geometry.dispose();
     }
     
-    // Create geometry based on shape - with more dynamic segmentation like the reference
+    // Create geometry based on shape with consistent parameters
     switch (shape) {
       case 'cube':
-        // More dynamic segment ranges like the reference
-        const cubeWidthSeg = Math.floor(THREE.MathUtils.randInt(20, 60));  // Renamed for clarity
-        const cubeHeightSeg = Math.floor(THREE.MathUtils.randInt(10, 100)); // Renamed for clarity
-        const cubeDepthSeg = Math.floor(THREE.MathUtils.randInt(20, 120));  // Renamed for clarity
-        
-        this.geometry = new THREE.BoxGeometry(
-          22, 22, 22, cubeWidthSeg, cubeHeightSeg, cubeDepthSeg
-        );
-    
-        // Higher offset size like reference
-        this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(30, 50));
+        const cubeSegments = 30;
+        this.geometry = new THREE.BoxGeometry(22, 22, 22, cubeSegments, cubeSegments, cubeSegments);
+        this.uniforms.offsetSize.value = 30;
         this.currentShape = 'cube';
         break;
     
       case 'plane':
-        // More dynamic segmentation
-        const planeWidthSeg = Math.floor(THREE.MathUtils.randInt(80, 150)); // Renamed for clarity
-        const planeHeightSeg = Math.floor(THREE.MathUtils.randInt(80, 150)); // Renamed for clarity
-        
-        this.geometry = new THREE.PlaneGeometry(
-          50, 50, planeWidthSeg, planeHeightSeg
-        );
-    
-        this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(25, 50));
+        const planeSegments = 100;
+        this.geometry = new THREE.PlaneGeometry(50, 50, planeSegments, planeSegments);
+        this.uniforms.offsetSize.value = 25;
         this.currentShape = 'plane';
         break;
     
       case 'ring':
-        // More detailed torus with random segments
-        const torusSegments = Math.floor(THREE.MathUtils.randInt(180, 300));
-        const torusTubularSeg = Math.floor(THREE.MathUtils.randInt(20, 50));
-        
-        this.geometry = new THREE.TorusGeometry(
-          12, 2, torusTubularSeg, torusSegments
-        );
-    
-        this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(35, 55));
+        this.geometry = new THREE.TorusGeometry(12, 2, 30, 200);
+        this.uniforms.offsetSize.value = 35;
         this.currentShape = 'ring';
         break;
     
       case 'cylinder':
-        // More detailed cylinder with random segments
-        const cylinderRadialSeg = Math.floor(THREE.MathUtils.randInt(64, 128)); // Renamed for clarity
-        const cylinderHeightSeg = Math.floor(THREE.MathUtils.randInt(64, 128)); // Renamed for clarity
-    
-        this.geometry = new THREE.CylinderGeometry(
-          12, 12, 28, cylinderRadialSeg, cylinderHeightSeg, true
-        );
-    
-        this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(25, 50));
+        this.geometry = new THREE.CylinderGeometry(12, 12, 28, 80, 80, true);
+        this.uniforms.offsetSize.value = 25;
         this.currentShape = 'cylinder';
         break;
       
       case 'torusKnot':
-        // Significantly more detailed torus knot for more particles
-        const knotTubularSeg = Math.floor(THREE.MathUtils.randInt(200, 400)); // Doubled for more particles
-        const knotRadialSeg = Math.floor(THREE.MathUtils.randInt(30, 120)); // Doubled for more particles
-        
-        // Dynamic p,q values with wider range for more interesting patterns
-        const knotP = THREE.MathUtils.randInt(3, 5); // Extended range (was 2-3)
-        const knotQ = THREE.MathUtils.randInt(3, 5); // Extended range (was 3-5)
-        
-        // Create a larger knot
-        this.geometry = new THREE.TorusKnotGeometry(
-          15, 8, knotTubularSeg, knotRadialSeg, knotP, knotQ
-        );
-
-        // Higher offset size for more dramatic effect
-        this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(55, 150));
-        
-        // Store the shape for special handling in update method
+        this.geometry = new THREE.TorusKnotGeometry(15, 8, 250, 40, 3, 4);
+        this.uniforms.offsetSize.value = 55;
         this.currentShape = 'torusKnot';
         break;
     
       case 'sphere':
       default:
-        // More detailed sphere
-        const sphereWidthSeg = Math.floor(THREE.MathUtils.randInt(40, 80)); // Renamed for clarity
-        const sphereHeightSeg = Math.floor(THREE.MathUtils.randInt(40, 80)); // Renamed for clarity
-        
-        this.geometry = new THREE.SphereGeometry(
-          15, sphereWidthSeg, sphereHeightSeg
-        );
-    
-        this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(35, 65));
+        this.geometry = new THREE.SphereGeometry(15, 50, 50);
+        this.uniforms.offsetSize.value = 35;
         this.currentShape = 'sphere';
         break;
     }
@@ -340,66 +285,38 @@ class ParticleSystem {
   update(time, audioData, beatDetected) {
     if (!this.material) return;
     
-    // Slightly faster time increment for more motion
-    this.time += 0.15;
+    // Simple time increment
+    this.time += 0.1;
     this.uniforms.time.value = this.time;
     
-    // Apply audio data to key uniforms with higher multipliers
+    // Apply audio data to uniforms with consistent reactivity
     if (audioData) {
-      // Base reactivity
-      let amplitudeMod = this.reactivityMultiplier;
-      let frequencyMod = this.reactivityMultiplier;
-      let offsetMod = this.reactivityMultiplier;
-      
-      // Special handling for torusKnot - more dramatic reactivity
-      if (this.currentShape === 'torusKnot') {
-        amplitudeMod *= 1.5; // 50% more amplitude effect
-        frequencyMod *= 1.35; // 35% more frequency effect
-        offsetMod *= 1.4; // 40% more offset effect
-      }
-      
-      // Even more dramatic amplitude reactivity
-      this.uniforms.amplitude.value = 0.8 + THREE.MathUtils.mapLinear(
-        audioData.high * amplitudeMod, 
-        0, 0.6, 
-        -0.1, 1.0
-      );
-      
-      // More dramatic offset gain 
-      this.uniforms.offsetGain.value = audioData.mid * 2.5 * offsetMod;
-      
-      // More aggressive frequency modulation
-      this.uniforms.frequency.value = 2.0 + (audioData.low * 4.5 * frequencyMod);
+      // Standardized reactivity
+      this.uniforms.amplitude.value = 0.8 + (audioData.high * this.reactivityMultiplier);
+      this.uniforms.offsetGain.value = audioData.mid * this.reactivityMultiplier;
+      this.uniforms.frequency.value = 2.0 + (audioData.low * this.reactivityMultiplier);
     } else {
       // Default values when no audio
       this.uniforms.amplitude.value = 0.8;
-      this.uniforms.offsetGain.value = 0;
-      this.uniforms.frequency.value = 2.0;
+      this.uniforms.offsetGain.value = 0.2;
+      this.uniforms.frequency.value = 0.8;
     }
     
-    // Handle beat detection
+    // Consistent beat detection for all shapes
     if (beatDetected) {
-      // Special handling for torusKnot - more dramatic beat effect
-      if (this.currentShape === 'torusKnot') {
-        // Extra dramatic size pulse on beat for torusKnot
-        this.uniforms.size.value = 9 * this.reactivityMultiplier; // Higher than normal (7)
-        this.uniforms.maxDistance.value = 1.0; // Higher than normal (2.5)
-      } else {
-        // Normal beat pulse for other shapes
-        this.uniforms.size.value = 7 * this.reactivityMultiplier;
-        this.uniforms.maxDistance.value = 1.5;
-      }
+      this.uniforms.size.value = 5 * this.reactivityMultiplier;
+      this.uniforms.maxDistance.value = 1.5;
     } else {
-      // Faster return to normal size with smoother transition
-      this.uniforms.size.value = Math.max(2, this.uniforms.size.value * 0.93);
-      this.uniforms.maxDistance.value = Math.max(1.8, this.uniforms.maxDistance.value * 0.95);
+      // Return to normal size
+      this.uniforms.size.value = Math.max(1.5, this.uniforms.size.value * 0.95);
+      this.uniforms.maxDistance.value = Math.max(1.0, this.uniforms.maxDistance.value * 0.95);
     }
   }
   
-  // Add resize method to handle window resizing
+  // Simplified resize method
   resize(width, height) {
-    // Nothing specific to do for particle system on resize
+    // Nothing specific needed
   }
 }
 
-export default ParticleSystem; 
+export default ParticleSystem;
