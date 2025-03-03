@@ -6,7 +6,7 @@ class ParticleSystem {
     this.time = 0;
     this.reactivityMultiplier = 1.0;
     
-    // Shader uniforms setup - simplified to match reference exactly
+    // Shader uniforms setup - match reference exactly
     this.uniforms = {
       time: { value: 0 },
       offsetSize: { value: 2 },
@@ -170,11 +170,16 @@ class ParticleSystem {
         gl_FragColor=vec4(color,circ.r * vDistance);
       }
     `;
+    
+    // Create material immediately so it's ready
+    this.createMaterial();
+    // Create default geometry
+    this.createShapedGeometry('sphere');
   }
 
   async load() {
     try {
-      this.createMaterial();
+      // Material is already created in constructor
       return true;
     } catch (error) {
       console.error('[ParticleSystem] Error loading:', error);
@@ -245,24 +250,32 @@ class ParticleSystem {
       this.geometry.computeVertexNormals();
     }
     
+    // Return the geometry
     return this.geometry;
   }
 
   create() {
+    // Safety check - make sure we have geometry and material
     if (!this.geometry) {
-      this.createShapedGeometry('cube');
+      this.createShapedGeometry('sphere');
     }
     
-    if (this.points) {
-      // If points already exist, just update the geometry
-      this.points.geometry.dispose();
-      this.points.geometry = this.geometry;
-      return this.points;
-    } else {
-      // Create new points with our material
-      this.points = new THREE.Points(this.geometry, this.material);
-      return this.points;
+    if (!this.material) {
+      this.createMaterial();
     }
+    
+    // Clean up previous points
+    if (this.points) {
+      this.points.geometry.dispose();
+    }
+    
+    // Create new points with material and geometry
+    this.points = new THREE.Points(this.geometry, this.material);
+    
+    // Ensure the points are visible
+    this.points.visible = true;
+    
+    return this.points;
   }
 
   update(time, audioData, beatDetected) {
@@ -297,6 +310,11 @@ class ParticleSystem {
       // Return to normal size
       this.uniforms.size.value = Math.max(2, this.uniforms.size.value * 0.95);
     }
+  }
+  
+  // Add resize method to handle window resizing
+  resize(width, height) {
+    // Nothing specific to do for particle system on resize
   }
 }
 
