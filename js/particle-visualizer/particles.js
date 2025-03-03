@@ -214,7 +214,7 @@ class ParticleSystem {
         const cubeDepthSeg = Math.floor(THREE.MathUtils.randInt(20, 120));  // Renamed for clarity
         
         this.geometry = new THREE.BoxGeometry(
-          16, 16, 16, cubeWidthSeg, cubeHeightSeg, cubeDepthSeg
+          18, 18, 18, cubeWidthSeg, cubeHeightSeg, cubeDepthSeg
         );
     
         // Higher offset size like reference
@@ -228,7 +228,7 @@ class ParticleSystem {
         const planeHeightSeg = Math.floor(THREE.MathUtils.randInt(80, 150)); // Renamed for clarity
         
         this.geometry = new THREE.PlaneGeometry(
-          30, 30, planeWidthSeg, planeHeightSeg
+          40, 40, planeWidthSeg, planeHeightSeg
         );
     
         this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(25, 50));
@@ -254,7 +254,7 @@ class ParticleSystem {
         const cylinderHeightSeg = Math.floor(THREE.MathUtils.randInt(64, 128)); // Renamed for clarity
     
         this.geometry = new THREE.CylinderGeometry(
-          12, 12, 24, cylinderRadialSeg, cylinderHeightSeg, true
+          12, 12, 28, cylinderRadialSeg, cylinderHeightSeg, true
         );
     
         this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(45, 65));
@@ -268,15 +268,15 @@ class ParticleSystem {
         
         // Dynamic p,q values with wider range for more interesting patterns
         const knotP = THREE.MathUtils.randInt(2, 5); // Extended range (was 2-3)
-        const knotQ = THREE.MathUtils.randInt(3, 7); // Extended range (was 3-5)
+        const knotQ = THREE.MathUtils.randInt(3, 6); // Extended range (was 3-5)
         
         // Create a larger knot
         this.geometry = new THREE.TorusKnotGeometry(
-          8, 2.2, knotTubularSeg, knotRadialSeg, knotP, knotQ
+          12, 4.8, knotTubularSeg, knotRadialSeg, knotP, knotQ
         );
 
         // Higher offset size for more dramatic effect
-        this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(45, 70));
+        this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(45, 90));
         
         // Store the shape for special handling in update method
         this.currentShape = 'torusKnot';
@@ -289,10 +289,10 @@ class ParticleSystem {
         const sphereHeightSeg = Math.floor(THREE.MathUtils.randInt(40, 80)); // Renamed for clarity
         
         this.geometry = new THREE.SphereGeometry(
-          10, sphereWidthSeg, sphereHeightSeg
+          15, sphereWidthSeg, sphereHeightSeg
         );
     
-        this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(35, 55));
+        this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(35, 65));
         this.currentShape = 'sphere';
         break;
     }
