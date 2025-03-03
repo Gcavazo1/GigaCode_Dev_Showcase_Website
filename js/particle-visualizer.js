@@ -171,8 +171,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       const sliderReactivity = document.getElementById('reactivity-control');
       const reactivityDisplay = document.getElementById('reactivity-value');
       if (sliderReactivity && reactivityDisplay) {
-        sliderReactivity.value = "0.5"; // Default to 0.5 instead of 1.0
-        reactivityDisplay.textContent = "0.5";
+        sliderReactivity.value = "0.8"; // Default to 0.8 instead of 0.5
+        reactivityDisplay.textContent = "0.8";
       }
     }
 
@@ -189,9 +189,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Update the initial values to be set AFTER the visualizer is created
     if (window.particleVisualizer && window.particleVisualizer.particleSystem) {
-      // Set default frequency and amplitude based on lower reactivity
-      window.particleVisualizer.particleSystem.uniforms.frequency.value = 2.0 * 0.5; // 0.5 instead of 1.0
-      window.particleVisualizer.particleSystem.uniforms.amplitude.value = 0.8 * 0.5; // 0.5 instead of 1.0
+      // Set default frequency and amplitude based on higher reactivity
+      window.particleVisualizer.particleSystem.uniforms.frequency.value = 2.0 * 0.8; // 0.8 instead of 0.5
+      window.particleVisualizer.particleSystem.uniforms.amplitude.value = 0.8 * 0.8; // 0.8 instead of 0.5
       window.particleVisualizer.particleSystem.uniforms.offsetGain.value = 0.5;
       window.particleVisualizer.particleSystem.uniforms.maxDistance.value = 1.8;
       
@@ -200,7 +200,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       window.particleVisualizer.particleSystem.uniforms.offsetSize.value = 45; // Default for torusKnot
       
       // Set reactivity multiplier
-      window.particleVisualizer.particleSystem.reactivityMultiplier = 0.5;
+      window.particleVisualizer.particleSystem.reactivityMultiplier = 0.8; // Changed from 0.5
     }
 
     // Now add the terminal-related event handlers that were in the second listener
@@ -344,112 +344,33 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-// Make the terminal draggable for better user experience
-function makeDraggable(element) {
-  // Reset any existing inline styles that might interfere
-  element.style.position = 'fixed';
+// REPLACE makeDraggable with a simpler setup function
+function setupTerminal(element) {
+  // Set the terminal to position absolute so it scrolls with the page
+  element.style.position = 'absolute';
   element.style.right = '20px';
   element.style.top = '50%';
   element.style.transform = 'translateY(-50%)';
   
-  let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-  let isDragging = false;
+  // Remove any existing reset buttons since we don't need them anymore
+  const existingResetButtons = element.querySelectorAll('.terminal-button.reset');
+  existingResetButtons.forEach(btn => btn.remove());
   
-  // Store original position for reset
-  const originalPosition = {
-    top: '50%',
-    right: '20px',
-    transform: 'translateY(-50%)'
-  };
-  
-  const header = element.querySelector('.terminal-header');
-  if (header) {
-    console.log("Setting up draggable on terminal header");
-    header.style.cursor = 'grab'; // Better cursor
-    
-    header.addEventListener('mousedown', dragMouseDown);
-  }
-  
-  function dragMouseDown(e) {
-    e.preventDefault();
-    console.log("Header mousedown - starting drag");
-    
-    // Record starting position
-    isDragging = true;
-    header.style.cursor = 'grabbing';
-    
-    // Get current mouse position
-    pos3 = e.clientX;
-    pos4 = e.clientY;
-    
-    // Add event listeners for drag and end
-    document.addEventListener('mouseup', closeDragElement);
-    document.addEventListener('mousemove', elementDrag);
-  }
-  
-  function elementDrag(e) {
-    if (!isDragging) return;
-    
-    e.preventDefault();
-    console.log("Dragging terminal");
-    
-    // Calculate the new position
-    pos1 = pos3 - e.clientX;
-    pos2 = pos4 - e.clientY;
-    pos3 = e.clientX;
-    pos4 = e.clientY;
-    
-    // Always maintain the element within the viewport
-    const newTop = (element.offsetTop - pos2);
-    const newLeft = (element.offsetLeft - pos1);
-    
-    // Ensure the element stays within the viewport
-    const maxTop = window.innerHeight - header.offsetHeight;
-    const maxLeft = window.innerWidth - header.offsetWidth;
-    
-    // Set the element's new position with constraints
-    element.style.top = Math.min(Math.max(0, newTop), maxTop) + "px";
-    element.style.left = Math.min(Math.max(0, newLeft), maxLeft) + "px";
-    
-    // Reset transform which could interfere with dragging
-    element.style.transform = 'none';
-  }
-  
-  function closeDragElement() {
-    console.log("End of dragging");
-    // Stop moving when mouse button is released
-    isDragging = false;
-    header.style.cursor = 'grab';
-    document.removeEventListener('mouseup', closeDragElement);
-    document.removeEventListener('mousemove', elementDrag);
-  }
-  
-  // Add reset button to return to original position if needed
+  // Ensure the close button works
   const closeButton = element.querySelector('.terminal-button.close');
-  if (closeButton && closeButton.parentNode) {
-    const resetButton = document.createElement('span');
-    resetButton.className = 'terminal-button reset';
-    resetButton.style.backgroundColor = '#ffcc00';
-    resetButton.style.marginLeft = '5px';
-    resetButton.title = 'Reset Position';
+  if (closeButton) {
+    // Remove any existing listeners
+    const newCloseButton = closeButton.cloneNode(true);
+    closeButton.parentNode.replaceChild(newCloseButton, closeButton);
     
-    resetButton.addEventListener('click', (e) => {
-      e.stopPropagation();
-      console.log("Resetting terminal position");
+    // Add new click listener
+    newCloseButton.addEventListener('click', () => {
+      console.log("Close button clicked");
+      element.classList.remove('active');
       
-      // Restore original position
-      if (originalPosition.transform) {
-        element.style.transform = originalPosition.transform;
-      } else {
-        element.style.transform = 'translateY(-50%)';
-      }
-      
-      element.style.top = originalPosition.top;
-      element.style.left = originalPosition.right || '20px';
-      element.style.right = 'auto';
+      // Re-setup the nav button to ensure it works after closing
+      setTimeout(setupVisualizerNavButton, 100);
     });
-    
-    closeButton.parentNode.appendChild(resetButton);
   }
 }
 
@@ -517,38 +438,29 @@ function showVisualizerControls() {
   // Show terminal
   terminal.classList.add('active');
   
-  // Make it draggable
-  makeDraggable(terminal);
+  // Set up terminal (non-draggable version)
+  setupTerminal(terminal);
   
   // Add typing effect
   setTimeout(addTerminalTypingEffect, 300);
   
-  // Add this new section - Setup all controls
+  // Setup all controls
   setupVisualizerControls();
   
-  // Set up close button
-  const closeButton = terminal.querySelector('.terminal-button.close');
-  if (closeButton) {
-    // Remove any existing listeners
-    const newCloseButton = closeButton.cloneNode(true);
-    closeButton.parentNode.replaceChild(newCloseButton, closeButton);
-    
-    // Add new click listener
-    newCloseButton.addEventListener('click', () => {
-      console.log("Close button clicked");
-      terminal.classList.remove('active');
-      
-      // Re-setup the nav button to ensure it works after closing
-      setTimeout(setupVisualizerNavButton, 100);
-    });
-  }
-  
-  // Highlight the active shape button (should be torusKnot by default)
+  // Highlight the active shape button based on current shape
   setTimeout(() => {
-    const torusKnotButton = document.querySelector('[data-shape="torusKnot"]');
-    if (torusKnotButton) {
+    if (window.particleVisualizer && window.particleVisualizer.particleSystem) {
+      const currentShape = window.particleVisualizer.particleSystem.currentShape;
+      console.log(`Initial shape is: ${currentShape}`);
+      
+      // Clear any existing active classes
       document.querySelectorAll('[data-shape]').forEach(btn => btn.classList.remove('active'));
-      torusKnotButton.classList.add('active');
+      
+      // Set the active class on the current shape button
+      const activeButton = document.querySelector(`[data-shape="${currentShape}"]`);
+      if (activeButton) {
+        activeButton.classList.add('active');
+      }
     }
   }, 1500);
 }
@@ -561,6 +473,24 @@ function setupVisualizerControls() {
   const shapeButtons = document.querySelectorAll('.visualizer-terminal .control-buttons [data-shape]');
   console.log(`Found ${shapeButtons.length} shape buttons`);
   
+  // Define a function to update the active button based on current shape
+  function updateActiveShapeButton() {
+    if (window.particleVisualizer && window.particleVisualizer.particleSystem) {
+      const currentShape = window.particleVisualizer.particleSystem.currentShape;
+      console.log(`Updating active button to: ${currentShape}`);
+      
+      // Clear all active classes first
+      shapeButtons.forEach(btn => btn.classList.remove('active'));
+      
+      // Find and highlight the correct button
+      const activeButton = document.querySelector(`.visualizer-terminal .control-buttons [data-shape="${currentShape}"]`);
+      if (activeButton) {
+        activeButton.classList.add('active');
+      }
+    }
+  }
+  
+  // Call this whenever the shape changes
   shapeButtons.forEach(btn => {
     // Remove old listeners by cloning
     const newBtn = btn.cloneNode(true);
@@ -571,19 +501,16 @@ function setupVisualizerControls() {
       const shape = newBtn.getAttribute('data-shape');
       console.log(`Shape button clicked: ${shape}`);
       
-      // Remove active class from all buttons
-      shapeButtons.forEach(b => b.classList.remove('active'));
-      newBtn.classList.add('active');
-      
       // Apply shape change with the new pattern
       if (window.particleVisualizer) {
         try {
           // Create new particles with selected shape
-          // The create method now handles all cleanup internally
-          const particles = window.particleVisualizer.particleSystem.create(shape);
-          
-          // Log success
+          window.particleVisualizer.particleSystem.create(shape);
           console.log(`Created new ${shape} particles`);
+          
+          // Update button highlighting AFTER the shape is created
+          // This ensures we use the actual current shape
+          setTimeout(updateActiveShapeButton, 100);
         } catch (error) {
           console.error("Error changing particle shape:", error);
         }
@@ -591,7 +518,7 @@ function setupVisualizerControls() {
     });
   });
   
-  // Setup for randomize segments button
+  // Also update the button highlighting when the randomize button is clicked
   const randomizeButton = document.getElementById('randomize-segments');
   if (randomizeButton) {
     // Remove existing listeners
@@ -604,6 +531,9 @@ function setupVisualizerControls() {
         try {
           window.particleVisualizer.particleSystem.randomizeCurrentShape();
           console.log("Segments randomized for current shape");
+          
+          // Update button highlighting after randomization
+          updateActiveShapeButton();
         } catch (error) {
           console.error("Error randomizing segments:", error);
         }

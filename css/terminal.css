@@ -184,7 +184,7 @@
 
 /* Add to your terminal.css */
 .visualizer-terminal {
-    position: fixed;
+    position: absolute;
     right: 20px;
     top: 50%;
     transform: translateY(-50%);
@@ -219,7 +219,7 @@
 }
 
 .visualizer-terminal .terminal-header {
-    cursor: move; /* Show that it's draggable */
+    cursor: default;
 }
 
 .terminal-line .command {

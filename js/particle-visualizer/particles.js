@@ -4,8 +4,8 @@ class ParticleSystem {
   constructor(gui) {
     this.name = 'ParticleSystem';
     this.time = 0;
-    this.reactivityMultiplier = 0.01
-    this.currentShape = 'torusKnot';
+    this.reactivityMultiplier = 0.1
+    this.currentShape = 'ring';
     
     // Add counter for randomization
     this.randomizeCounter = 0;
@@ -320,9 +320,9 @@ class ParticleSystem {
       depth: depthSeg,
     };
     
-    this.segmentsFolder.add(this.guiProperties.segments, "width", 5, 30);
-    this.segmentsFolder.add(this.guiProperties.segments, "height", 5, 80);
-    this.segmentsFolder.add(this.guiProperties.segments, "depth", 5, 30);
+    this.segmentsFolder.add(this.guiProperties.segments, "width",25, 80);
+    this.segmentsFolder.add(this.guiProperties.segments, "height",15, 25);
+    this.segmentsFolder.add(this.guiProperties.segments, "depth",25, 80);
     this.segmentsFolder
       .add(this.guiProperties, "randomizeSegments")
       .name("Randomize Segments");
@@ -370,7 +370,7 @@ class ParticleSystem {
       radial: radialSeg,
     };
     
-    this.segmentsFolder.add(this.guiProperties.segments, "height", 32, 192);
+    this.segmentsFolder.add(this.guiProperties.segments, "height", 92, 192);
     this.segmentsFolder.add(this.guiProperties.segments, "radial", 32, 320);
     this.segmentsFolder
       .add(this.guiProperties, "randomizeSegments")
@@ -417,7 +417,7 @@ class ParticleSystem {
     };
     
     this.segmentsFolder.add(this.guiProperties.segments, "width", 20, 100);
-    this.segmentsFolder.add(this.guiProperties.segments, "height", 20, 100);
+    this.segmentsFolder.add(this.guiProperties.segments, "height", 100,300);
     this.segmentsFolder
       .add(this.guiProperties, "randomizeSegments")
       .name("Randomize Segments");
@@ -459,8 +459,8 @@ class ParticleSystem {
       height: heightSeg
     };
     
-    this.segmentsFolder.add(this.guiProperties.segments, "width", 20, 150);
-    this.segmentsFolder.add(this.guiProperties.segments, "height", 20, 150);
+    this.segmentsFolder.add(this.guiProperties.segments, "width", 20, 60);
+    this.segmentsFolder.add(this.guiProperties.segments, "height", 120, 150);
     this.segmentsFolder
       .add(this.guiProperties, "randomizeSegments")
       .name("Randomize Segments");
@@ -482,12 +482,12 @@ class ParticleSystem {
   }
 
   createRing() {
-    let tubeSeg = Math.floor(THREE.MathUtils.randInt(30, 60));
+    let tubeSeg = Math.floor(THREE.MathUtils.randInt(40, 60));
     let radialSeg = Math.floor(THREE.MathUtils.randInt(120, 160));
     
     this.geometry = new THREE.TorusGeometry(
-      18,
-      8,
+      17,
+      7,
       tubeSeg,
       radialSeg
     );
@@ -503,8 +503,8 @@ class ParticleSystem {
       radial: radialSeg
     };
     
-    this.segmentsFolder.add(this.guiProperties.segments, "tube", 5, 20);
-    this.segmentsFolder.add(this.guiProperties.segments, "radial", 50, 70);
+    this.segmentsFolder.add(this.guiProperties.segments, "tube",75,120);
+    this.segmentsFolder.add(this.guiProperties.segments, "radial", 40, 60);
     this.segmentsFolder
       .add(this.guiProperties, "randomizeSegments")
       .name("Randomize Segments");
@@ -555,8 +555,8 @@ class ParticleSystem {
     
     this.segmentsFolder.add(this.guiProperties.segments, "tube", 20, 150);
     this.segmentsFolder.add(this.guiProperties.segments, "radial", 50, 250);
-    this.segmentsFolder.add(this.guiProperties.segments, "p", 1, 5, 1);
-    this.segmentsFolder.add(this.guiProperties.segments, "q", 1, 7, 1);
+    this.segmentsFolder.add(this.guiProperties.segments, "p", 1, 2, 5);
+    this.segmentsFolder.add(this.guiProperties.segments, "q", 3, 7, 2);
     this.segmentsFolder
       .add(this.guiProperties, "randomizeSegments")
       .name("Randomize Segments");
