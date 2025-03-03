@@ -11,9 +11,9 @@ class ParticleSystem {
     this.uniforms = {
       time: { value: 0 },
       offsetSize: { value: 1.7 },
-      size: { value: 1.2 },
+      size: { value: 1.5},
       frequency: { value: 2.5 },
-      amplitude: { value: 0.8 },
+      amplitude: { value: 0.4},
       offsetGain: { value: 0.4 },
       maxDistance: { value: 1.5 },
       startColor: { value: new THREE.Color(0xff00ff) }, // Magenta
@@ -230,14 +230,14 @@ class ParticleSystem {
         break;
     
       case 'cylinder':
-        this.geometry = new THREE.CylinderGeometry(12, 12, 28, 80, 80, true);
+        this.geometry = new THREE.CylinderGeometry(12, 12, 56,120, 80, true);
         this.uniforms.offsetSize.value = 25;
         this.currentShape = 'cylinder';
         break;
       
       case 'torusKnot':
-        this.geometry = new THREE.TorusKnotGeometry(12, 8, 450, 120, 5, 3);
-        this.uniforms.offsetSize.value = 55;
+        this.geometry = new THREE.TorusKnotGeometry(10, 8, 250,200, 2, 4);
+        this.uniforms.offsetSize.value = 35;
         this.currentShape = 'torusKnot';
         break;
     
