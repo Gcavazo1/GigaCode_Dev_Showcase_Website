@@ -7,6 +7,10 @@ class ParticleSystem {
     this.reactivityMultiplier = 0.01
     this.currentShape = 'torusKnot';
     
+    // Add counter for randomization
+    this.randomizeCounter = 0;
+    this.maxRandomizations = 3; // Maximum number of randomizations before reset
+    
     // Store the GUI instance
     this.gui = gui || {
       addFolder: () => ({
@@ -37,9 +41,9 @@ class ParticleSystem {
       offsetSize: { value: 2 },
       size: { value: 2 },
       frequency: { value: 2 },
-      amplitude: { value: 0.8 },
-      offsetGain: { value: 0.4 },
-      maxDistance: { value: 1.8 },
+      amplitude: { value: 0.5 },
+      offsetGain: { value: 0.5 },
+      maxDistance: { value: 2 },
       startColor: { value: new THREE.Color(0xff00ff) }, // Magenta
       endColor: { value: new THREE.Color(0x00ffff) },   // Cyan
     };
@@ -223,8 +227,35 @@ class ParticleSystem {
   }
 
   randomizeCurrentShape() {
+    // Increment counter
+    this.randomizeCounter++;
+    
+    // Check if we need to do a full reset
+    if (this.randomizeCounter > this.maxRandomizations) {
+      console.log("Maximum randomizations reached, performing full reset");
+      this.randomizeCounter = 1; // Reset counter (1 because we're doing a randomization now)
+      
+      // Do a more thorough cleanup
+      this.fullCleanup();
+    }
+    
+    // Store current shape
+    const currentShape = this.currentShape;
+    
+    // Clear existing point mesh
+    if (this.pointsMesh) {
+      this.holder.remove(this.pointsMesh);
+      this.pointsMesh = null;
+    }
+    
+    // Dispose of existing geometry
+    if (this.geometry) {
+      this.geometry.dispose();
+      this.geometry = null;
+    }
+    
     // Call the appropriate shape creation method based on current shape
-    switch (this.currentShape) {
+    switch (currentShape) {
       case 'cube':
         this.createCube();
         break;
@@ -247,6 +278,23 @@ class ParticleSystem {
   }
 
   createCube() {
+    // Log current randomization count when creating shape
+    if (this.randomizeCounter > 0) {
+      console.log(`Cube randomization #${this.randomizeCounter} of ${this.maxRandomizations}`);
+    }
+    
+    // Clean up any existing pointsMesh first
+    if (this.pointsMesh) {
+      this.holder.remove(this.pointsMesh);
+      this.pointsMesh = null;
+    }
+    
+    // Clean up any existing geometry
+    if (this.geometry) {
+      this.geometry.dispose();
+    }
+    
+    // Now create the new geometry
     let widthSeg = Math.floor(THREE.MathUtils.randInt(15,20));
     let heightSeg = Math.floor(THREE.MathUtils.randInt(20, 40));
     let depthSeg = Math.floor(THREE.MathUtils.randInt(10, 60));
@@ -532,9 +580,21 @@ class ParticleSystem {
   }
 
   create(shapeType = 'torusKnot') {
-    // Clean up previous points
+    // Reset randomization counter when changing shapes
+    this.randomizeCounter = 0;
+    
+    // More thorough cleanup before creating a new shape
+    
+    // First, remove the existing pointsMesh from the holder
     if (this.pointsMesh) {
       this.holder.remove(this.pointsMesh);
+      this.pointsMesh = null; // Clear the reference
+    }
+    
+    // Also dispose of any existing geometry to prevent memory leaks
+    if (this.geometry) {
+      this.geometry.dispose();
+      this.geometry = null; // Clear the reference
     }
     
     // Create new shape based on type
@@ -615,6 +675,37 @@ class ParticleSystem {
   // Simplified resize method
   resize(width, height) {
     // Nothing specific needed
+  }
+
+  // Add a more thorough cleanup method
+  fullCleanup() {
+    // Remove all children from holder
+    while(this.holder.children.length > 0) {
+      const child = this.holder.children[0];
+      if (child.geometry) {
+        child.geometry.dispose();
+      }
+      if (child.material) {
+        child.material.dispose();
+      }
+      this.holder.remove(child);
+    }
+    
+    // Reset holder
+    this.holder = new THREE.Object3D();
+    this.holder.name = 'particle-holder';
+    
+    // Reset pointsMesh reference
+    this.pointsMesh = null;
+    
+    // Reset geometry
+    if (this.geometry) {
+      this.geometry.dispose();
+      this.geometry = null;
+    }
+    
+    // Create fresh material
+    this.createMaterial();
   }
 }
 

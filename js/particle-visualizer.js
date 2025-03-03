@@ -578,17 +578,12 @@ function setupVisualizerControls() {
       // Apply shape change with the new pattern
       if (window.particleVisualizer) {
         try {
-          // First clean up existing particles
-          window.particleVisualizer.holder.remove(window.particleVisualizer.particleSystem.holder);
-          
           // Create new particles with selected shape
+          // The create method now handles all cleanup internally
           const particles = window.particleVisualizer.particleSystem.create(shape);
           
-          // Add to scene if successful
-          if (particles) {
-            window.particleVisualizer.holder.add(particles);
-            console.log(`Created new ${shape} particles`);
-          }
+          // Log success
+          console.log(`Created new ${shape} particles`);
         } catch (error) {
           console.error("Error changing particle shape:", error);
         }
