@@ -438,7 +438,7 @@ class ParticleSystem {
     let radialSeg = Math.floor(THREE.MathUtils.randInt(50, 200));
     
     this.geometry = new THREE.TorusGeometry(
-      14
+      14,
       5,
       tubeSeg,
       radialSeg
