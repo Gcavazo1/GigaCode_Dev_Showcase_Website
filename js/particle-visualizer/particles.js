@@ -369,7 +369,7 @@ class ParticleSystem {
       this.uniforms.offsetGain.value = audioData.mid * 2.5 * offsetMod;
       
       // More aggressive frequency modulation
-      this.uniforms.frequency.value = 1.0 + (audioData.low * 4.5 * frequencyMod);
+      this.uniforms.frequency.value = 2.0 + (audioData.low * 4.5 * frequencyMod);
     } else {
       // Default values when no audio
       this.uniforms.amplitude.value = 0.8;
