@@ -6,8 +6,8 @@ class BeatDetector {
     this.minBeatInterval = 200; // Minimum ms between beats
     
     this.prevLowValue = 0;
-    this.energyHistory = Array(8).fill(0);
-    this.energyIndex = 0;
+    this.energy = 0;
+    this.lastEnergy = 0;
     this.lastBeatTime = 0;
     
     this.onBeat = null; // Callback for beat detection
@@ -19,13 +19,10 @@ class BeatDetector {
     // Focus on low frequencies for better beat detection
     const value = audioData.low;
     
-    // Calculate energy with a higher weight
+    // Calculate energy
     this.energy = value * value * 1.5;
     
-    // Lower threshold for more responsiveness
-    this.threshold = 0.15; 
-    
-    // More sensitive beat detection
+    // Check if it's a beat - using a dynamic threshold based on previous energy
     const isBeat = this.energy > this.threshold && 
                    this.energy > this.lastEnergy * 1.1 && 
                    currentTime > this.lastBeatTime + this.minBeatInterval;

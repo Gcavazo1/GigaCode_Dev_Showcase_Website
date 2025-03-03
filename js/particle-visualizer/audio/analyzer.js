@@ -5,16 +5,16 @@ class AudioAnalyzer {
       mid: 0,
       high: 0
     };
-    this.smoothingFactor = 0.4; // Less smoothing = more responsive (was 0.6)
+    this.smoothingFactor = 0.4;
     this.audioContext = null;
     this.analyser = null;
     this.dataArray = null;
     this.isConnected = false;
     
-    // Frequency ranges (in Hz)
+    // Frequency ranges (in Hz) - match the reference
     this.frequencyRanges = {
-      low: [20, 250],    // Bass
-      mid: [250, 2000],  // Midrange
+      low: [10, 250],     // Bass
+      mid: [250, 2000],   // Midrange
       high: [2000, 20000] // Treble
     };
   }
@@ -30,10 +30,10 @@ class AudioAnalyzer {
         
         // Create analyzer node with more sensitive settings
         this.analyser = this.audioContext.createAnalyser();
-        this.analyser.fftSize = 2048; // Increased from 1024
-        this.analyser.smoothingTimeConstant = 0.3; // More responsive
-        this.analyser.minDecibels = -90; // Detect quieter sounds
-        this.analyser.maxDecibels = -10; // Better dynamic range
+        this.analyser.fftSize = 2048;
+        this.analyser.smoothingTimeConstant = 0.3;
+        this.analyser.minDecibels = -90;
+        this.analyser.maxDecibels = -10;
         this.bufferLength = this.analyser.frequencyBinCount;
         this.dataArray = new Uint8Array(this.bufferLength);
         
@@ -43,15 +43,15 @@ class AudioAnalyzer {
         this.isConnected = true;
         return true;
       } else {
-        // Continue with original code to create a new context
+        // Create a new context
         this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
         
-        // Create analyzer node with more sensitive settings
+        // Create analyzer node
         this.analyser = this.audioContext.createAnalyser();
-        this.analyser.fftSize = 2048; // Increased from 1024
-        this.analyser.smoothingTimeConstant = 0.3; // More responsive
-        this.analyser.minDecibels = -90; // Detect quieter sounds
-        this.analyser.maxDecibels = -10; // Better dynamic range
+        this.analyser.fftSize = 2048;
+        this.analyser.smoothingTimeConstant = 0.3;
+        this.analyser.minDecibels = -90;
+        this.analyser.maxDecibels = -10;
         this.bufferLength = this.analyser.frequencyBinCount;
         this.dataArray = new Uint8Array(this.bufferLength);
         

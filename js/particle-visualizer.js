@@ -85,20 +85,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Apply shape change if visualizer exists
         if (window.particleVisualizer && window.particleVisualizer.particleSystem) {
+          // First remove old points from holder
+          if (window.particleVisualizer.particleSystem.points) {
+            window.particleVisualizer.holder.remove(window.particleVisualizer.particleSystem.points);
+          }
+          
           // Create new geometry with selected shape
           window.particleVisualizer.particleSystem.createShapedGeometry(shape);
           
-          // Force recreate the points with the new geometry
-          if (window.particleVisualizer.particleSystem.points) {
-            // Remove old points
-            window.particleVisualizer.scene.remove(window.particleVisualizer.particleSystem.points);
-            window.particleVisualizer.particleSystem.points.geometry.dispose();
-            window.particleVisualizer.particleSystem.points = null;
-          }
-          
-          // Create new points and add to scene
+          // Create new points and add to holder
           const particles = window.particleVisualizer.particleSystem.create();
-          window.particleVisualizer.scene.add(particles);
+          window.particleVisualizer.holder.add(particles);
           
           console.log(`[Visualizer] Shape changed to ${shape}`);
         }
@@ -124,8 +121,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const startColor = new THREE.Color(htmlColorToHex(startColorPicker.value));
         const endColor = new THREE.Color(htmlColorToHex(endColorPicker.value));
         
-        uniforms.startColor.value.copy(startColor);
-        uniforms.endColor.value.copy(endColor);
+        uniforms.startColor.value = startColor;
+        uniforms.endColor.value = endColor;
       }
     }
     
@@ -144,9 +141,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const size = parseFloat(sizeSlider.value);
         sizeValue.textContent = size;
         
-        // Directly set the size value - don't rely on particleSize
         if (window.particleVisualizer && window.particleVisualizer.particleSystem) {
-          window.particleVisualizer.particleSystem.uniforms.size.value = size / 10; // Scale down to match reference
+          // Directly set the size uniform value (divide by 10 to match reference scale)
+          window.particleVisualizer.particleSystem.uniforms.size.value = size / 10;
         }
       });
     }
@@ -161,10 +158,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         reactivityValue.textContent = reactivity.toFixed(1);
         
         if (window.particleVisualizer && window.particleVisualizer.particleSystem) {
-          // Update reactivity
+          // Set reactivity multiplier
           window.particleVisualizer.particleSystem.reactivityMultiplier = reactivity;
           
-          // Directly update frequency and amplitude to match
+          // Also update base values according to reactivity
           window.particleVisualizer.particleSystem.uniforms.frequency.value = 2.0 * reactivity;
           window.particleVisualizer.particleSystem.uniforms.amplitude.value = 0.8 * reactivity;
         }
@@ -186,15 +183,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // Add this after we create visualizer
+  // Add this after we create visualizer to ensure it's using our reference values
   // Set initial control values to match reference
   if (window.particleVisualizer && window.particleVisualizer.particleSystem) {
     // Set initial frequency and amplitude
     window.particleVisualizer.particleSystem.uniforms.frequency.value = 2.0;
     window.particleVisualizer.particleSystem.uniforms.amplitude.value = 0.8;
     window.particleVisualizer.particleSystem.uniforms.offsetGain.value = 0.5;
+    window.particleVisualizer.particleSystem.uniforms.maxDistance.value = 1.8;
     
     // Make sure size is properly initialized
     window.particleVisualizer.particleSystem.uniforms.size.value = 2.0;
+    window.particleVisualizer.particleSystem.uniforms.offsetSize.value = 2.0;
   }
 });
