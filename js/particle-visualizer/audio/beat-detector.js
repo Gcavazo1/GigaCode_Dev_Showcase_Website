@@ -1,9 +1,9 @@
 class BeatDetector {
   constructor() {
-    this.sensitivity = 1.5;
-    this.threshold = 0.15;
+    this.sensitivity = 1.8;
+    this.threshold = 0.12;
     this.decayRate = 0.01;
-    this.minBeatInterval = 200; // Minimum ms between beats
+    this.minBeatInterval = 180; // Minimum ms between beats
     
     this.prevLowValue = 0;
     this.energy = 0;

@@ -212,36 +212,57 @@ class ParticleSystem {
         const heightSeg = Math.floor(THREE.MathUtils.randInt(1, 40)); 
         const depthSeg = Math.floor(THREE.MathUtils.randInt(5, 80));
         
+        // Increase the size to 5 (from 1) to match other shapes' scale
         this.geometry = new THREE.BoxGeometry(
-          1, 1, 1, widthSeg, heightSeg, depthSeg
+          5, 5, 5, widthSeg, heightSeg, depthSeg
         );
+        
+        // Set appropriate offset size for cube
+        this.uniforms.offsetSize.value = 30;
         break;
         
       case 'plane':
+        // Increase segments for more detail
         this.geometry = new THREE.PlaneGeometry(
-          10, 10, 30, 30
+          10, 10, 50, 50
         );
+        
+        // Set appropriate offset size for plane
+        this.uniforms.offsetSize.value = 15;
         break;
         
       case 'ring':
+        // Increase tube radius slightly for better visibility
         this.geometry = new THREE.TorusGeometry(
-          5, 0.5, 16, 100
+          5, 0.8, 20, 120
         );
+        
+        // Set appropriate offset size for ring
+        this.uniforms.offsetSize.value = 20;
         break;
         
       case 'cylinder':
         const radialSegments = 64;
         const heightSegments = 64;
+        
+        // Increase radius and height to match other shapes
         this.geometry = new THREE.CylinderGeometry(
-          1, 1, 4, radialSegments, heightSegments, true
+          4, 4, 8, radialSegments, heightSegments, true
         );
+        
+        // Set appropriate offset size for cylinder
+        this.uniforms.offsetSize.value = 30;
         break;
         
       case 'sphere':
       default:
+        // Increase detail for sphere
         this.geometry = new THREE.SphereGeometry(
-          5, 32, 32
+          5, 40, 40
         );
+        
+        // Set appropriate offset size for sphere
+        this.uniforms.offsetSize.value = 20;
         break;
     }
     
@@ -250,7 +271,6 @@ class ParticleSystem {
       this.geometry.computeVertexNormals();
     }
     
-    // Return the geometry
     return this.geometry;
   }
 
@@ -287,28 +307,36 @@ class ParticleSystem {
     
     // Apply audio data to key uniforms
     if (audioData) {
-      // Update amplitude based on high frequencies (exactly like reference)
+      // Enhanced amplitude reactivity - more dramatic range
       this.uniforms.amplitude.value = 0.8 + THREE.MathUtils.mapLinear(
         audioData.high * this.reactivityMultiplier, 
         0, 0.6, 
-        -0.1, 0.3
+        -0.1, 0.6  // Increased upper range from 0.3 to 0.6
       );
       
-      // Update offset gain based on mid frequencies
-      this.uniforms.offsetGain.value = audioData.mid * 0.6 * this.reactivityMultiplier;
+      // More dramatic offset gain based on mid frequencies
+      this.uniforms.offsetGain.value = audioData.mid * 1.5 * this.reactivityMultiplier;
+      
+      // Add frequency modulation based on low frequencies 
+      this.uniforms.frequency.value = 2.0 + (audioData.low * 3.0 * this.reactivityMultiplier);
     } else {
       // Default values when no audio
       this.uniforms.amplitude.value = 0.8;
       this.uniforms.offsetGain.value = 0;
+      this.uniforms.frequency.value = 2.0;
     }
     
-    // Handle beat detection
+    // Handle beat detection with more dramatic effect
     if (beatDetected) {
-      // Pulse the size on beat
-      this.uniforms.size.value = 4;
+      // Pulse the size on beat - more dramatic
+      this.uniforms.size.value = 5 * this.reactivityMultiplier;
+      
+      // Also pulse the maxDistance for more dramatic effect on beat
+      this.uniforms.maxDistance.value = 2.2;
     } else {
-      // Return to normal size
+      // Return to normal size with smoother transition
       this.uniforms.size.value = Math.max(2, this.uniforms.size.value * 0.95);
+      this.uniforms.maxDistance.value = Math.max(1.8, this.uniforms.maxDistance.value * 0.97);
     }
   }
   

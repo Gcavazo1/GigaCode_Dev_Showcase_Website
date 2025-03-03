@@ -5,15 +5,15 @@ class AudioAnalyzer {
       mid: 0,
       high: 0
     };
-    this.smoothingFactor = 0.4;
+    this.smoothingFactor = 0.3;
     this.audioContext = null;
     this.analyser = null;
     this.dataArray = null;
     this.isConnected = false;
     
-    // Frequency ranges (in Hz) - match the reference
+    // Frequency ranges (in Hz) - adjust low range for better beat detection
     this.frequencyRanges = {
-      low: [10, 250],     // Bass
+      low: [5, 250],     // Bass (lowered from 10 to 5)
       mid: [250, 2000],   // Midrange
       high: [2000, 20000] // Treble
     };
@@ -31,7 +31,7 @@ class AudioAnalyzer {
         // Create analyzer node with more sensitive settings
         this.analyser = this.audioContext.createAnalyser();
         this.analyser.fftSize = 2048;
-        this.analyser.smoothingTimeConstant = 0.3;
+        this.analyser.smoothingTimeConstant = 0.25;
         this.analyser.minDecibels = -90;
         this.analyser.maxDecibels = -10;
         this.bufferLength = this.analyser.frequencyBinCount;
@@ -49,7 +49,7 @@ class AudioAnalyzer {
         // Create analyzer node
         this.analyser = this.audioContext.createAnalyser();
         this.analyser.fftSize = 2048;
-        this.analyser.smoothingTimeConstant = 0.3;
+        this.analyser.smoothingTimeConstant = 0.25;
         this.analyser.minDecibels = -90;
         this.analyser.maxDecibels = -10;
         this.bufferLength = this.analyser.frequencyBinCount;
