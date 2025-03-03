@@ -271,6 +271,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   } catch (error) {
     console.error("Error initializing visualizer:", error);
   }
+
+  // Show visualizer controls automatically after a delay
+  setTimeout(() => {
+    console.log("Auto-showing visualizer controls");
+    showVisualizerControls();
+  }, 2000); // Show after 2 seconds
 });
 
 // Make the terminal draggable for better user experience

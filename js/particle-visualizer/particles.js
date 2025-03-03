@@ -225,7 +225,7 @@ class ParticleSystem {
         );
     
         // Higher offset size like reference
-        this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(50, 90));
+        this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(30, 50));
         this.currentShape = 'cube';
         break;
     
@@ -238,7 +238,7 @@ class ParticleSystem {
           50, 50, planeWidthSeg, planeHeightSeg
         );
     
-        this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(35, 70));
+        this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(25, 50));
         this.currentShape = 'plane';
         break;
     
@@ -264,7 +264,7 @@ class ParticleSystem {
           12, 12, 28, cylinderRadialSeg, cylinderHeightSeg, true
         );
     
-        this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(45, 65));
+        this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(25, 50));
         this.currentShape = 'cylinder';
         break;
       
@@ -274,7 +274,7 @@ class ParticleSystem {
         const knotRadialSeg = Math.floor(THREE.MathUtils.randInt(30, 60)); // Doubled for more particles
         
         // Dynamic p,q values with wider range for more interesting patterns
-        const knotP = THREE.MathUtils.randInt(2, 5); // Extended range (was 2-3)
+        const knotP = THREE.MathUtils.randInt(3, 5); // Extended range (was 2-3)
         const knotQ = THREE.MathUtils.randInt(3, 6); // Extended range (was 3-5)
         
         // Create a larger knot
@@ -283,7 +283,7 @@ class ParticleSystem {
         );
 
         // Higher offset size for more dramatic effect
-        this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(45, 90));
+        this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(25, 50));
         
         // Store the shape for special handling in update method
         this.currentShape = 'torusKnot';
