@@ -20,7 +20,6 @@ class ParticleSystem {
     this.uniforms = {
       uTime: { value: 0 },
       uSize: { value: this.particleSize },
-      uColor: { value: new THREE.Color(0x08f7fe) },
       uFrequencyData: { value: new Float32Array(128).fill(0) },
       uBassFrequency: { value: 0.0 },
       uMidFrequency: { value: 0.0 },
@@ -77,6 +76,7 @@ class ParticleSystem {
           varying vec3 vPosition;
           varying float vScale;
           varying float vDistance;
+          varying vec3 vColor;
           
           void main() {
             vec3 pos = position;
@@ -97,6 +97,9 @@ class ParticleSystem {
             float distance = length(pos - position) / uMaxDistance;
             vDistance = clamp(distance, 0.0, 1.0);
             
+            // Assign either startColor or endColor based on distance threshold
+            vColor = distance > 0.5 ? endColor : startColor;
+            
             vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
             gl_Position = projectionMatrix * mvPosition;
             
@@ -110,9 +113,7 @@ class ParticleSystem {
         `;
         
         fragmentShader = `
-          uniform vec3 startColor;
-          uniform vec3 endColor;
-          
+          varying vec3 vColor;
           varying float vDistance;
           
           float circle(in vec2 _st, in float _radius) {
@@ -123,10 +124,12 @@ class ParticleSystem {
           }
           
           void main() {
+            float alpha = 1.0;
             vec2 uv = vec2(gl_PointCoord.x, 1.0 - gl_PointCoord.y);
-            vec3 circ = vec3(circle(uv, 1.));
-            vec3 color = mix(startColor, endColor, vDistance);
-            gl_FragColor = vec4(color, circ.r * vDistance);
+            vec3 circ = vec3(circle(uv, 1.0));
+            
+            // Use the color directly from vertex shader, no interpolation
+            gl_FragColor = vec4(vColor, circ.r * vDistance);
           }
         `;
       }
