@@ -4,7 +4,7 @@ class ParticleSystem {
   constructor(gui) {
     this.name = 'ParticleSystem';
     this.time = 0;
-    this.reactivityMultiplier = 0.5;
+    this.reactivityMultiplier = 0.1;
     this.currentShape = 'torusKnot';
     
     // Store the GUI instance
@@ -252,9 +252,9 @@ class ParticleSystem {
     let depthSeg = Math.floor(THREE.MathUtils.randInt(5, 80));
     
     this.geometry = new THREE.BoxGeometry(
-      1,
-      1,
-      1,
+      20,
+      20,
+      20,
       widthSeg,
       heightSeg,
       depthSeg
@@ -282,9 +282,9 @@ class ParticleSystem {
     this.segmentsFolder.onChange(() => {
       this.holder.remove(this.pointsMesh);
       this.geometry = new THREE.BoxGeometry(
-        1,
-        1,
-        1,
+        20,
+        20,
+        20,
         this.guiProperties.segments.width,
         this.guiProperties.segments.height,
         this.guiProperties.segments.depth
@@ -294,7 +294,7 @@ class ParticleSystem {
     });
     
     this.currentShape = 'cube';
-    this.uniforms.offsetSize.value = 30;
+    this.uniforms.offsetSize.value = 60;
   }
 
   createCylinder() {
@@ -302,9 +302,9 @@ class ParticleSystem {
     let heightSeg = Math.floor(THREE.MathUtils.randInt(64, 320));
     
     this.geometry = new THREE.CylinderGeometry(
-      1,
-      1,
-      4,
+      8,
+      8,
+      42,
       radialSeg,
       heightSeg,
       true
@@ -331,9 +331,9 @@ class ParticleSystem {
     this.segmentsFolder.onChange(() => {
       this.holder.remove(this.pointsMesh);
       this.geometry = new THREE.CylinderGeometry(
-        1,
-        1,
-        4,
+        8,
+        8,
+        42,
         this.guiProperties.segments.radial,
         this.guiProperties.segments.height,
         true
@@ -344,7 +344,7 @@ class ParticleSystem {
     });
     
     this.currentShape = 'cylinder';
-    this.uniforms.offsetSize.value = 25;
+    this.uniforms.offsetSize.value = 50;
   }
 
   createSphere() {
@@ -352,7 +352,7 @@ class ParticleSystem {
     let heightSeg = Math.floor(THREE.MathUtils.randInt(20, 100));
     
     this.geometry = new THREE.SphereGeometry(
-      1,
+      15,
       widthSeg,
       heightSeg
     );
@@ -377,7 +377,7 @@ class ParticleSystem {
     this.segmentsFolder.onChange(() => {
       this.holder.remove(this.pointsMesh);
       this.geometry = new THREE.SphereGeometry(
-        1,
+        15,
         this.guiProperties.segments.width,
         this.guiProperties.segments.height
       );
@@ -386,7 +386,7 @@ class ParticleSystem {
     });
     
     this.currentShape = 'sphere';
-    this.uniforms.offsetSize.value = 35;
+    this.uniforms.offsetSize.value = 70;
   }
 
   createPlane() {
@@ -394,8 +394,8 @@ class ParticleSystem {
     let heightSeg = Math.floor(THREE.MathUtils.randInt(50, 150));
     
     this.geometry = new THREE.PlaneGeometry(
-      2,
-      2,
+      50,
+      50,
       widthSeg,
       heightSeg
     );
@@ -420,8 +420,8 @@ class ParticleSystem {
     this.segmentsFolder.onChange(() => {
       this.holder.remove(this.pointsMesh);
       this.geometry = new THREE.PlaneGeometry(
-        2,
-        2,
+        50,
+        50,
         this.guiProperties.segments.width,
         this.guiProperties.segments.height
       );
@@ -430,7 +430,7 @@ class ParticleSystem {
     });
     
     this.currentShape = 'plane';
-    this.uniforms.offsetSize.value = 25;
+    this.uniforms.offsetSize.value = 50;
   }
 
   createRing() {
@@ -438,8 +438,8 @@ class ParticleSystem {
     let radialSeg = Math.floor(THREE.MathUtils.randInt(50, 200));
     
     this.geometry = new THREE.TorusGeometry(
-      1,
-      0.3,
+      14
+      5,
       tubeSeg,
       radialSeg
     );
@@ -464,8 +464,8 @@ class ParticleSystem {
     this.segmentsFolder.onChange(() => {
       this.holder.remove(this.pointsMesh);
       this.geometry = new THREE.TorusGeometry(
-        1,
-        0.3,
+        14,
+        5,
         this.guiProperties.segments.tube,
         this.guiProperties.segments.radial
       );
@@ -474,7 +474,7 @@ class ParticleSystem {
     });
     
     this.currentShape = 'ring';
-    this.uniforms.offsetSize.value = 35;
+    this.uniforms.offsetSize.value = 70;
   }
 
   createTorusKnot() {
@@ -484,8 +484,8 @@ class ParticleSystem {
     let q = Math.floor(THREE.MathUtils.randInt(3, 7));
     
     this.geometry = new THREE.TorusKnotGeometry(
-      1,
-      0.3,
+      12,
+      5,
       tubeSeg,
       radialSeg,
       p,
@@ -516,8 +516,8 @@ class ParticleSystem {
     this.segmentsFolder.onChange(() => {
       this.holder.remove(this.pointsMesh);
       this.geometry = new THREE.TorusKnotGeometry(
-        1,
-        0.3,
+        12,
+        5,
         this.guiProperties.segments.tube,
         this.guiProperties.segments.radial,
         this.guiProperties.segments.p,
@@ -528,7 +528,7 @@ class ParticleSystem {
     });
     
     this.currentShape = 'torusKnot';
-    this.uniforms.offsetSize.value = 35;
+    this.uniforms.offsetSize.value = 70;
   }
 
   create(shapeType = 'torusKnot') {
