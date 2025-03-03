@@ -10,8 +10,15 @@ class ParticleSystem {
     // Store the GUI instance
     this.gui = gui || {
       addFolder: () => ({
-        add: () => ({ onChange: () => {} }),
+        add: () => ({ 
+          onChange: () => {},
+          name: (n) => { return { onChange: () => {} }; }
+        }),
         destroy: () => {}
+      }),
+      add: () => ({ 
+        onChange: () => {},
+        name: (n) => { return { onChange: () => {} }; }
       })
     };
     

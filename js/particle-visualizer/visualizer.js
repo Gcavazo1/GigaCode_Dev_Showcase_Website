@@ -64,7 +64,13 @@ class ParticleVisualizer {
             return {
               add: (obj, prop, min, max) => {
                 console.log(`Added GUI control for ${prop}`);
-                return { onChange: (fn) => {} };
+                return { 
+                  onChange: (fn) => {},
+                  name: (n) => { 
+                    console.log(`Named control: ${n}`); 
+                    return { onChange: (fn) => {} }; 
+                  }
+                };
               },
               onChange: (fn) => {},
               destroy: () => {}
@@ -72,7 +78,13 @@ class ParticleVisualizer {
           },
           add: (obj, prop, min, max) => {
             console.log(`Added GUI control for ${prop}`);
-            return { onChange: (fn) => {} };
+            return { 
+              onChange: (fn) => {},
+              name: (n) => { 
+                console.log(`Named control: ${n}`); 
+                return { onChange: (fn) => {} }; 
+              }
+            };
           },
           onChange: (fn) => {},
           destroy: () => {}

@@ -339,16 +339,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Add this to your DOMContentLoaded event, where other setup functions are called
     setupVisualizerNavButton();
 
-    // And make sure to add a call to re-setup the nav button after the terminal is closed
-    // Modify the close button event handler in showVisualizerControls:
-    newCloseButton.addEventListener('click', () => {
-      console.log("Close button clicked");
-      terminal.classList.remove('active');
-      
-      // Re-setup the nav button to ensure it works after closing
-      setTimeout(setupVisualizerNavButton, 100);
-    });
-
   } catch (error) {
     console.error("Error initializing visualizer:", error);
   }
