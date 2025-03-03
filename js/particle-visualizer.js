@@ -1,14 +1,23 @@
+// Add debug logs at key points
+console.log("Particle visualizer script loaded");
+
 // Merge the two DOMContentLoaded listeners to avoid race conditions
 document.addEventListener('DOMContentLoaded', async () => {
+  console.log("DOMContentLoaded event triggered for visualizer");
+  
   // First section: Dynamic import and setup of visualizer 
   try {
+    console.log("Attempting to import visualizer module");
     // Dynamically import the visualizer module
     const { default: ParticleVisualizer } = await import('./particle-visualizer/visualizer.js');
+    console.log("Module imported successfully");
     
     const visualizer = new ParticleVisualizer();
+    console.log("Visualizer instance created");
     
     // Make it globally accessible
     window.particleVisualizer = visualizer;
+    console.log("Visualizer attached to window object");
     
     // Connect to audio player when it exists
     const connectToAudioPlayer = () => {
@@ -288,6 +297,44 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Updated minimize button functionality
     setupMinimizeButton();
     
+    // Inside the main DOMContentLoaded event, add:
+    console.log("Setting up visualizer nav button");
+    const visualizerNavButton = document.getElementById('visualizer-nav-button');
+    if (visualizerNavButton) {
+      console.log("Found visualizer nav button, adding click handler");
+      visualizerNavButton.addEventListener('click', (e) => {
+        e.preventDefault(); // Prevent the default anchor behavior
+        console.log("Visualizer button clicked");
+        showVisualizerControls();
+      });
+    }
+    
+    // In the main DOMContentLoaded event, setup the audio terminal observer:
+    console.log("Setting up audio terminal observer");
+    const audioTerminalObserver = new MutationObserver((mutations) => {
+      console.log("Mutation detected, checking for audio terminal changes");
+      mutations.forEach(mutation => {
+        // Look for removed nodes that might be the audio terminal
+        if (mutation.removedNodes && mutation.removedNodes.length) {
+          for (let i = 0; i < mutation.removedNodes.length; i++) {
+            const node = mutation.removedNodes[i];
+            console.log("Checking removed node:", node);
+            if (node.classList && (
+                node.classList.contains('music-terminal') || 
+                node.classList.contains('powershell-music') || 
+                node.classList.contains('audio-terminal')
+              )) {
+              console.log('Audio terminal closed, showing visualizer');
+              // Audio terminal was closed, show our visualizer with slight delay
+              setTimeout(showVisualizerControls, 600);
+            }
+          }
+        }
+        
+        // Rest of the observer code...
+      });
+    });
+    
   } catch (error) {
     console.error("Error initializing visualizer:", error);
   }
@@ -424,59 +471,6 @@ function showVisualizerControls() {
     }
   }, 1500);
 }
-
-// Add event listener for visualizer nav button
-document.addEventListener('DOMContentLoaded', () => {
-  // Add click handler for the new nav button
-  const visualizerNavButton = document.getElementById('visualizer-nav-button');
-  if (visualizerNavButton) {
-    visualizerNavButton.addEventListener('click', () => {
-      showVisualizerControls();
-    });
-  }
-  
-  // Observe the audio terminal to detect when it closes
-  const audioTerminalObserver = new MutationObserver((mutations) => {
-    mutations.forEach(mutation => {
-      // Look for removed nodes that might be the audio terminal
-      if (mutation.removedNodes && mutation.removedNodes.length) {
-        for (let i = 0; i < mutation.removedNodes.length; i++) {
-          const node = mutation.removedNodes[i];
-          if (node.classList && (
-              node.classList.contains('music-terminal') || 
-              node.classList.contains('powershell-music') || 
-              node.classList.contains('audio-terminal')) {
-            console.log('Audio terminal closed, showing visualizer');
-            // Audio terminal was closed, show our visualizer with slight delay
-            setTimeout(showVisualizerControls, 600);
-          }
-        }
-      }
-      
-      // Look for class changes that might indicate terminal closing
-      if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-        const target = mutation.target;
-        if (target.classList && 
-            (target.classList.contains('music-terminal') || 
-             target.classList.contains('powershell-music') || 
-             target.classList.contains('audio-terminal')) && 
-            !target.classList.contains('active')) {
-          console.log('Audio terminal inactive, showing visualizer');
-          // Audio terminal was hidden, show our visualizer
-          setTimeout(showVisualizerControls, 600);
-        }
-      }
-    });
-  });
-
-  // Start observing the document for audio terminal changes
-  audioTerminalObserver.observe(document.body, { 
-    childList: true, 
-    subtree: true,
-    attributes: true,
-    attributeFilter: ['class']
-  });
-});
 
 // Remove the old play button handler and update the close button handler
 function updateVisualizerControls() {
