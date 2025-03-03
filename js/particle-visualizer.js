@@ -243,39 +243,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     function setupMusicEnableButton() {
       console.log("Setting up music enable button detection");
       
-      // Direct click detection for the Enable-Music button
+      // Look for the button in the PowerShell terminal
       document.addEventListener('click', (e) => {
-        // Check if the clicked element is our target button (case-sensitive matching)
-        if (e.target.classList.contains('Enable-Music') || 
-            e.target.className.includes('Enable-Music')) {
-          console.log('Enable-Music button clicked directly!');
+        // More specific targeting of the PowerShell button
+        if (e.target.matches('.powershell-buttons .Enable-Music')) {
+          console.log('Enable-Music button clicked in PowerShell terminal!');
           musicEnabled = true;
           
-          // Wait for animation to complete before showing visualizer
+          // Wait for PowerShell terminal to close
           setTimeout(() => {
             const musicTerminal = document.querySelector('.powershell-music');
             if (!musicTerminal || !musicTerminal.classList.contains('active')) {
-              console.log("Music terminal closed or inactive, showing visualizer");
+              console.log("Music terminal closed, showing visualizer");
               showVisualizerControls();
-            } else {
-              // Set up an observer to detect when the terminal is closed
-              console.log("Music terminal still active, setting up terminal close observer");
-              observeMusicTerminalClose();
             }
-          }, 300);
+          }, 800); // Increased delay to ensure terminal closes first
         }
       });
-      
-      // Also try to find the button directly if it already exists
-      const existingButton = document.querySelector('.Enable-Music');
-      if (existingButton) {
-        console.log("Found existing Enable-Music button:", existingButton);
-        existingButton.addEventListener('click', () => {
-          console.log("Existing Enable-Music button clicked!");
-          musicEnabled = true;
-          setTimeout(() => showVisualizerControls(), 1200);
-        });
-      }
     }
 
     // Observer to detect when music terminal closes
@@ -330,7 +314,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     
     // Updated minimize button functionality
-    setupMinimizeButton();
+    document.querySelector('.visualizer-terminal .terminal-button.minimize').remove();
     
     // Inside the main DOMContentLoaded event, add:
     console.log("Setting up visualizer nav button");
@@ -426,19 +410,6 @@ function addTerminalTypingEffect() {
   });
 }
 
-// Updated minimize button functionality
-function setupMinimizeButton() {
-  const minimizeButton = document.querySelector('.visualizer-terminal .terminal-button.minimize');
-  if (minimizeButton) {
-    console.log('Found minimize button, adding event listener');
-    minimizeButton.addEventListener('click', () => {
-      console.log('Minimize button clicked');
-      const terminal = document.querySelector('.visualizer-terminal');
-      terminal.classList.toggle('minimized');
-    });
-  }
-}
-
 // Update the showVisualizerControls function
 function showVisualizerControls() {
   const terminal = document.querySelector('.visualizer-terminal');
@@ -471,12 +442,14 @@ function showVisualizerControls() {
   // Add typing effect
   setTimeout(addTerminalTypingEffect, 300);
   
-  // Set up close button - remove old listeners first
+  // Set up close button
   const closeButton = terminal.querySelector('.terminal-button.close');
   if (closeButton) {
+    // Remove any existing listeners
     const newCloseButton = closeButton.cloneNode(true);
     closeButton.parentNode.replaceChild(newCloseButton, closeButton);
     
+    // Add new click listener
     newCloseButton.addEventListener('click', () => {
       console.log("Close button clicked");
       terminal.classList.remove('active');

@@ -339,14 +339,19 @@
 .visualizer-terminal .terminal-button.close {
   background-color: #ff3344;
   box-shadow: 0 0 5px rgba(255, 51, 68, 0.7);
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .visualizer-terminal .terminal-button.close:hover {
   background-color: #ff5566;
   box-shadow: 0 0 10px rgba(255, 51, 68, 0.9);
+  transform: scale(1.1);
 }
 
-/* Hide the minimize button since we're not using it */
-.visualizer-terminal .terminal-button.minimize {
+/* Remove these classes as they're no longer needed */
+.visualizer-terminal.minimized,
+.visualizer-terminal .terminal-button.minimize,
+.visualizer-terminal .terminal-button.maximize {
   display: none;
 } 
