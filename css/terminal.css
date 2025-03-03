@@ -354,4 +354,18 @@
 .visualizer-terminal .terminal-button.minimize,
 .visualizer-terminal .terminal-button.maximize {
   display: none;
+}
+
+/* Add reset button styling */
+.visualizer-terminal .terminal-button.reset {
+  background-color: #ffcc00;
+  box-shadow: 0 0 5px rgba(255, 204, 0, 0.7);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.visualizer-terminal .terminal-button.reset:hover {
+  background-color: #ffdd44;
+  box-shadow: 0 0 10px rgba(255, 204, 0, 0.9);
+  transform: scale(1.1);
 } 

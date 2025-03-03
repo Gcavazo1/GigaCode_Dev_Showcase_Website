@@ -10,12 +10,12 @@ class ParticleSystem {
     // Shader uniforms setup - with reduced size value
     this.uniforms = {
       time: { value: 0 },
-      offsetSize: { value: 2 },
-      size: { value: 1.5 },
-      frequency: { value: 0.8 },
-      amplitude: { value: 1.3 },
-      offsetGain: { value: 0.2 },
-      maxDistance: { value: 1.0 },
+      offsetSize: { value: 1.7 },
+      size: { value: 1.2 },
+      frequency: { value: 0.5 },
+      amplitude: { value: 2 },
+      offsetGain: { value: 0.4 },
+      maxDistance: { value: 1.5 },
       startColor: { value: new THREE.Color(0xff00ff) }, // Magenta
       endColor: { value: new THREE.Color(0x00ffff) },   // Cyan
     };

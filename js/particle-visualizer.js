@@ -308,24 +308,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Updated minimize button functionality
     document.querySelector('.visualizer-terminal .terminal-button.minimize').remove();
     
-    // Inside the main DOMContentLoaded event, add:
-    console.log("Setting up visualizer nav button");
-    const visualizerNavButton = document.getElementById('visualizer-nav-button');
-    if (visualizerNavButton) {
-      console.log("Found visualizer nav button");
-      document.addEventListener('click', (e) => {
-        // Log all clicks for debugging
-        console.log("Click detected on:", e.target);
-        
-        // Check if the click was on the visualizer nav button
-        if (e.target.closest('#visualizer-nav-button') || 
-            (e.target.id === 'visualizer-nav-button') ||
-            e.target.closest('[href="#visualizer"]')) {
-          
-          console.log("Visualizer nav button clicked directly!");
-          e.preventDefault();
-          showVisualizerControls();
-        }
+    // Setting up visualizer nav button - improved version
+    console.log("Setting up visualizer nav button - improved version");
+    const visualizerNavItem = document.querySelector('a[href="#visualizer"]');
+    if (visualizerNavItem) {
+      console.log("Found visualizer nav button, adding direct click handler");
+      visualizerNavItem.addEventListener('click', function(e) {
+        e.preventDefault();
+        console.log("Visualizer nav button clicked - direct handler");
+        showVisualizerControls();
       });
     }
     
@@ -337,39 +328,106 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Make the terminal draggable for better user experience
 function makeDraggable(element) {
   let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  let isDragging = false;
+  
+  // Store original position to restore if needed
+  let originalTop = null;
+  let originalLeft = null;
+  let originalTransform = null;
   
   const header = element.querySelector('.terminal-header');
   if (header) {
-    header.onmousedown = dragMouseDown;
+    console.log("Setting up draggable on terminal header");
+    header.style.cursor = 'grab'; // Better cursor
+    
+    // Save the original position when the terminal is shown
+    originalTop = element.style.top;
+    originalLeft = element.style.left;
+    originalTransform = element.style.transform;
+    
+    header.addEventListener('mousedown', dragMouseDown);
   }
   
   function dragMouseDown(e) {
     e.preventDefault();
-    // Get mouse position at startup
+    console.log("Header mousedown - starting drag");
+    
+    // Record starting position
+    isDragging = true;
+    header.style.cursor = 'grabbing';
+    
+    // Get current mouse position
     pos3 = e.clientX;
     pos4 = e.clientY;
-    document.onmouseup = closeDragElement;
-    document.onmousemove = elementDrag;
+    
+    // Add event listeners for drag and end
+    document.addEventListener('mouseup', closeDragElement);
+    document.addEventListener('mousemove', elementDrag);
   }
   
   function elementDrag(e) {
+    if (!isDragging) return;
+    
     e.preventDefault();
-    // Calculate new position
+    console.log("Dragging terminal");
+    
+    // Calculate the new position
     pos1 = pos3 - e.clientX;
     pos2 = pos4 - e.clientY;
     pos3 = e.clientX;
     pos4 = e.clientY;
-    // Set the element's new position
-    element.style.top = (element.offsetTop - pos2) + "px";
-    element.style.left = (element.offsetLeft - pos1) + "px";
+    
+    // Always maintain the element within the viewport
+    const newTop = (element.offsetTop - pos2);
+    const newLeft = (element.offsetLeft - pos1);
+    
+    // Ensure the element stays within the viewport
+    const maxTop = window.innerHeight - header.offsetHeight;
+    const maxLeft = window.innerWidth - header.offsetWidth;
+    
+    // Set the element's new position with constraints
+    element.style.top = Math.min(Math.max(0, newTop), maxTop) + "px";
+    element.style.left = Math.min(Math.max(0, newLeft), maxLeft) + "px";
+    
     // Reset transform which could interfere with dragging
     element.style.transform = 'none';
   }
   
   function closeDragElement() {
+    console.log("End of dragging");
     // Stop moving when mouse button is released
-    document.onmouseup = null;
-    document.onmousemove = null;
+    isDragging = false;
+    header.style.cursor = 'grab';
+    document.removeEventListener('mouseup', closeDragElement);
+    document.removeEventListener('mousemove', elementDrag);
+  }
+  
+  // Add reset button to return to original position if needed
+  const closeButton = element.querySelector('.terminal-button.close');
+  if (closeButton && closeButton.parentNode) {
+    const resetButton = document.createElement('span');
+    resetButton.className = 'terminal-button reset';
+    resetButton.style.backgroundColor = '#ffcc00';
+    resetButton.style.marginLeft = '5px';
+    resetButton.title = 'Reset Position';
+    
+    resetButton.addEventListener('click', (e) => {
+      e.stopPropagation();
+      console.log("Resetting terminal position");
+      
+      // Restore original position
+      if (originalTransform) {
+        element.style.transform = originalTransform;
+      } else {
+        element.style.transform = 'translateY(-50%)';
+      }
+      
+      element.style.top = '50%';
+      element.style.left = originalLeft || '20px';
+      element.style.right = 'auto';
+    });
+    
+    closeButton.parentNode.appendChild(resetButton);
   }
 }
 
