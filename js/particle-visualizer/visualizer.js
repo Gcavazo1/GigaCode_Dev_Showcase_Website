@@ -75,7 +75,7 @@ class ParticleVisualizer {
       // Load particle system
       await this.particleSystem.load();
       
-      // Create particles and add to holder
+      // Create particles and add to holder (torusKnot is already set as default in particles.js)
       const particles = this.particleSystem.create();
       
       if (particles) {

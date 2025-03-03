@@ -168,8 +168,24 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     }
     
-    // Set initial active buttons
-    document.querySelector('[data-shape="sphere"]').classList.add('active');
+    // Set initial active shape button to torusKnot instead of sphere
+    document.querySelector('[data-shape="sphere"]').classList.remove('active');
+    document.querySelector('[data-shape="torusKnot"]').classList.add('active');
+    
+    // Update slider values to match new defaults
+    const sizeSlider = document.getElementById('size-control');
+    const sizeValue = document.getElementById('size-value');
+    if (sizeSlider && sizeValue) {
+      sizeSlider.value = "25"; // Default to 25 instead of 30
+      sizeValue.textContent = "25";
+    }
+    
+    const reactivitySlider = document.getElementById('reactivity-control');
+    const reactivityValue = document.getElementById('reactivity-value');
+    if (reactivitySlider && reactivityValue) {
+      reactivitySlider.value = "0.5"; // Default to 0.5 instead of 1.0
+      reactivityValue.textContent = "0.5";
+    }
   }
 
   // Add rotation toggle functionality
@@ -183,17 +199,172 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // Add this after we create visualizer to ensure it's using our reference values
-  // Set initial control values to match reference
+  // Update the initial values to be set AFTER the visualizer is created
   if (window.particleVisualizer && window.particleVisualizer.particleSystem) {
-    // Set initial frequency and amplitude
-    window.particleVisualizer.particleSystem.uniforms.frequency.value = 2.0;
-    window.particleVisualizer.particleSystem.uniforms.amplitude.value = 0.8;
+    // Set default frequency and amplitude based on lower reactivity
+    window.particleVisualizer.particleSystem.uniforms.frequency.value = 2.0 * 0.5; // 0.5 instead of 1.0
+    window.particleVisualizer.particleSystem.uniforms.amplitude.value = 0.8 * 0.5; // 0.5 instead of 1.0
     window.particleVisualizer.particleSystem.uniforms.offsetGain.value = 0.5;
     window.particleVisualizer.particleSystem.uniforms.maxDistance.value = 1.8;
     
-    // Make sure size is properly initialized
-    window.particleVisualizer.particleSystem.uniforms.size.value = 2.0;
-    window.particleVisualizer.particleSystem.uniforms.offsetSize.value = 2.0;
+    // Set initial size
+    window.particleVisualizer.particleSystem.uniforms.size.value = 25 / 10; // 2.5 instead of 2.0
+    window.particleVisualizer.particleSystem.uniforms.offsetSize.value = 45; // Default for torusKnot
+    
+    // Set reactivity multiplier
+    window.particleVisualizer.particleSystem.reactivityMultiplier = 0.5;
   }
 });
+
+// Update your event handling for more robustness
+document.addEventListener('DOMContentLoaded', () => {
+  // Attach click handler to close button
+  const closeButton = document.querySelector('.visualizer-terminal .terminal-button.close');
+  if (closeButton) {
+    closeButton.addEventListener('click', () => {
+      document.querySelector('.visualizer-terminal').classList.remove('active');
+    });
+  }
+  
+  // Better method to listen for enable music with event delegation
+  document.addEventListener('click', (e) => {
+    // Check if the clicked element or its parent has the Enable-Music class
+    const musicButton = e.target.closest('.Enable-Music');
+    if (musicButton) {
+      console.log('Music enable button clicked');
+      // Wait for music terminal to close before showing visualizer
+      setTimeout(showVisualizerControls, 1200);
+    }
+  });
+  
+  // Handle audio play button with similar robustness
+  document.addEventListener('click', (e) => {
+    const playButton = e.target.closest('#play-audio');
+    if (playButton) {
+      console.log('Music play button clicked');
+      if (!document.querySelector('.visualizer-terminal').classList.contains('active')) {
+        showVisualizerControls();
+      }
+    }
+  });
+  
+  // Add minimize functionality to the terminal
+  const minimizeButton = document.querySelector('.visualizer-terminal .terminal-button.minimize');
+  if (minimizeButton) {
+    minimizeButton.addEventListener('click', () => {
+      const terminal = document.querySelector('.visualizer-terminal');
+      if (terminal.classList.contains('minimized')) {
+        terminal.classList.remove('minimized');
+      } else {
+        terminal.classList.add('minimized');
+      }
+    });
+  }
+});
+
+// Make the terminal draggable for better user experience
+function makeDraggable(element) {
+  let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  
+  const header = element.querySelector('.terminal-header');
+  if (header) {
+    header.onmousedown = dragMouseDown;
+  }
+  
+  function dragMouseDown(e) {
+    e.preventDefault();
+    // Get mouse position at startup
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    document.onmousemove = elementDrag;
+  }
+  
+  function elementDrag(e) {
+    e.preventDefault();
+    // Calculate new position
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    // Set the element's new position
+    element.style.top = (element.offsetTop - pos2) + "px";
+    element.style.left = (element.offsetLeft - pos1) + "px";
+    // Reset transform which could interfere with dragging
+    element.style.transform = 'none';
+  }
+  
+  function closeDragElement() {
+    // Stop moving when mouse button is released
+    document.onmouseup = null;
+    document.onmousemove = null;
+  }
+}
+
+// Call this function to add terminal command typing effect
+function addTerminalTypingEffect() {
+  const terminalLines = document.querySelectorAll('.visualizer-terminal .terminal-line .command');
+  
+  terminalLines.forEach((line, index) => {
+    const text = line.textContent;
+    line.textContent = '';
+    line.classList.add('typing');
+    
+    // Type with delay based on index
+    setTimeout(() => {
+      let i = 0;
+      const typeSpeed = 30;
+      
+      function typeText() {
+        if (i < text.length) {
+          line.textContent += text.charAt(i);
+          i++;
+          setTimeout(typeText, typeSpeed);
+        } else {
+          line.classList.remove('typing');
+          
+          // Reveal the content after the command is typed
+          const group = line.closest('.control-group');
+          if (group) {
+            const content = group.querySelector('.terminal-buttons-grid, .terminal-colors, .terminal-sliders, .terminal-options');
+            if (content) {
+              content.style.opacity = '1';
+            }
+          }
+        }
+      }
+      
+      typeText();
+    }, index * 400); // Stagger the typing of each line
+  });
+}
+
+// Enhanced show function with typing effect
+function showVisualizerControls() {
+  const terminal = document.querySelector('.visualizer-terminal');
+  
+  // Hide content initially for typing effect
+  const contentAreas = terminal.querySelectorAll('.terminal-buttons-grid, .terminal-colors, .terminal-sliders, .terminal-options');
+  contentAreas.forEach(area => {
+    area.style.opacity = '0';
+    area.style.transition = 'opacity 0.5s ease';
+  });
+  
+  // Show terminal
+  terminal.classList.add('active');
+  
+  // Make it draggable
+  makeDraggable(terminal);
+  
+  // Add typing effect
+  setTimeout(addTerminalTypingEffect, 300);
+  
+  // Highlight the active shape button (should be torusKnot by default)
+  setTimeout(() => {
+    const torusKnotButton = document.querySelector('[data-shape="torusKnot"]');
+    if (torusKnotButton) {
+      document.querySelectorAll('[data-shape]').forEach(btn => btn.classList.remove('active'));
+      torusKnotButton.classList.add('active');
+    }
+  }, 1500);
+}

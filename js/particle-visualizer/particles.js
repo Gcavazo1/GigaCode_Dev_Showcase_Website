@@ -4,14 +4,15 @@ class ParticleSystem {
   constructor() {
     this.name = 'ParticleSystem';
     this.time = 0;
-    this.reactivityMultiplier = 1.0;
+    this.reactivityMultiplier = 0.5;
+    this.currentShape = 'torusKnot';
     
-    // Shader uniforms setup - match reference exactly
+    // Shader uniforms setup - with reduced size value
     this.uniforms = {
       time: { value: 0 },
       offsetSize: { value: 2 },
-      size: { value: 2 },
-      frequency: { value: 2 },
+      size: { value: 1.5 },
+      frequency: { value: 2.0 },
       amplitude: { value: 0.8 },
       offsetGain: { value: 0.5 },
       maxDistance: { value: 1.8 },
@@ -174,15 +175,21 @@ class ParticleSystem {
     // Create material immediately so it's ready
     this.createMaterial();
     // Create default geometry
-    this.createShapedGeometry('sphere');
+    this.createShapedGeometry('torusKnot');
   }
 
   async load() {
     try {
-      // Material is already created in constructor
+      // Skip file loading and use our hardcoded shaders directly
+      console.log('[ParticleSystem] Using reference shader implementation');
+      this.createMaterial();
+      
+      // Create torusKnot geometry as default
+      this.createShapedGeometry('torusKnot');
+      
       return true;
     } catch (error) {
-      console.error('[ParticleSystem] Error loading:', error);
+      console.error('[ParticleSystem] Error loading shaders:', error);
       return false;
     }
   }
@@ -200,7 +207,7 @@ class ParticleSystem {
     console.log("[ParticleSystem] Material created successfully");
   }
 
-  createShapedGeometry(shape = 'sphere') {
+  createShapedGeometry(shape = 'torusKnot') {
     if (this.geometry) {
       this.geometry.dispose();
     }
@@ -309,7 +316,7 @@ class ParticleSystem {
   create() {
     // Safety check - make sure we have geometry and material
     if (!this.geometry) {
-      this.createShapedGeometry('sphere');
+      this.createShapedGeometry('torusKnot');
     }
     
     if (!this.material) {

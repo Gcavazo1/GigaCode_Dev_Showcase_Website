@@ -180,4 +180,147 @@
 @keyframes pulseLegend {
     from { text-shadow: 0 0 10px rgba(249, 249, 0, 0.7); }
     to { text-shadow: 0 0 20px rgba(249, 249, 0, 0.9), 0 0 30px rgba(249, 249, 0, 0.5); }
+}
+
+/* Add to your terminal.css */
+.visualizer-terminal {
+    position: fixed;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 400px;
+    background: rgba(0, 10, 20, 0.85);
+    border: 1px solid var(--primary-color);
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+    display: none; /* Hidden by default */
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.visualizer-terminal.active {
+    display: block;
+    animation: terminalFadeIn 0.4s ease-out;
+}
+
+.visualizer-terminal.minimized {
+    height: 30px;
+    overflow: hidden;
+}
+
+.visualizer-terminal .terminal-header {
+    cursor: move; /* Show that it's draggable */
+}
+
+.terminal-line .command {
+    position: relative;
+}
+
+.terminal-line .command.typing::after {
+    content: '|';
+    position: absolute;
+    animation: cursorBlink 0.8s infinite;
+}
+
+.terminal-content {
+    padding: 15px;
+}
+
+/* Add a subtle grid background for cyberpunk feel */
+.visualizer-terminal::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 20px 20px;
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* Enhance buttons with glow effect on hover */
+.terminal-buttons-grid button:hover {
+    box-shadow: 0 0 15px var(--primary-color);
+    text-shadow: 0 0 5px var(--primary-color);
+}
+
+.terminal-buttons-grid button.active {
+    background: var(--primary-color);
+    color: #000;
+    box-shadow: 0 0 20px var(--primary-color);
+}
+
+/* Fancier range sliders with glow effect */
+.slider-group input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    cursor: pointer;
+    box-shadow: 0 0 10px var(--primary-color);
+}
+
+.slider-group input[type="range"]:focus {
+    outline: none;
+}
+
+.slider-group input[type="range"]::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    cursor: pointer;
+    box-shadow: 0 0 10px var(--primary-color);
+    border: none;
+}
+
+@keyframes cursorBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+.terminal-buttons-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.terminal-colors {
+    display: flex;
+    gap: 20px;
+    margin: 10px 0;
+}
+
+.terminal-sliders {
+    padding: 10px 0;
+}
+
+.slider-group {
+    margin: 10px 0;
+}
+
+.slider-group input[type="range"] {
+    width: 100%;
+    height: 4px;
+    background: rgba(0, 255, 255, 0.2);
+    border-radius: 2px;
+    outline: none;
+}
+
+@keyframes terminalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-48%) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(-50%) scale(1);
+    }
 } 
