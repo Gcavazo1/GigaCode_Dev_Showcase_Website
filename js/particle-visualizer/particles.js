@@ -13,9 +13,9 @@ class ParticleSystem {
       offsetSize: { value: 2 },
       size: { value: 1.5 },
       frequency: { value: 0.8 },
-      amplitude: { value: 1.0 },
-      offsetGain: { value: 0.7 },
-      maxDistance: { value: 3.0 },
+      amplitude: { value: 1.3 },
+      offsetGain: { value: 0.2 },
+      maxDistance: { value: 1.0 },
       startColor: { value: new THREE.Color(0xff00ff) }, // Magenta
       endColor: { value: new THREE.Color(0x00ffff) },   // Cyan
     };
@@ -283,7 +283,7 @@ class ParticleSystem {
         );
 
         // Higher offset size for more dramatic effect
-        this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(25, 50));
+        this.uniforms.offsetSize.value = Math.floor(THREE.MathUtils.randInt(55, 150));
         
         // Store the shape for special handling in update method
         this.currentShape = 'torusKnot';
@@ -383,11 +383,11 @@ class ParticleSystem {
       if (this.currentShape === 'torusKnot') {
         // Extra dramatic size pulse on beat for torusKnot
         this.uniforms.size.value = 9 * this.reactivityMultiplier; // Higher than normal (7)
-        this.uniforms.maxDistance.value = 3.0; // Higher than normal (2.5)
+        this.uniforms.maxDistance.value = 1.0; // Higher than normal (2.5)
       } else {
         // Normal beat pulse for other shapes
         this.uniforms.size.value = 7 * this.reactivityMultiplier;
-        this.uniforms.maxDistance.value = 2.5;
+        this.uniforms.maxDistance.value = 1.5;
       }
     } else {
       // Faster return to normal size with smoother transition
