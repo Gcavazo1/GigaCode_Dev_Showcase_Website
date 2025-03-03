@@ -236,58 +236,93 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     }
     
-    // Look specifically for the PowerShell music module enable button
-    const musicEnableButton = document.querySelector('.Enable-Music, button[class*="Enable-Music"], #powershell-enable-music');
-    
-    if (musicEnableButton) {
-      console.log('Found music enable button:', musicEnableButton);
-      musicEnableButton.addEventListener('click', () => {
-        console.log('Music enable button clicked!');
-        setTimeout(showVisualizerControls, 1200);
-      });
-    } else {
-      // Wait for dynamic content to load
-      console.log('Music enable button not found initially, setting up observer');
+    // Keep track of user music choice
+    let musicEnabled = false;
+
+    // Music Enable Button Handler - be very specific about the selector
+    function setupMusicEnableButton() {
+      console.log("Setting up music enable button detection");
       
-      // Set up a mutation observer to detect when the button might be added to the DOM
-      const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-          if (mutation.addedNodes && mutation.addedNodes.length > 0) {
-            for (let i = 0; i < mutation.addedNodes.length; i++) {
-              const node = mutation.addedNodes[i];
-              if (node.classList && (node.classList.contains('Enable-Music') || node.id === 'powershell-enable-music')) {
-                console.log('Music enable button found after DOM change:', node);
-                node.addEventListener('click', () => {
-                  setTimeout(showVisualizerControls, 1200);
-                });
-                observer.disconnect();
-                return;
-              }
+      // Direct click detection for the Enable-Music button
+      document.addEventListener('click', (e) => {
+        // Check if the clicked element is our target button (case-sensitive matching)
+        if (e.target.classList.contains('Enable-Music') || 
+            e.target.className.includes('Enable-Music')) {
+          console.log('Enable-Music button clicked directly!');
+          musicEnabled = true;
+          
+          // Wait for animation to complete before showing visualizer
+          setTimeout(() => {
+            const musicTerminal = document.querySelector('.powershell-music');
+            if (!musicTerminal || !musicTerminal.classList.contains('active')) {
+              console.log("Music terminal closed or inactive, showing visualizer");
+              showVisualizerControls();
+            } else {
+              // Set up an observer to detect when the terminal is closed
+              console.log("Music terminal still active, setting up terminal close observer");
+              observeMusicTerminalClose();
+            }
+          }, 300);
+        }
+      });
+      
+      // Also try to find the button directly if it already exists
+      const existingButton = document.querySelector('.Enable-Music');
+      if (existingButton) {
+        console.log("Found existing Enable-Music button:", existingButton);
+        existingButton.addEventListener('click', () => {
+          console.log("Existing Enable-Music button clicked!");
+          musicEnabled = true;
+          setTimeout(() => showVisualizerControls(), 1200);
+        });
+      }
+    }
+
+    // Observer to detect when music terminal closes
+    function observeMusicTerminalClose() {
+      const terminalCloseObserver = new MutationObserver((mutations) => {
+        mutations.forEach(mutation => {
+          if (mutation.type === 'attributes' && 
+              mutation.attributeName === 'class' && 
+              mutation.target.classList.contains('powershell-music')) {
+            
+            // Check if the terminal was active and is now inactive
+            if (!mutation.target.classList.contains('active')) {
+              console.log("Music terminal closed via class change");
+              terminalCloseObserver.disconnect();
               
-              // Also check inside the added node
-              const button = node.querySelector?.('.Enable-Music, button[class*="Enable-Music"], #powershell-enable-music');
-              if (button) {
-                console.log('Music enable button found inside added content:', button);
-                button.addEventListener('click', () => {
-                  setTimeout(showVisualizerControls, 1200);
-                });
-                observer.disconnect();
-                return;
+              if (musicEnabled) {
+                console.log("Music was enabled, showing visualizer");
+                setTimeout(() => showVisualizerControls(), 800);
               }
             }
           }
         });
       });
       
-      // Start observing
-      observer.observe(document.body, { childList: true, subtree: true });
+      // Observe all powershell-music terminals for class changes
+      const musicTerminals = document.querySelectorAll('.powershell-music');
+      if (musicTerminals.length > 0) {
+        console.log(`Found ${musicTerminals.length} music terminals to observe`);
+        musicTerminals.forEach(terminal => {
+          terminalCloseObserver.observe(terminal, { 
+            attributes: true,
+            attributeFilter: ['class']
+          });
+        });
+      } else {
+        console.log("No music terminals found to observe");
+      }
     }
-    
-    // Handle audio play button with similar robustness
+
+    // Call our setup functions
+    setupMusicEnableButton();
+    observeMusicTerminalClose();
+
+    // Audio player play button integration
     document.addEventListener('click', (e) => {
-      const playButton = e.target.closest('#play-audio');
-      if (playButton) {
-        console.log('Music play button clicked');
+      if (e.target.id === 'play-audio' || e.target.closest('#play-audio')) {
+        console.log('Play audio button clicked');
         if (!document.querySelector('.visualizer-terminal').classList.contains('active')) {
           showVisualizerControls();
         }
@@ -301,39 +336,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log("Setting up visualizer nav button");
     const visualizerNavButton = document.getElementById('visualizer-nav-button');
     if (visualizerNavButton) {
-      console.log("Found visualizer nav button, adding click handler");
+      console.log("Found visualizer nav button");
       visualizerNavButton.addEventListener('click', (e) => {
-        e.preventDefault(); // Prevent the default anchor behavior
-        console.log("Visualizer button clicked");
+        e.preventDefault();
+        console.log("Visualizer nav button clicked");
         showVisualizerControls();
       });
     }
-    
-    // In the main DOMContentLoaded event, setup the audio terminal observer:
-    console.log("Setting up audio terminal observer");
-    const audioTerminalObserver = new MutationObserver((mutations) => {
-      console.log("Mutation detected, checking for audio terminal changes");
-      mutations.forEach(mutation => {
-        // Look for removed nodes that might be the audio terminal
-        if (mutation.removedNodes && mutation.removedNodes.length) {
-          for (let i = 0; i < mutation.removedNodes.length; i++) {
-            const node = mutation.removedNodes[i];
-            console.log("Checking removed node:", node);
-            if (node.classList && (
-                node.classList.contains('music-terminal') || 
-                node.classList.contains('powershell-music') || 
-                node.classList.contains('audio-terminal')
-              )) {
-              console.log('Audio terminal closed, showing visualizer');
-              // Audio terminal was closed, show our visualizer with slight delay
-              setTimeout(showVisualizerControls, 600);
-            }
-          }
-        }
-        
-        // Rest of the observer code...
-      });
-    });
     
   } catch (error) {
     console.error("Error initializing visualizer:", error);
@@ -434,14 +443,17 @@ function setupMinimizeButton() {
 function showVisualizerControls() {
   const terminal = document.querySelector('.visualizer-terminal');
   if (!terminal) {
-    console.error('Terminal not found');
+    console.error('Visualizer terminal not found');
     return;
   }
   
   // If already active, don't show again
   if (terminal.classList.contains('active')) {
+    console.log("Visualizer terminal already active");
     return;
   }
+  
+  console.log("Showing visualizer terminal");
   
   // Hide content initially for typing effect
   const contentAreas = terminal.querySelectorAll('.terminal-buttons-grid, .terminal-colors, .terminal-sliders, .terminal-options');
@@ -459,8 +471,17 @@ function showVisualizerControls() {
   // Add typing effect
   setTimeout(addTerminalTypingEffect, 300);
   
-  // Set up close button
-  updateVisualizerControls();
+  // Set up close button - remove old listeners first
+  const closeButton = terminal.querySelector('.terminal-button.close');
+  if (closeButton) {
+    const newCloseButton = closeButton.cloneNode(true);
+    closeButton.parentNode.replaceChild(newCloseButton, closeButton);
+    
+    newCloseButton.addEventListener('click', () => {
+      console.log("Close button clicked");
+      terminal.classList.remove('active');
+    });
+  }
   
   // Highlight the active shape button (should be torusKnot by default)
   setTimeout(() => {
@@ -470,16 +491,4 @@ function showVisualizerControls() {
       torusKnotButton.classList.add('active');
     }
   }, 1500);
-}
-
-// Remove the old play button handler and update the close button handler
-function updateVisualizerControls() {
-  // Update close button to fully close the terminal instead of minimizing
-  const closeButton = document.querySelector('.visualizer-terminal .terminal-button.close');
-  if (closeButton) {
-    closeButton.addEventListener('click', () => {
-      const terminal = document.querySelector('.visualizer-terminal');
-      terminal.classList.remove('active');
-    });
-  }
 }
