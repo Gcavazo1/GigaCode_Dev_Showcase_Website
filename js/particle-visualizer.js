@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   try {
     console.log("Attempting to import visualizer module");
     // Dynamically import the visualizer module
-    import ParticleVisualizer from './particle-visualizer/visualizer.js';
+    const ParticleVisualizer = await import('./particle-visualizer/visualizer.js').then(module => module.default);
     console.log("Module imported successfully");
     
     const visualizer = new ParticleVisualizer();
