@@ -113,6 +113,21 @@ class AudioAnalyzer {
   smooth(oldValue, newValue) {
     return oldValue * this.smoothingFactor + newValue * (1 - this.smoothingFactor);
   }
+
+  useExternalAnalyser(externalAnalyser, audioElement) {
+    // Store the external analyser reference
+    this.analyser = externalAnalyser;
+    
+    // Store the audio element reference
+    this.audio = audioElement;
+    
+    // Setup the data array
+    this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+    
+    console.log('[AudioAnalyzer] Using external analyser, frequency bin count:', this.analyser.frequencyBinCount);
+    
+    return true;
+  }
 }
 
 export default AudioAnalyzer; 

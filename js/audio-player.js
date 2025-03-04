@@ -173,9 +173,14 @@ class AudioPlayer {
                 console.log("Created new audio element and connected properly");
                 
                 // Add this section to connect the visualizer to the new audio element
-                if (window.audioVisualizer && window.audioVisualizer.connectToAudioElement) {
-                    console.log("Attempting to reconnect visualizer to new audio element");
+                if (window.particleVisualizer && window.particleVisualizer.connectToAudioElement) {
+                    console.log("Attempting to reconnect particle visualizer to new audio element");
+                    window.particleVisualizer.connectToAudioElement(this.audio, this.analyser);
+                } else if (window.audioVisualizer && window.audioVisualizer.connectToAudioElement) {
+                    console.log("Attempting to reconnect audio visualizer to new audio element");
                     window.audioVisualizer.connectToAudioElement(this.audio, this.analyser);
+                } else {
+                    console.warn("No visualizer found to reconnect to new audio element");
                 }
                 
                 // Immediately load the current track into the new audio element
