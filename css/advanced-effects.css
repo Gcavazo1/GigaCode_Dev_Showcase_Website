@@ -878,8 +878,8 @@
 /* Audio Playlist */
 .audio-playlist {
     width: 100%;
-    max-width: 800px;
-    margin: 1.5rem auto 0;
+    max-width: 950px;
+    margin: 2.5rem auto 0;
     background: rgba(10, 10, 18, 0.7);
     border-radius: 10px;
     border: 1px solid rgba(0, 255, 255, 0.3);

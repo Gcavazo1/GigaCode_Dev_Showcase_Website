@@ -301,13 +301,13 @@
     left: calc(50% - 160px);
     top: calc(50% - 60px);
     background: rgba(0, 106, 133, 0.95);
-    border: 1px solid rgba(255, 0, 195, 0.4);
+    border: 1px solid rgba(255, 192, 0, 0.4);
     border-radius: 8px;
     overflow: hidden;
     transition: all 0.8s cubic-bezier(0.2, 1, 0.3, 1);
     cursor: pointer;
     transform-style: preserve-3d;
-    box-shadow: 0 5px 30px rgba(255, 0, 157, 0.5),
+    box-shadow: 0 5px 30px rgba(255, 255, 0, 0.5),
                 inset 0 0 30px rgba(0, 120, 147, 0.1);
 }
 
