@@ -195,6 +195,7 @@ class ParticleVisualizer {
             this.audioAnalyzer.useExternalAnalyser(existingAnalyser, audioElement);
             console.log('[Visualizer] Using existing analyser from audio player');
             this.isPlaying = true;
+            this.show(); // <-- Ensure visualizer is shown here
             return true;
         } else {
             // Create new connection
@@ -290,9 +291,10 @@ class ParticleVisualizer {
   show() {
     console.log('[Visualizer] Showing visualizer');
     if (this.canvas) {
-      this.canvas.style.display = 'block';
-      this.canvas.style.opacity = '1';
-      this.canvas.classList.add('active');
+        this.canvas.style.display = 'block';
+        this.canvas.style.opacity = '1';
+        this.canvas.classList.add('active');
+        this.resize(); // Ensure canvas is resized properly
     }
   }
 
