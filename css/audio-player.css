@@ -475,4 +475,115 @@
 
 .audio-glow-effect {
     animation: audioGlow 3s infinite;
+}
+
+/* ======================================
+   3D CAROUSEL PLAYLIST - RESTORED
+   ====================================== */
+
+/* 3D Carousel container */
+.ps-playlist-carousel {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    perspective: 1000px;
+    margin: 20px 0;
+    overflow: hidden;
+}
+
+.ps-carousel-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.ps-carousel-item {
+    position: absolute;
+    width: 160px;
+    height: 160px;
+    top: 20px;
+    left: 50%;
+    margin-left: -80px;
+    background: rgba(5, 15, 30, 0.8);
+    border: 1px solid var(--audio-border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    transition: all 0.5s ease;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    cursor: pointer;
+}
+
+.ps-carousel-item:hover {
+    box-shadow: 0 0 25px var(--audio-glow-color);
+}
+
+.ps-carousel-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+.ps-carousel-item:hover img {
+    opacity: 1;
+}
+
+.ps-carousel-item.active {
+    border: 2px solid var(--audio-primary-color);
+    box-shadow: 0 0 30px var(--audio-glow-color);
+}
+
+.ps-carousel-item .ps-track-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 10px;
+    background: rgba(0, 10, 20, 0.8);
+    color: var(--audio-primary-color);
+    font-size: 12px;
+    text-align: center;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+}
+
+.ps-carousel-item:hover .ps-track-info {
+    transform: translateY(0);
+}
+
+.ps-playlist-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 20, 40, 0.9);
+    border: 1px solid var(--audio-border-color);
+    color: var(--audio-primary-color);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 200;
+    transition: all 0.3s ease;
+    font-size: 1.2em;
+}
+
+.ps-playlist-nav:hover {
+    background: rgba(0, 255, 255, 0.2);
+    box-shadow: 0 0 15px var(--audio-glow-color);
+}
+
+.ps-prev {
+    left: 20px;
+}
+
+.ps-next {
+    right: 20px;
 } 
