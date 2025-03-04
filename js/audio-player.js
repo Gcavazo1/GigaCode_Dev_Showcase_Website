@@ -172,15 +172,36 @@ class AudioPlayer {
                 
                 console.log("Created new audio element and connected properly");
                 
+                // Explicit debugging for visualization
+                console.log("VISUALIZER DEBUG: Is particleVisualizer available?", !!window.particleVisualizer);
+                console.log("VISUALIZER DEBUG: Canvas element exists?", !!document.getElementById('background-visualizer'));
+                
                 // Add this section to connect the visualizer to the new audio element
                 if (window.particleVisualizer && window.particleVisualizer.connectToAudioElement) {
                     console.log("Attempting to reconnect particle visualizer to new audio element");
-                    window.particleVisualizer.connectToAudioElement(this.audio, this.analyser);
-                } else if (window.audioVisualizer && window.audioVisualizer.connectToAudioElement) {
-                    console.log("Attempting to reconnect audio visualizer to new audio element");
-                    window.audioVisualizer.connectToAudioElement(this.audio, this.analyser);
-                } else {
-                    console.warn("No visualizer found to reconnect to new audio element");
+                    const success = window.particleVisualizer.connectToAudioElement(this.audio, this.analyser);
+                    console.log("VISUALIZER DEBUG: Connection success:", success);
+                    
+                    // FORCE VISUALIZER TO SHOW - add this
+                    setTimeout(() => {
+                        if (window.particleVisualizer) {
+                            console.log("VISUALIZER DEBUG: Forcing visualizer to show");
+                            window.particleVisualizer.show();
+                            // Also make sure canvas is visible through CSS
+                            const canvas = document.getElementById('background-visualizer');
+                            if (canvas) {
+                                canvas.style.display = 'block';
+                                canvas.style.opacity = '1';
+                                canvas.style.zIndex = '-1'; // Behind content but visible
+                                canvas.style.position = 'fixed';
+                                canvas.style.top = '0';
+                                canvas.style.left = '0';
+                                canvas.style.width = '100%';
+                                canvas.style.height = '100%';
+                                console.log("VISUALIZER DEBUG: Canvas CSS forced");
+                            }
+                        }
+                    }, 500); // Slight delay to ensure everything is ready
                 }
                 
                 // Immediately load the current track into the new audio element
