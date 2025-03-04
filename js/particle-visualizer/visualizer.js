@@ -18,6 +18,11 @@ class ParticleVisualizer {
       document.body.appendChild(this.canvas);
     }
     
+    // Make sure canvas is visible by default
+    this.canvas.style.display = 'block';
+    this.canvas.style.opacity = '1';
+    this.canvas.classList.add('active');
+    
     // Create renderer first
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
@@ -179,7 +184,7 @@ class ParticleVisualizer {
   connectToAudioElement(audioElement, existingAnalyser) {
     console.log('[Visualizer] Reconnecting to new audio element');
     
-    // Ensure we're visible
+    // Show the visualizer immediately when connecting
     this.show();
     
     if (!audioElement) {
@@ -190,15 +195,19 @@ class ParticleVisualizer {
     try {
       if (existingAnalyser) {
         // Use the existing analyser from the audio player
-        this.audioAnalyzer.useExternalAnalyser(existingAnalyser, audioElement);
-        console.log('[Visualizer] Using existing analyser from audio player');
-        this.isPlaying = true;
-        return true;
+        const success = this.audioAnalyzer.useExternalAnalyser(existingAnalyser, audioElement);
+        if (success) {
+          console.log('[Visualizer] Using existing analyser from audio player');
+          this.isPlaying = true;
+          this.isInitialized = true; // Make sure we're initialized
+          return true;
+        }
       } else {
         // Create new connection
         const connected = this.audioAnalyzer.connect(audioElement);
         if (connected) {
           this.isPlaying = true;
+          this.isInitialized = true; // Make sure we're initialized
           console.log('[Visualizer] Created new connection to audio element');
           return true;
         }
@@ -283,15 +292,23 @@ class ParticleVisualizer {
   }
 
   show() {
+    console.log('[Visualizer] Showing visualizer');
     if (this.canvas) {
       this.canvas.style.display = 'block';
+      this.canvas.style.opacity = '1';
       this.canvas.classList.add('active');
+      
+      // Force a resize to ensure proper dimensions
+      this.resize();
     }
   }
 
   hide() {
+    console.log('[Visualizer] Hiding visualizer');
     if (this.canvas) {
+      this.canvas.style.opacity = '0';
       this.canvas.classList.remove('active');
+      // Don't set display: none to avoid WebGL context loss
     }
   }
 }
