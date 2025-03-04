@@ -144,32 +144,42 @@ document.addEventListener('DOMContentLoaded', function () {
     // Function to show AI with a glitch effect
     function showAIWithTVEffect(aiSection) {
         if (!aiSection) return;
-
-        // Prepare AI Assistant for simple fade-in
+        
+        console.log("Starting AI assistant reveal");
+        
+        // Make sure AI is visible from the start
         aiSection.style.visibility = 'visible';
         aiSection.style.opacity = '0';
         
+        // Position it correctly immediately
+        aiSection.style.position = 'relative';
+        aiSection.style.top = '0';
+        aiSection.style.left = '0';
+        aiSection.style.right = '0';
+        aiSection.style.width = '100%';
+        
         // Small delay before fading in
         setTimeout(() => {
-            // Set proper positioning immediately
-            aiSection.style.position = 'relative';
-            aiSection.style.top = '0';
-            aiSection.style.left = '0';
-            aiSection.style.right = '0';
-            aiSection.style.width = '100%';
+            console.log("Fading in AI assistant");
             
-            // Simple fade in with yellow glow
+            // Set explicit opacity
+            aiSection.style.opacity = '1';
+            
+            // Add fade-in class for animation
             aiSection.classList.add('fade-in-effect');
             
             // After fade completes, add loaded class
             setTimeout(() => {
+                console.log("AI assistant fade complete, adding loaded class");
+                
+                // Add loaded class
                 aiSection.classList.add('loaded');
                 
                 // Ensure the pulse-glow animation continues
                 aiSection.style.animation = 'pulse-glow 4s ease-in-out infinite alternate';
                 
-                console.log("AI Assistant revealed with fade effect");
-            }, 500); // shorter duration for simpler animation
+                console.log("AI Assistant fully loaded");
+            }, 600);
         }, 300);
     }
 }); 

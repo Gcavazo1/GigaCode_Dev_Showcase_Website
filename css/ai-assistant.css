@@ -19,10 +19,11 @@
     opacity: 0;
     position: relative;
     min-height: 400px;
+    transition: opacity 0.5s ease;
 }
 
 .ai-assistant.loaded {
-    opacity: 1;
+    opacity: 1 !important;
     animation: pulse-glow 4s ease-in-out infinite alternate !important;
     border: 1px solid rgba(249, 249, 0, 0.3) !important;
     box-shadow: 0 0 30px rgba(249, 249, 0, 0.25) !important;
@@ -337,7 +338,7 @@
 
 /* Add a simple fade-in effect */
 .ai-assistant.fade-in-effect {
-    animation: simpleFadeIn 0.5s ease-in-out forwards;
+    opacity: 1 !important;
 }
 
 @keyframes simpleFadeIn {
