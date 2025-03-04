@@ -23,7 +23,8 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="loading-bar"></div>
             <div class="loading-percentage">0%</div>
         </div>
-        <div class="loading-status">Establishing neural connection...</div>
+        <div class="loading-text" data-text="Establishing neural connection...">Establishing neural connection...</div>
+        <div class="loading-status">Initializing...</div>
     `; 
 
         // Add to DOM
