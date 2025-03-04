@@ -14,15 +14,17 @@
     background: rgba(0, 0, 0, 0.5);
     border-radius: 12px;
     overflow: hidden;
-    border: 1px solid rgba(0, 255, 255, 0.3);
-    box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+    border: 1px solid rgba(249, 249, 0, 0.3);
+    box-shadow: 0 0 30px rgba(249, 249, 0, 0.25);
     opacity: 0;
     position: relative;
     min-height: 400px;
+    animation: pulse-glow 4s ease-in-out infinite alternate;
 }
 
 .ai-assistant.loaded {
     opacity: 1;
+    animation: pulse-glow 4s ease-in-out infinite alternate;
 }
 
 .ai-avatar {
@@ -522,4 +524,20 @@
 @keyframes circuitFlow {
     0% { background-position: 0 0; }
     100% { background-position: 50px 50px; }
+}
+
+/* Add the pulse animation for the container glow */
+@keyframes pulse-glow {
+    0% {
+        box-shadow: 0 0 20px rgba(249, 249, 0, 0.2);
+        border-color: rgba(249, 249, 0, 0.25);
+    }
+    50% {
+        box-shadow: 0 0 35px rgba(249, 249, 0, 0.35), 0 0 50px rgba(249, 249, 0, 0.15);
+        border-color: rgba(249, 249, 0, 0.4);
+    }
+    100% {
+        box-shadow: 0 0 25px rgba(249, 249, 0, 0.3);
+        border-color: rgba(249, 249, 0, 0.35);
+    }
 } 
