@@ -17,6 +17,11 @@
     display: flex;
     align-items: center;
     gap: 1rem;
+    margin-top: 30px;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 8px;
+    border: 1px solid rgba(0, 255, 255, 0.2);
 }
 
 .track-info {
@@ -448,4 +453,53 @@
 @keyframes ps-scan-active {
     0% { transform: translateX(-100%); }
     100% { transform: translateX(100%); }
+}
+
+/* Update canvas container styling */
+.audio-player-container {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.3); /* Reduced opacity */
+    border-radius: 12px;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.15);
+    margin-top: -50px; /* Move it higher up */
+}
+
+/* Enhance the floating effect for the playlist */
+.playlist-container {
+    position: relative;
+    margin-top: 40px; /* Increased gap */
+    margin-bottom: 30px;
+    padding: 15px;
+    background: rgba(0, 10, 20, 0.7);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 8px;
+    box-shadow: 
+        0 0 20px rgba(0, 255, 255, 0.1),
+        0 10px 20px rgba(0, 0, 0, 0.2);
+    transform: translateY(0);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Add hover effect to enhance floating feel */
+.playlist-container:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+        0 0 25px rgba(0, 255, 255, 0.15),
+        0 15px 25px rgba(0, 0, 0, 0.25);
+}
+
+/* Adjust the canvas opacity */
+#audio-canvas {
+    opacity: 0.8; /* Lower opacity for better floating effect */
+    transition: opacity 0.3s ease;
+}
+
+/* Optional: Add hover effect to canvas */
+#audio-canvas:hover {
+    opacity: 0.9;
 } 
