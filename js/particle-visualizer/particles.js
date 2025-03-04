@@ -38,11 +38,11 @@ class ParticleSystem {
     // Shader uniforms setup
     this.uniforms = {
       time: { value: 0 },
-      offsetSize: { value: 2 },
+      offsetSize: { value: 1.5 },
       size: { value: 2},
-      frequency: { value: 2 },
+      frequency: { value: 1.4 },
       amplitude: { value: 0.7 },
-      offsetGain: { value: 0.6 },
+      offsetGain: { value: 0.5 },
       maxDistance: { value: 1.5 },
       startColor: { value: new THREE.Color(0x00FFFF) }, // Default cyan
       endColor: { value: new THREE.Color(0xFF00FF) },   // Default magenta
@@ -527,14 +527,14 @@ class ParticleSystem {
   }
 
   createTorusKnot() {
-    let tubeSeg = Math.floor(THREE.MathUtils.randInt(150,250));
-    let radialSeg = Math.floor(THREE.MathUtils.randInt(100, 150));
-    let p = Math.floor(THREE.MathUtils.randInt(2, 3));
-    let q = Math.floor(THREE.MathUtils.randInt(3, 2));
+    let tubeSeg = Math.floor(THREE.MathUtils.randInt(180,320));
+    let radialSeg = Math.floor(THREE.MathUtils.randInt(750, 150));
+    let p = Math.floor(THREE.MathUtils.randInt(2, 4));
+    let q = Math.floor(THREE.MathUtils.randInt(1, 5));
     
     this.geometry = new THREE.TorusKnotGeometry(
-      17,
-      5,
+      15,
+      8,
       tubeSeg,
       radialSeg,
       p,
@@ -554,8 +554,8 @@ class ParticleSystem {
       q: q
     };
     
-    this.segmentsFolder.add(this.guiProperties.segments, "tube", 100, 250);
-    this.segmentsFolder.add(this.guiProperties.segments, "radial", 20, 50);
+    this.segmentsFolder.add(this.guiProperties.segments, "tube", 20, 100);
+    this.segmentsFolder.add(this.guiProperties.segments, "radial", 100, 350);
     this.segmentsFolder.add(this.guiProperties.segments, "p", 4, 2, 5);
     this.segmentsFolder.add(this.guiProperties.segments, "q", 3, 7, 2);
     this.segmentsFolder
@@ -565,8 +565,8 @@ class ParticleSystem {
     this.segmentsFolder.onChange(() => {
       this.holder.remove(this.pointsMesh);
       this.geometry = new THREE.TorusKnotGeometry(
-        17,
-        5,
+        15,
+        8,
         this.guiProperties.segments.tube,
         this.guiProperties.segments.radial,
         this.guiProperties.segments.p,
