@@ -4,7 +4,7 @@ class ParticleSystem {
   constructor(gui) {
     this.name = 'ParticleSystem';
     this.time = 0;
-    this.reactivityMultiplier = 0.1
+    this.reactivityMultiplier = 0.6;
     this.currentShape = 'torusKnot';
     
     // Add counter for randomization
@@ -44,8 +44,9 @@ class ParticleSystem {
       amplitude: { value: 0.7 },
       offsetGain: { value: 0.6 },
       maxDistance: { value: 1.5 },
-      startColor: { value: new THREE.Color(0x00FFFF) }, // Cyan
-      endColor: { value: new THREE.Color(0xFF00FF) },   // Magenta
+      startColor: { value: new THREE.Color(0x00FFFF) }, // Default cyan
+      endColor: { value: new THREE.Color(0xFF00FF) },   // Default magenta
+      reactivityMultiplier: { value: 0.6 }  // Set default reactivity
     };
     
     // Reference shader implementations
@@ -330,9 +331,9 @@ class ParticleSystem {
     this.segmentsFolder.onChange(() => {
       this.holder.remove(this.pointsMesh);
       this.geometry = new THREE.BoxGeometry(
-        45,
-        45,
-        45,
+        34,
+        34,
+        34,
         this.guiProperties.segments.width,
         this.guiProperties.segments.height,
         this.guiProperties.segments.depth
@@ -380,8 +381,8 @@ class ParticleSystem {
       this.holder.remove(this.pointsMesh);
       this.geometry = new THREE.CylinderGeometry(
         16,
-        6,
-        36,
+        16,
+        56,
         this.guiProperties.segments.radial,
         this.guiProperties.segments.height,
         true
@@ -425,7 +426,7 @@ class ParticleSystem {
     this.segmentsFolder.onChange(() => {
       this.holder.remove(this.pointsMesh);
       this.geometry = new THREE.SphereGeometry(
-        16,
+        30,
         this.guiProperties.segments.width,
         this.guiProperties.segments.height
       );
@@ -512,8 +513,8 @@ class ParticleSystem {
     this.segmentsFolder.onChange(() => {
       this.holder.remove(this.pointsMesh);
       this.geometry = new THREE.TorusGeometry(
-        16,
-        4,
+        19,
+        7,
         this.guiProperties.segments.tube,
         this.guiProperties.segments.radial
       );
@@ -564,8 +565,8 @@ class ParticleSystem {
     this.segmentsFolder.onChange(() => {
       this.holder.remove(this.pointsMesh);
       this.geometry = new THREE.TorusKnotGeometry(
-        14,
-        10,
+        17,
+        5,
         this.guiProperties.segments.tube,
         this.guiProperties.segments.radial,
         this.guiProperties.segments.p,

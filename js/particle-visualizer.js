@@ -54,107 +54,58 @@ function showVisualizerControls() {
 
 // Setup the visualizer controls
 function setupVisualizerControls() {
-  if (!window.particleVisualizer || !window.particleVisualizer.particleSystem) return;
-  
-  // Shape buttons
-  document.querySelectorAll('.visualizer-terminal [data-shape]').forEach(btn => {
-    // Remove old event listeners by cloning
-    const newBtn = btn.cloneNode(true);
-    btn.parentNode.replaceChild(newBtn, btn);
-    
-    newBtn.addEventListener('click', () => {
-      const shape = newBtn.getAttribute('data-shape');
-      if (window.particleVisualizer.particleSystem) {
-        try {
-          if (typeof window.particleVisualizer.particleSystem.create === 'function') {
-            window.particleVisualizer.particleSystem.create(shape);
-          } else {
-            window.particleVisualizer.particleSystem.createShapedGeometry(shape);
-          }
-        } catch (error) {
-          console.error("Error changing particle shape:", error);
-        }
-      }
-    });
-  });
-  
-  // Randomize button
-  const randomizeBtn = document.getElementById('randomize-segments');
-  if (randomizeBtn) {
-    // Remove existing listeners
-    const newRandomizeBtn = randomizeBtn.cloneNode(true);
-    randomizeBtn.parentNode.replaceChild(newRandomizeBtn, randomizeBtn);
-    
-    newRandomizeBtn.addEventListener('click', () => {
-      if (window.particleVisualizer.particleSystem) {
-        window.particleVisualizer.particleSystem.randomizeCurrentShape();
-      }
-    });
-  }
-  
-  // Reactivity slider
   const reactivitySlider = document.getElementById('reactivity-control');
   const reactivityValue = document.getElementById('reactivity-value');
   
   if (reactivitySlider && reactivityValue) {
-    // Remove old event listeners by cloning
-    const newSlider = reactivitySlider.cloneNode(true);
-    reactivitySlider.parentNode.replaceChild(newSlider, reactivitySlider);
-    
-    // Initialize with current value
-    const currentValue = window.particleVisualizer.particleSystem.reactivityMultiplier || 0.6;
-    newSlider.value = currentValue.toString();
+    // Set initial value from particle system or default to 0.6
+    const currentValue = window.particleVisualizer?.particleSystem?.reactivityMultiplier || 0.6;
+    reactivitySlider.value = currentValue;
     reactivityValue.textContent = currentValue.toFixed(1);
     
-    // Add new event listener
-    newSlider.addEventListener('input', () => {
-      const value = parseFloat(newSlider.value);
+    reactivitySlider.addEventListener('input', (e) => {
+      const value = parseFloat(e.target.value);
       reactivityValue.textContent = value.toFixed(1);
-      
-      if (window.particleVisualizer.particleSystem) {
+      if (window.particleVisualizer?.particleSystem) {
         window.particleVisualizer.particleSystem.reactivityMultiplier = value;
       }
     });
-    
-    // Trigger the input event to apply initial value
-    const event = new Event('input');
-    newSlider.dispatchEvent(event);
   }
-  
-  // Color pickers
+
+  // Fix color picker implementation
   const startColorPicker = document.getElementById('start-color-picker');
   const endColorPicker = document.getElementById('end-color-picker');
   
-  if (startColorPicker && endColorPicker && window.THREE) {
+  if (startColorPicker && endColorPicker && window.particleVisualizer?.particleSystem) {
     const updateColors = () => {
-      if (window.particleVisualizer.particleSystem && 
-          window.particleVisualizer.particleSystem.uniforms) {
-        // Fix color conversion - use THREE.Color constructor with hex string
-        const startColor = new THREE.Color(startColorPicker.value);
-        const endColor = new THREE.Color(endColorPicker.value);
-        
-        // Update uniforms
-        window.particleVisualizer.particleSystem.uniforms.startColor.value = startColor;
-        window.particleVisualizer.particleSystem.uniforms.endColor.value = endColor;
+      const system = window.particleVisualizer.particleSystem;
+      if (system && system.uniforms) {
+        // Convert hex colors to THREE.Color
+        system.uniforms.startColor.value.set(startColorPicker.value);
+        system.uniforms.endColor.value.set(endColorPicker.value);
       }
     };
+
+    // Set initial colors from HTML
+    startColorPicker.value = '#00ffff';  // Cyan
+    endColorPicker.value = '#ff00ff';    // Magenta
     
-    // Remove old listeners by cloning
-    const newStartPicker = startColorPicker.cloneNode(true);
-    const newEndPicker = endColorPicker.cloneNode(true);
-    
-    startColorPicker.parentNode.replaceChild(newStartPicker, startColorPicker);
-    endColorPicker.parentNode.replaceChild(newEndPicker, endColorPicker);
-    
-    // Add change event listener (fires when color picker closes)
-    newStartPicker.addEventListener('change', updateColors);
-    newEndPicker.addEventListener('change', updateColors);
-    
-    // Add input event listener (fires while picking color)
-    newStartPicker.addEventListener('input', updateColors);
-    newEndPicker.addEventListener('input', updateColors);
+    // Add event listeners
+    startColorPicker.addEventListener('input', updateColors);
+    endColorPicker.addEventListener('input', updateColors);
     
     // Initial update
     updateColors();
   }
 }
+
+// Ensure visualizer is initialized before setting up controls
+document.addEventListener('DOMContentLoaded', () => {
+  // Wait for particle system to be ready
+  const checkVisualizer = setInterval(() => {
+    if (window.particleVisualizer?.particleSystem) {
+      setupVisualizerControls();
+      clearInterval(checkVisualizer);
+    }
+  }, 100);
+});

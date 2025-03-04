@@ -126,6 +126,15 @@ class ParticleVisualizer {
     
     // Handle window resizing
     window.addEventListener('resize', this.resize.bind(this));
+    
+    // Ensure default values are set
+    this.particleSystem.reactivityMultiplier = 0.6;
+    
+    // Initialize colors
+    if (this.particleSystem.uniforms) {
+      this.particleSystem.uniforms.startColor.value.set('#00ffff');
+      this.particleSystem.uniforms.endColor.value.set('#ff00ff');
+    }
   }
 
   async init() {
