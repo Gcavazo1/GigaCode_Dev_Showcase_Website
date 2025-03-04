@@ -575,4 +575,6 @@ class AudioPlayer {
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     new AudioPlayer();
-}); 
+});
+
+window.audioPlayerInstance = new AudioPlayer(); 
