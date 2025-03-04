@@ -141,36 +141,35 @@ document.addEventListener('DOMContentLoaded', function () {
         aiSection.style.zIndex = '10'; // Ensure it's above other elements
     }
 
-    // Function to show AI with a simple fade-in effect
+    // Function to show AI with a glitch effect
     function showAIWithTVEffect(aiSection) {
         if (!aiSection) return;
 
-        // Remove TV effect class if it exists
-        aiSection.classList.remove('tv-on-effect');
-
-        // Add fade-in class
-        aiSection.classList.add('fade-in-effect');
-
-        // Make visible
-        aiSection.style.opacity = '1';
-
-        // After fade-in completes, gradually reset position to normal
+        // Prepare AI Assistant for glitch effect
+        aiSection.style.visibility = 'visible';
+        aiSection.style.opacity = '0';
+        
+        // Small delay before starting glitch animation
         setTimeout(() => {
-            // Start transition to final position
-            aiSection.style.transition = 'all 0.8s ease-in-out';
+            // Add the glitch-in class to trigger the animation
+            aiSection.classList.add('glitch-in-effect');
+            
+            // Start transition to visible state
+            aiSection.style.opacity = '1';
+            
+            // Set proper positioning immediately (no second animation)
             aiSection.style.position = 'relative';
             aiSection.style.top = '0';
             aiSection.style.left = '0';
             aiSection.style.right = '0';
             aiSection.style.width = '100%';
-
-            // After transition completes, clean up
+            
+            // After glitch effect completes, add loaded class
             setTimeout(() => {
                 aiSection.classList.add('loaded');
-                aiSection.classList.remove('fade-in-effect');
-                aiSection.style.transition = '';
-                console.log("AI Assistant revealed with fade-in effect");
-            }, 800);
-        }, 1500); // Wait for fade-in to complete
+                aiSection.classList.remove('glitch-in-effect');
+                console.log("AI Assistant revealed with glitch effect");
+            }, 1500); // Match the total glitch-in animation duration
+        }, 300);
     }
 }); 
