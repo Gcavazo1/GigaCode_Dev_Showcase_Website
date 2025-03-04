@@ -484,17 +484,17 @@
 .ps-playlist-carousel {
     position: relative;
     width: 100%;
-    height: 220px;
-    perspective: 1200px;
-    margin: 30px 0;
-    overflow: hidden;
+    height: 300px;
+    perspective: 1500px;
+    margin: 50px 0;
+    overflow: visible;
 }
 
 .ps-carousel-container {
     position: relative;
     width: 100%;
     height: 100%;
-    transform-style: preserve-3d;
+    transform-style: preserve-3d !important;
     transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
@@ -502,17 +502,18 @@
     position: absolute;
     width: 180px;
     height: 180px;
-    top: 20px;
+    top: 50%;
     left: 50%;
     margin-left: -90px;
+    margin-top: -90px;
     background: rgba(5, 15, 30, 0.8);
     border: 1px solid var(--audio-border-color);
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
     transition: all 0.5s ease;
-    transform-style: preserve-3d;
-    backface-visibility: hidden;
+    transform-style: preserve-3d !important;
+    backface-visibility: hidden !important;
     cursor: pointer;
     display: flex;
     flex-direction: column;

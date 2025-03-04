@@ -449,16 +449,28 @@ class AudioPlayer {
         
         const cards = this.carouselContainer.querySelectorAll('.ps-track-card');
         const cardCount = cards.length;
+        
+        // Adjust these values to fix the 3D positioning
         const angleStep = (2 * Math.PI) / cardCount;
-        const radius = 300; // Adjust for desired carousel size
+        const radius = 400; // Increased radius for better spacing
+        
+        // Force the container to use 3D transforms
+        this.carouselContainer.style.transformStyle = 'preserve-3d';
         
         cards.forEach((card, index) => {
             const angle = angleStep * index;
+            
+            // Calculate position on the circle
             const x = Math.sin(angle) * radius;
             const z = Math.cos(angle) * radius;
             const rotY = (angle * 180) / Math.PI;
             
+            // Apply 3D transform with translateZ for proper depth
             card.style.transform = `rotateY(${rotY}deg) translateZ(${radius}px)`;
+            
+            // Ensure each card has 3D transforms enabled
+            card.style.transformStyle = 'preserve-3d';
+            card.style.backfaceVisibility = 'hidden';
             
             // Adjust opacity based on position (front cards more visible)
             const normalizedAngle = Math.abs((angle % (2 * Math.PI)) - Math.PI);
