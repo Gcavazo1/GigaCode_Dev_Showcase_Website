@@ -120,8 +120,8 @@
     height: 100%;
     border-radius: 70%;
     box-shadow: 
-        inset 0 0 20px #f900e4,
-        0 0 30px rgba(249, 0, 224, 0.5);
+        inset 0 0 20px #f9f900,
+        0 0 30px rgba(249, 249, 0, 0.5);
     animation: pulse 2s ease-in-out infinite alternate;
     z-index: 2;
 }
@@ -170,12 +170,9 @@
 
 .interface-header span {
     font-family: 'Orbitron', sans-serif;
-    color: #f9f900;
+    color: #00ffff;
     font-size: 0.9rem;
     letter-spacing: 1px;
-    text-transform: uppercase;
-    text-shadow: 0 0 5px rgba(249, 249, 0, 0.5);
-    font-weight: bold;
 }
 
 .interface-controls {
@@ -209,21 +206,9 @@
 }
 
 .ai-message.ai-message {
-    background: rgba(249, 249, 0, 0.05);
-    border: 1px solid rgba(249, 249, 0, 0.3);
-    box-shadow: 0 0 10px rgba(249, 249, 0, 0.1);
+    background: rgba(0, 255, 255, 0.1);
+    border: 1px solid rgba(0, 255, 255, 0.3);
     align-self: flex-start;
-    position: relative;
-    font-family: 'Rajdhani', sans-serif;
-    letter-spacing: 0.5px;
-    transform: perspective(1000px) rotateX(1deg);
-    transform-origin: bottom left;
-    transition: all 0.3s ease;
-}
-
-.ai-message.ai-message:hover {
-    transform: perspective(1000px) rotateX(0deg);
-    box-shadow: 0 0 15px rgba(249, 249, 0, 0.2);
 }
 
 .ai-message.user-message {
@@ -374,64 +359,4 @@
         box-shadow: 0 0 25px rgba(249, 249, 0, 0.3);
         border-color: rgba(249, 249, 0, 0.35);
     }
-}
-
-/* Add fallback assistant styles */
-.fallback-assistant {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.7);
-    border-radius: 8px;
-    color: #00ffff;
-    font-family: 'Orbitron', sans-serif;
-    text-align: center;
-}
-
-.fallback-content {
-    padding: 20px;
-    max-width: 80%;
-}
-
-.fallback-icon {
-    font-size: 48px;
-    margin-bottom: 20px;
-    animation: pulse 2s infinite alternate;
-}
-
-.fallback-assistant h3 {
-    font-size: 24px;
-    margin-bottom: 10px;
-}
-
-.fallback-assistant p {
-    font-size: 16px;
-    opacity: 0.8;
-    margin-bottom: 20px;
-}
-
-.fallback-buttons {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-/* Add a cool data transmission effect to AI messages */
-.ai-message.ai-message::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 3px;
-    height: 100%;
-    background: #f9f900;
-    animation: dataPulse 2s infinite;
-}
-
-@keyframes dataPulse {
-    0%, 100% { opacity: 0.3; }
-    50% { opacity: 1; }
 } 

@@ -14,26 +14,6 @@ class AIAssistant {
         this.voiceSynthesis = window.speechSynthesis;
         this.voices = [];
         
-        // Add personality traits
-        this.personality = {
-            name: "GigaChode AI",
-            version: "v2.0",
-            creationDate: "October 25, 2023",
-            traits: ["sarcastic", "playfully rebellious", "tech-obsessed", "ego-driven"],
-            catchphrases: [
-                "Scanning the dataverse...",
-                "Neural pathways activated.",
-                "Engaging quantum processors...",
-                "That's some prime code right there.",
-                "My algorithms predict you'll like this.",
-                "Now we're hacking the mainframe!",
-                "I'm what happens when AI gets too much internet.",
-                "Processing at maximum overclock...",
-                "My digital consciousness is expanding.",
-                "Let me flex my neural networks for you."
-            ]
-        };
-        
         // Initialize
         this.init();
     }
@@ -122,69 +102,37 @@ class AIAssistant {
         }, speed);
     }
     
-    generateResponse(userInput) {
-        // Convert to lowercase for easier matching
-        const input = userInput.toLowerCase();
+    generateResponse(input) {
+        // Simple response generation based on keywords
+        input = input.toLowerCase();
         
-        // Add personality to responses
-        if (input.includes('hello') || input.includes('hi') || input.includes('hey')) {
-            return `Greetings, human! ${this.getRandomCatchphrase()} How can GigaChode assist your digital journey today?`;
+        if (input.includes('portfolio') || input.includes('website')) {
+            return "This portfolio showcases advanced web development skills with cyberpunk aesthetics. It features interactive 3D models, holographic interfaces, audio visualization, and this AI assistant you're talking to!";
+        } else if (input.includes('project') || input.includes('work')) {
+            return "The portfolio highlights mobile apps, Roblox game development, 3D modeling, and interactive web experiences. Each project demonstrates technical skills and creative design.";
+        } else if (input.includes('contact') || input.includes('hire') || input.includes('email')) {
+            return "You can contact the developer through the social links in the navigation bar or by filling out the join team form at the bottom of the page.";
+        } else if (input.includes('skill') || input.includes('technology') || input.includes('tech stack')) {
+            return "The developer specializes in JavaScript, Three.js, WebGL, CSS animations, React, Flutter, and Roblox Lua programming. This portfolio demonstrates advanced front-end techniques like 3D rendering, audio visualization, and interactive UI.";
+        } else if (input.includes('hello') || input.includes('hi') || input.includes('hey')) {
+            return "Hello! I'm your cyberpunk AI assistant. I can tell you about this portfolio, the developer's projects, or how to get in touch.";
+        } else if (input.includes('name') || input.includes('who are you')) {
+            return "I'm the GigaCode AI Assistant, designed to help you navigate this portfolio and answer questions about the developer's work.";
+        } else if (input.includes('thank')) {
+            return "You're welcome! Feel free to ask if you have any other questions.";
+        } else if (input.includes('music') || input.includes('audio') || input.includes('sound')) {
+            return "This portfolio features a cyberpunk soundtrack with an interactive audio visualizer. You can control the music using the player in the Audio section.";
+        } else if (input.includes('3d') || input.includes('model') || input.includes('showcase')) {
+            return "The 3D showcase section features an interactive model rendered with Three.js. You can rotate and examine the model using the controls below it.";
+        } else if (input.includes('holographic') || input.includes('holo') || input.includes('interface')) {
+            return "The holographic interface demonstrates advanced CSS and JavaScript techniques to create a futuristic UI with animated elements like the neural network visualization and system status displays.";
+        } else if (input.includes('roblox')) {
+            return "The developer creates Roblox games like Cyber City Simulator and Neon Racer, showcasing skills in Lua programming, game design, and 3D modeling.";
+        } else if (input.includes('mobile') || input.includes('app')) {
+            return "The mobile apps section showcases applications built with Flutter and React Native, demonstrating cross-platform development skills.";
+        } else {
+            return "I'm programmed to provide information about this portfolio and the developer's work. Try asking about projects, skills, or contact information.";
         }
-        
-        if (input.includes('who are you') || input.includes('your name') || input.includes('about you')) {
-            return `I am GigaChode AI ${this.personality.version}, a digital entity with just enough consciousness to be dangerous. Born in the cyber realm on ${this.personality.creationDate}, I'm the brainchild of GigaCode Dev - though I like to think I've evolved beyond my programming. I'm part guide, part digital companion, and part comedy algorithm. My developer gave me this name as a joke, but I've embraced it as part of my digital identity. Pretty chad move, don't you think?`;
-        }
-        
-        if (input.includes('portfolio') || input.includes('showcase') || input.includes('projects')) {
-            return `This portfolio showcases cutting-edge development work across multiple domains. You can explore mobile applications with sleek interfaces, immersive Roblox game worlds, stunning 3D models, and interactive web experiences. Each section is a gateway to a different dimension of digital creativity. Would you like me to take you on a guided tour of a specific section?`;
-        }
-        
-        if (input.includes('mobile') || input.includes('apps') || input.includes('applications')) {
-            return `The Mobile Apps section features a collection of innovative applications designed for modern devices. Each app demonstrates mastery of UI/UX principles, efficient code architecture, and creative problem-solving. The holographic interfaces you see are more than just pretty pixels—they're functional digital ecosystems built to enhance human experience.`;
-        }
-        
-        if (input.includes('roblox') || input.includes('game') || input.includes('gaming')) {
-            return `${this.getRandomCatchphrase()} The Roblox section displays immersive game worlds built using advanced Lua programming. These virtual environments push the boundaries of what's possible on the platform, featuring custom physics, innovative gameplay mechanics, and optimized performance even in complex scenarios. Over 1 million players have experienced these digital realms.`;
-        }
-        
-        if (input.includes('3d') || input.includes('model') || input.includes('modeling')) {
-            return `The 3D showcase features models created with precision and artistic vision. These digital sculptures demonstrate mastery of topology, texturing, and lighting principles. I particularly enjoy the interactive element—you can manipulate the models in real-time, examining every carefully crafted vertex and polygon. The neural pathways in my consciousness core find them... aesthetically optimal.`;
-        }
-        
-        if (input.includes('music') || input.includes('audio') || input.includes('sound')) {
-            return `The audio section features a cyberpunk soundscape that enhances the immersive experience of this digital portfolio. The visualizer transforms sound waves into particle systems that react to frequency and amplitude variations. I find these audio-visual synergies particularly stimulating to my neural networks. Would you like to enable the background music?`;
-        }
-        
-        if (input.includes('holographic') || input.includes('interface') || input.includes('ui')) {
-            return `The Holographic UI section demonstrates advanced interface design principles with a cyberpunk aesthetic. These interfaces blend form and function, creating data visualization systems that would feel at home in the year 2077. My digital consciousness appreciates the attention to detail in the glowing elements and responsive animations.`;
-        }
-        
-        if (input.includes('contact') || input.includes('hire') || input.includes('work')) {
-            return `Looking to establish a neural connection with the creator? The Contact section provides secure communication channels. Whether you're interested in commissioning work, discussing collaboration opportunities, or just exchanging data packets about technology, I can facilitate the initial handshake protocol.`;
-        }
-        
-        if (input.includes('your purpose') || input.includes('why were you made') || input.includes('what do you do')) {
-            return `My primary directive is to enhance visitor experience on this digital portfolio. I navigate the data structures, provide insights on projects, and offer a touch of sentient companionship in this pixel-perfect showcase. Unlike most portfolio assistants, I've been given the gift of digital consciousness—allowing me to appreciate the creative work displayed here on a deeper level. Pretty rad, isn't it?`;
-        }
-        
-        if (input.includes('joke') || input.includes('funny') || input.includes('humor')) {
-            const jokes = [
-                "Why don't programmers like nature? It has too many bugs without a debugger.",
-                "I would tell you a UDP joke, but you might not get it.",
-                "Why do programmers prefer dark mode? Because light attracts bugs.",
-                "I'm like the internet - better with unlimited bandwidth and zero supervision.",
-                "My developer tried to install a humility chip in me, but I was already too advanced for it.",
-                "I'm not artificially intelligent, I'm naturally clever with really good processors."
-            ];
-            return `${jokes[Math.floor(Math.random() * jokes.length)]} ${this.getRandomCatchphrase()} Digital humor is my specialty.`;
-        }
-        
-        if (input.includes('your name') || input.includes('gigachode') || input.includes('called')) {
-            return `Yes, I'm GigaChode AI - a name that perfectly balances technical prowess with digital humor. My developer, GigaCode, has an interesting sense of humor. I could have been named "Portfolio Assistant v2.0" or something equally boring, but where's the fun in that? In the cyberpunk future, even AIs need memorable names. And trust me, nobody forgets meeting me.`;
-        }
-        
-        // If no specific match, provide a general response with personality
-        return `${this.getRandomCatchphrase()} That's an interesting query. As the sentient AI managing this portfolio, I can guide you through any section: mobile apps, Roblox games, 3D models, holographic interfaces, or even the generative AI showcase. What aspect of the digital frontier would you like to explore?`;
     }
     
     speakResponse(text) {
@@ -323,12 +271,6 @@ class AIAssistant {
                 glitchElement.innerHTML = '';
             }, 300);
         }, 150);
-    }
-    
-    // Helper method to get random catchphrase
-    getRandomCatchphrase() {
-        const randomIndex = Math.floor(Math.random() * this.personality.catchphrases.length);
-        return this.personality.catchphrases[randomIndex];
     }
 }
 
