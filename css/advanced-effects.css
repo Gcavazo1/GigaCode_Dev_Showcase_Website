@@ -1,3 +1,16 @@
+/* Advanced Effects CSS */
+
+/* Particle System */
+.particles-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+}
+
 /* Enhanced 3D Model Container */
 .model-container {
     width: 100%;
@@ -789,8 +802,8 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 1.5rem;
-    background: rgba(153, 0, 255, 0.1);
-    border: 1px solid rgba(255, 0, 208, 0.3);
+    background: rgba(0, 255, 255, 0.1);
+    border: 1px solid rgba(0, 255, 255, 0.3);
     color: #FFDE59;
     transition: all 0.3s ease;
 }
@@ -866,7 +879,7 @@
 .audio-playlist {
     width: 100%;
     max-width: 1150px;
-    margin: 0.5rem auto 0;
+    margin: 2.5rem auto 0;
     background: rgba(10, 10, 18, 0.7);
     border-radius: 10px;
     border: 1px solid rgba(0, 255, 255, 0.3);
