@@ -1,4 +1,13 @@
-// Advanced AI Assistant with Voice Synthesis and Animation
+/**
+ * Advanced AI Assistant - Interactive chat interface with animations
+ * 
+ * This file provides the core functionality for the AI Assistant including:
+ * - Chat interface with user interaction
+ * - Response generation based on user queries
+ * - Avatar animations and visual effects
+ * - Voice synthesis for spoken responses
+ * - Idle animations and interactive elements
+ */
 
 class AIAssistant {
     constructor() {

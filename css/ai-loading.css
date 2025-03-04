@@ -259,8 +259,79 @@
     to { opacity: 1; }
 }
 
-/* Make sure this is at the end of the file */
-/* Ensure this loading sequence is hidden when AI assistant is shown */
+/* AI Assistant entrance animation */
+#virtual-assistant {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+    margin-top: 2rem; /* Add some space after the loading sequence */
+}
+
+#virtual-assistant.loaded {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Add a subtle animation to the AI Assistant when it loads */
+#virtual-assistant.loaded .ai-assistant {
+    animation: assistantGlow 2s ease-in-out;
+}
+
+@keyframes assistantGlow {
+    0% { box-shadow: 0 0 0px rgba(0, 255, 255, 0); }
+    50% { box-shadow: 0 0 30px rgba(0, 255, 255, 0.4); }
+    100% { box-shadow: 0 0 15px rgba(0, 255, 255, 0.2); }
+}
+
+/* Adjust AI Assistant positioning for sections without headers */
+#virtual-assistant.section.no-header {
+    padding: 0;
+    margin-top: -1rem;
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* Loaded state */
+#virtual-assistant.section.no-header.loaded {
+    opacity: 1;
+    visibility: visible;
+    animation: fadeGlitch 0.6s ease-out forwards;
+}
+
+@keyframes fadeGlitch {
+    0% {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    40% {
+        opacity: 0.6;
+        transform: translateX(10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Home section spacing for AI containers */
+.home-ai-container {
+    min-height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding-top: 1.5rem;
+    margin-bottom: 1.5rem; /* Add space after AI Assistant */
+}
+
+/* Ensure AI Assistant is properly displayed in home section */
+#home {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 0;
+    min-height: auto;
+}
+
+/* Hide loading sequence when AI Assistant is loaded */
 .ai-assistant.loaded ~ .loading-sequence {
     display: none;
 } 

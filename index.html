@@ -622,7 +622,11 @@
                     </div>
                 </div>
                 
-                <audio id="background-audio" preload="auto"></audio>
+                <audio id="background-audio" preload="auto" crossorigin="anonymous">
+                    <!-- Fallback source in case JS doesn't load properly -->
+                    <source src="audio/cyberpunk-theme.mp3" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
             </div>
         </section>
 

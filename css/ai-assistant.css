@@ -1,3 +1,9 @@
+/* 
+ * AI Assistant CSS - Manages assistant interface styles
+ * This file handles all styles related to the AI assistant interface,
+ * avatar, chat elements, and associated animations.
+ */
+
 /* New dedicated CSS file for AI Assistant */
 .assistant-container {
     width: 100%;
@@ -335,28 +341,47 @@
     }
 }
 
-/* Add a simple fade-in effect */
+/* Animation for fade-in effect */
 .ai-assistant.fade-in-effect {
-    opacity: 1 !important;
+    animation: simpleFadeIn 0.8s ease-out forwards;
 }
 
 @keyframes simpleFadeIn {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-/* Keep this pulse glow animation */
+/* Additional animation for the glow effect */
 @keyframes pulse-glow {
-    0% {
-        box-shadow: 0 0 20px rgba(249, 249, 0, 0.2);
-        border-color: rgba(249, 249, 0, 0.25);
-    }
-    50% {
-        box-shadow: 0 0 35px rgba(249, 249, 0, 0.35), 0 0 50px rgba(249, 249, 0, 0.15);
-        border-color: rgba(249, 249, 0, 0.4);
-    }
-    100% {
-        box-shadow: 0 0 25px rgba(249, 249, 0, 0.3);
-        border-color: rgba(249, 249, 0, 0.35);
-    }
+    0% { box-shadow: 0 0 5px rgba(0, 255, 255, 0.3); }
+    50% { box-shadow: 0 0 20px rgba(0, 255, 255, 0.6); }
+    100% { box-shadow: 0 0 5px rgba(0, 255, 255, 0.3); }
+}
+
+/* Enhanced AI Assistant styling */
+.ai-assistant.enhanced {
+    opacity: 1;
+    width: 100%;
+    margin: 0;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+}
+
+/* Hologram float animation */
+@keyframes hologram-float {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0); }
+}
+
+/* Message appear animation */
+@keyframes message-appear {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Make sure terminal section has proper padding */
+#terminal.section {
+    padding-top: 4rem;
 } 

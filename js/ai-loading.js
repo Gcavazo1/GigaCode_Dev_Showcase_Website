@@ -1,3 +1,14 @@
+/**
+ * AI Loading Sequence - Handles loading animation and transition to AI Assistant
+ * 
+ * This file creates and manages the cyberpunk-style loading sequence
+ * that appears before revealing the AI Assistant interface.
+ * It handles:
+ * - Creating the loading bar and animation
+ * - Progressive status updates
+ * - Smooth transition to the AI Assistant
+ */
+
 // Dedicated JS file for AI loading animation
 document.addEventListener('DOMContentLoaded', function () {
     const tagline = document.querySelector('.typing-text');

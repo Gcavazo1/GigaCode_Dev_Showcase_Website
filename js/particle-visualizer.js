@@ -39,21 +39,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Also connect to audio player instance if it exists
         if (window.audioPlayerInstance) {
-          // Override the play method to show visualizer
-          const originalPlayMethod = window.audioPlayerInstance.playAudio;
-          window.audioPlayerInstance.playAudio = function() {
-            originalPlayMethod.apply(this);
-            visualizer.isPlaying = true;
-            visualizer.show();
-          };
+          connectToAudioPlayerInstance(window.audioPlayerInstance);
+        } else {
+          // Set up a listener for the audioPlayerInstance if it doesn't exist yet
+          const checkInterval = setInterval(() => {
+            if (window.audioPlayerInstance) {
+              connectToAudioPlayerInstance(window.audioPlayerInstance);
+              clearInterval(checkInterval);
+            }
+          }, 500);
           
-          // Override the pause method to hide visualizer
-          const originalPauseMethod = window.audioPlayerInstance.pauseAudio;
-          window.audioPlayerInstance.pauseAudio = function() {
-            originalPauseMethod.apply(this);
-            visualizer.isPlaying = false;
-            visualizer.hide();
-          };
+          // Clear the interval after 10 seconds to prevent memory leaks
+          setTimeout(() => clearInterval(checkInterval), 10000);
         }
         
         return true;
@@ -62,6 +59,25 @@ document.addEventListener('DOMContentLoaded', async () => {
       return false;
     };
     
+    // Helper function to connect to the audio player instance
+    function connectToAudioPlayerInstance(instance) {
+      // Override the play method to show visualizer
+      const originalPlayMethod = instance.playAudio;
+      instance.playAudio = function() {
+        originalPlayMethod.apply(this);
+        visualizer.isPlaying = true;
+        visualizer.show();
+      };
+      
+      // Override the pause method to hide visualizer
+      const originalPauseMethod = instance.pauseAudio;
+      instance.pauseAudio = function() {
+        originalPauseMethod.apply(this);
+        visualizer.isPlaying = false;
+        visualizer.hide();
+      };
+    }
+
     // Try to connect immediately, or wait for the player to be available
     if (!connectToAudioPlayer()) {
       // If audio player isn't available yet, try again when play button is clicked

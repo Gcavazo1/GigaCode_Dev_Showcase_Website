@@ -1,6 +1,35 @@
 // Cyberpunk Audio Player with PowerShell-style widget
 let audioPlayerInstance = null;
 
+// Add global document interaction events to help with autoplay permission
+function setupGlobalAudioPermission() {
+    const interactionEvents = ['click', 'touchstart', 'keydown'];
+    
+    function handleUserInteraction() {
+        // If we have an audio context, try to resume it
+        if (audioPlayerInstance && audioPlayerInstance.audioContext) {
+            if (audioPlayerInstance.audioContext.state === 'suspended') {
+                audioPlayerInstance.audioContext.resume().then(() => {
+                    console.log("AudioContext resumed by user interaction");
+                });
+            }
+        }
+        
+        // Remove listeners after first interaction
+        interactionEvents.forEach(event => {
+            document.removeEventListener(event, handleUserInteraction);
+        });
+    }
+    
+    // Add listeners for user interaction
+    interactionEvents.forEach(event => {
+        document.addEventListener(event, handleUserInteraction);
+    });
+}
+
+// Call this function when document is loaded
+document.addEventListener('DOMContentLoaded', setupGlobalAudioPermission);
+
 class AudioPlayer {
     constructor() {
         // Singleton pattern
@@ -137,6 +166,15 @@ class AudioPlayer {
             // Create audio context
             this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
             
+            // Resume AudioContext - may be in suspended state due to browser autoplay policies
+            if (this.audioContext.state === 'suspended') {
+                this.audioContext.resume().then(() => {
+                    console.log("AudioContext resumed successfully");
+                }).catch(err => {
+                    console.error("Failed to resume AudioContext:", err);
+                });
+            }
+            
             // Check if audio is already connected to another node
             try {
                 // Set up audio nodes
@@ -150,6 +188,7 @@ class AudioPlayer {
                 this.analyser.connect(this.audioContext.destination);
             } catch (sourceError) {
                 console.log("Audio element already connected, using alternative approach");
+                console.warn("Detailed error:", sourceError);
                 
                 // Create analyzer node without directly connecting to audio element
                 this.analyser = this.audioContext.createAnalyser();
@@ -186,13 +225,41 @@ class AudioPlayer {
             this.loadTrack(this.currentTrack);
         }
         
+        // Ensure AudioContext is resumed before playing
+        if (this.audioContext && this.audioContext.state === 'suspended') {
+            this.audioContext.resume().then(() => {
+                console.log("AudioContext resumed before playback");
+                this.actuallyPlayAudio();
+            }).catch(err => {
+                console.error("Failed to resume AudioContext:", err);
+                // Try to play anyway
+                this.actuallyPlayAudio();
+            });
+        } else {
+            this.actuallyPlayAudio();
+        }
+    }
+    
+    actuallyPlayAudio() {
+        console.log("Attempting to play audio:", this.audio.src);
+        
         this.audio.play()
             .then(() => {
+                console.log("Playback started successfully");
                 this.isPlaying = true;
                 this.updatePlayButton();
             })
             .catch(error => {
                 console.error("Play failed:", error);
+                
+                // Show a message to the user about autoplay restrictions
+                if (error.name === 'NotAllowedError') {
+                    this.showAudioError("Browser blocked autoplay. Please click play again.");
+                    // Add the attention-grabbing animation to the play button
+                    this.playButton.classList.add('pulse-attention');
+                } else {
+                    this.showAudioError("Playback error: " + error.message);
+                }
             });
     }
     
@@ -218,17 +285,43 @@ class AudioPlayer {
     }
     
     loadTrack(index) {
-        this.currentTrack = index;
-        this.audio.src = this.playlist[index].file;
-        document.getElementById('track-title').textContent = this.playlist[index].title;
-        
-        // Update active track in playlist carousel
-        this.updatePlaylistActiveTrack(index);
-        
-        if (this.isPlaying) {
-            this.playAudio();
-        } else {
-            this.updatePlayButton();
+        try {
+            this.currentTrack = index;
+            const trackSrc = this.playlist[index].file;
+            console.log(`Loading track: ${this.playlist[index].title} from ${trackSrc}`);
+            
+            // Verify audio file exists by creating a temporary XMLHttpRequest
+            const xhr = new XMLHttpRequest();
+            xhr.open('HEAD', trackSrc, true);
+            xhr.onload = () => {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    console.log(`Track file verified: ${trackSrc}`);
+                } else {
+                    console.error(`Error loading track file: ${trackSrc}. Status: ${xhr.status}`);
+                    this.showAudioError(`Error loading audio file (${xhr.status})`);
+                }
+            };
+            xhr.onerror = () => {
+                console.error(`Network error loading track file: ${trackSrc}`);
+                this.showAudioError("Network error loading audio file");
+            };
+            xhr.send();
+            
+            // Set the source and update UI
+            this.audio.src = trackSrc;
+            document.getElementById('track-title').textContent = this.playlist[index].title;
+            
+            // Update active track in playlist carousel
+            this.updatePlaylistActiveTrack(index);
+            
+            if (this.isPlaying) {
+                this.playAudio();
+            } else {
+                this.updatePlayButton();
+            }
+        } catch (error) {
+            console.error("Error in loadTrack:", error);
+            this.showAudioError("Error loading track: " + error.message);
         }
     }
     
@@ -529,6 +622,28 @@ class AudioPlayer {
             this.currentCarouselIndex = index;
             this.updateCarouselPosition();
         }
+    }
+
+    showAudioError(message) {
+        // Create or find status element
+        let statusElement = document.querySelector('.audio-status');
+        if (!statusElement) {
+            statusElement = document.createElement('div');
+            statusElement.className = 'audio-status error';
+            this.audio.parentNode.appendChild(statusElement);
+        } else {
+            statusElement.className = 'audio-status error';
+        }
+        
+        statusElement.textContent = message;
+        
+        // Fade out after 5 seconds
+        setTimeout(() => {
+            statusElement.style.opacity = '0';
+            setTimeout(() => {
+                statusElement.remove();
+            }, 500);
+        }, 5000);
     }
 }
 
