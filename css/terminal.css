@@ -186,7 +186,7 @@
 .visualizer-terminal {
     position: fixed;
     right: 20px;
-    top: 50%;
+    top: 100px;
     transform: translateY(-50%);
     width: 400px;
     background: rgba(0, 10, 20, 0.85);

@@ -11,6 +11,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const eqContainer = document.querySelector('.ps-eq-container');
     const visualizerTerminal = document.querySelector('.visualizer-terminal');
     
+    // Reposition the visualizer terminal higher on the page
+    if (visualizerTerminal) {
+        visualizerTerminal.style.top = '100px'; // Adjust this value as needed
+    }
+    
     // Add event listener to visualizer terminal close button
     if (visualizerTerminal) {
         const closeButton = visualizerTerminal.querySelector('.terminal-button.close');
