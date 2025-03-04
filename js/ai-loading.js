@@ -2,6 +2,13 @@
 document.addEventListener('DOMContentLoaded', function () {
     const tagline = document.querySelector('.typing-text');
     const aiSection = document.querySelector('#virtual-assistant');
+    
+    // Hide AI section immediately on page load
+    if (aiSection) {
+        aiSection.style.visibility = 'hidden';
+        aiSection.style.opacity = '0';
+        aiSection.style.transition = 'opacity 0.6s ease-in-out';
+    }
 
     // Flag to ensure we only initialize once
     let initialized = false;
@@ -18,6 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Create loading sequence element right away
         const loadingSequence = document.createElement('div');
+        loadingSequence.className = 'loading-sequence';
         loadingSequence.innerHTML = `
         <div class="loading-bar-container">
             <div class="loading-bar"></div>
@@ -25,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function () {
         </div>
         <div class="loading-text" data-text="Establishing neural connection...">Establishing neural connection...</div>
         <div class="loading-status">Initializing...</div>
-    `; 
+        `;
 
         // Add to DOM
         const homeSection = document.querySelector('#home');
@@ -34,6 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Start with opacity 0
             loadingSequence.style.opacity = '0';
+            loadingSequence.style.transition = 'opacity 0.5s ease';
 
             // Type the tagline character by character
             let charIndex = 0;
@@ -109,8 +118,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     setTimeout(() => {
                         loadingSequence.remove();
                         showAIWithTVEffect(aiSection);
-                    }, 300);
-                }, 300);
+                    }, 500); // Increased delay to ensure loading sequence is gone
+                }, 500); // Increased delay for better visual effect
             }
         }, 30);
     }
@@ -119,8 +128,8 @@ document.addEventListener('DOMContentLoaded', function () {
     function positionAIAssistant(loadingSequence, aiSection) {
         if (!aiSection || !loadingSequence) return;
 
-        // Make AI visible but with 0 opacity
-        aiSection.style.visibility = 'visible';
+        // Make sure AI is still hidden
+        aiSection.style.visibility = 'hidden';
         aiSection.style.opacity = '0';
 
         // Position it in the same place
@@ -147,11 +156,10 @@ document.addEventListener('DOMContentLoaded', function () {
         
         console.log("Starting AI assistant reveal");
         
-        // Make sure AI is visible from the start
+        // Make AI visible but still with 0 opacity
         aiSection.style.visibility = 'visible';
-        aiSection.style.opacity = '0';
         
-        // Position it correctly immediately
+        // Position it correctly
         aiSection.style.position = 'relative';
         aiSection.style.top = '0';
         aiSection.style.left = '0';
@@ -162,7 +170,7 @@ document.addEventListener('DOMContentLoaded', function () {
         setTimeout(() => {
             console.log("Fading in AI assistant");
             
-            // Set explicit opacity
+            // Set explicit opacity for fade-in
             aiSection.style.opacity = '1';
             
             // Add fade-in class for animation
