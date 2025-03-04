@@ -10,16 +10,37 @@ document.addEventListener('DOMContentLoaded', function() {
     const statusIndicator = document.querySelector('.ps-status');
     const eqContainer = document.querySelector('.ps-eq-container');
     
-    // Check if we have the main audio player instance
-    const audioPlayer = window.audioPlayer;
+    // Function to get the audio player instance
+    function getAudioPlayer() {
+        // Try to get from window.audioPlayer (set by audio-player.js)
+        if (window.audioPlayer) {
+            return window.audioPlayer;
+        }
+        
+        // Try to get from audioPlayerInstance (another way it might be stored)
+        if (window.audioPlayerInstance) {
+            return window.audioPlayerInstance;
+        }
+        
+        // If no instance exists yet, try to create one
+        if (typeof AudioPlayer === 'function') {
+            return new AudioPlayer();
+        }
+        
+        return null;
+    }
+    
+    // Get or create audio player instance
+    const audioPlayer = getAudioPlayer();
     
     // Function to update the PowerShell widget state based on audio player
     function updateWidgetState() {
-        if (!audioPlayer) return;
-        
         // Update status indicator
         if (statusIndicator) {
-            const isPlaying = audioPlayer.isPlaying || false;
+            // Check if audio is playing
+            const audioElement = document.querySelector('audio');
+            const isPlaying = audioElement ? !audioElement.paused : false;
+            
             statusIndicator.textContent = isPlaying ? "Active" : "Inactive";
             statusIndicator.classList.toggle('active', isPlaying);
             statusIndicator.classList.toggle('inactive', !isPlaying);
@@ -27,7 +48,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Update EQ animation
         if (eqContainer) {
-            const isPlaying = audioPlayer.isPlaying || false;
+            const audioElement = document.querySelector('audio');
+            const isPlaying = audioElement ? !audioElement.paused : false;
             eqContainer.classList.toggle('active', isPlaying);
         }
     }
@@ -41,6 +63,42 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    // Function to directly play audio without relying on the audio player instance
+    function playAudioDirectly() {
+        const audioElement = document.querySelector('audio');
+        if (audioElement) {
+            // Create audio context if needed
+            if (!window.audioContext) {
+                try {
+                    window.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    
+                    // Connect audio element to context if not already connected
+                    if (!window.audioSource) {
+                        window.audioSource = window.audioContext.createMediaElementSource(audioElement);
+                        window.audioSource.connect(window.audioContext.destination);
+                    }
+                } catch (e) {
+                    console.error("Error creating audio context:", e);
+                }
+            }
+            
+            // Play the audio
+            const playPromise = audioElement.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    console.log("Audio playback started successfully");
+                    updateWidgetState();
+                }).catch(e => {
+                    console.warn("Audio playback was prevented:", e);
+                });
+            }
+            
+            return true;
+        }
+        return false;
+    }
+    
     // Connect enable button to the existing audio player
     if (enableAudioBtn) {
         enableAudioBtn.addEventListener('click', function() {
@@ -48,58 +106,53 @@ document.addEventListener('DOMContentLoaded', function() {
             this.classList.add('clicked');
             setTimeout(() => this.classList.remove('clicked'), 800);
             
-            // Use the existing audio player if available
-            if (audioPlayer && audioPlayer.initAudio) {
-                audioPlayer.initAudio();
-                audioPlayer.playAudio();
+            let audioStarted = false;
+            
+            // Try multiple methods to start audio
+            
+            // Method 1: Use the audio player instance if available
+            if (audioPlayer) {
+                console.log("Using audio player instance to play audio");
                 
-                // Update widget state
-                updateWidgetState();
+                // Initialize audio if needed
+                if (typeof audioPlayer.initAudio === 'function') {
+                    audioPlayer.initAudio();
+                }
                 
-                // Show visualizer terminal
-                showVisualizerTerminal();
-                
-                // Hide PowerShell widget with animation
-                setTimeout(() => {
-                    psWidget.style.transition = 'all 0.5s cubic-bezier(0.7, 0, 0.84, 0)';
-                    psWidget.classList.remove('ps-active');
-                    psWidget.style.opacity = '0';
-                    psWidget.style.transform = 'translateY(20px) scale(0.95)';
-                    
-                    // Don't completely remove, just hide
-                    setTimeout(() => {
-                        psWidget.style.display = 'none';
-                    }, 500);
-                }, 1000);
-            } else {
-                // Fallback if audioPlayer is not available
-                const audioElement = document.querySelector('audio');
-                if (audioElement) {
-                    audioElement.play().catch(e => console.warn("Autoplay prevented:", e));
-                    
-                    // Update status
-                    if (statusIndicator) {
-                        statusIndicator.textContent = "Active";
-                        statusIndicator.classList.add('active');
-                        statusIndicator.classList.remove('inactive');
-                    }
-                    
-                    // Activate EQ animation
-                    if (eqContainer) {
-                        eqContainer.classList.add('active');
-                    }
-                    
-                    // Show visualizer terminal
-                    showVisualizerTerminal();
-                    
-                    // Hide PowerShell widget
-                    setTimeout(() => {
-                        psWidget.style.display = 'none';
-                    }, 1000);
-                } else {
-                    console.warn("No audio element found");
+                // Play audio
+                if (typeof audioPlayer.playAudio === 'function') {
+                    audioPlayer.playAudio();
+                    audioStarted = true;
                 }
             }
+            
+            // Method 2: Direct audio element control (fallback)
+            if (!audioStarted) {
+                console.log("Falling back to direct audio element control");
+                audioStarted = playAudioDirectly();
+            }
+            
+            // Update button text
+            this.textContent = "AUDIO ENABLED";
+            
+            // Update widget state
+            updateWidgetState();
+            
+            // Show visualizer terminal
+            showVisualizerTerminal();
+            
+            // Hide PowerShell widget with animation
+            setTimeout(() => {
+                psWidget.style.transition = 'all 0.5s cubic-bezier(0.7, 0, 0.84, 0)';
+                psWidget.classList.remove('ps-active');
+                psWidget.style.opacity = '0';
+                psWidget.style.transform = 'translateY(20px) scale(0.95)';
+                
+                // Don't completely remove, just hide
+                setTimeout(() => {
+                    psWidget.style.display = 'none';
+                }, 500);
+            }, 1000);
         });
     }
     
@@ -109,6 +162,12 @@ document.addEventListener('DOMContentLoaded', function() {
             // Add click effect
             this.classList.add('clicked');
             setTimeout(() => this.classList.remove('clicked'), 800);
+            
+            // Try to pause audio
+            const audioElement = document.querySelector('audio');
+            if (audioElement) {
+                audioElement.pause();
+            }
             
             // Hide PowerShell widget
             setTimeout(() => {
@@ -195,25 +254,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Listen for audio player events to update the widget
-    if (audioPlayer) {
-        // Check if the audio player has an event system
-        if (audioPlayer.addEventListener) {
-            audioPlayer.addEventListener('play', updateWidgetState);
-            audioPlayer.addEventListener('pause', updateWidgetState);
-            audioPlayer.addEventListener('trackchange', updateWidgetState);
-        }
-        
-        // Initial state update
-        updateWidgetState();
-    } else {
-        // Fallback for audio element events
-        const audioElement = document.querySelector('audio');
-        if (audioElement) {
-            audioElement.addEventListener('play', updateWidgetState);
-            audioElement.addEventListener('pause', updateWidgetState);
-            audioElement.addEventListener('ended', updateWidgetState);
-        }
+    // Listen for audio events to update the widget
+    const audioElement = document.querySelector('audio');
+    if (audioElement) {
+        audioElement.addEventListener('play', updateWidgetState);
+        audioElement.addEventListener('pause', updateWidgetState);
+        audioElement.addEventListener('ended', updateWidgetState);
     }
     
     // Expose functions to global scope for external access
@@ -232,4 +278,9 @@ document.addEventListener('DOMContentLoaded', function() {
             psWidget.classList.add('ps-active');
         }, 1000);
     }
+    
+    // Debug info
+    console.log("PowerShell Audio Widget initialized");
+    console.log("Audio player instance:", audioPlayer ? "Found" : "Not found");
+    console.log("Audio element:", audioElement ? "Found" : "Not found");
 }); 
