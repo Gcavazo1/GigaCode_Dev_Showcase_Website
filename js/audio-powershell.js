@@ -74,20 +74,20 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to show the visualizer terminal after enabling audio
     function showVisualizerTerminal() {
         if (visualizerTerminal) {
+            // First, make sure it's hidden but ready to animate
             visualizerTerminal.style.display = 'block';
-            visualizerTerminal.classList.add('active');
-            
-            // Add a slight animation effect
             visualizerTerminal.style.opacity = '0';
-            visualizerTerminal.style.transform = 'translateY(-20px)';
+            visualizerTerminal.style.transform = 'translateY(-20px) scale(0.95)';
             
-            // Force reflow
-            visualizerTerminal.offsetHeight;
-            
-            // Animate in
-            visualizerTerminal.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-            visualizerTerminal.style.opacity = '1';
-            visualizerTerminal.style.transform = 'translateY(0)';
+            // Delay the appearance to allow PowerShell widget to fade out first
+            setTimeout(() => {
+                visualizerTerminal.classList.add('active');
+                
+                // Animate in with a smooth transition
+                visualizerTerminal.style.transition = 'opacity 0.6s ease-out, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)';
+                visualizerTerminal.style.opacity = '1';
+                visualizerTerminal.style.transform = 'translateY(0) scale(1)';
+            }, 600); // Delay by 600ms to allow PowerShell widget to fade out
         }
     }
     
@@ -180,7 +180,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 setTimeout(() => {
                     psWidget.style.display = 'none';
                 }, 500);
-            }, 1000);
+                
+                // Show visualizer terminal with delay
+                showVisualizerTerminal();
+            }, 300); // Reduced from 1000ms to 300ms for a quicker start to the transition
         });
     }
     
