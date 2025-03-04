@@ -76,14 +76,14 @@ class AudioAnalyzer {
     }
     
     try {
-      // Get frequency data - this is the critical part
+      // Get frequency data
       this.analyser.getByteFrequencyData(this.dataArray);
       
-      // Calculate the values with higher values for better visibility
+      // Calculate the values with appropriate amplification
       const newData = {
-        low: this.calculateBandValue(this.frequencyRanges.low) * 1.5,  // Amplify low frequencies
-        mid: this.calculateBandValue(this.frequencyRanges.mid) * 1.2,  // Amplify mid frequencies
-        high: this.calculateBandValue(this.frequencyRanges.high)       // Keep high frequencies as is
+        low: this.calculateBandValue(this.frequencyRanges.low) * 1.5,
+        mid: this.calculateBandValue(this.frequencyRanges.mid) * 1.2,
+        high: this.calculateBandValue(this.frequencyRanges.high)
       };
       
       // Apply smoothing
@@ -91,18 +91,8 @@ class AudioAnalyzer {
       this.frequencyData.mid = this.smooth(this.frequencyData.mid, newData.mid);
       this.frequencyData.high = this.smooth(this.frequencyData.high, newData.high);
       
-      // Debug log occasionally
-      if (Math.random() < 0.01) {
-        console.log('[AudioAnalyzer] Frequency data:', {
-          low: this.frequencyData.low.toFixed(3),
-          mid: this.frequencyData.mid.toFixed(3),
-          high: this.frequencyData.high.toFixed(3)
-        });
-      }
-      
       return this.frequencyData;
     } catch (err) {
-      console.error('[AudioAnalyzer] Error updating:', err);
       return { low: 0, mid: 0, high: 0 };
     }
   }
@@ -131,38 +121,25 @@ class AudioAnalyzer {
   }
 
   useExternalAnalyser(externalAnalyser, audioElement) {
-    if (!externalAnalyser) {
-      console.error('[AudioAnalyzer] No external analyser provided');
-      return false;
-    }
+    if (!externalAnalyser) return false;
     
-    // Store the external analyser reference
+    // Store references
     this.analyser = externalAnalyser;
-    
-    // Store the audio element reference
     this.audio = audioElement;
-    
-    // Store audioContext reference for frequency calculations
     this.audioContext = this.analyser.context;
     
-    // Setup the data array PROPER SIZE
+    // Setup the data array
     this.bufferLength = this.analyser.frequencyBinCount;
     this.dataArray = new Uint8Array(this.bufferLength);
     
-    console.log('[AudioAnalyzer] Using external analyser, buffer length:', this.bufferLength);
-    
-    // Test immediate data access
+    // Test data access
     try {
       this.analyser.getByteFrequencyData(this.dataArray);
-      const hasData = this.dataArray.some(val => val > 0);
-      console.log('[AudioAnalyzer] Initial data check:', hasData ? 'Data present' : 'No data yet');
     } catch (e) {
-      console.error('[AudioAnalyzer] Error testing data access:', e);
+      // Silent fail
     }
     
-    // Set connected flag
     this.isConnected = true;
-    
     return true;
   }
 }

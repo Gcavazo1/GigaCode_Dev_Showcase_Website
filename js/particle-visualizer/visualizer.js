@@ -226,18 +226,16 @@ class ParticleVisualizer {
     requestAnimationFrame(this.animate.bind(this));
     
     // Skip if not initialized
-    if (!this.isInitialized) {
-      return;
-    }
+    if (!this.isInitialized) return;
     
     const elapsedTime = this.clock.getElapsedTime();
     
-    // DIRECT ACCESS TO AUDIO PLAYER'S ANALYZER DATA
+    // Streamlined audio data acquisition
     let audioData = { low: 0, mid: 0, high: 0 }; 
     let beatDetected = false;
     
     // Try multiple approaches to get audio data
-    // 1. First try our own analyzer
+    // First try our analyzer
     if (this.isPlaying && this.audioAnalyzer) {
       try {
         audioData = this.audioAnalyzer.update();
@@ -246,13 +244,13 @@ class ParticleVisualizer {
       }
     }
     
-    // 2. If no data, try direct access to audio player's data
+    // If no data, try direct access to audio player's data
     if (Math.max(audioData.low, audioData.mid, audioData.high) < 0.01 && 
         window.audioPlayerInstance && 
         window.audioPlayerInstance.analyser) {
       
       try {
-        // Manual direct access to audio player's analyzer
+        // Direct access to audio player's analyzer
         const analyser = window.audioPlayerInstance.analyser;
         const dataArray = new Uint8Array(analyser.frequencyBinCount);
         analyser.getByteFrequencyData(dataArray);
@@ -261,18 +259,14 @@ class ParticleVisualizer {
         const average = Array.from(dataArray).reduce((sum, val) => sum + val, 0) / dataArray.length;
         const normalized = average / 255;
         
-        // Split into low, mid, high with emphasis on bass for better visuals
+        // Split into low/mid/high with appropriate values
         audioData = {
           low: normalized * 0.8,
           mid: normalized * 0.5,
           high: normalized * 0.3
         };
-        
-        if (normalized > 0.01) {
-          console.log('[Visualizer] Using direct data access:', normalized.toFixed(3));
-        }
       } catch (e) {
-        console.error('[Visualizer] Error with direct data access:', e);
+        // Silent fail - no need to log this
       }
     }
     
@@ -281,31 +275,20 @@ class ParticleVisualizer {
       beatDetected = this.beatDetector.update(audioData, elapsedTime * 1000);
     }
     
-    // Log audio data occasionally 
-    if (Math.random() < 0.005 && Math.max(audioData.low, audioData.mid, audioData.high) > 0.01) {
-      console.log('[Visualizer] Audio data:', 
-        `L:${audioData.low.toFixed(2)} M:${audioData.mid.toFixed(2)} H:${audioData.high.toFixed(2)}`);
-    }
-    
-    // ALWAYS update particle system with whatever data we have
+    // Update particle system
     if (this.particleSystem) {
       this.particleSystem.update(elapsedTime, audioData, beatDetected);
     }
     
-    // RESTORE AUTO-ROTATION - add this back
+    // Auto-rotation
     if (this.holder) {
-      // Slow constant rotation
       this.holder.rotation.y += 0.002;
       this.holder.rotation.x += 0.001;
     }
     
     // Render scene
     if (this.scene && this.camera && this.renderer) {
-      try {
-        this.renderer.render(this.scene, this.camera);
-      } catch (error) {
-        console.error('[Visualizer] Error during rendering:', error);
-      }
+      this.renderer.render(this.scene, this.camera);
     }
   }
 
@@ -351,26 +334,14 @@ class ParticleVisualizer {
   }
 
   testAudioConnection() {
-    if (!this.audioAnalyzer || !this.audioAnalyzer.analyser) {
-        console.error('[Visualizer] No analyzer to test');
-        return false;
-    }
+    if (!this.audioAnalyzer || !this.audioAnalyzer.analyser) return false;
     
     try {
-        // Get fresh data
-        const data = this.audioAnalyzer.update();
-        
-        // Check if we have any non-zero values
-        const hasData = Object.values(data).some(val => val > 0.01);
-        
-        console.log('[Visualizer] Audio connection test:', 
-                   hasData ? 'DATA FLOWING' : 'NO DATA', 
-                   data);
-        
-        return hasData;
+      const data = this.audioAnalyzer.update();
+      const hasData = Object.values(data).some(val => val > 0.01);
+      return hasData;
     } catch (e) {
-        console.error('[Visualizer] Error testing audio connection:', e);
-        return false;
+      return false;
     }
   }
 }

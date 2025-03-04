@@ -627,38 +627,27 @@ class ParticleSystem {
   update(time, audioData, beatDetected) {
     if (!this.material) return;
     
-    // Simple time increment
-    this.time += 0.01; // Slower base animation
+    // Time increment
+    this.time += 0.01;
     this.uniforms.time.value = this.time;
     
     // Set audio data defaults if not provided
     const audio = audioData || { low: 0, mid: 0, high: 0 };
     
-    // Log real audio data values occasionally
-    if (audioData && audioData.low > 0.01 && Math.random() < 0.02) {
-      console.log("[ParticleSystem] Active audio data:", {
-        low: audio.low.toFixed(3),
-        mid: audio.mid.toFixed(3),
-        high: audio.high.toFixed(3)
-      });
-    }
-    
     // Get reactivity with default
     const reactivity = Math.max(0.5, this.reactivityMultiplier || 0.8);
     
-    // Apply DIRECT mapping with MORE SUBTLE effects
-    // Reduced intensity values for less overreaction
-    this.uniforms.amplitude.value = 0.3 + (audio.low * 1.5 * reactivity);  // Reduced from 3.0
-    this.uniforms.offsetGain.value = 0.1 + (audio.mid * 1.0 * reactivity);  // Reduced from 2.0
-    this.uniforms.frequency.value = 1.0 + (audio.high * 2.0 * reactivity);  // Reduced from 5.0
+    // Apply audio data to uniforms
+    this.uniforms.amplitude.value = 0.3 + (audio.low * 1.5 * reactivity);
+    this.uniforms.offsetGain.value = 0.1 + (audio.mid * 1.0 * reactivity);
+    this.uniforms.frequency.value = 1.0 + (audio.high * 2.0 * reactivity);
     
-    // Beat detection with more subtle effect
+    // Beat detection
     if (beatDetected) {
-      console.log("[ParticleSystem] Beat detected!");
-      this.uniforms.size.value = 2.5 * reactivity;  // Reduced from 4.0
-      this.uniforms.maxDistance.value = 1.5;  // Reduced from 2.0
+      this.uniforms.size.value = 2.5 * reactivity;
+      this.uniforms.maxDistance.value = 1.5;
     } else {
-      // Smoother falloff
+      // Smooth falloff
       this.uniforms.size.value = Math.max(0.8, this.uniforms.size.value * 0.92);
       this.uniforms.maxDistance.value = Math.max(0.8, this.uniforms.maxDistance.value * 0.95);
     }

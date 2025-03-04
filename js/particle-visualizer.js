@@ -1,10 +1,8 @@
 // Minimalist initialization for particle visualizer
-console.log("Particle visualizer script loaded");
+console.log("Particle visualizer initialized");
 
 // Single clean initialization
 document.addEventListener('DOMContentLoaded', async () => {
-  console.log("Initializing particle visualizer");
-  
   try {
     // Import the visualizer module
     const ParticleVisualizer = await import('./particle-visualizer/visualizer.js').then(module => module.default);
@@ -12,7 +10,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Create visualizer instance and make it globally accessible
     const visualizer = new ParticleVisualizer();
     window.particleVisualizer = visualizer;
-    console.log("Visualizer created and attached to window");
     
     // Setup visualizer controls
     setupVisualizerControls();
@@ -23,85 +20,24 @@ document.addEventListener('DOMContentLoaded', async () => {
       navButton.addEventListener('click', showVisualizerControls);
     }
     
-    // RESTORE AUTO-OPEN FUNCTIONALITY:
-    // Listen for clicks on the Enable-Music button
+    // Auto-open functionality for Enable-Music button
     document.addEventListener('click', function(event) {
-      // Check if clicked element is the Enable-Music button
-      console.log("Click detected, checking if Enable-Music button:", event.target);
-      
       if (event.target.classList.contains('ps-enable-btn') || 
           event.target.textContent.includes('Enable-Music')) {
-        console.log("Enable-Music button detected and clicked!");
         
         // Show visualizer when music is enabled
-        setTimeout(function() {
-          console.log("Attempting to show visualizer after Enable-Music");
-          showVisualizerControls();
-        }, 1000);
+        setTimeout(() => showVisualizerControls(), 1000);
       }
     });
-    
-    // Test audio connection after a few seconds
-    setTimeout(() => {
-        if (window.particleVisualizer) {
-            // Add test method if not present
-            if (!window.particleVisualizer.testAudioConnection) {
-                window.particleVisualizer.testAudioConnection = function() {
-                    if (!this.audioAnalyzer || !this.audioAnalyzer.analyser) {
-                        console.error('No analyzer to test');
-                        return false;
-                    }
-                    
-                    try {
-                        // Get fresh data
-                        const data = this.audioAnalyzer.update();
-                        
-                        // Check if we have any non-zero values
-                        const hasData = Object.values(data).some(val => val > 0.01);
-                        
-                        console.log('Audio connection test:', 
-                                   hasData ? 'DATA FLOWING' : 'NO DATA', 
-                                   data);
-                        
-                        return hasData;
-                    } catch (e) {
-                        console.error('Error testing audio connection:', e);
-                        return false;
-                    }
-                };
-            }
-            
-            // Run test
-            window.particleVisualizer.testAudioConnection();
-            
-            // Schedule another test when audio is playing
-            if (window.audioPlayerInstance && window.audioPlayerInstance.isPlaying) {
-                console.log("Testing visualizer connection with playing audio");
-                window.particleVisualizer.testAudioConnection();
-            }
-        }
-    }, 5000);
-    
   } catch (error) {
     console.error("Error initializing visualizer:", error);
   }
 });
 
-// Terminal setup simplified
+// Show visualizer terminal controls
 function showVisualizerControls() {
   const terminal = document.querySelector('.visualizer-terminal');
-  if (!terminal) {
-    console.error('Visualizer terminal not found');
-    return;
-  }
-  
-  // If already active, don't show again
-  if (terminal.classList.contains('active')) {
-    console.log("Visualizer terminal already active");
-    return;
-  }
-  
-  console.log("Showing visualizer terminal");
+  if (!terminal || terminal.classList.contains('active')) return;
   
   // Show terminal
   terminal.classList.add('active');
@@ -116,13 +52,9 @@ function showVisualizerControls() {
   setupVisualizerControls();
 }
 
+// Setup the visualizer controls
 function setupVisualizerControls() {
-  if (!window.particleVisualizer || !window.particleVisualizer.particleSystem) {
-    console.warn("Particle system not available for controls");
-    return;
-  }
-  
-  console.log("Setting up visualizer controls");
+  if (!window.particleVisualizer || !window.particleVisualizer.particleSystem) return;
   
   // Shape buttons
   document.querySelectorAll('.visualizer-terminal [data-shape]').forEach(btn => {
@@ -132,16 +64,13 @@ function setupVisualizerControls() {
     
     newBtn.addEventListener('click', () => {
       const shape = newBtn.getAttribute('data-shape');
-      console.log(`Shape button clicked: ${shape}`);
       if (window.particleVisualizer.particleSystem) {
         try {
-          // Try both create methods (for compatibility)
           if (typeof window.particleVisualizer.particleSystem.create === 'function') {
             window.particleVisualizer.particleSystem.create(shape);
           } else {
             window.particleVisualizer.particleSystem.createShapedGeometry(shape);
           }
-          console.log(`Created new ${shape} particles`);
         } catch (error) {
           console.error("Error changing particle shape:", error);
         }
@@ -157,19 +86,13 @@ function setupVisualizerControls() {
     randomizeBtn.parentNode.replaceChild(newRandomizeBtn, randomizeBtn);
     
     newRandomizeBtn.addEventListener('click', () => {
-      console.log("Randomize segments button clicked");
       if (window.particleVisualizer.particleSystem) {
-        try {
-          window.particleVisualizer.particleSystem.randomizeCurrentShape();
-          console.log("Segments randomized for current shape");
-        } catch (error) {
-          console.error("Error randomizing segments:", error);
-        }
+        window.particleVisualizer.particleSystem.randomizeCurrentShape();
       }
     });
   }
   
-  // Reactivity slider - FIXED IMPLEMENTATION
+  // Reactivity slider
   const reactivitySlider = document.getElementById('reactivity-control');
   const reactivityValue = document.getElementById('reactivity-value');
   
@@ -188,7 +111,6 @@ function setupVisualizerControls() {
       const value = parseFloat(newSlider.value);
       reactivityValue.textContent = value.toFixed(1);
       
-      console.log(`Setting reactivity to: ${value}`);
       if (window.particleVisualizer.particleSystem) {
         window.particleVisualizer.particleSystem.reactivityMultiplier = value;
       }
@@ -213,7 +135,6 @@ function setupVisualizerControls() {
         
         window.particleVisualizer.particleSystem.uniforms.startColor.value.copy(startColor);
         window.particleVisualizer.particleSystem.uniforms.endColor.value.copy(endColor);
-        console.log("Colors updated:", startColorPicker.value, endColorPicker.value);
       }
     };
     

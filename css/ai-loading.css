@@ -1,3 +1,6 @@
+/* This file is dedicated to AI loading - no visualizer styles should be here */
+/* If any visualizer-related styles are found, they should be removed */
+
 /* New dedicated CSS file for AI loading animation */
 .loading-sequence {
     position: relative;

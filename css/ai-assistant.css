@@ -434,4 +434,7 @@
 @keyframes dataPulse {
     0%, 100% { opacity: 0.3; }
     50% { opacity: 1; }
-} 
+}
+
+/* This file is dedicated to AI assistant UI - no visualizer styles should be here */
+/* If any visualizer-related styles are found, they should be removed */ 
