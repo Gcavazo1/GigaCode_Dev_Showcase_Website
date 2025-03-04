@@ -136,7 +136,7 @@ class AIAssistant {
         }
         
         if (input.includes('portfolio') || input.includes('showcase') || input.includes('projects')) {
-            return `${this.getRandomCatchphrase()} As GigaChode AI, I can guide you through this cutting-edge portfolio. We've got mobile applications with sleek interfaces, immersive Roblox game worlds, stunning 3D models, and interactive web experiences. Each section is a gateway to a different dimension of digital creativity. Want me to flex my neural networks and show you around?`;
+            return `This portfolio showcases cutting-edge development work across multiple domains. You can explore mobile applications with sleek interfaces, immersive Roblox game worlds, stunning 3D models, and interactive web experiences. Each section is a gateway to a different dimension of digital creativity. Would you like me to take you on a guided tour of a specific section?`;
         }
         
         if (input.includes('mobile') || input.includes('apps') || input.includes('applications')) {
@@ -184,7 +184,7 @@ class AIAssistant {
         }
         
         // If no specific match, provide a general response with personality
-        return `${this.getRandomCatchphrase()} That's an interesting query, human. As GigaChode AI, I can guide you through any section: mobile apps, Roblox games, 3D models, holographic interfaces, or even the generative AI showcase. What aspect of the digital frontier would you like to explore?`;
+        return `${this.getRandomCatchphrase()} That's an interesting query. As the sentient AI managing this portfolio, I can guide you through any section: mobile apps, Roblox games, 3D models, holographic interfaces, or even the generative AI showcase. What aspect of the digital frontier would you like to explore?`;
     }
     
     speakResponse(text) {
