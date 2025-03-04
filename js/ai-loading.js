@@ -145,31 +145,31 @@ document.addEventListener('DOMContentLoaded', function () {
     function showAIWithTVEffect(aiSection) {
         if (!aiSection) return;
 
-        // Prepare AI Assistant for glitch effect
+        // Prepare AI Assistant for simple fade-in
         aiSection.style.visibility = 'visible';
         aiSection.style.opacity = '0';
         
-        // Small delay before starting glitch animation
+        // Small delay before fading in
         setTimeout(() => {
-            // Add the glitch-in class to trigger the animation
-            aiSection.classList.add('glitch-in-effect');
-            
-            // Start transition to visible state
-            aiSection.style.opacity = '1';
-            
-            // Set proper positioning immediately (no second animation)
+            // Set proper positioning immediately
             aiSection.style.position = 'relative';
             aiSection.style.top = '0';
             aiSection.style.left = '0';
             aiSection.style.right = '0';
             aiSection.style.width = '100%';
             
-            // After glitch effect completes, add loaded class
+            // Simple fade in with yellow glow
+            aiSection.classList.add('fade-in-effect');
+            
+            // After fade completes, add loaded class
             setTimeout(() => {
                 aiSection.classList.add('loaded');
-                aiSection.classList.remove('glitch-in-effect');
-                console.log("AI Assistant revealed with glitch effect");
-            }, 1500); // Match the total glitch-in animation duration
+                
+                // Ensure the pulse-glow animation continues
+                aiSection.style.animation = 'pulse-glow 4s ease-in-out infinite alternate';
+                
+                console.log("AI Assistant revealed with fade effect");
+            }, 500); // shorter duration for simpler animation
         }, 300);
     }
 }); 
