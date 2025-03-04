@@ -366,30 +366,10 @@ class AudioPlayer {
             carouselContainer.appendChild(card);
         });
 
-        // Add navigation
-        const prevBtn = document.createElement('button');
-        prevBtn.className = 'ps-playlist-nav ps-prev';
-        prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+        // No more navigation buttons - we're using drag interaction now
         
-        const nextBtn = document.createElement('button');
-        nextBtn.className = 'ps-playlist-nav ps-next';
-        nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
-
-        // Add event listeners
-        prevBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.rotateCarousel('prev');
-        });
-
-        nextBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.rotateCarousel('next');
-        });
-
         // Assemble the carousel
         carousel.appendChild(carouselContainer);
-        carousel.appendChild(prevBtn);
-        carousel.appendChild(nextBtn);
         playlistContainer.appendChild(carousel);
         audioContainer.appendChild(playlistContainer);
 
@@ -399,8 +379,8 @@ class AudioPlayer {
 
         // Initial positioning
         this.positionCarouselCards();
-
-        // Add this after storing the references:
+        
+        // Initialize drag functionality
         this.initCarouselDrag();
     }
 
@@ -441,7 +421,7 @@ class AudioPlayer {
         const cards = this.carouselContainer.querySelectorAll('.ps-track-card');
         const cardCount = cards.length;
         const theta = (2 * Math.PI) / cardCount;
-        const radius = 250; // Adjust this value to change circle size
+        const radius = 350; // Increased radius for a wider carousel
 
         cards.forEach((card, index) => {
             const angle = theta * index;
