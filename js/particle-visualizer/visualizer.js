@@ -232,25 +232,59 @@ class ParticleVisualizer {
     
     const elapsedTime = this.clock.getElapsedTime();
     
-    // Update audio analyzer - ALWAYS TRY TO GET AUDIO DATA
+    // DIRECT ACCESS TO AUDIO PLAYER'S ANALYZER DATA
     let audioData = { low: 0, mid: 0, high: 0 }; 
     let beatDetected = false;
     
+    // Try multiple approaches to get audio data
+    // 1. First try our own analyzer
     if (this.isPlaying && this.audioAnalyzer) {
       try {
         audioData = this.audioAnalyzer.update();
-        
-        // Only log occasionally to avoid console spam
-        if (Math.random() < 0.005) { 
-          console.log('[Visualizer] Audio data:', 
-            `L:${audioData.low.toFixed(2)} M:${audioData.mid.toFixed(2)} H:${audioData.high.toFixed(2)}`);
-        }
-        
-        // Update beat detector
-        beatDetected = this.beatDetector.update(audioData, elapsedTime * 1000);
       } catch (e) {
         console.error('[Visualizer] Error updating audio:', e);
       }
+    }
+    
+    // 2. If no data, try direct access to audio player's data
+    if (Math.max(audioData.low, audioData.mid, audioData.high) < 0.01 && 
+        window.audioPlayerInstance && 
+        window.audioPlayerInstance.analyser) {
+      
+      try {
+        // Manual direct access to audio player's analyzer
+        const analyser = window.audioPlayerInstance.analyser;
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+        analyser.getByteFrequencyData(dataArray);
+        
+        // Simple conversion to our format
+        const average = Array.from(dataArray).reduce((sum, val) => sum + val, 0) / dataArray.length;
+        const normalized = average / 255;
+        
+        // Split into low, mid, high with emphasis on bass for better visuals
+        audioData = {
+          low: normalized * 1.5,
+          mid: normalized * 0.8,
+          high: normalized * 0.5
+        };
+        
+        if (normalized > 0.01) {
+          console.log('[Visualizer] Using direct data access:', normalized.toFixed(3));
+        }
+      } catch (e) {
+        console.error('[Visualizer] Error with direct data access:', e);
+      }
+    }
+    
+    // Update beat detector
+    if (this.beatDetector) {
+      beatDetected = this.beatDetector.update(audioData, elapsedTime * 1000);
+    }
+    
+    // Log audio data occasionally 
+    if (Math.random() < 0.005 && Math.max(audioData.low, audioData.mid, audioData.high) > 0.01) {
+      console.log('[Visualizer] Audio data:', 
+        `L:${audioData.low.toFixed(2)} M:${audioData.mid.toFixed(2)} H:${audioData.high.toFixed(2)}`);
     }
     
     // ALWAYS update particle system with whatever data we have
