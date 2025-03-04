@@ -1,6 +1,45 @@
 // Cyberpunk Audio Player with PowerShell-style widget
 let audioPlayerInstance = null;
 
+// Handle paths to audio files properly
+function getAudioPath(filePath) {
+    // Log the current location for debugging
+    console.log("Current location:", window.location.href);
+    
+    // Check if the URL already includes the full path
+    if (filePath.startsWith('http')) {
+        return filePath;
+    }
+    
+    // Make sure to remove any leading slash from filePath
+    const cleanPath = filePath.startsWith('/') ? filePath.substring(1) : filePath;
+    
+    // For GitHub hosted content - use raw.githubusercontent.com
+    // This is the correct way to access raw files from GitHub
+    if (window.location.href.includes('github.io') || 
+        window.location.href.includes('gcavazo1.github.io') ||
+        window.location.hostname === 'gcavazo1.github.io') {
+        
+        const githubPath = `https://raw.githubusercontent.com/Gcavazo1/GigaCode_Dev_Showcase_Website/enhanced-gigachode-ai/${cleanPath}`;
+        console.log(`Using GitHub raw URL: ${githubPath}`);
+        return githubPath;
+    }
+    
+    // Allow testing with a query parameter ?useGithub=true
+    if (window.location.search.includes('useGithub=true')) {
+        const githubPath = `https://raw.githubusercontent.com/Gcavazo1/GigaCode_Dev_Showcase_Website/enhanced-gigachode-ai/${cleanPath}`;
+        console.log(`Using GitHub raw URL (from query param): ${githubPath}`);
+        return githubPath;
+    }
+    
+    // For local development
+    const baseUrl = window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '/');
+    const localPath = baseUrl + cleanPath;
+    
+    console.log(`Using local audio path: ${localPath}`);
+    return localPath;
+}
+
 // Add global document interaction events to help with autoplay permission
 function setupGlobalAudioPermission() {
     const interactionEvents = ['click', 'touchstart', 'keydown'];
@@ -243,6 +282,38 @@ class AudioPlayer {
     actuallyPlayAudio() {
         console.log("Attempting to play audio:", this.audio.src);
         
+        // First check if the Audio element is properly loaded
+        if (!this.audio) {
+            console.error("Audio element not found!");
+            this.showAudioError("Audio element not available");
+            return;
+        }
+        
+        // Check if we have a source set
+        if (!this.audio.src) {
+            console.error("No audio source set!");
+            this.showAudioError("No audio source set");
+            return;
+        }
+        
+        // Perform a pre-check on the audio source using fetch API
+        fetch(this.audio.src, { method: 'HEAD' })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Audio file not accessible (${response.status})`);
+                }
+                console.log(`Pre-check successful: ${this.audio.src} (${response.status})`);
+                return this.performPlayback();
+            })
+            .catch(error => {
+                console.error("Pre-check failed:", error);
+                this.showAudioError(`Audio file not accessible: ${error.message}`);
+                // Try to play anyway as a fallback
+                this.performPlayback();
+            });
+    }
+    
+    performPlayback() {
         this.audio.play()
             .then(() => {
                 console.log("Playback started successfully");
@@ -287,8 +358,10 @@ class AudioPlayer {
     loadTrack(index) {
         try {
             this.currentTrack = index;
-            const trackSrc = this.playlist[index].file;
-            console.log(`Loading track: ${this.playlist[index].title} from ${trackSrc}`);
+            const trackPath = this.playlist[index].file;
+            const trackSrc = getAudioPath(trackPath);
+            console.log(`Loading track: ${this.playlist[index].title} from ${trackPath}`);
+            console.log(`Resolved audio URL: ${trackSrc}`);
             
             // Verify audio file exists by creating a temporary XMLHttpRequest
             const xhr = new XMLHttpRequest();
@@ -437,12 +510,42 @@ class AudioPlayer {
         
         // Add event listeners
         widget.querySelector('.ps-enable-btn').addEventListener('click', () => {
-            this.initAudio();
-            this.playAudio();
-            this.closePowerShellWidget(widget);
+            console.log("Enable music button clicked");
+            if (!this.audioContext) {
+                this.initAudio();
+            }
+            
+            // Try to resume AudioContext in case it's suspended
+            if (this.audioContext && this.audioContext.state === 'suspended') {
+                console.log("Resuming suspended AudioContext");
+                this.audioContext.resume().then(() => {
+                    console.log("AudioContext resumed successfully");
+                }).catch(err => {
+                    console.error("Failed to resume AudioContext:", err);
+                });
+            }
+            
+            // Update widget UI to show "Enabling music..."
+            const outputEl = widget.querySelector('.ps-terminal-output');
+            if (outputEl) {
+                outputEl.innerHTML = `
+                    [INFO] Enabling music... <br>
+                    [STATUS] Initializing audio system... <br>
+                    [STATUS] Preparing to play track: ${this.playlist[this.currentTrack].title}
+                `;
+            }
+            
+            // Give a moment for AudioContext to initialize before playing
+            setTimeout(() => {
+                this.playAudio();
+                this.closePowerShellWidget(widget);
+            }, 1000);
         });
         
         widget.querySelector('.ps-disable-btn').addEventListener('click', () => {
+            if (this.isPlaying) {
+                this.pauseAudio();
+            }
             this.closePowerShellWidget(widget);
         });
         
@@ -645,9 +748,83 @@ class AudioPlayer {
             }, 500);
         }, 5000);
     }
+    
+    debugAudio() {
+        console.group("🔍 Audio Player Debug Info");
+        console.log("Audio Element:", this.audio);
+        console.log("Audio Source:", this.audio.src);
+        console.log("Current Track:", this.currentTrack, this.playlist[this.currentTrack]);
+        console.log("AudioContext State:", this.audioContext ? this.audioContext.state : "No AudioContext");
+        console.log("Is Playing:", this.isPlaying);
+        
+        // Test if the audio file is accessible
+        if (this.audio.src) {
+            console.log("Testing audio file accessibility...");
+            fetch(this.audio.src, { method: 'HEAD' })
+                .then(response => {
+                    console.log(`Audio file test: ${response.status} ${response.statusText}`);
+                    if (response.ok) {
+                        console.log("✅ Audio file is accessible");
+                    } else {
+                        console.error("❌ Audio file is NOT accessible");
+                    }
+                })
+                .catch(error => {
+                    console.error("❌ Audio file fetch error:", error);
+                });
+        }
+        
+        console.groupEnd();
+        
+        // Show a message to the user
+        this.showAudioError("Debug info logged to console (Press F12)");
+        
+        // Create a test tone to check audio system
+        try {
+            const context = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = context.createOscillator();
+            const gainNode = context.createGain();
+            
+            oscillator.type = 'sine';
+            oscillator.frequency.value = 440; // A4 note
+            gainNode.gain.value = 0.1; // Low volume
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(context.destination);
+            
+            oscillator.start();
+            
+            // Stop after 1 second
+            setTimeout(() => {
+                oscillator.stop();
+                this.showAudioError("Test tone completed");
+            }, 1000);
+            
+            console.log("Test tone playing...");
+        } catch (error) {
+            console.error("Failed to create test tone:", error);
+        }
+    }
 }
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    new AudioPlayer();
+    const player = new AudioPlayer();
+    
+    // Add debug button (hidden by default)
+    if (window.location.search.includes('debug=true')) {
+        const debugButton = document.createElement('button');
+        debugButton.textContent = "Debug Audio";
+        debugButton.className = "cyber-button small";
+        debugButton.style.position = "fixed";
+        debugButton.style.bottom = "10px";
+        debugButton.style.right = "10px";
+        debugButton.style.zIndex = "9999";
+        
+        debugButton.addEventListener('click', () => {
+            player.debugAudio();
+        });
+        
+        document.body.appendChild(debugButton);
+    }
 }); 
