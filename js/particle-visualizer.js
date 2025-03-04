@@ -102,7 +102,7 @@ function setupVisualizerControls() {
     reactivitySlider.parentNode.replaceChild(newSlider, reactivitySlider);
     
     // Initialize with current value
-    const currentValue = window.particleVisualizer.particleSystem.reactivityMultiplier || 0.8;
+    const currentValue = window.particleVisualizer.particleSystem.reactivityMultiplier || 0.6;
     newSlider.value = currentValue.toString();
     reactivityValue.textContent = currentValue.toFixed(1);
     
