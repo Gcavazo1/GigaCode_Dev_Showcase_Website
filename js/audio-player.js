@@ -3,6 +3,7 @@ let audioPlayerInstance = null;
 
 class AudioPlayer {
     constructor() {
+        console.log("🎵 Audio Player: Constructor initialized");
         // Singleton pattern
         if (audioPlayerInstance) {
             return audioPlayerInstance;
@@ -51,6 +52,9 @@ class AudioPlayer {
             { title: "Chasing Legends", file: "audio/ChasingLegends.mp3" }
         ];
         this.currentTrack = 0;
+        
+        // Log playlist available
+        console.log(`🎵 Audio Player: Found ${this.playlist.length} tracks in playlist`);
         
         // Initialize
         this.initBasic();
@@ -131,33 +135,35 @@ class AudioPlayer {
     }
     
     initAudio() {
-        if (this.audioContext) return; // Already initialized
+        console.log("🎵 Audio Player: Initializing audio context");
         
         try {
             // Create audio context
-            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            this.audioContext = new AudioContext();
+            console.log("🎵 Audio Player: Audio context created successfully", this.audioContext.state);
             
-            // Check if audio is already connected to another node
-            try {
-                // Set up audio nodes
-                this.analyser = this.audioContext.createAnalyser();
-                this.analyser.fftSize = 512; // For equalizer
-                this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
-                
-                // Try to create a source - might fail if already connected
-                this.source = this.audioContext.createMediaElementSource(this.audio);
-                this.source.connect(this.analyser);
-                this.analyser.connect(this.audioContext.destination);
-            } catch (sourceError) {
-                console.log("Audio element already connected, using alternative approach");
-                
-                // Create analyzer node without directly connecting to audio element
-                this.analyser = this.audioContext.createAnalyser();
-                this.analyser.fftSize = 512;
-                this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
-                
-                // Connect analyzer to destination to hear audio
-                this.analyser.connect(this.audioContext.destination);
+            // Create source from audio element
+            this.source = this.audioContext.createMediaElementSource(this.audio);
+            console.log("🎵 Audio Player: Media element source created");
+            
+            // Create analyzer for visualization
+            this.analyzer = this.audioContext.createAnalyser();
+            this.analyzer.fftSize = 256;
+            console.log("🎵 Audio Player: Analyzer created with fftSize:", this.analyzer.fftSize);
+            
+            // Connect everything
+            this.source.connect(this.analyzer);
+            this.analyzer.connect(this.audioContext.destination);
+            console.log("🎵 Audio Player: Audio nodes connected");
+            
+            // Initialize visualizer if it exists
+            if (window.particleVisualizer) {
+                console.log("🎵 Audio Player: Found particle visualizer, attempting to connect");
+                const connected = window.particleVisualizer.connectToAudioPlayer(this.audio);
+                console.log("🎵 Audio Player: Visualizer connection result:", connected);
+            } else {
+                console.warn("🎵 Audio Player: Particle visualizer not found");
             }
             
             // Load the actual audio source
@@ -165,13 +171,22 @@ class AudioPlayer {
             
             console.log("Audio initialized successfully");
         } catch (error) {
-            console.error("Error initializing audio:", error);
+            console.error("🎵 Audio Player: Error initializing audio:", error);
         }
     }
     
     togglePlay() {
-        if (this.audioContext && this.audioContext.state === 'suspended') {
-            this.audioContext.resume();
+        console.log("🎵 Audio Player: togglePlay called, current state:", this.isPlaying);
+        
+        // Check audio context state
+        if (this.audioContext) {
+            console.log("🎵 Audio Player: Audio context state:", this.audioContext.state);
+            if (this.audioContext.state === 'suspended') {
+                console.log("🎵 Audio Player: Resuming suspended audio context");
+                this.audioContext.resume();
+            }
+        } else {
+            console.warn("🎵 Audio Player: No audio context exists yet");
         }
         
         if (this.isPlaying) {
@@ -182,24 +197,45 @@ class AudioPlayer {
     }
     
     playAudio() {
-        if (!this.audio.src) {
-            this.loadTrack(this.currentTrack);
-        }
+        console.log("🎵 Audio Player: playAudio called, audio element:", this.audio);
         
-        this.audio.play()
-            .then(() => {
-                this.isPlaying = true;
-                this.updatePlayButton();
-            })
-            .catch(error => {
-                console.error("Play failed:", error);
-            });
+        try {
+            // Check audio element
+            if (!this.audio) {
+                console.error("🎵 Audio Player: Audio element not found!");
+                return;
+            }
+            
+            // Try to play and handle promise
+            const playPromise = this.audio.play();
+            
+            if (playPromise !== undefined) {
+                playPromise
+                    .then(() => {
+                        console.log("🎵 Audio Player: Playback started successfully");
+                        this.isPlaying = true;
+                        this.playButton.innerHTML = '<i class="fas fa-pause"></i>';
+                        // Check if we have sound output
+                        console.log("🎵 Audio Player: Current volume:", this.audio.volume);
+                        console.log("🎵 Audio Player: Current time:", this.audio.currentTime);
+                    })
+                    .catch(error => {
+                        console.error("🎵 Audio Player: Playback failed:", error);
+                        this.isPlaying = false;
+                        this.playButton.innerHTML = '<i class="fas fa-play"></i>';
+                    });
+            }
+        } catch (error) {
+            console.error("🎵 Audio Player: Error in playAudio:", error);
+        }
     }
     
     pauseAudio() {
+        console.log("🎵 Audio Player: pauseAudio called");
         this.audio.pause();
         this.isPlaying = false;
-        this.updatePlayButton();
+        this.playButton.innerHTML = '<i class="fas fa-play"></i>';
+        console.log("🎵 Audio Player: Playback paused");
     }
     
     updatePlayButton() {
@@ -218,17 +254,34 @@ class AudioPlayer {
     }
     
     loadTrack(index) {
-        this.currentTrack = index;
-        this.audio.src = this.playlist[index].file;
-        document.getElementById('track-title').textContent = this.playlist[index].title;
+        console.log(`🎵 Audio Player: Loading track at index ${index}`);
         
-        // Update active track in playlist carousel
-        this.updatePlaylistActiveTrack(index);
-        
-        if (this.isPlaying) {
-            this.playAudio();
-        } else {
-            this.updatePlayButton();
+        try {
+            // Get track info
+            const track = this.playlist[index];
+            console.log("🎵 Audio Player: Track to load:", track);
+            
+            // Set audio source
+            this.audio.src = track.file;
+            console.log(`🎵 Audio Player: Set audio source to: ${track.file}`);
+            
+            // Preload audio
+            this.audio.load();
+            console.log("🎵 Audio Player: Audio preloaded");
+            
+            // Update display
+            this.loadTrackInfo(index);
+            
+            // Update playlist
+            this.highlightCurrentTrack();
+            
+            // If was playing, continue playing new track
+            if (this.isPlaying) {
+                console.log("🎵 Audio Player: Auto-playing new track");
+                this.playAudio();
+            }
+        } catch (error) {
+            console.error("🎵 Audio Player: Error loading track:", error);
         }
     }
     
@@ -530,9 +583,50 @@ class AudioPlayer {
             this.updateCarouselPosition();
         }
     }
+
+    // Check audio availability
+    checkAudioFiles() {
+        console.log("🎵 Audio Player: Checking audio files");
+        
+        // Test the first audio file with a fetch request
+        if (this.playlist.length > 0) {
+            const testTrack = this.playlist[0];
+            console.log(`🎵 Audio Player: Testing file existence: ${testTrack.file}`);
+            
+            fetch(testTrack.file)
+                .then(response => {
+                    if (response.ok) {
+                        console.log(`🎵 Audio Player: File exists and is accessible`);
+                    } else {
+                        console.error(`🎵 Audio Player: File exists but returned status: ${response.status}`);
+                    }
+                })
+                .catch(error => {
+                    console.error(`🎵 Audio Player: Error fetching file: ${error}`);
+                });
+        }
+    }
 }
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    new AudioPlayer();
+    console.log("🎵 Audio Player: DOM loaded, checking for audio player");
+    
+    // Check if audio element exists
+    const audioElement = document.getElementById('audio');
+    console.log("🎵 Audio Player: Audio element exists:", !!audioElement);
+    
+    // Check if player container exists
+    const playerContainer = document.querySelector('.audio-player');
+    console.log("🎵 Audio Player: Player container exists:", !!playerContainer);
+    
+    // Check for control elements
+    const playButton = document.querySelector('.play-pause');
+    console.log("🎵 Audio Player: Play button exists:", !!playButton);
+    
+    // If player exists, test audio file availability
+    if (window.audioPlayer) {
+        console.log("🎵 Audio Player: Instance exists, testing audio files");
+        window.audioPlayer.checkAudioFiles();
+    }
 }); 
