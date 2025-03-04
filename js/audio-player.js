@@ -249,7 +249,37 @@ class AudioPlayer {
     
     loadTrackInfo(index) {
         this.currentTrack = index;
-        document.getElementById('track-title').textContent = this.playlist[index].title;
+        const titleElement = document.querySelector('.track-title');
+        if (titleElement) {
+            const title = this.playlist[index].title;
+            titleElement.textContent = title;
+            titleElement.setAttribute('data-text', title);
+        }
+        
+        // Update active track in playlist carousel
+        this.updatePlaylistActiveTrack(index);
+        
+        if (this.isPlaying) {
+            this.playAudio();
+        } else {
+            this.updatePlayButton();
+        }
+        
+        console.log("Loading track:", this.playlist[index].title);
+        console.log("Track path:", this.playlist[index].file);
+        
+        // Test if file exists
+        fetch(this.playlist[index].file)
+            .then(response => {
+                if (!response.ok) {
+                    console.error("Audio file not found:", this.playlist[index].file);
+                } else {
+                    console.log("Audio file exists:", this.playlist[index].file);
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching audio file:", error);
+            });
     }
     
     loadTrack(index) {

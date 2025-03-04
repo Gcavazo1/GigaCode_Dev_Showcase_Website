@@ -34,56 +34,102 @@
 
 /* Main controls area with buttons and info */
 .audio-controls {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
+    position: relative;
     width: 100%;
-    max-width: 1000px;
-    margin: 2.5rem auto;
+    max-width: 600px;
+    margin: 0 auto 2rem;
+    padding: 15px 20px;
+    background: rgba(0, 0, 0, 0.4);
+    border-left: 3px solid #f9f900;
+    border-radius: 3px;
+    z-index: 50;
 }
 
 /* Track information display */
 .audio-container .track-info {
-    flex: 1;
-    color: var(--audio-text-color);
-    font-family: 'Orbitron', sans-serif;
+    text-align: center;
+    margin-bottom: 1rem;
 }
 
 .audio-container .track-title {
-    font-size: 1.2rem;
-    margin-bottom: 0.5rem;
+    font-family: 'Orbitron', sans-serif;
+    color: #f9f900;
+    font-size: 1.4rem;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    text-shadow: 
+        0 0 10px rgba(249, 249, 0, 0.8),
+        0 0 20px rgba(249, 249, 0, 0.4);
+    position: relative;
+    display: inline-block;
+    margin-bottom: 1rem;
+}
+
+/* Add glitch effect to the title */
+.audio-container .track-title::before,
+.audio-container .track-title::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.1);
+    clip: rect(0, 0, 0, 0);
+}
+
+.audio-container .track-title::before {
+    left: -2px;
+    text-shadow: 2px 0 #00ffff;
+    animation: glitch-effect 3s infinite linear alternate-reverse;
+}
+
+.audio-container .track-title::after {
+    left: 2px;
+    text-shadow: -2px 0 #ff00ff;
+    animation: glitch-effect 2s infinite linear alternate-reverse;
 }
 
 /* Control buttons container */
 .audio-container .control-buttons {
     display: flex;
+    justify-content: center;
+    align-items: center;
     gap: 2rem;
+    margin: 1rem 0;
 }
 
 /* Individual control buttons */
 .audio-container .control-button {
-    background: var(--audio-bg-color);
-    border: 1px solid var(--audio-border-color);
-    color: var(--audio-text-color);
-    width: 40px;
-    height: 40px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(249, 249, 0, 0.4);
+    color: #f9f900;
+    width: 45px;
+    height: 45px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s ease;
+    box-shadow: 
+        0 0 10px rgba(249, 249, 0, 0.2),
+        inset 0 0 5px rgba(249, 249, 0, 0.1);
 }
 
 .audio-container .control-button:hover {
-    background: rgba(0, 255, 255, 0.2);
-    box-shadow: 0 0 15px var(--audio-glow-color);
+    background: rgba(249, 249, 0, 0.1);
+    box-shadow: 
+        0 0 15px rgba(249, 249, 0, 0.4),
+        inset 0 0 5px rgba(249, 249, 0, 0.2);
+    transform: scale(1.05);
 }
 
 /* Play button specific styling */
 .audio-container .play-button {
-    width: 50px;
-    height: 50px;
+    width: 55px;
+    height: 55px;
+    font-size: 1.2em;
 }
 
 .audio-container .play-button.playing {
@@ -94,18 +140,19 @@
 .audio-container .volume-control {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    width: 150px;
+    gap: 1rem;
+    margin-top: 1rem;
 }
 
 /* Volume slider styling */
 .audio-container .volume-slider {
     -webkit-appearance: none;
-    width: 100px;
+    width: 120px;
     height: 4px;
-    background: rgba(0, 255, 255, 0.2);
+    background: rgba(249, 249, 0, 0.2);
     border-radius: 2px;
     outline: none;
+    box-shadow: inset 0 0 5px rgba(249, 249, 0, 0.3);
 }
 
 .audio-container .volume-slider::-webkit-slider-thumb {
@@ -113,8 +160,9 @@
     width: 12px;
     height: 12px;
     border-radius: 50%;
-    background: var(--audio-primary-color);
+    background: #f9f900;
     cursor: pointer;
+    box-shadow: 0 0 10px rgba(249, 249, 0, 0.8);
 }
 
 .audio-container .volume-slider::-moz-range-thumb {
@@ -752,4 +800,23 @@
     height: 1px;
     background: linear-gradient(to right, rgba(0, 255, 255, 0.5), rgba(0, 255, 255, 0), rgba(0, 255, 255, 0.5));
     opacity: 0.3;
+}
+
+/* Add scan lines effect */
+.audio-controls::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.1),
+        rgba(0, 0, 0, 0.1) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    pointer-events: none;
+    z-index: 1;
 } 
