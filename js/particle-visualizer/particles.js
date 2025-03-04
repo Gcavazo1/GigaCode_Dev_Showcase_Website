@@ -628,45 +628,39 @@ class ParticleSystem {
     if (!this.material) return;
     
     // Simple time increment
-    this.time += 0.1;
+    this.time += 0.01; // Slower base animation
     this.uniforms.time.value = this.time;
     
-    // Debug values to console to verify data flow
-    if (audioData && Math.random() < 0.01) {
-      console.log("[ParticleSystem] Received audio data:", {
-        low: audioData.low.toFixed(3),
-        mid: audioData.mid.toFixed(3),
-        high: audioData.high.toFixed(3)
+    // Set audio data defaults if not provided
+    const audio = audioData || { low: 0, mid: 0, high: 0 };
+    
+    // Log real audio data values occasionally
+    if (audioData && audioData.low > 0.01 && Math.random() < 0.02) {
+      console.log("[ParticleSystem] Active audio data:", {
+        low: audio.low.toFixed(3),
+        mid: audio.mid.toFixed(3),
+        high: audio.high.toFixed(3)
       });
     }
     
-    // Apply audio data to uniforms with consistent reactivity
-    if (audioData) {
-      // Get the reactivity multiplier with a fallback
-      const reactivity = this.reactivityMultiplier || 0.8;
-      
-      // Standardized reactivity
-      this.uniforms.amplitude.value = 0.8 + (audioData.low * reactivity * 2.0);
-      this.uniforms.offsetGain.value = audioData.mid * reactivity;
-      this.uniforms.frequency.value = 2.0 + (audioData.high * reactivity);
-    } else {
-      // Default values when no audio
-      this.uniforms.amplitude.value = 0.8;
-      this.uniforms.offsetGain.value = 0.2;
-      this.uniforms.frequency.value = 0.8;
-    }
+    // Get reactivity with default
+    const reactivity = Math.max(0.5, this.reactivityMultiplier || 0.8);
     
-    // Consistent beat detection for all shapes
+    // Apply DIRECT mapping with MORE DRAMATIC effects
+    // More extreme values to make visualization more obvious
+    this.uniforms.amplitude.value = 0.3 + (audio.low * 3.0 * reactivity);
+    this.uniforms.offsetGain.value = 0.1 + (audio.mid * 2.0 * reactivity); 
+    this.uniforms.frequency.value = 1.0 + (audio.high * 5.0 * reactivity);
+    
+    // Beat detection with more dramatic effect
     if (beatDetected) {
-      // Log to confirm we're receiving beat events
       console.log("[ParticleSystem] Beat detected!");
-      
-      this.uniforms.size.value = 5 * (this.reactivityMultiplier || 0.8);
-      this.uniforms.maxDistance.value = 1.5;
+      this.uniforms.size.value = 4.0 * reactivity;
+      this.uniforms.maxDistance.value = 2.0;
     } else {
-      // Return to normal size
-      this.uniforms.size.value = Math.max(1.5, this.uniforms.size.value * 0.95);
-      this.uniforms.maxDistance.value = Math.max(1.0, this.uniforms.maxDistance.value * 0.95);
+      // Smoother falloff
+      this.uniforms.size.value = Math.max(0.8, this.uniforms.size.value * 0.92);
+      this.uniforms.maxDistance.value = Math.max(0.8, this.uniforms.maxDistance.value * 0.95);
     }
   }
   

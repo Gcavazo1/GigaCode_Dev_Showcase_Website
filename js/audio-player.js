@@ -174,16 +174,27 @@ class AudioPlayer {
                 
                 // Explicit debugging for visualization
                 console.log("VISUALIZER DEBUG: Is particleVisualizer available?", !!window.particleVisualizer);
-                console.log("VISUALIZER DEBUG: Canvas element exists?", !!document.getElementById('background-visualizer'));
                 
-                // Add this section to connect the visualizer to the new audio element
-                if (window.particleVisualizer && window.particleVisualizer.connectToAudioElement) {
-                    console.log("Attempting to reconnect particle visualizer to new audio element");
-                    const success = window.particleVisualizer.connectToAudioElement(this.audio, this.analyser);
-                    console.log("VISUALIZER DEBUG: Connection success:", success);
-                    
-                    // Force visualizer to show and stay visible
-                    window.particleVisualizer.show();
+                // CONNECT DIRECTLY AFTER CREATING
+                if (window.particleVisualizer) {
+                    // Force direct connection to THIS analyser and audio element
+                    try {
+                        console.log("Directly connecting visualizer to analyser node");
+                        if (window.particleVisualizer.audioAnalyzer) {
+                            // Clear any existing connection
+                            window.particleVisualizer.isPlaying = false;
+                            
+                            // Set up direct connection
+                            const connected = window.particleVisualizer.audioAnalyzer.useExternalAnalyser(this.analyser, this.audio);
+                            if (connected) {
+                                window.particleVisualizer.isPlaying = true;
+                                window.particleVisualizer.show();
+                                console.log("VISUALIZER DEBUG: Direct connection successful");
+                            }
+                        }
+                    } catch (e) {
+                        console.error("Error connecting visualizer:", e);
+                    }
                 }
                 
                 // Immediately load the current track into the new audio element

@@ -75,22 +75,36 @@ class AudioAnalyzer {
       return { low: 0, mid: 0, high: 0 };
     }
     
-    // Get frequency data
-    this.analyser.getByteFrequencyData(this.dataArray);
-    
-    // Calculate the values for low, mid, and high frequency ranges
-    const newData = {
-      low: this.calculateBandValue(this.frequencyRanges.low),
-      mid: this.calculateBandValue(this.frequencyRanges.mid),
-      high: this.calculateBandValue(this.frequencyRanges.high)
-    };
-    
-    // Apply smoothing
-    this.frequencyData.low = this.smooth(this.frequencyData.low, newData.low);
-    this.frequencyData.mid = this.smooth(this.frequencyData.mid, newData.mid);
-    this.frequencyData.high = this.smooth(this.frequencyData.high, newData.high);
-    
-    return this.frequencyData;
+    try {
+      // Get frequency data - this is the critical part
+      this.analyser.getByteFrequencyData(this.dataArray);
+      
+      // Calculate the values with higher values for better visibility
+      const newData = {
+        low: this.calculateBandValue(this.frequencyRanges.low) * 1.5,  // Amplify low frequencies
+        mid: this.calculateBandValue(this.frequencyRanges.mid) * 1.2,  // Amplify mid frequencies
+        high: this.calculateBandValue(this.frequencyRanges.high)       // Keep high frequencies as is
+      };
+      
+      // Apply smoothing
+      this.frequencyData.low = this.smooth(this.frequencyData.low, newData.low);
+      this.frequencyData.mid = this.smooth(this.frequencyData.mid, newData.mid);
+      this.frequencyData.high = this.smooth(this.frequencyData.high, newData.high);
+      
+      // Debug log occasionally
+      if (Math.random() < 0.01) {
+        console.log('[AudioAnalyzer] Frequency data:', {
+          low: this.frequencyData.low.toFixed(3),
+          mid: this.frequencyData.mid.toFixed(3),
+          high: this.frequencyData.high.toFixed(3)
+        });
+      }
+      
+      return this.frequencyData;
+    } catch (err) {
+      console.error('[AudioAnalyzer] Error updating:', err);
+      return { low: 0, mid: 0, high: 0 };
+    }
   }
 
   calculateBandValue(range) {
@@ -131,13 +145,23 @@ class AudioAnalyzer {
     // Store audioContext reference for frequency calculations
     this.audioContext = this.analyser.context;
     
-    // Setup the data array
-    this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+    // Setup the data array PROPER SIZE
+    this.bufferLength = this.analyser.frequencyBinCount;
+    this.dataArray = new Uint8Array(this.bufferLength);
+    
+    console.log('[AudioAnalyzer] Using external analyser, buffer length:', this.bufferLength);
+    
+    // Test immediate data access
+    try {
+      this.analyser.getByteFrequencyData(this.dataArray);
+      const hasData = this.dataArray.some(val => val > 0);
+      console.log('[AudioAnalyzer] Initial data check:', hasData ? 'Data present' : 'No data yet');
+    } catch (e) {
+      console.error('[AudioAnalyzer] Error testing data access:', e);
+    }
     
     // Set connected flag
     this.isConnected = true;
-    
-    console.log('[AudioAnalyzer] Using external analyser, frequency bin count:', this.analyser.frequencyBinCount);
     
     return true;
   }

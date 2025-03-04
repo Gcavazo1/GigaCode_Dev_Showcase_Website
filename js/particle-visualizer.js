@@ -41,6 +41,47 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
     
+    // Test audio connection after a few seconds
+    setTimeout(() => {
+        if (window.particleVisualizer) {
+            // Add test method if not present
+            if (!window.particleVisualizer.testAudioConnection) {
+                window.particleVisualizer.testAudioConnection = function() {
+                    if (!this.audioAnalyzer || !this.audioAnalyzer.analyser) {
+                        console.error('No analyzer to test');
+                        return false;
+                    }
+                    
+                    try {
+                        // Get fresh data
+                        const data = this.audioAnalyzer.update();
+                        
+                        // Check if we have any non-zero values
+                        const hasData = Object.values(data).some(val => val > 0.01);
+                        
+                        console.log('Audio connection test:', 
+                                   hasData ? 'DATA FLOWING' : 'NO DATA', 
+                                   data);
+                        
+                        return hasData;
+                    } catch (e) {
+                        console.error('Error testing audio connection:', e);
+                        return false;
+                    }
+                };
+            }
+            
+            // Run test
+            window.particleVisualizer.testAudioConnection();
+            
+            // Schedule another test when audio is playing
+            if (window.audioPlayerInstance && window.audioPlayerInstance.isPlaying) {
+                console.log("Testing visualizer connection with playing audio");
+                window.particleVisualizer.testAudioConnection();
+            }
+        }
+    }, 5000);
+    
   } catch (error) {
     console.error("Error initializing visualizer:", error);
   }

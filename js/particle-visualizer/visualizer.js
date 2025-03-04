@@ -232,46 +232,30 @@ class ParticleVisualizer {
     
     const elapsedTime = this.clock.getElapsedTime();
     
-    // Update audio analyzer
-    if (this.isPlaying) {
-      const audioData = this.audioAnalyzer.update();
-      
-      // Only log audio data occasionally for debugging
-      if (this._debugAudioConnection && Math.random() < 0.01) {
-        console.log('[Visualizer] Audio data sample:', {
-          low: audioData.low.toFixed(3),
-          mid: audioData.mid.toFixed(3), 
-          high: audioData.high.toFixed(3)
-        });
+    // Update audio analyzer - ALWAYS TRY TO GET AUDIO DATA
+    let audioData = { low: 0, mid: 0, high: 0 }; 
+    let beatDetected = false;
+    
+    if (this.isPlaying && this.audioAnalyzer) {
+      try {
+        audioData = this.audioAnalyzer.update();
         
-        // After 5 seconds, turn off frequent debugging
-        if (!this._debugTimerSet) {
-          this._debugTimerSet = true;
-          setTimeout(() => {
-            this._debugAudioConnection = false;
-            console.log('[Visualizer] Audio data debug logging reduced');
-          }, 5000);
+        // Only log occasionally to avoid console spam
+        if (Math.random() < 0.005) { 
+          console.log('[Visualizer] Audio data:', 
+            `L:${audioData.low.toFixed(2)} M:${audioData.mid.toFixed(2)} H:${audioData.high.toFixed(2)}`);
         }
-      }
-      
-      // Update beat detector with current time in milliseconds
-      const beatDetected = this.beatDetector.update(audioData, elapsedTime * 1000);
-      
-      // Update particle system
-      if (this.particleSystem) {
-        this.particleSystem.update(elapsedTime, audioData, beatDetected);
-      }
-    } else {
-      // Update with no audio
-      if (this.particleSystem) {
-        this.particleSystem.update(elapsedTime);
+        
+        // Update beat detector
+        beatDetected = this.beatDetector.update(audioData, elapsedTime * 1000);
+      } catch (e) {
+        console.error('[Visualizer] Error updating audio:', e);
       }
     }
     
-    // Rotate holder - auto-rotate is always enabled now
-    if (this.holder) {
-      this.holder.rotation.x += this.rotationSpeed;
-      this.holder.rotation.y += this.rotationSpeed;
+    // ALWAYS update particle system with whatever data we have
+    if (this.particleSystem) {
+      this.particleSystem.update(elapsedTime, audioData, beatDetected);
     }
     
     // Render scene
@@ -322,6 +306,30 @@ class ParticleVisualizer {
     if (this.canvas) {
       this.canvas.style.opacity = '0';
       this.canvas.classList.remove('active');
+    }
+  }
+
+  testAudioConnection() {
+    if (!this.audioAnalyzer || !this.audioAnalyzer.analyser) {
+        console.error('[Visualizer] No analyzer to test');
+        return false;
+    }
+    
+    try {
+        // Get fresh data
+        const data = this.audioAnalyzer.update();
+        
+        // Check if we have any non-zero values
+        const hasData = Object.values(data).some(val => val > 0.01);
+        
+        console.log('[Visualizer] Audio connection test:', 
+                   hasData ? 'DATA FLOWING' : 'NO DATA', 
+                   data);
+        
+        return hasData;
+    } catch (e) {
+        console.error('[Visualizer] Error testing audio connection:', e);
+        return false;
     }
   }
 }
