@@ -343,155 +343,130 @@ class AudioPlayer {
     }
     
     createPlaylistCarousel() {
-        // Check if audio container exists
         const audioContainer = document.querySelector('.audio-container');
-        if (!audioContainer) {
-            console.warn('Audio container not found, delaying playlist creation');
-            setTimeout(() => this.createPlaylistCarousel(), 500);
-            return;
-        }
-        
-        // Remove any existing playlist
+        if (!audioContainer) return;
+
+        // Clear any existing carousel
         const existingPlaylist = document.querySelector('.ps-playlist-container');
-        if (existingPlaylist) {
-            existingPlaylist.remove();
-        }
-        
-        // Create playlist container
+        if (existingPlaylist) existingPlaylist.remove();
+
+        // Create new structure
         const playlistContainer = document.createElement('div');
         playlistContainer.className = 'ps-playlist-container';
-        
-        // Create carousel wrapper
+
         const carousel = document.createElement('div');
         carousel.className = 'ps-playlist-carousel';
-        
-        // Create carousel container for 3D effect
+
         const carouselContainer = document.createElement('div');
         carouselContainer.className = 'ps-carousel-container';
-        
-        // Add track cards
+
+        // Create and position cards
         this.playlist.forEach((track, index) => {
-            const card = document.createElement('div');
-            card.className = 'ps-track-card';
-            card.dataset.index = index;
-            
-            // Add active class to current track
-            if (index === this.currentTrack) {
-                card.classList.add('ps-track-active');
-            }
-            
-            // Create card content
-            card.innerHTML = `
-                <div class="ps-card-glitch-effect"></div>
-                <div class="ps-card-content">
-                    <div class="ps-track-number">${(index + 1).toString().padStart(2, '0')}</div>
-                    <div class="ps-track-title">${track.title}</div>
-                    <div class="ps-track-equalizer">
-                        ${Array(5).fill(0).map(() => '<div class="ps-eq-bar"></div>').join('')}
-                    </div>
-                </div>
-                <div class="ps-card-shine"></div>
-            `;
-            
-            // Add click event to play track
-            card.addEventListener('click', () => {
-                if (!this.audioContext) {
-                    this.initAudio();
-                }
-                this.loadTrack(index);
-                this.playAudio();
-                this.updatePlaylistActiveTrack(index);
-            });
-            
+            const card = this.createTrackCard(track, index);
             carouselContainer.appendChild(card);
         });
-        
-        // Add carousel container to carousel
-        carousel.appendChild(carouselContainer);
-        
-        // Add navigation buttons
+
+        // Add navigation
         const prevBtn = document.createElement('button');
         prevBtn.className = 'ps-playlist-nav ps-prev';
         prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
-        prevBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.rotateCarousel('prev');
-        });
         
         const nextBtn = document.createElement('button');
         nextBtn.className = 'ps-playlist-nav ps-next';
         nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+
+        // Add event listeners
+        prevBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.rotateCarousel('prev');
+        });
+
         nextBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             this.rotateCarousel('next');
         });
-        
+
+        // Assemble the carousel
+        carousel.appendChild(carouselContainer);
         carousel.appendChild(prevBtn);
         carousel.appendChild(nextBtn);
-        
-        // Add carousel to playlist container
         playlistContainer.appendChild(carousel);
-        
-        // Add playlist container to audio container
         audioContainer.appendChild(playlistContainer);
-        
-        // Position cards in 3D space
-        this.positionCarouselCards();
-        
+
         // Store references
         this.carouselContainer = carouselContainer;
         this.carousel = carousel;
+
+        // Initial positioning
+        this.positionCarouselCards();
     }
 
-    // Position cards in 3D space
+    createTrackCard(track, index) {
+        const card = document.createElement('div');
+        card.className = 'ps-track-card';
+        card.dataset.index = index;
+
+        if (index === this.currentTrack) {
+            card.classList.add('ps-track-active');
+        }
+
+        card.innerHTML = `
+            <div class="ps-card-glitch-effect"></div>
+            <div class="ps-card-content">
+                <div class="ps-track-number">${(index + 1).toString().padStart(2, '0')}</div>
+                <div class="ps-track-title">${track.title}</div>
+                <div class="ps-track-equalizer">
+                    ${Array(5).fill(0).map(() => '<div class="ps-eq-bar"></div>').join('')}
+                </div>
+            </div>
+            <div class="ps-card-shine"></div>
+        `;
+
+        card.addEventListener('click', () => {
+            if (!this.audioContext) this.initAudio();
+            this.loadTrack(index);
+            this.playAudio();
+            this.updatePlaylistActiveTrack(index);
+        });
+
+        return card;
+    }
+
     positionCarouselCards() {
         if (!this.carouselContainer) return;
-        
+
         const cards = this.carouselContainer.querySelectorAll('.ps-track-card');
         const cardCount = cards.length;
-        
-        // Adjust these values to fix the 3D positioning
-        const angleStep = (2 * Math.PI) / cardCount;
-        const radius = 400; // Increased radius for better spacing
-        
-        // Force the container to use 3D transforms
-        this.carouselContainer.style.transformStyle = 'preserve-3d';
-        
+        const theta = (2 * Math.PI) / cardCount;
+        const radius = 250; // Adjust this value to change circle size
+
         cards.forEach((card, index) => {
-            const angle = angleStep * index;
+            const angle = theta * index;
+            const transform = `
+                rotateY(${angle * (180/Math.PI)}deg)
+                translateZ(${radius}px)
+            `;
             
-            // Calculate position on the circle
-            const x = Math.sin(angle) * radius;
-            const z = Math.cos(angle) * radius;
-            const rotY = (angle * 180) / Math.PI;
+            card.style.transform = transform;
             
-            // Apply 3D transform with translateZ for proper depth
-            card.style.transform = `rotateY(${rotY}deg) translateZ(${radius}px)`;
-            
-            // Ensure each card has 3D transforms enabled
-            card.style.transformStyle = 'preserve-3d';
-            card.style.backfaceVisibility = 'hidden';
-            
-            // Adjust opacity based on position (front cards more visible)
+            // Calculate opacity based on position
             const normalizedAngle = Math.abs((angle % (2 * Math.PI)) - Math.PI);
-            const opacity = 0.5 + (0.5 * (1 - normalizedAngle / Math.PI));
+            const opacity = 0.3 + (0.7 * (1 - normalizedAngle / Math.PI));
             card.style.opacity = opacity.toFixed(2);
         });
-        
-        // Rotate to show current track
+
+        // Initial rotation to show current track
         this.rotateToTrack(this.currentTrack);
     }
 
-    // Rotate carousel to show specific track
     rotateToTrack(index) {
         if (!this.carouselContainer || !this.playlist) return;
         
         const cardCount = this.playlist.length;
-        const angleStep = (2 * Math.PI) / cardCount;
-        const angle = -angleStep * index; // Negative to rotate in correct direction
-        const rotY = (angle * 180) / Math.PI;
+        const theta = (2 * Math.PI) / cardCount;
+        const angle = -(theta * index); // Negative for correct rotation direction
         
-        this.carouselContainer.style.transform = `rotateY(${rotY}deg)`;
+        this.carouselContainer.style.transform = `rotateY(${angle * (180/Math.PI)}deg)`;
     }
 
     // Handle carousel rotation

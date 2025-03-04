@@ -481,43 +481,42 @@
    3D CAROUSEL PLAYLIST - REBUILT
    ====================================== */
 
+/* New 3D Carousel Implementation */
 .ps-playlist-carousel {
     position: relative;
     width: 100%;
-    height: 300px;
-    perspective: 1500px;
+    height: 400px; /* Increased height for better visibility */
+    perspective: 2000px; /* Deeper perspective */
     margin: 50px 0;
-    overflow: visible;
 }
 
 .ps-carousel-container {
-    position: relative;
+    position: absolute;
     width: 100%;
     height: 100%;
-    transform-style: preserve-3d !important;
-    transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transform-style: preserve-3d;
+    transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+    left: 0;
+    right: 0;
+    margin: 0 auto;
 }
 
 .ps-track-card {
     position: absolute;
-    width: 180px;
-    height: 180px;
-    top: 50%;
+    width: 200px;
+    height: 200px;
     left: 50%;
-    margin-left: -90px;
-    margin-top: -90px;
-    background: rgba(5, 15, 30, 0.8);
+    top: 50%;
+    transform-origin: 50% 50% -250px; /* This is key for the 3D circle */
+    margin-left: -100px;
+    margin-top: -100px;
+    background: rgba(5, 15, 30, 0.95);
     border: 1px solid var(--audio-border-color);
-    border-radius: 8px;
-    overflow: hidden;
+    border-radius: 10px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-    transition: all 0.5s ease;
-    transform-style: preserve-3d !important;
-    backface-visibility: hidden !important;
+    transition: transform 0.5s ease, opacity 0.5s ease;
+    backface-visibility: hidden;
     cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
 }
 
 .ps-track-card:hover {
