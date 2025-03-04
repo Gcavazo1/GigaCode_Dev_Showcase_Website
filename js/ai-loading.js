@@ -19,7 +19,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Create loading sequence element right away
         const loadingSequence = document.createElement('div');
         loadingSequence.className = 'loading-sequence';
-        loadingSequence.innerHTML = `</div>
+        loadingSequence.innerHTML = `
+            <div class="loading-bar"></div>
+            <div class="loading-percentage">0%</div>
             <div class="loading-status">Establishing neural connection...</div>
         `;
         

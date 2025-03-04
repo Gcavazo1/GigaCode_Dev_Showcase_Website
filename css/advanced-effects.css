@@ -1671,8 +1671,8 @@
 
 .ai-chat-input button {
     background: rgba(0, 255, 255, 0.2);
-    border: 1px solid rgba(0, 255, 255, 0.5);
-    color: #00ffff;
+    border: 1px solid #f9f900;
+    color: #f9f900;
     padding: 10px 15px;
     border-radius: 0 5px 5px 0;
     cursor: pointer;
@@ -1814,7 +1814,7 @@
 
 /* Add a subtle animation to the AI Assistant when it loads */
 #virtual-assistant.loaded .ai-assistant {
-    animation: assistantGlow 1s ease-in-out;
+    animation: assistantGlow 2s ease-in-out;
 }
 
 @keyframes assistantGlow {
@@ -1888,7 +1888,7 @@
     letter-spacing: 4px;
     text-align: center;
     margin-bottom: 0.5rem;
-    text-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+    text-shadow: 0 0 10px #f9f900;
     opacity: 0.8;
     animation: textFlicker 2s infinite;
 }
@@ -1900,7 +1900,7 @@
     color: #f9f900;
     font-family: 'Orbitron', sans-serif;
     font-size: 0.8rem;
-    text-shadow: 0 0 5px rgba(0, 255, 255, 0.7);
+    text-shadow: 0 0 5px #f9f900;
 }
 
 .loading-status {
