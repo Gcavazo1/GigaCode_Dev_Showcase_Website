@@ -9,6 +9,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const disableAudioBtn = document.querySelector('.ps-disable-audio');
     const statusIndicator = document.querySelector('.ps-status');
     const eqContainer = document.querySelector('.ps-eq-container');
+    const visualizerTerminal = document.querySelector('.visualizer-terminal');
+    
+    // Add event listener to visualizer terminal close button
+    if (visualizerTerminal) {
+        const closeButton = visualizerTerminal.querySelector('.terminal-button.close');
+        if (closeButton) {
+            closeButton.addEventListener('click', function() {
+                visualizerTerminal.style.display = 'none';
+                visualizerTerminal.classList.remove('active');
+            });
+        }
+    }
     
     // Function to get the audio player instance
     function getAudioPlayer() {
@@ -56,10 +68,21 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to show the visualizer terminal after enabling audio
     function showVisualizerTerminal() {
-        const visualizerTerminal = document.querySelector('.visualizer-terminal');
         if (visualizerTerminal) {
             visualizerTerminal.style.display = 'block';
             visualizerTerminal.classList.add('active');
+            
+            // Add a slight animation effect
+            visualizerTerminal.style.opacity = '0';
+            visualizerTerminal.style.transform = 'translateY(-20px)';
+            
+            // Force reflow
+            visualizerTerminal.offsetHeight;
+            
+            // Animate in
+            visualizerTerminal.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+            visualizerTerminal.style.opacity = '1';
+            visualizerTerminal.style.transform = 'translateY(0)';
         }
     }
     
@@ -182,9 +205,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 500);
             
             // Hide visualizer terminal if it's visible
-            const visualizerTerminal = document.querySelector('.visualizer-terminal');
             if (visualizerTerminal) {
                 visualizerTerminal.style.display = 'none';
+                visualizerTerminal.classList.remove('active');
             }
         });
     }
@@ -269,6 +292,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
     
+    // Expose function to show visualizer terminal
+    window.showVisualizerTerminal = showVisualizerTerminal;
+    
     // Initial update
     updateWidgetState();
     
@@ -283,4 +309,5 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log("PowerShell Audio Widget initialized");
     console.log("Audio player instance:", audioPlayer ? "Found" : "Not found");
     console.log("Audio element:", audioElement ? "Found" : "Not found");
+    console.log("Visualizer terminal:", visualizerTerminal ? "Found" : "Not found");
 }); 
