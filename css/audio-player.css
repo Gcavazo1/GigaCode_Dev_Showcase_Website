@@ -10,7 +10,10 @@
 .audio-container {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 0.5rem;
+    margin: 2.5rem auto;
+    width: 90%;
+    max-width: 1000px;
 }
 
 .audio-controls {
@@ -281,7 +284,7 @@
 .ps-playlist-container {
     position: relative;
     height: 400px;
-    margin: 140px 0;
+    margin: 240px 0;
     perspective: 2000px;
     overflow: visible;
 }
