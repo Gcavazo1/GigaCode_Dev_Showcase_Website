@@ -589,7 +589,7 @@
         0 0 20px rgba(0, 255, 255, 0.4),
         0 0 10px rgba(255, 0, 255, 0.4);
     transform: scale(1.05);
-    border-color: rgba(0, 255, 255, 0.7);
+    border-color: rgba(255, 242, 0, 0.7);
 }
 
 .ps-track-card.ps-track-active {
