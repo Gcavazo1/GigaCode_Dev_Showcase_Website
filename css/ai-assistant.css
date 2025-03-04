@@ -28,11 +28,28 @@
     width: 200px;
     height: 200px;
     position: relative;
-    background: rgba(0, 0, 0, 0.7);
+    background: url('../images/backgrounds/ai_avatar_background.jpg') center center;
+    background-size: cover;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    border-right: 1px solid rgba(0, 255, 255, 0.3);
+}
+
+.ai-avatar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 10, 20, 0.7);
+    z-index: 1;
+}
+
+.ai-avatar .circuit-overlay {
+    display: none;
 }
 
 .ai-hologram {
@@ -44,7 +61,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+    box-shadow: 
+        0 0 30px rgba(0, 255, 255, 0.5),
+        0 0 50px rgba(0, 255, 255, 0.3);
+    z-index: 3;
 }
 
 .ai-face {
@@ -97,18 +117,11 @@
     width: 100%;
     height: 100%;
     border-radius: 70%;
-    box-shadow: inset 0 0 20px #f9f900;
+    box-shadow: 
+        inset 0 0 20px #f9f900,
+        0 0 30px rgba(249, 249, 0, 0.5);
     animation: pulse 2s ease-in-out infinite alternate;
-}
-
-.circuit-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 200%;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M10,10 L30,10 L30,30 L50,30 L50,50 L70,50 L70,70 L90,70" fill="none" stroke="rgba(0,255,255,0.3)" stroke-width="1"/><path d="M90,10 L70,10 L70,30 L50,30 L50,50 L30,50 L30,70 L10,70" fill="none" stroke="rgba(0,255,255,0.3)" stroke-width="1"/></svg>');
-    opacity: 0.3;
+    z-index: 2;
 }
 
 .glitch-effect {
@@ -296,7 +309,10 @@
     
     .ai-avatar {
         width: 100%;
-        height: 150px;
+        height: 200px;
+        border-right: none;
+        border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+        background-position: center center;
     }
     
     .ai-chat-messages {
@@ -489,4 +505,9 @@
 @keyframes typing {
     from { width: 0 }
     to { width: 100% }
+}
+
+@keyframes circuitFlow {
+    0% { background-position: 0 0; }
+    100% { background-position: 50px 50px; }
 } 
