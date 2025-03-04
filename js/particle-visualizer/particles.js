@@ -39,11 +39,11 @@ class ParticleSystem {
     this.uniforms = {
       time: { value: 0 },
       offsetSize: { value: 2 },
-      size: { value: 1.5},
+      size: { value: 2},
       frequency: { value: 2 },
-      amplitude: { value: 0.5 },
-      offsetGain: { value: 0.5 },
-      maxDistance: { value: 1.7 },
+      amplitude: { value: 0.7 },
+      offsetGain: { value: 0.6 },
+      maxDistance: { value: 1.5 },
       startColor: { value: new THREE.Color(0x00FFFF) }, // Cyan
       endColor: { value: new THREE.Color(0xFF00FF) },   // Magenta
     };
@@ -320,9 +320,9 @@ class ParticleSystem {
       depth: depthSeg,
     };
     
-    this.segmentsFolder.add(this.guiProperties.segments, "width",25, 80);
-    this.segmentsFolder.add(this.guiProperties.segments, "height",15, 25);
-    this.segmentsFolder.add(this.guiProperties.segments, "depth",25, 80);
+    this.segmentsFolder.add(this.guiProperties.segments, "width",35, 150);
+    this.segmentsFolder.add(this.guiProperties.segments, "height",15, 105);
+    this.segmentsFolder.add(this.guiProperties.segments, "depth",35, 300);
     this.segmentsFolder
       .add(this.guiProperties, "randomizeSegments")
       .name("Randomize Segments");
@@ -330,9 +330,9 @@ class ParticleSystem {
     this.segmentsFolder.onChange(() => {
       this.holder.remove(this.pointsMesh);
       this.geometry = new THREE.BoxGeometry(
-        34,
-        34,
-        34,
+        45,
+        45,
+        45,
         this.guiProperties.segments.width,
         this.guiProperties.segments.height,
         this.guiProperties.segments.depth
@@ -370,7 +370,7 @@ class ParticleSystem {
       radial: radialSeg,
     };
     
-    this.segmentsFolder.add(this.guiProperties.segments, "height", 92, 192);
+    this.segmentsFolder.add(this.guiProperties.segments, "height", 32, 320);
     this.segmentsFolder.add(this.guiProperties.segments, "radial", 32, 320);
     this.segmentsFolder
       .add(this.guiProperties, "randomizeSegments")
@@ -380,8 +380,8 @@ class ParticleSystem {
       this.holder.remove(this.pointsMesh);
       this.geometry = new THREE.CylinderGeometry(
         16,
-        16,
-        56,
+        6,
+        36,
         this.guiProperties.segments.radial,
         this.guiProperties.segments.height,
         true
@@ -425,7 +425,7 @@ class ParticleSystem {
     this.segmentsFolder.onChange(() => {
       this.holder.remove(this.pointsMesh);
       this.geometry = new THREE.SphereGeometry(
-        30,
+        16,
         this.guiProperties.segments.width,
         this.guiProperties.segments.height
       );
@@ -483,10 +483,10 @@ class ParticleSystem {
 
   createRing() {
     let tubeSeg = Math.floor(THREE.MathUtils.randInt(40, 60));
-    let radialSeg = Math.floor(THREE.MathUtils.randInt(120, 160));
+    let radialSeg = Math.floor(THREE.MathUtils.randInt(140, 180));
     
     this.geometry = new THREE.TorusGeometry(
-      17,
+      19,
       7,
       tubeSeg,
       radialSeg
@@ -503,7 +503,7 @@ class ParticleSystem {
       radial: radialSeg
     };
     
-    this.segmentsFolder.add(this.guiProperties.segments, "tube",75,120);
+    this.segmentsFolder.add(this.guiProperties.segments, "tube",95,180);
     this.segmentsFolder.add(this.guiProperties.segments, "radial", 40, 60);
     this.segmentsFolder
       .add(this.guiProperties, "randomizeSegments")
@@ -512,8 +512,8 @@ class ParticleSystem {
     this.segmentsFolder.onChange(() => {
       this.holder.remove(this.pointsMesh);
       this.geometry = new THREE.TorusGeometry(
-        20,
-        8,
+        16,
+        4,
         this.guiProperties.segments.tube,
         this.guiProperties.segments.radial
       );
@@ -553,9 +553,9 @@ class ParticleSystem {
       q: q
     };
     
-    this.segmentsFolder.add(this.guiProperties.segments, "tube", 20, 150);
-    this.segmentsFolder.add(this.guiProperties.segments, "radial", 50, 250);
-    this.segmentsFolder.add(this.guiProperties.segments, "p", 1, 2, 5);
+    this.segmentsFolder.add(this.guiProperties.segments, "tube", 100, 250);
+    this.segmentsFolder.add(this.guiProperties.segments, "radial", 20, 50);
+    this.segmentsFolder.add(this.guiProperties.segments, "p", 4, 2, 5);
     this.segmentsFolder.add(this.guiProperties.segments, "q", 3, 7, 2);
     this.segmentsFolder
       .add(this.guiProperties, "randomizeSegments")
@@ -564,8 +564,8 @@ class ParticleSystem {
     this.segmentsFolder.onChange(() => {
       this.holder.remove(this.pointsMesh);
       this.geometry = new THREE.TorusKnotGeometry(
-        20,
-        8,
+        14,
+        10,
         this.guiProperties.segments.tube,
         this.guiProperties.segments.radial,
         this.guiProperties.segments.p,
