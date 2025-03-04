@@ -399,6 +399,9 @@ class AudioPlayer {
 
         // Initial positioning
         this.positionCarouselCards();
+
+        // Add this after storing the references:
+        this.initCarouselDrag();
     }
 
     createTrackCard(track, index) {
@@ -463,10 +466,13 @@ class AudioPlayer {
         if (!this.carouselContainer || !this.playlist) return;
         
         const cardCount = this.playlist.length;
-        const theta = (2 * Math.PI) / cardCount;
-        const angle = -(theta * index); // Negative for correct rotation direction
+        const anglePerCard = 360 / cardCount;
+        // Calculate the exact angle needed for this card
+        const angle = -anglePerCard * index; // Negative for correct rotation direction
         
-        this.carouselContainer.style.transform = `rotateY(${angle * (180/Math.PI)}deg)`;
+        // Apply rotation centered on the carousel container
+        this.carouselContainer.style.transition = 'transform 0.8s cubic-bezier(0.2, 0.9, 0.1, 1)';
+        this.carouselContainer.style.transform = `rotateY(${angle}deg)`;
     }
 
     // Handle carousel rotation
@@ -513,6 +519,180 @@ class AudioPlayer {
         
         // Rotate carousel to show active track
         this.rotateToTrack(index);
+    }
+
+    // Add this method to handle dragging the carousel
+    initCarouselDrag() {
+        if (!this.carousel) return;
+        
+        let isDragging = false;
+        let startX = 0;
+        let startRotation = 0;
+        let currentRotation = 0;
+        let lastDragTime = 0;
+        let lastDragX = 0;
+        let dragSpeed = 0;
+        
+        // Helper to get current rotation in degrees
+        const getCurrentRotation = () => {
+            const transform = this.carouselContainer.style.transform;
+            const match = transform.match(/rotateY\(([-\d.]+)deg\)/);
+            return match ? parseFloat(match[1]) : 0;
+        };
+        
+        // Start dragging
+        this.carousel.addEventListener('mousedown', (e) => {
+            if (e.target.closest('.ps-playlist-nav')) return; // Skip if clicking navigation buttons
+            
+            isDragging = true;
+            startX = e.clientX;
+            startRotation = getCurrentRotation();
+            currentRotation = startRotation;
+            lastDragTime = Date.now();
+            lastDragX = e.clientX;
+            
+            this.carousel.style.cursor = 'grabbing';
+            this.carouselContainer.style.transition = 'none'; // Disable transitions during drag
+            
+            e.preventDefault();
+        });
+        
+        // Handle dragging
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            
+            const deltaX = e.clientX - startX;
+            const sensitivity = 0.5; // Adjust for faster/slower rotation
+            
+            // Calculate new rotation
+            currentRotation = startRotation + (deltaX * sensitivity);
+            
+            // Apply new rotation
+            this.carouselContainer.style.transform = `rotateY(${currentRotation}deg)`;
+            
+            // Calculate drag speed for inertia
+            const now = Date.now();
+            const dt = now - lastDragTime;
+            if (dt > 0) {
+                dragSpeed = (e.clientX - lastDragX) / dt;
+            }
+            lastDragTime = now;
+            lastDragX = e.clientX;
+        });
+        
+        // End dragging with inertia
+        document.addEventListener('mouseup', () => {
+            if (!isDragging) return;
+            isDragging = false;
+            
+            this.carousel.style.cursor = 'grab';
+            
+            // Apply inertia
+            if (Math.abs(dragSpeed) > 0.1) {
+                const inertia = dragSpeed * 15; // Adjust for more/less inertia
+                const targetRotation = currentRotation + inertia;
+                
+                // Re-enable smooth transition for inertia
+                this.carouselContainer.style.transition = 'transform 1s cubic-bezier(0.2, 0.9, 0.1, 1)';
+                this.carouselContainer.style.transform = `rotateY(${targetRotation}deg)`;
+                
+                // Snap to nearest track after inertia
+                setTimeout(() => this.snapToNearestTrack(), 1000);
+            } else {
+                // If dragged slowly, just snap to nearest track
+                this.snapToNearestTrack();
+            }
+        });
+        
+        // Touch support for mobile
+        this.carousel.addEventListener('touchstart', (e) => {
+            if (e.target.closest('.ps-playlist-nav')) return;
+            
+            isDragging = true;
+            startX = e.touches[0].clientX;
+            startRotation = getCurrentRotation();
+            currentRotation = startRotation;
+            lastDragTime = Date.now();
+            lastDragX = e.touches[0].clientX;
+            
+            this.carouselContainer.style.transition = 'none';
+            e.preventDefault();
+        });
+        
+        document.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            
+            const deltaX = e.touches[0].clientX - startX;
+            const sensitivity = 0.5;
+            
+            currentRotation = startRotation + (deltaX * sensitivity);
+            this.carouselContainer.style.transform = `rotateY(${currentRotation}deg)`;
+            
+            const now = Date.now();
+            const dt = now - lastDragTime;
+            if (dt > 0) {
+                dragSpeed = (e.touches[0].clientX - lastDragX) / dt;
+            }
+            lastDragTime = now;
+            lastDragX = e.touches[0].clientX;
+        });
+        
+        document.addEventListener('touchend', () => {
+            if (!isDragging) return;
+            isDragging = false;
+            
+            if (Math.abs(dragSpeed) > 0.1) {
+                const inertia = dragSpeed * 15;
+                const targetRotation = currentRotation + inertia;
+                
+                this.carouselContainer.style.transition = 'transform 1s cubic-bezier(0.2, 0.9, 0.1, 1)';
+                this.carouselContainer.style.transform = `rotateY(${targetRotation}deg)`;
+                
+                setTimeout(() => this.snapToNearestTrack(), 1000);
+            } else {
+                this.snapToNearestTrack();
+            }
+        });
+        
+        // Initial cursor style
+        this.carousel.style.cursor = 'grab';
+    }
+
+    // Add this method to snap to the nearest track after dragging
+    snapToNearestTrack() {
+        if (!this.carouselContainer || !this.playlist) return;
+        
+        // Get current rotation
+        const transform = this.carouselContainer.style.transform;
+        const match = transform.match(/rotateY\(([-\d.]+)deg\)/);
+        if (!match) return;
+        
+        const currentRotation = parseFloat(match[1]);
+        
+        // Calculate parameters
+        const cardCount = this.playlist.length;
+        const anglePerCard = 360 / cardCount;
+        
+        // Find nearest track
+        const normalizedRotation = ((currentRotation % 360) + 360) % 360;
+        const nearestCardIndex = Math.round(normalizedRotation / anglePerCard) % cardCount;
+        
+        // Get the actual track index (reverse direction)
+        const trackIndex = (cardCount - nearestCardIndex) % cardCount;
+        
+        // Smooth transition to nearest track
+        this.carouselContainer.style.transition = 'transform 0.5s cubic-bezier(0.2, 0.9, 0.1, 1)';
+        
+        // Load and update the track
+        if (this.audioContext) {
+            this.loadTrack(trackIndex);
+            this.playAudio();
+        } else {
+            this.loadTrackInfo(trackIndex);
+        }
+        
+        // Update active track in playlist
+        this.updatePlaylistActiveTrack(trackIndex);
     }
 }
 
