@@ -54,11 +54,37 @@ function showVisualizerControls() {
 
 // Setup the visualizer controls
 function setupVisualizerControls() {
+  if (!window.particleVisualizer?.particleSystem) return;
+  
+  // Shape buttons
+  document.querySelectorAll('.visualizer-terminal [data-shape]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const shape = btn.getAttribute('data-shape');
+      if (window.particleVisualizer.particleSystem) {
+        try {
+          window.particleVisualizer.particleSystem.create(shape);
+        } catch (error) {
+          console.error("Error changing particle shape:", error);
+        }
+      }
+    });
+  });
+  
+  // Randomize button
+  const randomizeBtn = document.getElementById('randomize-segments');
+  if (randomizeBtn) {
+    randomizeBtn.addEventListener('click', () => {
+      if (window.particleVisualizer.particleSystem) {
+        window.particleVisualizer.particleSystem.randomizeCurrentShape();
+      }
+    });
+  }
+
+  // Reactivity slider
   const reactivitySlider = document.getElementById('reactivity-control');
   const reactivityValue = document.getElementById('reactivity-value');
   
   if (reactivitySlider && reactivityValue) {
-    // Set initial value from particle system or default to 0.6
     const currentValue = window.particleVisualizer?.particleSystem?.reactivityMultiplier || 0.6;
     reactivitySlider.value = currentValue;
     reactivityValue.textContent = currentValue.toFixed(1);
@@ -72,7 +98,7 @@ function setupVisualizerControls() {
     });
   }
 
-  // Fix color picker implementation
+  // Color picker
   const startColorPicker = document.getElementById('start-color-picker');
   const endColorPicker = document.getElementById('end-color-picker');
   
@@ -80,21 +106,17 @@ function setupVisualizerControls() {
     const updateColors = () => {
       const system = window.particleVisualizer.particleSystem;
       if (system && system.uniforms) {
-        // Convert hex colors to THREE.Color
         system.uniforms.startColor.value.set(startColorPicker.value);
         system.uniforms.endColor.value.set(endColorPicker.value);
       }
     };
 
-    // Set initial colors from HTML
-    startColorPicker.value = '#00ffff';  // Cyan
-    endColorPicker.value = '#ff00ff';    // Magenta
+    startColorPicker.value = '#00ffff';
+    endColorPicker.value = '#ff00ff';
     
-    // Add event listeners
     startColorPicker.addEventListener('input', updateColors);
     endColorPicker.addEventListener('input', updateColors);
     
-    // Initial update
     updateColors();
   }
 }

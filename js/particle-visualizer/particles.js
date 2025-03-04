@@ -44,8 +44,8 @@ class ParticleSystem {
       amplitude: { value: 0.7 },
       offsetGain: { value: 0.5 },
       maxDistance: { value: 1.5 },
-      startColor: { value: new THREE.Color(0x00FFFF) }, // Default cyan
-      endColor: { value: new THREE.Color(0xFF00FF) },   // Default magenta
+      startColor: { value: new THREE.Color(0x000000) }, // Default cyan
+      endColor: { value: new THREE.Color(0xFFCC00) },   // Default magenta
       reactivityMultiplier: { value: 0.6 }  // Set default reactivity
     };
     
