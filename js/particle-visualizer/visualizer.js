@@ -18,10 +18,10 @@ class ParticleVisualizer {
       document.body.appendChild(this.canvas);
     }
     
-    // Make sure canvas is visible by default
+    // Start hidden by default
     this.canvas.style.display = 'block';
-    this.canvas.style.opacity = '1';
-    this.canvas.classList.add('active');
+    this.canvas.style.opacity = '0';
+    this.canvas.classList.remove('active');
     
     // Create renderer first
     this.renderer = new THREE.WebGLRenderer({
@@ -195,12 +195,14 @@ class ParticleVisualizer {
             this.audioAnalyzer.useExternalAnalyser(existingAnalyser, audioElement);
             console.log('[Visualizer] Using existing analyser from audio player');
             this.isPlaying = true;
+            this.show(); // Show visualizer after successful connection
             return true;
         } else {
             // Create new connection
             const connected = this.audioAnalyzer.connect(audioElement);
             if (connected) {
                 this.isPlaying = true;
+                this.show(); // Show visualizer after successful connection
                 console.log('[Visualizer] Created new connection to audio element');
                 return true;
             }
@@ -290,8 +292,6 @@ class ParticleVisualizer {
       this.canvas.style.display = 'block';
       this.canvas.style.opacity = '1';
       this.canvas.classList.add('active');
-      
-      // Force a resize to ensure proper dimensions
       this.resize();
     }
   }
@@ -301,7 +301,6 @@ class ParticleVisualizer {
     if (this.canvas) {
       this.canvas.style.opacity = '0';
       this.canvas.classList.remove('active');
-      // Don't set display: none to avoid WebGL context loss
     }
   }
 }
