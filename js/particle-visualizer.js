@@ -1,408 +1,68 @@
 // Add debug logs at key points
 console.log("Particle visualizer script loaded");
 
-// Merge the two DOMContentLoaded listeners to avoid race conditions
+// Simplified initialization
 document.addEventListener('DOMContentLoaded', async () => {
   console.log("DOMContentLoaded event triggered for visualizer");
   
-  // First section: Dynamic import and setup of visualizer 
   try {
     console.log("Attempting to import visualizer module");
     // Dynamically import the visualizer module
     const ParticleVisualizer = await import('./particle-visualizer/visualizer.js').then(module => module.default);
     console.log("Module imported successfully");
     
+    // Create visualizer instance and make it globally accessible
     const visualizer = new ParticleVisualizer();
-    console.log("Visualizer instance created and attached to window");
-    
-    // Make it globally accessible
     window.particleVisualizer = visualizer;
-    console.log("Visualizer attached to window object");
+    console.log("Visualizer instance created and attached to window object");
     
-    // Connect to audio player when it exists
-    const connectToAudioPlayer = () => {
-      // Try both possible audio elements
-      const audioElement = document.getElementById('background-audio') || 
-                          document.getElementById('background-audio-player');
-      
-      if (audioElement) {
-        console.log("Found audio element, attempting to connect");
-        visualizer.connectToAudioPlayer(audioElement);
-        
-        // Listen for play/pause events
-        audioElement.addEventListener('play', () => {
-          visualizer.isPlaying = true;
-          visualizer.show();
-        });
-        
-        audioElement.addEventListener('pause', () => {
-          visualizer.isPlaying = false;
-          visualizer.hide();
-        });
-        
-        // Also connect to audio player instance if it exists
-        if (window.audioPlayerInstance && window.audioPlayerInstance.analyser) {
-          console.log("Found audio player instance, connecting to analyzer");
-          visualizer.connectToAudioElement(audioElement, window.audioPlayerInstance.analyser);
-        }
-        
-        return true;
-      }
-      
-      return false;
-    };
+    // Initialize visualizer but don't connect to audio yet
+    // The connection will happen via audio-player.js
     
-    // Try to connect immediately, or wait for the player to be available
-    if (!connectToAudioPlayer()) {
-      // If audio player isn't available yet, try again when play button is clicked
-      const playButton = document.getElementById('play-audio');
-      if (playButton) {
-        playButton.addEventListener('click', () => {
-          setTimeout(connectToAudioPlayer, 100);
-        });
-      }
-    }
-
-    // Control panel functionality
-    const toggleButton = document.querySelector('.toggle-controls');
-    const controlPanel = document.querySelector('.control-panel');
+    // REMOVE any auto-connection to audio element here
+    // REMOVE play/pause event listeners that might hide visualizer
     
-    if (toggleButton && controlPanel) {
-      // Toggle controls panel
-      toggleButton.addEventListener('click', () => {
-        controlPanel.classList.toggle('active');
-        toggleButton.classList.toggle('active');
-      });
-      
-      // Shape buttons
-      const shapeButtons = document.querySelectorAll('.control-buttons [data-shape]');
-      shapeButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-          const shape = btn.getAttribute('data-shape');
-          
-          // Remove active class from all buttons
-          shapeButtons.forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          
-          // Apply shape change if visualizer exists
-          if (window.particleVisualizer && window.particleVisualizer.particleSystem) {
-            // First remove old points from holder
-            if (window.particleVisualizer.particleSystem.points) {
-              window.particleVisualizer.holder.remove(window.particleVisualizer.particleSystem.points);
-            }
-            
-            // Create new geometry with selected shape
-            window.particleVisualizer.particleSystem.createShapedGeometry(shape);
-            
-            // Create new points and add to holder
-            const particles = window.particleVisualizer.particleSystem.create();
-            window.particleVisualizer.holder.add(particles);
-            
-            console.log(`[Visualizer] Shape changed to ${shape}`);
-          }
-        });
-      });
-      
-      // Color picker functionality
-      const startColorPicker = document.getElementById('start-color-picker');
-      const endColorPicker = document.getElementById('end-color-picker');
-      
-      // Function to convert HTML color to hex
-      function htmlColorToHex(htmlColor) {
-        // Remove the # if it exists
-        const color = htmlColor.replace('#', '');
-        // Convert to integer
-        return parseInt(color, 16);
-      }
-      
-      // Function to update colors
-      function updateColors() {
-        if (window.particleVisualizer && window.particleVisualizer.particleSystem) {
-          const uniforms = window.particleVisualizer.particleSystem.uniforms;
-          const startColor = new THREE.Color(htmlColorToHex(startColorPicker.value));
-          const endColor = new THREE.Color(htmlColorToHex(endColorPicker.value));
-          
-          uniforms.startColor.value = startColor;
-          uniforms.endColor.value = endColor;
-        }
-      }
-      
-      // Apply color changes when pickers are adjusted
-      if (startColorPicker && endColorPicker) {
-        startColorPicker.addEventListener('input', updateColors);
-        endColorPicker.addEventListener('input', updateColors);
-      }
-      
-      // Reactivity control
-      const reactivitySlider = document.getElementById('reactivity-control');
-      const reactivityValue = document.getElementById('reactivity-value');
-      
-      if (reactivitySlider && reactivityValue) {
-        reactivitySlider.addEventListener('input', () => {
-          const reactivity = parseFloat(reactivitySlider.value);
-          reactivityValue.textContent = reactivity.toFixed(1);
-          
-          if (window.particleVisualizer && window.particleVisualizer.particleSystem) {
-            // Set reactivity multiplier
-            window.particleVisualizer.particleSystem.reactivityMultiplier = reactivity;
-            
-            // Also update base values according to reactivity
-            window.particleVisualizer.particleSystem.uniforms.frequency.value = 2.0 * reactivity;
-            window.particleVisualizer.particleSystem.uniforms.amplitude.value = 0.8 * reactivity;
-          }
-        });
-      }
-      
-      // Set initial active shape button to ring instead of torusKnot
-      document.querySelector('[data-shape="torusKnot"]').classList.remove('active');
-      document.querySelector('[data-shape="ring"]').classList.add('active');
-      
-      // Update slider values to match new defaults
-      const sliderReactivity = document.getElementById('reactivity-control');
-      const reactivityDisplay = document.getElementById('reactivity-value');
-      if (sliderReactivity && reactivityDisplay) {
-        sliderReactivity.value = "0.8"; // Default to 0.8 instead of 0.5
-        reactivityDisplay.textContent = "0.8";
-      }
-    }
-
-    // Add rotation toggle functionality
-    const rotationToggle = document.getElementById('toggle-rotation');
-    if (rotationToggle) {
-      rotationToggle.addEventListener('click', () => {
-        rotationToggle.classList.toggle('active');
-        if (window.particleVisualizer) {
-          window.particleVisualizer.autoRotate = rotationToggle.classList.contains('active');
-        }
-      });
-    }
-
-    // Update the initial values to be set AFTER the visualizer is created
-    if (window.particleVisualizer && window.particleVisualizer.particleSystem) {
-      // Set default frequency and amplitude based on higher reactivity
-      window.particleVisualizer.particleSystem.uniforms.frequency.value = 2.0 * 0.8; // 0.8 instead of 0.5
-      window.particleVisualizer.particleSystem.uniforms.amplitude.value = 0.8 * 0.8; // 0.8 instead of 0.5
-      window.particleVisualizer.particleSystem.uniforms.offsetGain.value = 0.5;
-      window.particleVisualizer.particleSystem.uniforms.maxDistance.value = 1.8;
-      
-      // Set initial size
-      window.particleVisualizer.particleSystem.uniforms.size.value = 25 / 10; // 2.5 instead of 2.0
-      window.particleVisualizer.particleSystem.uniforms.offsetSize.value = 45; // Default for torusKnot
-      
-      // Set reactivity multiplier
-      window.particleVisualizer.particleSystem.reactivityMultiplier = 0.8; // Changed from 0.5
-    }
-
-    // Now add the terminal-related event handlers that were in the second listener
+    // Setup visualizer terminal controls
+    setupVisualizerTerminal();
     
-    // Attach click handler to close button
-    const closeButton = document.querySelector('.visualizer-terminal .terminal-button.close');
-    if (closeButton) {
-      closeButton.addEventListener('click', () => {
-        document.querySelector('.visualizer-terminal').classList.remove('active');
-      });
-    }
-    
-    // Keep track of user music choice
-    let musicEnabled = false;
-
-    // Music Enable Button Handler - be very specific about the selector
-    function setupMusicEnableButton() {
-      console.log("Setting up music enable button detection - fixed version");
-      
-      // Use a more general approach to catch all possible Enable-Music buttons
-      document.addEventListener('click', (e) => {
-        console.log("Click detected, checking if Enable-Music button:", e.target);
-        
-        // Check using multiple methods to be sure we catch it
-        if ((e.target.textContent === 'Enable-Music') || 
-            (e.target.className && e.target.className.includes('Enable-Music')) ||
-            (e.target.classList && e.target.classList.contains('Enable-Music'))) {
-          
-          console.log('Enable-Music button detected and clicked!');
-          musicEnabled = true;
-          
-          // Longer delay to ensure terminal has time to close
-          setTimeout(() => {
-            console.log("Attempting to show visualizer after Enable-Music");
-            showVisualizerControls();
-          }, 1200);
-        }
-      });
-    }
-
-    // Observer to detect when music terminal closes
-    function observeMusicTerminalClose() {
-      const terminalCloseObserver = new MutationObserver((mutations) => {
-        mutations.forEach(mutation => {
-          if (mutation.type === 'attributes' && 
-              mutation.attributeName === 'class' && 
-              mutation.target.classList.contains('powershell-music')) {
-            
-            // Check if the terminal was active and is now inactive
-            if (!mutation.target.classList.contains('active')) {
-              console.log("Music terminal closed via class change");
-              terminalCloseObserver.disconnect();
-              
-              if (musicEnabled) {
-                console.log("Music was enabled, showing visualizer");
-                setTimeout(() => showVisualizerControls(), 800);
-              }
-            }
-          }
-        });
-      });
-      
-      // Observe all powershell-music terminals for class changes
-      const musicTerminals = document.querySelectorAll('.powershell-music');
-      if (musicTerminals.length > 0) {
-        console.log(`Found ${musicTerminals.length} music terminals to observe`);
-        musicTerminals.forEach(terminal => {
-          terminalCloseObserver.observe(terminal, { 
-            attributes: true,
-            attributeFilter: ['class']
-          });
-        });
-      } else {
-        console.log("No music terminals found to observe");
-      }
-    }
-
-    // Call our setup functions
-    setupMusicEnableButton();
-    observeMusicTerminalClose();
-
-    // Updated minimize button functionality
-    const minimizeButton = document.querySelector('.visualizer-terminal .terminal-button.minimize');
-    if (minimizeButton) {
-      minimizeButton.remove();
-    }
-    
-    // Setting up visualizer nav button - improved version
-    console.log("Setting up visualizer nav button (improved)");
-    function setupVisualizerNavButton() {
-      console.log("Setting up visualizer nav button (improved)");
-      
-      // Use direct ID selector and attach once
-      const navButton = document.getElementById('visualizer-nav-button');
-      
-      if (navButton) {
-        console.log("Found visualizer nav button by ID");
-        
-        // Remove any existing listeners by cloning
-        const newNavButton = navButton.cloneNode(true);
-        navButton.parentNode.replaceChild(newNavButton, navButton);
-        
-        // Add new click listener
-        newNavButton.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          console.log("Visualizer nav button clicked directly");
-          showVisualizerControls();
-          return false;
-        });
-      } else {
-        console.warn("Visualizer nav button not found by ID, trying alternate selectors");
-        
-        // Fallback to other selectors
-        const altNavButton = document.querySelector('a[href="#visualizer"]');
-        if (altNavButton) {
-          console.log("Found visualizer nav button by href");
-          
-          // Remove existing listeners
-          const newAltButton = altNavButton.cloneNode(true);
-          altNavButton.parentNode.replaceChild(newAltButton, altNavButton);
-          
-          newAltButton.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log("Visualizer nav button clicked (alternate)");
-            showVisualizerControls();
-            return false;
-          });
-        } else {
-          console.error("Visualizer nav button could not be found with any selector");
-        }
-      }
-    }
-
-    // Add this to your DOMContentLoaded event, where other setup functions are called
-    setupVisualizerNavButton();
-
   } catch (error) {
     console.error("Error initializing visualizer:", error);
   }
 });
 
-// REPLACE makeDraggable with a simpler setup function
-function setupTerminal(element) {
-  // Set the terminal to position fixed so it's locked in the viewport
-  element.style.position = 'fixed';
-  element.style.right = '20px';
-  element.style.top = '50%';
-  element.style.transform = 'translateY(-50%)';
+// Keep terminal setup functions
+function setupVisualizerTerminal() {
+  // Setup visualizer nav button
+  setupVisualizerNavButton();
   
-  // Remove any existing reset buttons since we don't need them anymore
-  const existingResetButtons = element.querySelectorAll('.terminal-button.reset');
-  existingResetButtons.forEach(btn => btn.remove());
+  // Set up control handlers when terminal is shown
+  const setupControls = () => {
+    if (window.particleVisualizer) {
+      setupVisualizerControls();
+    }
+  };
   
-  // Ensure the close button works
-  const closeButton = element.querySelector('.terminal-button.close');
-  if (closeButton) {
-    // Remove any existing listeners
-    const newCloseButton = closeButton.cloneNode(true);
-    closeButton.parentNode.replaceChild(newCloseButton, closeButton);
-    
-    // Add new click listener
-    newCloseButton.addEventListener('click', () => {
-      console.log("Close button clicked");
-      element.classList.remove('active');
-      
-      // Re-setup the nav button to ensure it works after closing
-      setTimeout(setupVisualizerNavButton, 100);
+  // Add listener to setup controls when terminal is shown
+  const terminal = document.querySelector('.visualizer-terminal');
+  if (terminal) {
+    terminal.addEventListener('shown', setupControls);
+  }
+}
+
+// Keep your existing button setup function
+function setupVisualizerNavButton() {
+  const navButton = document.getElementById('visualizer-nav-button');
+  
+  if (navButton) {
+    console.log("Found visualizer nav button by ID");
+    navButton.addEventListener('click', function() {
+      console.log("Visualizer nav button clicked directly");
+      showVisualizerControls();
     });
   }
 }
 
-// Call this function to add terminal command typing effect
-function addTerminalTypingEffect() {
-  const terminalLines = document.querySelectorAll('.visualizer-terminal .terminal-line .command');
-  
-  terminalLines.forEach((line, index) => {
-    const text = line.textContent;
-    line.textContent = '';
-    line.classList.add('typing');
-    
-    // Type with delay based on index
-    setTimeout(() => {
-      let i = 0;
-      const typeSpeed = 30;
-      
-      function typeText() {
-        if (i < text.length) {
-          line.textContent += text.charAt(i);
-          i++;
-          setTimeout(typeText, typeSpeed);
-        } else {
-          line.classList.remove('typing');
-          
-          // Reveal the content after the command is typed
-          const group = line.closest('.control-group');
-          if (group) {
-            const content = group.querySelector('.terminal-buttons-grid, .terminal-colors, .terminal-sliders, .terminal-options');
-            if (content) {
-              content.style.opacity = '1';
-            }
-          }
-        }
-      }
-      
-      typeText();
-    }, index * 400); // Stagger the typing of each line
-  });
-}
-
-// Update the showVisualizerControls function
+// Keep your existing terminal functions - no changes needed to these
 function showVisualizerControls() {
   const terminal = document.querySelector('.visualizer-terminal');
   if (!terminal) {
@@ -446,7 +106,6 @@ function showVisualizerControls() {
   }
 }
 
-// Update setupVisualizerControls to work with the new particles.js structure
 function setupVisualizerControls() {
   console.log("Setting up visualizer control event handlers for updated particle system");
   
@@ -536,4 +195,72 @@ function setupVisualizerControls() {
       }
     });
   }
+}
+
+// REPLACE makeDraggable with a simpler setup function
+function setupTerminal(element) {
+  // Set the terminal to position fixed so it's locked in the viewport
+  element.style.position = 'fixed';
+  element.style.right = '20px';
+  element.style.top = '50%';
+  element.style.transform = 'translateY(-50%)';
+  
+  // Remove any existing reset buttons since we don't need them anymore
+  const existingResetButtons = element.querySelectorAll('.terminal-button.reset');
+  existingResetButtons.forEach(btn => btn.remove());
+  
+  // Ensure the close button works
+  const closeButton = element.querySelector('.terminal-button.close');
+  if (closeButton) {
+    // Remove any existing listeners
+    const newCloseButton = closeButton.cloneNode(true);
+    closeButton.parentNode.replaceChild(newCloseButton, closeButton);
+    
+    // Add new click listener
+    newCloseButton.addEventListener('click', () => {
+      console.log("Close button clicked");
+      element.classList.remove('active');
+      
+      // Re-setup the nav button to ensure it works after closing
+      setTimeout(setupVisualizerNavButton, 100);
+    });
+  }
+}
+
+// Call this function to add terminal command typing effect
+function addTerminalTypingEffect() {
+  const terminalLines = document.querySelectorAll('.visualizer-terminal .terminal-line .command');
+  
+  terminalLines.forEach((line, index) => {
+    const text = line.textContent;
+    line.textContent = '';
+    line.classList.add('typing');
+    
+    // Type with delay based on index
+    setTimeout(() => {
+      let i = 0;
+      const typeSpeed = 30;
+      
+      function typeText() {
+        if (i < text.length) {
+          line.textContent += text.charAt(i);
+          i++;
+          setTimeout(typeText, typeSpeed);
+        } else {
+          line.classList.remove('typing');
+          
+          // Reveal the content after the command is typed
+          const group = line.closest('.control-group');
+          if (group) {
+            const content = group.querySelector('.terminal-buttons-grid, .terminal-colors, .terminal-sliders, .terminal-options');
+            if (content) {
+              content.style.opacity = '1';
+            }
+          }
+        }
+      }
+      
+      typeText();
+    }, index * 400); // Stagger the typing of each line
+  });
 }
