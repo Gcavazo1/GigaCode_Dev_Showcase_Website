@@ -420,7 +420,7 @@ class AudioPlayer {
         const cards = this.carouselContainer.querySelectorAll('.ps-track-card');
         const cardCount = cards.length;
         const theta = (2 * Math.PI) / cardCount;
-        const radius = 500; // Increased radius for a wider carousel
+        const radius = 600; // Increased radius for a wider carousel
 
         cards.forEach((card, index) => {
             const angle = theta * index;
