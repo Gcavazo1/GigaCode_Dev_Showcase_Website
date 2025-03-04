@@ -107,51 +107,29 @@
 }
 
 .gigachode-toggle {
-  transition: all 0.3s ease;
+  color: #00ffff !important;
+  text-shadow: 0 0 5px #00ffff !important;
+  opacity: 0.8;
+  transition: all 0.3s ease !important;
 }
 
 .gigachode-toggle:hover {
-  animation: gigachodeRotate 1s infinite linear;
-  text-shadow: 0 0 10px #00ffff;
+  opacity: 1;
+  text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff !important;
 }
 
 /* Custom tooltip for toggle */
 .gigachode-theme .gigachode-toggle::after {
-  content: 'GigaChode Mode: ON';
-  position: absolute;
-  background: rgba(10, 147, 150, 0.8);
-  color: #e9d8a6;
-  padding: 5px 10px;
-  border-radius: 4px;
-  font-size: 12px;
-  opacity: 0;
-  transition: opacity 0.3s;
-  pointer-events: none;
-  white-space: nowrap;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  margin-top: 5px;
+  content: 'AI Personality: GigaChode';
+  background: rgba(0, 255, 255, 0.1) !important;
+  border: 1px solid #00ffff !important;
+  color: #00ffff !important;
+  text-shadow: 0 0 5px #00ffff !important;
 }
 
 .gigachode-toggle::after {
-  content: 'GigaChode Mode: OFF';
-  position: absolute;
-  background: rgba(50, 50, 50, 0.8);
-  color: #ddd;
-  padding: 5px 10px;
-  border-radius: 4px;
-  font-size: 12px;
-  opacity: 0;
-  transition: opacity 0.3s;
-  pointer-events: none;
-  white-space: nowrap;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  margin-top: 5px;
-}
-
-.gigachode-toggle:hover::after {
-  opacity: 1;
+  content: 'AI Personality: Standard';
+  background: rgba(0, 0, 0, 0.8) !important;
+  border: 1px solid #00ffff !important;
+  color: #00ffff !important;
 } 

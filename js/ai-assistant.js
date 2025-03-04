@@ -335,4 +335,60 @@ class AIAssistant {
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     new AIAssistant();
-}); 
+});
+
+// FIXED: Create theme toggle button function with improved targeting and visibility
+const createThemeToggle = () => {
+    console.log("Attempting to create GigaChode theme toggle button");
+    
+    // Try to find the title area that contains "GIGACHODE AI V2.0"
+    const titleArea = document.querySelector('.ai-chat-interface .interface-header, .ai-window-title');
+    if (!titleArea) {
+        console.log("Could not find title area");
+        return false;
+    }
+    
+    // Create toggle button with cyberpunk styling
+    const toggleBtn = document.createElement('button');
+    toggleBtn.id = 'gigachode-theme-toggle';
+    toggleBtn.className = 'gigachode-toggle';
+    toggleBtn.innerHTML = '⚙️'; // Using a gear icon instead of rotation
+    toggleBtn.title = 'Toggle AI Personality';
+    
+    // Apply cyberpunk styling to match your UI
+    Object.assign(toggleBtn.style, {
+        background: 'none',
+        border: 'none',
+        color: '#00ffff',
+        cursor: 'pointer',
+        fontSize: '20px',
+        padding: '5px',
+        marginRight: '10px',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative',
+        zIndex: '100',
+        transition: 'transform 0.3s ease'
+    });
+    
+    // Add it before the dots menu if it exists
+    const dotsMenu = titleArea.querySelector('.dots-menu, .menu-dots');
+    if (dotsMenu) {
+        dotsMenu.parentNode.insertBefore(toggleBtn, dotsMenu);
+    } else {
+        // Otherwise add it to the end of the title area
+        titleArea.appendChild(toggleBtn);
+    }
+    
+    // Add hover effect
+    toggleBtn.addEventListener('mouseenter', () => {
+        toggleBtn.style.transform = 'rotate(180deg)';
+    });
+    
+    toggleBtn.addEventListener('mouseleave', () => {
+        toggleBtn.style.transform = 'rotate(0deg)';
+    });
+    
+    return true;
+}; 
