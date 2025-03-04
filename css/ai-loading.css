@@ -6,6 +6,7 @@
     margin: 1.5rem auto 2rem;
     opacity: 0;
     animation: fadeIn 0.5s ease-in-out forwards;
+    z-index: 50; /* Add this to ensure it appears on top */
 }
 
 .loading-bar-container {
@@ -120,4 +121,10 @@
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
+}
+
+/* Make sure this is at the end of the file */
+/* Ensure this loading sequence is hidden when AI assistant is shown */
+.ai-assistant.loaded ~ .loading-sequence {
+    display: none;
 } 
