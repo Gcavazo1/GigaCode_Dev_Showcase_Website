@@ -21,7 +21,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Connect to audio player when it exists
     const connectToAudioPlayer = () => {
-      const audioElement = document.getElementById('background-audio');
+      // Try both possible audio elements
+      const audioElement = document.getElementById('background-audio') || 
+                          document.getElementById('background-audio-player');
       
       if (audioElement) {
         console.log("Found audio element, attempting to connect");
@@ -39,22 +41,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         
         // Also connect to audio player instance if it exists
-        if (window.audioPlayerInstance) {
-          // Override the play method to show visualizer
-          const originalPlayMethod = window.audioPlayerInstance.playAudio;
-          window.audioPlayerInstance.playAudio = function() {
-            originalPlayMethod.apply(this);
-            visualizer.isPlaying = true;
-            visualizer.show();
-          };
-          
-          // Override the pause method to hide visualizer
-          const originalPauseMethod = window.audioPlayerInstance.pauseAudio;
-          window.audioPlayerInstance.pauseAudio = function() {
-            originalPauseMethod.apply(this);
-            visualizer.isPlaying = false;
-            visualizer.hide();
-          };
+        if (window.audioPlayerInstance && window.audioPlayerInstance.analyser) {
+          console.log("Found audio player instance, connecting to analyzer");
+          visualizer.connectToAudioElement(audioElement, window.audioPlayerInstance.analyser);
         }
         
         return true;
