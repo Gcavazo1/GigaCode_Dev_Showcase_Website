@@ -83,6 +83,13 @@ class AudioAnalyzer {
       high: this.calculateBandValue(this.frequencyRanges.high)
     };
     
+    // Add debug logging
+    console.log('[AudioAnalyzer] Frequency data:', {
+      low: newData.low.toFixed(3),
+      mid: newData.mid.toFixed(3),
+      high: newData.high.toFixed(3)
+    });
+    
     // Apply smoothing
     this.frequencyData.low = this.smooth(this.frequencyData.low, newData.low);
     this.frequencyData.mid = this.smooth(this.frequencyData.mid, newData.mid);
@@ -123,6 +130,9 @@ class AudioAnalyzer {
     
     // Setup the data array
     this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+    
+    // Set connected flag
+    this.isConnected = true;
     
     console.log('[AudioAnalyzer] Using external analyser, frequency bin count:', this.analyser.frequencyBinCount);
     

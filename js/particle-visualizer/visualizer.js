@@ -226,8 +226,11 @@ class ParticleVisualizer {
     if (this.isPlaying) {
       const audioData = this.audioAnalyzer.update();
       
-      // Update beat detector
-      const beatDetected = this.beatDetector.update(audioData, elapsedTime * 1000);
+      // Log audio data for debugging
+      console.log('[Visualizer] Audio data:', audioData);
+      
+      // Update beat detector with current time in milliseconds
+      const beatDetected = this.beatDetector.update(audioData, performance.now());
       
       // Update particle system with the updated interface
       if (this.particleSystem) {
