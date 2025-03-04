@@ -185,34 +185,40 @@ class ParticleVisualizer {
     console.log('[Visualizer] Reconnecting to new audio element');
     
     if (!audioElement) {
-        console.error('[Visualizer] No audio element provided to connectToAudioElement');
-        return false;
+      console.error('[Visualizer] No audio element provided to connectToAudioElement');
+      return false;
     }
     
     try {
-        if (existingAnalyser) {
-            // Use the existing analyser from the audio player
-            this.audioAnalyzer.useExternalAnalyser(existingAnalyser, audioElement);
-            console.log('[Visualizer] Using existing analyser from audio player');
-            this.isPlaying = true;
-            this.show(); // <-- Ensure visualizer is shown here
-            return true;
-        } else {
-            // Create new connection
-            const connected = this.audioAnalyzer.connect(audioElement);
-            if (connected) {
-                this.isPlaying = true;
-                this.show(); // Show visualizer after successful connection
-                console.log('[Visualizer] Created new connection to audio element');
-                return true;
-            }
+      if (existingAnalyser) {
+        // Use the existing analyser from the audio player
+        const connected = this.audioAnalyzer.useExternalAnalyser(existingAnalyser, audioElement);
+        if (connected) {
+          console.log('[Visualizer] Using existing analyser from audio player');
+          this.isPlaying = true;
+          this.show();
+          
+          // Debug - print frequency data in update loop to verify connection
+          this._debugAudioConnection = true;
+          
+          return true;
         }
-        
-        console.error('[Visualizer] Failed to connect to new audio element');
-        return false;
+      } else {
+        // Create new connection
+        const connected = this.audioAnalyzer.connect(audioElement);
+        if (connected) {
+          this.isPlaying = true;
+          this.show();
+          console.log('[Visualizer] Created new connection to audio element');
+          return true;
+        }
+      }
+      
+      console.error('[Visualizer] Failed to connect to new audio element');
+      return false;
     } catch (error) {
-        console.error('[Visualizer] Error connecting to new audio element:', error);
-        return false;
+      console.error('[Visualizer] Error connecting to new audio element:', error);
+      return false;
     }
   }
 
@@ -230,15 +236,28 @@ class ParticleVisualizer {
     if (this.isPlaying) {
       const audioData = this.audioAnalyzer.update();
       
-      // Log audio data for debugging
-      console.log('[Visualizer] Audio data:', audioData);
+      // Only log audio data occasionally for debugging
+      if (this._debugAudioConnection && Math.random() < 0.01) {
+        console.log('[Visualizer] Audio data sample:', {
+          low: audioData.low.toFixed(3),
+          mid: audioData.mid.toFixed(3), 
+          high: audioData.high.toFixed(3)
+        });
+        
+        // After 5 seconds, turn off frequent debugging
+        if (!this._debugTimerSet) {
+          this._debugTimerSet = true;
+          setTimeout(() => {
+            this._debugAudioConnection = false;
+            console.log('[Visualizer] Audio data debug logging reduced');
+          }, 5000);
+        }
+      }
       
       // Update beat detector with current time in milliseconds
-      // Update beat detector
       const beatDetected = this.beatDetector.update(audioData, elapsedTime * 1000);
-
       
-      // Update particle system with the updated interface
+      // Update particle system
       if (this.particleSystem) {
         this.particleSystem.update(elapsedTime, audioData, beatDetected);
       }
@@ -255,8 +274,8 @@ class ParticleVisualizer {
       this.holder.rotation.y += this.rotationSpeed;
     }
     
-    // Safety check before rendering
-    if (this.scene && this.camera) {
+    // Render scene
+    if (this.scene && this.camera && this.renderer) {
       try {
         this.renderer.render(this.scene, this.camera);
       } catch (error) {

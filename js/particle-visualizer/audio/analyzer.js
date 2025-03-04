@@ -71,7 +71,9 @@ class AudioAnalyzer {
   }
 
   update() {
-    if (!this.analyser || !this.dataArray) return this.frequencyData;
+    if (!this.analyser || !this.dataArray) {
+      return { low: 0, mid: 0, high: 0 };
+    }
     
     // Get frequency data
     this.analyser.getByteFrequencyData(this.dataArray);
@@ -115,14 +117,25 @@ class AudioAnalyzer {
   }
 
   useExternalAnalyser(externalAnalyser, audioElement) {
+    if (!externalAnalyser) {
+      console.error('[AudioAnalyzer] No external analyser provided');
+      return false;
+    }
+    
     // Store the external analyser reference
     this.analyser = externalAnalyser;
     
     // Store the audio element reference
     this.audio = audioElement;
     
+    // Store audioContext reference for frequency calculations
+    this.audioContext = this.analyser.context;
+    
     // Setup the data array
     this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+    
+    // Set connected flag
+    this.isConnected = true;
     
     console.log('[AudioAnalyzer] Using external analyser, frequency bin count:', this.analyser.frequencyBinCount);
     
