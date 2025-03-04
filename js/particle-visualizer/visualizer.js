@@ -132,8 +132,8 @@ class ParticleVisualizer {
     
     // Initialize colors
     if (this.particleSystem.uniforms) {
-      this.particleSystem.uniforms.startColor.value.set('#000000');
-      this.particleSystem.uniforms.endColor.value.set('#FFCC00');
+      this.particleSystem.uniforms.startColor.value.set('#ffffff');
+      this.particleSystem.uniforms.endColor.value.set('#fdf901');
     }
   }
 

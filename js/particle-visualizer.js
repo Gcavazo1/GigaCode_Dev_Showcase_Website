@@ -111,8 +111,8 @@ function setupVisualizerControls() {
       }
     };
 
-    startColorPicker.value = '#00ffff';
-    endColorPicker.value = '#ff00ff';
+    startColorPicker.value = '#FFFFFF';
+    endColorPicker.value = '#fdf901';
     
     startColorPicker.addEventListener('input', updateColors);
     endColorPicker.addEventListener('input', updateColors);
