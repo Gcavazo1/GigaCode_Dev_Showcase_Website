@@ -433,8 +433,8 @@
 /* Adjust AI Assistant container spacing */
 .home-ai-container {
     min-height: auto;
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
     gap: 0;
     padding-top: 1rem;
     margin-bottom: 2rem; /* Add space after AI Assistant */

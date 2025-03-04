@@ -38,14 +38,14 @@ class ParticleSystem {
     // Shader uniforms setup
     this.uniforms = {
       time: { value: 0 },
-      offsetSize: { value: 2 },
-      size: { value: 1.5},
+      offsetSize: { value: 1 },
+      size: { value: .8},
       frequency: { value: 2 },
-      amplitude: { value: 0.5 },
+      amplitude: { value: 0.1 },
       offsetGain: { value: 0.5 },
-      maxDistance: { value: 1.8 },
-      startColor: { value: new THREE.Color(0x00FFFF) }, // Cyan
-      endColor: { value: new THREE.Color(0xFF00FF) },   // Magenta
+      maxDistance: { value: 2 },
+      startColor: { value: new THREE.Color(0x00ffff) }, // Cyan
+      endColor: { value: new THREE.Color(0xff00ff) },   // Magenta
     };
     
     // Reference shader implementations

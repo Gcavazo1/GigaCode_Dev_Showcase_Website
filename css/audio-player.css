@@ -1,464 +1,284 @@
 /* ======================================
-   CYBERPUNK AUDIO PLAYER - REDESIGNED
+   AUDIO PLAYER STYLING - CONSOLIDATED
    ====================================== */
 
 /* CSS Variables for easy theming */
 :root {
-  --audio-primary: #00ffff;
-  --audio-secondary: #ff00ff;
-  --audio-accent: #ffff00;
-  --audio-dark: rgba(5, 10, 20, 0.9);
-  --audio-medium: rgba(10, 20, 40, 0.8);
-  --audio-light: rgba(20, 40, 80, 0.7);
-  --audio-glow: 0 0 15px rgba(0, 255, 255, 0.7);
-  --audio-text: #ffffff;
-  --audio-gradient: linear-gradient(90deg, #00ffff, #ff00ff);
-  --audio-border: 1px solid rgba(0, 255, 255, 0.4);
+  --audio-primary-color: #00ffff;
+  --audio-secondary-color: #0088ff;
+  --audio-bg-color: rgba(0, 20, 40, 0.8);
+  --audio-border-color: rgba(0, 255, 255, 0.4);
+  --audio-text-color: #00ffff;
+  --audio-glow-color: rgba(0, 255, 255, 0.5);
+  --audio-dark-bg: rgba(5, 10, 20, 0.9);
 }
 
-/* Audio Section Container */
-#audio-section {
-  padding: 2rem;
-  margin: 2rem auto;
-  max-width: 1200px;
+/* Basic audio player styling */
+.audio-section {
+    background: rgba(10, 15, 25, 0);
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 2rem auto;
+    max-width: 1200px;
 }
 
-/* Main Audio Player Container */
-.cyber-audio-player {
-  position: relative;
-  width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
-  background: var(--audio-dark);
-  border-radius: 12px;
-  padding: 2rem;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
-  border: var(--audio-border);
-  overflow: hidden;
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: auto auto auto auto auto;
-  gap: 1.5rem;
-  z-index: 1;
-}
-
-/* Visualizer Background */
-.audio-visualizer-bg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: 
-    linear-gradient(90deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px) 0 0 / 20px 20px,
-    linear-gradient(0deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px) 0 0 / 20px 20px;
-  opacity: 0.3;
-  z-index: -1;
-}
-
-/* Track Display Area */
-.track-display {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem 1rem;
-  background: var(--audio-medium);
-  border-radius: 8px;
-  border: var(--audio-border);
-  box-shadow: var(--audio-glow);
-}
-
-.track-info {
-  flex: 1;
-}
-
-.track-title {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 1.4rem;
-  color: var(--audio-primary);
-  margin-bottom: 0.3rem;
-  text-shadow: 0 0 5px rgba(0, 255, 255, 0.7);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.track-artist {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 1rem;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.track-time {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 1rem;
-  color: var(--audio-primary);
-  display: flex;
-  gap: 0.3rem;
-  align-items: center;
-  background: rgba(0, 0, 0, 0.3);
-  padding: 0.3rem 0.8rem;
-  border-radius: 20px;
-  border: 1px solid rgba(0, 255, 255, 0.2);
-}
-
-.time-separator {
-  opacity: 0.5;
-}
-
-/* Progress Bar */
-.progress-container {
-  position: relative;
-  height: 8px;
-  background: var(--audio-medium);
-  border-radius: 4px;
-  overflow: hidden;
-  cursor: pointer;
-}
-
-.progress-bar {
-  height: 100%;
-  width: 30%; /* Default value, will be updated by JS */
-  background: var(--audio-gradient);
-  border-radius: 4px;
-  position: relative;
-}
-
-.progress-glow {
-  position: absolute;
-  top: 0;
-  right: 0;
-  height: 100%;
-  width: 20px;
-  background: rgba(255, 255, 255, 0.7);
-  filter: blur(5px);
-  border-radius: 0 4px 4px 0;
-}
-
-.progress-handle {
-  position: absolute;
-  top: 50%;
-  left: 30%; /* Default value, will be updated by JS */
-  transform: translate(-50%, -50%);
-  width: 16px;
-  height: 16px;
-  background: var(--audio-primary);
-  border-radius: 50%;
-  box-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
-  z-index: 2;
-  cursor: grab;
-}
-
-.progress-handle:active {
-  cursor: grabbing;
-  transform: translate(-50%, -50%) scale(1.2);
-}
-
-/* Player Controls */
-.player-controls {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-.control-btn {
-  background: var(--audio-medium);
-  border: var(--audio-border);
-  color: var(--audio-primary);
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.control-btn::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(0, 255, 255, 0.2) 0%, transparent 70%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.control-btn:hover {
-  background: rgba(0, 255, 255, 0.2);
-  box-shadow: var(--audio-glow);
-  transform: translateY(-2px);
-}
-
-.control-btn:hover::before {
-  opacity: 1;
-}
-
-.control-btn:active {
-  transform: scale(0.95);
-}
-
-.control-btn i {
-  font-size: 1.2rem;
-  position: relative;
-  z-index: 1;
-}
-
-.play-btn {
-  width: 70px;
-  height: 70px;
-  background: var(--audio-gradient);
-  box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
-}
-
-.play-btn i {
-  font-size: 1.8rem;
-  color: var(--audio-text);
-}
-
-.play-btn.playing i {
-  content: '\f04c'; /* Font Awesome pause icon */
-}
-
-/* Volume Control */
-.volume-container {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 0.5rem 1rem;
-  background: var(--audio-medium);
-  border-radius: 30px;
-  border: var(--audio-border);
-}
-
-.volume-btn {
-  background: none;
-  border: none;
-  color: var(--audio-primary);
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.volume-btn:hover {
-  color: var(--audio-text);
-  text-shadow: 0 0 10px var(--audio-primary);
-}
-
-.volume-slider-container {
-  width: 100px;
-  height: 6px;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 3px;
-  position: relative;
-  cursor: pointer;
-}
-
-.volume-slider {
-  width: 100%;
-  height: 100%;
-  position: relative;
-}
-
-.volume-level {
-  height: 100%;
-  width: 70%; /* Default value, will be updated by JS */
-  background: var(--audio-primary);
-  border-radius: 3px;
-}
-
-.volume-handle {
-  position: absolute;
-  top: 50%;
-  left: 70%; /* Default value, will be updated by JS */
-  transform: translate(-50%, -50%);
-  width: 12px;
-  height: 12px;
-  background: var(--audio-text);
-  border-radius: 50%;
-  box-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
-}
-
-/* Visualizer Toggle */
-.visualizer-toggle {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: var(--audio-medium);
-  border: var(--audio-border);
-  color: var(--audio-primary);
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  z-index: 10;
-}
-
-.visualizer-toggle:hover {
-  background: rgba(0, 255, 255, 0.2);
-  box-shadow: var(--audio-glow);
-}
-
-.visualizer-toggle.active {
-  background: var(--audio-gradient);
-  color: var(--audio-text);
-}
-
-/* Animations */
-@keyframes pulse {
-  0%, 100% {
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
-  }
-  50% {
-    box-shadow: 0 0 25px rgba(0, 255, 255, 0.8);
-  }
-}
-
-.pulse-effect {
-  animation: pulse 2s infinite;
-}
-
-@keyframes scanline {
-  0% {
-    transform: translateY(-100%);
-  }
-  100% {
-    transform: translateY(100%);
-  }
-}
-
-.cyber-audio-player::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 5px;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    rgba(0, 255, 255, 0.2) 20%, 
-    rgba(0, 255, 255, 0.5) 50%, 
-    rgba(0, 255, 255, 0.2) 80%, 
-    transparent 100%);
-  z-index: 10;
-  animation: scanline 4s linear infinite;
-  opacity: 0.7;
-}
-
-/* Responsive Styles */
-@media (max-width: 768px) {
-  .cyber-audio-player {
-    padding: 1.5rem;
-    gap: 1rem;
-  }
-  
-  .track-display {
+/* Container for the entire audio player */
+.audio-container {
+    display: flex;
     flex-direction: column;
-    align-items: flex-start;
     gap: 0.5rem;
-  }
-  
-  .track-time {
-    align-self: flex-end;
-  }
-  
-  .player-controls {
-    gap: 0.8rem;
-  }
-  
-  .control-btn {
+    margin: 0.5rem auto;
+    width: 90%;
+    max-width: 1000px;
+}
+
+/* Main controls area with buttons and info */
+.audio-controls {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    width: 100%;
+    max-width: 1000px;
+    margin: 2.5rem auto;
+}
+
+/* Track information display */
+.audio-container .track-info {
+    flex: 1;
+    color: var(--audio-text-color);
+    font-family: 'Orbitron', sans-serif;
+}
+
+.audio-container .track-title {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Control buttons container */
+.audio-container .control-buttons {
+    display: flex;
+    gap: 2rem;
+}
+
+/* Individual control buttons */
+.audio-container .control-button {
+    background: var(--audio-bg-color);
+    border: 1px solid var(--audio-border-color);
+    color: var(--audio-text-color);
     width: 40px;
     height: 40px;
-  }
-  
-  .play-btn {
-    width: 60px;
-    height: 60px;
-  }
-  
-  .volume-container {
-    width: 100%;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
     justify-content: center;
-  }
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-/* Active States */
-.control-btn.active {
-  background: rgba(0, 255, 255, 0.3);
-  box-shadow: var(--audio-glow);
+.audio-container .control-button:hover {
+    background: rgba(0, 255, 255, 0.2);
+    box-shadow: 0 0 15px var(--audio-glow-color);
 }
 
-.shuffle-btn.active, .repeat-btn.active {
-  color: var(--audio-accent);
-  text-shadow: 0 0 10px rgba(255, 255, 0, 0.7);
+/* Play button specific styling */
+.audio-container .play-button {
+    width: 50px;
+    height: 50px;
 }
 
-/* ======================================
-   POWERSHELL TERMINAL MUSIC WIDGET
-   ====================================== */
+.audio-container .play-button.playing {
+    background: rgba(0, 255, 255, 0.2);
+}
 
+/* Volume control styling */
+.audio-container .volume-control {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 150px;
+}
+
+/* Volume slider styling */
+.audio-container .volume-slider {
+    -webkit-appearance: none;
+    width: 100px;
+    height: 4px;
+    background: rgba(0, 255, 255, 0.2);
+    border-radius: 2px;
+    outline: none;
+}
+
+.audio-container .volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--audio-primary-color);
+    cursor: pointer;
+}
+
+.audio-container .volume-slider::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--audio-primary-color);
+    cursor: pointer;
+    border: none;
+}
+
+/* Audio player progress bar */
+.audio-container .progress-container {
+    width: 100%;
+    height: 6px;
+    background: rgba(0, 20, 40, 0.6);
+    border-radius: 3px;
+    position: relative;
+    cursor: pointer;
+    margin: 1rem 0;
+    overflow: hidden;
+}
+
+.audio-container .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--audio-primary-color), var(--audio-secondary-color));
+    width: 0%;
+    border-radius: 3px;
+    position: relative;
+    transition: width 0.1s linear;
+}
+
+/* Progress bar handle */
+.audio-container .progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 8px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 0 3px 3px 0;
+    box-shadow: 0 0 10px var(--audio-glow-color);
+}
+
+/* Time display for current/total duration */
+.audio-container .time-display {
+    display: flex;
+    justify-content: space-between;
+    color: rgba(0, 255, 255, 0.8);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+/* Audio visualizer connection button */
+.audio-container .audio-visualizer-toggle {
+    background: var(--audio-bg-color);
+    border: 1px solid var(--audio-border-color);
+    color: var(--audio-text-color);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-family: 'Rajdhani', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: 1rem;
+}
+
+.audio-container .audio-visualizer-toggle:hover {
+    background: rgba(0, 255, 255, 0.2);
+    box-shadow: 0 0 15px var(--audio-glow-color);
+}
+
+.audio-container .audio-visualizer-toggle.active {
+    background: rgba(0, 255, 255, 0.3);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+}
+
+.audio-container .audio-visualizer-toggle i {
+    font-size: 1.2rem;
+}
+
+/* PowerShell Terminal Music Widget - with unique class names */
 .ps-music-widget {
     position: fixed;
     bottom: 30px;
     right: 30px;
     width: 400px;
-    height: auto;
-    background: rgba(10, 15, 25, 0.95);
-    border: 1px solid var(--audio-primary);
+    height: 120px;
+    background: rgba(10, 15, 25, 0.85);
+    border: 1px solid var(--audio-border-color);
     border-radius: 8px;
     overflow: hidden;
-    z-index: 1000;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.7), 0 0 15px rgba(0, 255, 255, 0.3);
-    font-family: 'Consolas', monospace;
-    transform: translateY(calc(100% + 30px));
-    transition: transform 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.1);
-    opacity: 0;
+    z-index: 100;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    font-family: 'Rajdhani', sans-serif;
+    transition: all 0.3s ease;
 }
 
-.ps-music-widget.active {
-    transform: translateY(0);
-    opacity: 1;
-}
-
-.ps-header {
+/* Rest of the PowerShell widget styles with more specific selectors */
+.ps-music-widget .ps-header {
     height: 30px;
     background: rgba(20, 30, 40, 0.9);
     display: flex;
     align-items: center;
-    justify-content: space-between;
     padding: 0 10px;
-    color: var(--audio-primary);
+    color: var(--audio-text-color);
     font-size: 14px;
     border-bottom: 1px solid rgba(0, 255, 255, 0.2);
 }
 
-.ps-close-btn {
+.ps-widget-header {
+    background: rgba(0, 20, 40, 0.9);
+    padding: 5px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.4);
+}
+
+.ps-widget-title {
+    color: #00ffff;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.ps-widget-title i {
+    font-size: 14px;
+}
+
+.ps-widget-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.ps-widget-control {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
     cursor: pointer;
-    font-size: 20px;
-    opacity: 0.8;
-    transition: all 0.3s ease;
 }
 
-.ps-close-btn:hover {
-    opacity: 1;
-    color: #ff5f5f;
+.ps-widget-minimize {
+    background: #ffbd44;
+    border: 1px solid #dfb13a;
 }
 
-.ps-terminal-content {
+.ps-widget-close {
+    background: #ff605c;
+    border: 1px solid #e04c49;
+}
+
+.ps-widget-content {
     padding: 15px;
     color: #e0e0e0;
     font-size: 14px;
-    position: relative;
-    min-height: 150px;
 }
 
 .ps-terminal-prompt {
@@ -471,7 +291,7 @@
 
 .ps-terminal-prompt::before {
     content: 'PS C:\\Music>';
-    color: var(--audio-primary);
+    color: #00ffff;
     font-weight: bold;
 }
 
@@ -481,8 +301,6 @@
     white-space: nowrap;
     overflow: hidden;
     display: inline-block;
-    width: 0;
-    transition: width 1.5s steps(30, end);
 }
 
 .ps-terminal-output {
@@ -500,7 +318,7 @@
 .ps-terminal-btn {
     background: rgba(0, 20, 40, 0.8);
     border: 1px solid rgba(0, 255, 255, 0.4);
-    color: var(--audio-primary);
+    color: #00ffff;
     padding: 5px 10px;
     font-family: 'Consolas', monospace;
     cursor: pointer;
@@ -533,7 +351,7 @@
     display: inline-block;
     width: 8px;
     height: 15px;
-    background: var(--audio-primary);
+    background: #00ffff;
     margin-left: 2px;
     animation: ps-blink 1s infinite;
     vertical-align: middle;
@@ -566,102 +384,116 @@
     100% { top: 100%; }
 }
 
-/* ======================================
-   3D PLAYLIST CAROUSEL
-   ====================================== */
-
+/* 3D Playlist Carousel */
 .ps-playlist-container {
     position: relative;
-    height: 200px;
-    margin: 3rem auto;
-    perspective: 1000px;
-    max-width: 800px;
+    height: 400px;
+    margin: 240px 0;
+    perspective: 2000px;
+    overflow: visible;
 }
 
 .ps-playlist-carousel {
-    position: absolute;
+    position: relative;
     width: 100%;
     height: 100%;
     transform-style: preserve-3d;
-    transition: transform 1s ease;
+    transition: transform 1.5s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .ps-track-card {
     position: absolute;
-    width: 250px;
-    height: 150px;
-    background: var(--audio-medium);
-    border: 1px solid rgba(0, 255, 255, 0.3);
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 1rem;
-    backface-visibility: hidden;
-    transform-origin: center;
-    transition: all 0.5s ease;
-    cursor: pointer;
+    width: 320px;
+    height: 120px;
+    left: calc(50% - 160px);
+    top: calc(50% - 60px);
+    background: rgba(0, 106, 133, 0.95);
+    border: 1px solid rgba(255, 192, 0, 0.4);
+    border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    transition: all 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+    cursor: pointer;
+    transform-style: preserve-3d;
+    box-shadow: 0 5px 30px rgba(255, 255, 0, 0.5),
+                inset 0 0 30px rgba(0, 120, 147, 0.1);
 }
 
 .ps-track-card:hover {
-    border-color: var(--audio-primary);
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+    box-shadow: 0 0 25px rgba(255, 255, 0, 0.5);
 }
 
-.ps-track-content {
-    text-align: center;
-    z-index: 2;
+.ps-track-active {
+    border: 1px solid rgba(0, 255, 255, 0.8);
+    box-shadow: 0 0 40px rgba(0, 255, 255, 0.4),
+                inset 0 0 30px rgba(0, 255, 255, 0.2);
+    background: rgba(2, 12, 24, 0.95);
+}
+
+.ps-track-active::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #00ffff, transparent);
+    animation: ps-scan-active 2s linear infinite;
+}
+
+.ps-card-glitch-effect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), transparent 80%);
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.ps-card-content {
+    position: relative;
+    padding: 20px;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.ps-track-number {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 24px;
+    color: rgba(0, 255, 255, 0.7);
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+    letter-spacing: 2px;
+    margin-bottom: 15px;
 }
 
 .ps-track-title {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1.2rem;
-    color: var(--audio-primary);
-    margin-bottom: 0.5rem;
-    text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+    display: none;
 }
 
-.ps-track-artist {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 1rem;
-}
-
-.ps-eq-visualizer {
+.ps-track-equalizer {
     display: flex;
-    gap: 3px;
+    gap: 4px;
     justify-content: center;
-    height: 20px;
+    height: 30px;
     align-items: flex-end;
 }
 
 .ps-eq-bar {
-    width: 4px;
+    width: 5px;
+    background: rgba(0, 255, 255, 0.5);
     height: 5px;
-    background: var(--audio-primary);
-    border-radius: 1px;
-}
-
-.ps-track-active {
-    border-color: var(--audio-primary);
-    box-shadow: 0 0 25px rgba(0, 255, 255, 0.5);
-    z-index: 10;
-}
-
-.ps-track-active .ps-track-title {
-    color: #ffffff;
-    text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+    transition: height 0.2s ease;
+    border-radius: 2px;
 }
 
 .ps-track-active .ps-eq-bar {
-    animation: ps-eq-animation 0.8s ease infinite;
+    animation: ps-eq-animation 1.2s infinite ease-in-out;
 }
 
-.ps-track-active .ps-eq-bar:nth-child(1) { animation-delay: 0s; }
+.ps-track-active .ps-eq-bar:nth-child(1) { animation-delay: 0.0s; }
 .ps-track-active .ps-eq-bar:nth-child(2) { animation-delay: 0.2s; }
 .ps-track-active .ps-eq-bar:nth-child(3) { animation-delay: 0.4s; }
 .ps-track-active .ps-eq-bar:nth-child(4) { animation-delay: 0.6s; }
@@ -687,11 +519,11 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background: var(--audio-medium);
+    background: rgba(0, 20, 40, 0.9);
     border: 1px solid rgba(0, 255, 255, 0.4);
-    color: var(--audio-primary);
-    width: 40px;
-    height: 40px;
+    color: #00ffff;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -699,7 +531,7 @@
     cursor: pointer;
     z-index: 200;
     transition: all 0.3s ease;
-    font-size: 1rem;
+    font-size: 1.2em;
 }
 
 .ps-playlist-nav:hover {
@@ -708,16 +540,48 @@
 }
 
 .ps-prev {
-    left: 20px;
+    left: 40px;
 }
 
 .ps-next {
-    right: 20px;
+    right: 40px;
 }
 
 @keyframes ps-eq-animation {
     0%, 100% { height: 5px; }
     50% { height: 20px; }
+}
+
+@keyframes ps-scan-active {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Audio player responsive styles */
+@media (max-width: 768px) {
+    .audio-container .audio-controls {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .audio-container .track-info {
+        text-align: center;
+    }
+    
+    .audio-container .control-buttons {
+        justify-content: center;
+    }
+    
+    .audio-container .volume-control {
+        width: 100%;
+        justify-content: center;
+        margin-top: 1rem;
+    }
+    
+    .ps-music-widget {
+        width: 90%;
+        right: 5%;
+    }
 }
 
 /* Audio player theme variations */

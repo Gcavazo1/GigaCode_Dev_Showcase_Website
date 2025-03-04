@@ -606,67 +606,36 @@
 
         <!-- Audio Section -->
         <section id="audio-section" class="section">
-            <div class="cyber-audio-player">
-                <!-- Visualizer Background -->
-                <div class="audio-visualizer-bg"></div>
-                
-                <!-- Track Info Area -->
-                <div class="track-display">
+            <div class="section-header">
+                <h2 class="cyber-heading">Audio Player</h2>
+                <div class="neon-separator"></div>
+            </div>
+            
+            <div class="audio-container">
+                <div class="audio-controls">
                     <div class="track-info">
-                        <div class="track-title" id="current-track-title">Cyberpunk Ambient</div>
-                        <div class="track-artist" id="current-track-artist">GigaCode Studios</div>
+                        <div id="track-title" class="track-title">Loading...</div>
                     </div>
-                    <div class="track-time">
-                        <span id="current-time">0:00</span>
-                        <span class="time-separator">/</span>
-                        <span id="total-time">0:00</span>
+                    
+                    <div class="control-buttons">
+                        <button id="prev-track" class="control-button">
+                            <i class="fas fa-step-backward"></i>
+                        </button>
+                        <button id="play-audio" class="control-button play-button">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <button id="next-track" class="control-button">
+                            <i class="fas fa-step-forward"></i>
+                        </button>
                     </div>
-                </div>
-                
-                <!-- Progress Bar -->
-                <div class="progress-container">
-                    <div class="progress-bar">
-                        <div class="progress-glow"></div>
-                    </div>
-                    <div class="progress-handle"></div>
-                </div>
-                
-                <!-- Controls Area -->
-                <div class="player-controls">
-                    <button class="control-btn shuffle-btn">
-                        <i class="fas fa-random"></i>
-                    </button>
-                    <button class="control-btn prev-btn">
-                        <i class="fas fa-step-backward"></i>
-                    </button>
-                    <button class="control-btn play-btn" id="play-btn">
-                        <i class="fas fa-play"></i>
-                    </button>
-                    <button class="control-btn next-btn">
-                        <i class="fas fa-step-forward"></i>
-                    </button>
-                    <button class="control-btn repeat-btn">
-                        <i class="fas fa-redo"></i>
-                    </button>
-                </div>
-                
-                <!-- Volume Control -->
-                <div class="volume-container">
-                    <button class="volume-btn">
+                    
+                    <div class="volume-control">
                         <i class="fas fa-volume-up"></i>
-                    </button>
-                    <div class="volume-slider-container">
-                        <div class="volume-slider">
-                            <div class="volume-level"></div>
-                            <div class="volume-handle"></div>
-                        </div>
+                        <input type="range" id="volume-slider" class="volume-slider" min="0" max="100" value="70">
                     </div>
                 </div>
                 
-                <!-- Visualizer Toggle -->
-                <button class="visualizer-toggle">
-                    <i class="fas fa-wave-square"></i>
-                </button>
+                <audio id="background-audio" preload="auto"></audio>
             </div>
         </section>
 
@@ -888,8 +857,5 @@
     </div>
 
     <script src="js/gigachode-toggle.js"></script>
-    <!-- Add this right before the closing </body> tag -->
-    <audio id="audio-element" preload="auto"></audio>
-    <script src="js/audio-player.js"></script>
 </body>
 </html>
