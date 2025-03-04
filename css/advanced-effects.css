@@ -2018,8 +2018,8 @@
     width: 100%;
     margin: 0;
     background: rgba(0, 0, 0, 0.7);
-    border: 1px solid rgba(0, 255, 255, 0.4);
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+    border: 1px solid #f9f900;
+    box-shadow: 0 0 20px rgba(249, 249, 0, 0.2);
 }
 
 /* Fix header title responsiveness */
