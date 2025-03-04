@@ -153,19 +153,28 @@ class AudioPlayer {
                 this.source.connect(this.analyser);
                 this.analyser.connect(this.audioContext.destination);
             } catch (sourceError) {
-                console.log("Audio element already connected, using alternative approach");
+                console.log("Audio element already connected, creating a new audio element");
                 
-                // Create analyzer node without directly connecting to audio element
+                // Create a new audio element since the original is being used elsewhere
+                this.audio = document.createElement('audio');
+                this.audio.id = 'background-audio-player';
+                this.audio.volume = 0.7;
+                
+                // Connect the new audio element properly
+                this.source = this.audioContext.createMediaElementSource(this.audio);
                 this.analyser = this.audioContext.createAnalyser();
                 this.analyser.fftSize = 512;
                 this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
                 
-                // Connect analyzer to destination to hear audio
+                // Connect everything correctly
+                this.source.connect(this.analyser);
                 this.analyser.connect(this.audioContext.destination);
+                
+                console.log("Created new audio element and connected properly");
+                
+                // Immediately load the current track into the new audio element
+                this.loadTrack(this.currentTrack);
             }
-            
-            // Load the actual audio source
-            this.loadTrack(this.currentTrack);
             
             console.log("Audio initialized successfully");
         } catch (error) {
