@@ -857,5 +857,54 @@
     </div>
 
     <script src="js/gigachode-toggle.js"></script>
+
+    <!-- Add this PowerShell Music Widget to your index.html before the closing body tag -->
+    <div class="ps-music-widget">
+        <div class="ps-header">
+            <div class="ps-title">
+                <i class="fas fa-terminal"></i> GIGACODE_AUDIO.exe
+            </div>
+            <div class="ps-controls">
+                <span class="ps-minimize"><i class="fas fa-minus"></i></span>
+                <span class="ps-maximize"><i class="fas fa-square"></i></span>
+                <span class="ps-close"><i class="fas fa-times"></i></span>
+            </div>
+        </div>
+        <div class="ps-content">
+            <div class="ps-command-line">
+                <span class="ps-prompt">PS C:\GIGACODE\AUDIO></span>
+                <span class="ps-command">Get-AudioStatus</span>
+            </div>
+            <div class="ps-output">
+                <div class="ps-status-line">
+                    <span class="ps-label">Status:</span>
+                    <span class="ps-value ps-status">Inactive</span>
+                </div>
+                <div class="ps-status-line">
+                    <span class="ps-label">Visualizer:</span>
+                    <span class="ps-value ps-visualizer-status">Disabled</span>
+                </div>
+                <div class="ps-eq-container">
+                    <div class="ps-eq-bar"></div>
+                    <div class="ps-eq-bar"></div>
+                    <div class="ps-eq-bar"></div>
+                    <div class="ps-eq-bar"></div>
+                    <div class="ps-eq-bar"></div>
+                </div>
+            </div>
+            <div class="ps-command-line">
+                <span class="ps-prompt">PS C:\GIGACODE\AUDIO></span>
+                <span class="ps-command">Start-AudioSystem</span>
+            </div>
+            <div class="ps-buttons">
+                <button class="ps-enable-audio">ENABLE AUDIO</button>
+                <button class="ps-toggle-visualizer">TOGGLE VISUALIZER</button>
+            </div>
+            <div class="ps-scan-line"></div>
+        </div>
+    </div>
+
+    <!-- Add this before the closing body tag -->
+    <script src="js/audio-powershell.js"></script>
 </body>
 </html>
