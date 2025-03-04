@@ -1,3 +1,7 @@
+/* ======================================
+   AUDIO PLAYER STYLING - CONSOLIDATED
+   ====================================== */
+
 /* Basic audio player styling */
 .audio-section {
     background: rgba(10, 15, 25, 0);
@@ -101,6 +105,78 @@
     background: #00ffff;
     cursor: pointer;
     border: none;
+}
+
+/* Audio player progress bar */
+.progress-container {
+    width: 100%;
+    height: 6px;
+    background: rgba(0, 20, 40, 0.6);
+    border-radius: 3px;
+    position: relative;
+    cursor: pointer;
+    margin: 1rem 0;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #00ffff, #0088ff);
+    width: 0%;
+    border-radius: 3px;
+    position: relative;
+    transition: width 0.1s linear;
+}
+
+.progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 8px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 0 3px 3px 0;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+}
+
+.time-display {
+    display: flex;
+    justify-content: space-between;
+    color: rgba(0, 255, 255, 0.8);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+/* Audio visualizer connection */
+.audio-visualizer-toggle {
+    background: rgba(0, 20, 40, 0.8);
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    color: #00ffff;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-family: 'Rajdhani', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: 1rem;
+}
+
+.audio-visualizer-toggle:hover {
+    background: rgba(0, 255, 255, 0.2);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+}
+
+.audio-visualizer-toggle.active {
+    background: rgba(0, 255, 255, 0.3);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+}
+
+.audio-visualizer-toggle i {
+    font-size: 1.2rem;
 }
 
 /* PowerShell Terminal Music Widget - with unique class names */
@@ -455,4 +531,55 @@
 @keyframes ps-scan-active {
     0% { transform: translateX(-100%); }
     100% { transform: translateX(100%); }
+}
+
+/* Audio player responsive styles */
+@media (max-width: 768px) {
+    .audio-controls {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .track-info {
+        text-align: center;
+    }
+    
+    .control-buttons {
+        justify-content: center;
+    }
+    
+    .volume-control {
+        width: 100%;
+        justify-content: center;
+        margin-top: 1rem;
+    }
+    
+    .ps-music-widget {
+        width: 90%;
+        right: 5%;
+    }
+}
+
+/* Audio player theme variations */
+.audio-player-dark {
+    background: rgba(5, 10, 20, 0.9);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+}
+
+.audio-player-neon {
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+}
+
+/* Audio player animations */
+@keyframes audioGlow {
+    0%, 100% {
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 25px rgba(0, 255, 255, 0.5);
+    }
+}
+
+.audio-glow-effect {
+    animation: audioGlow 3s infinite;
 } 
