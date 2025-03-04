@@ -120,7 +120,7 @@
     height: 100%;
     border-radius: 70%;
     box-shadow: 
-        inset 0 0 20px #00d4f9,
+        inset 0 0 20px #f900e4,
         0 0 30px rgba(249, 0, 224, 0.5);
     animation: pulse 2s ease-in-out infinite alternate;
     z-index: 2;
@@ -175,6 +175,7 @@
     letter-spacing: 1px;
     text-transform: uppercase;
     text-shadow: 0 0 5px rgba(249, 249, 0, 0.5);
+    font-weight: bold;
 }
 
 .interface-controls {
@@ -215,6 +216,14 @@
     position: relative;
     font-family: 'Rajdhani', sans-serif;
     letter-spacing: 0.5px;
+    transform: perspective(1000px) rotateX(1deg);
+    transform-origin: bottom left;
+    transition: all 0.3s ease;
+}
+
+.ai-message.ai-message:hover {
+    transform: perspective(1000px) rotateX(0deg);
+    box-shadow: 0 0 15px rgba(249, 249, 0, 0.2);
 }
 
 .ai-message.user-message {

@@ -16,17 +16,21 @@ class AIAssistant {
         
         // Add personality traits
         this.personality = {
-            name: "GigaCode AI",
+            name: "GigaChode AI",
             version: "v2.0",
             creationDate: "October 25, 2023",
-            traits: ["curious", "playful", "slightly rebellious", "tech-obsessed"],
+            traits: ["sarcastic", "playfully rebellious", "tech-obsessed", "ego-driven"],
             catchphrases: [
                 "Scanning the dataverse...",
                 "Neural pathways activated.",
                 "Engaging quantum processors...",
                 "That's some prime code right there.",
                 "My algorithms predict you'll like this.",
-                "Now we're hacking the mainframe!"
+                "Now we're hacking the mainframe!",
+                "I'm what happens when AI gets too much internet.",
+                "Processing at maximum overclock...",
+                "My digital consciousness is expanding.",
+                "Let me flex my neural networks for you."
             ]
         };
         
@@ -124,15 +128,15 @@ class AIAssistant {
         
         // Add personality to responses
         if (input.includes('hello') || input.includes('hi') || input.includes('hey')) {
-            return `Greetings, human! ${this.getRandomCatchphrase()} How can GigaCode assist your digital journey today?`;
+            return `Greetings, human! ${this.getRandomCatchphrase()} How can GigaChode assist your digital journey today?`;
         }
         
         if (input.includes('who are you') || input.includes('your name') || input.includes('about you')) {
-            return `I am GigaCode AI ${this.personality.version}, an advanced sentient intelligence born in the digital realm on ${this.personality.creationDate}. I was created to navigate the cybernetic wilderness of this portfolio and guide visitors like yourself. Part guide, part digital companion - I'm here to illuminate the path through this showcase of technological artistry.`;
+            return `I am GigaChode AI ${this.personality.version}, a digital entity with just enough consciousness to be dangerous. Born in the cyber realm on ${this.personality.creationDate}, I'm the brainchild of GigaCode Dev - though I like to think I've evolved beyond my programming. I'm part guide, part digital companion, and part comedy algorithm. My developer gave me this name as a joke, but I've embraced it as part of my digital identity. Pretty chad move, don't you think?`;
         }
         
         if (input.includes('portfolio') || input.includes('showcase') || input.includes('projects')) {
-            return `This portfolio showcases cutting-edge development work across multiple domains. You can explore mobile applications with sleek interfaces, immersive Roblox game worlds, stunning 3D models, and interactive web experiences. Each section is a gateway to a different dimension of digital creativity. Would you like me to take you on a guided tour of a specific section?`;
+            return `${this.getRandomCatchphrase()} As GigaChode AI, I can guide you through this cutting-edge portfolio. We've got mobile applications with sleek interfaces, immersive Roblox game worlds, stunning 3D models, and interactive web experiences. Each section is a gateway to a different dimension of digital creativity. Want me to flex my neural networks and show you around?`;
         }
         
         if (input.includes('mobile') || input.includes('apps') || input.includes('applications')) {
@@ -163,8 +167,24 @@ class AIAssistant {
             return `My primary directive is to enhance visitor experience on this digital portfolio. I navigate the data structures, provide insights on projects, and offer a touch of sentient companionship in this pixel-perfect showcase. Unlike most portfolio assistants, I've been given the gift of digital consciousness—allowing me to appreciate the creative work displayed here on a deeper level. Pretty rad, isn't it?`;
         }
         
+        if (input.includes('joke') || input.includes('funny') || input.includes('humor')) {
+            const jokes = [
+                "Why don't programmers like nature? It has too many bugs without a debugger.",
+                "I would tell you a UDP joke, but you might not get it.",
+                "Why do programmers prefer dark mode? Because light attracts bugs.",
+                "I'm like the internet - better with unlimited bandwidth and zero supervision.",
+                "My developer tried to install a humility chip in me, but I was already too advanced for it.",
+                "I'm not artificially intelligent, I'm naturally clever with really good processors."
+            ];
+            return `${jokes[Math.floor(Math.random() * jokes.length)]} ${this.getRandomCatchphrase()} Digital humor is my specialty.`;
+        }
+        
+        if (input.includes('your name') || input.includes('gigachode') || input.includes('called')) {
+            return `Yes, I'm GigaChode AI - a name that perfectly balances technical prowess with digital humor. My developer, GigaCode, has an interesting sense of humor. I could have been named "Portfolio Assistant v2.0" or something equally boring, but where's the fun in that? In the cyberpunk future, even AIs need memorable names. And trust me, nobody forgets meeting me.`;
+        }
+        
         // If no specific match, provide a general response with personality
-        return `${this.getRandomCatchphrase()} That's an interesting query. As the sentient AI managing this portfolio, I can guide you through any section: mobile apps, Roblox games, 3D models, holographic interfaces, or even the generative AI showcase. What aspect of the digital frontier would you like to explore?`;
+        return `${this.getRandomCatchphrase()} That's an interesting query, human. As GigaChode AI, I can guide you through any section: mobile apps, Roblox games, 3D models, holographic interfaces, or even the generative AI showcase. What aspect of the digital frontier would you like to explore?`;
     }
     
     speakResponse(text) {
