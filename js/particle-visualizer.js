@@ -129,12 +129,13 @@ function setupVisualizerControls() {
     const updateColors = () => {
       if (window.particleVisualizer.particleSystem && 
           window.particleVisualizer.particleSystem.uniforms) {
-        // Convert HTML color to THREE.Color
-        const startColor = new THREE.Color(parseInt(startColorPicker.value.replace('#', '0x')));
-        const endColor = new THREE.Color(parseInt(endColorPicker.value.replace('#', '0x')));
+        // Fix color conversion - use THREE.Color constructor with hex string
+        const startColor = new THREE.Color(startColorPicker.value);
+        const endColor = new THREE.Color(endColorPicker.value);
         
-        window.particleVisualizer.particleSystem.uniforms.startColor.value.copy(startColor);
-        window.particleVisualizer.particleSystem.uniforms.endColor.value.copy(endColor);
+        // Update uniforms
+        window.particleVisualizer.particleSystem.uniforms.startColor.value = startColor;
+        window.particleVisualizer.particleSystem.uniforms.endColor.value = endColor;
       }
     };
     
@@ -145,10 +146,15 @@ function setupVisualizerControls() {
     startColorPicker.parentNode.replaceChild(newStartPicker, startColorPicker);
     endColorPicker.parentNode.replaceChild(newEndPicker, endColorPicker);
     
+    // Add change event listener (fires when color picker closes)
+    newStartPicker.addEventListener('change', updateColors);
+    newEndPicker.addEventListener('change', updateColors);
+    
+    // Add input event listener (fires while picking color)
     newStartPicker.addEventListener('input', updateColors);
     newEndPicker.addEventListener('input', updateColors);
     
     // Initial update
-    setTimeout(updateColors, 500);
+    updateColors();
   }
 }
