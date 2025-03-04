@@ -560,49 +560,67 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    align-items: center;
+    justify-content: center;
 }
 
 .ps-track-number {
     font-family: 'Orbitron', sans-serif;
-    font-size: 16px;
+    font-size: 72px;
     color: #00FFFF;
-    margin-bottom: 10px;
-    text-shadow: 0 0 8px rgba(0, 255, 255, 0.8);
+    text-shadow: 
+        0 0 10px rgba(0, 255, 255, 0.8),
+        0 0 20px rgba(0, 255, 255, 0.4),
+        0 0 30px rgba(0, 136, 255, 0.3);
+    opacity: 0.8;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin: 0;
+    position: relative;
 }
 
 .ps-track-title {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 24px;
-    font-weight: 600;
-    color: #ffffff;
-    margin-bottom: 15px;
-    text-shadow: 
-        0 0 5px rgba(0, 255, 255, 0.7),
-        0 0 10px rgba(0, 136, 255, 0.5);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    letter-spacing: 1px;
+    display: none;
 }
 
 .ps-track-equalizer {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    height: 60px;
-    margin-top: auto;
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    height: 40px;
+    margin: 0;
 }
 
-.ps-eq-bar {
-    width: 14%;
-    height: 4px;
-    background: linear-gradient(to top, #00FFFF, #FF00FF);
-    border-radius: 2px;
-    transition: height 0.2s ease;
-    box-shadow: 0 0 8px rgba(0, 255, 255, 0.7);
+.ps-track-number::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 140px;
+    height: 140px;
+    border: 2px solid rgba(0, 255, 255, 0.2);
+    border-radius: 50%;
+    z-index: -1;
+}
+
+.ps-track-active .ps-track-number::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 160px;
+    height: 160px;
+    border: 2px solid rgba(0, 255, 255, 0.3);
+    border-radius: 50%;
+    animation: rotate-ring 10s linear infinite;
+}
+
+@keyframes rotate-ring {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
 .ps-track-active .ps-eq-bar {

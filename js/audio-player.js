@@ -397,7 +397,6 @@ class AudioPlayer {
             <div class="ps-card-glitch-effect"></div>
             <div class="ps-card-content">
                 <div class="ps-track-number">${(index + 1).toString().padStart(2, '0')}</div>
-                <div class="ps-track-title">${track.title}</div>
                 <div class="ps-track-equalizer">
                     ${Array(5).fill(0).map(() => '<div class="ps-eq-bar"></div>').join('')}
                 </div>
