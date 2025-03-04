@@ -119,6 +119,47 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+    
+    // Get the visualizer nav item
+    const visualizerNavItem = document.querySelector('nav a[href="#visualizer"], .nav-item[data-section="visualizer"]');
+    
+    if (visualizerNavItem) {
+        // Remove any existing click handlers
+        const newVisualizerNavItem = visualizerNavItem.cloneNode(true);
+        visualizerNavItem.parentNode.replaceChild(newVisualizerNavItem, visualizerNavItem);
+        
+        // Add new click handler
+        newVisualizerNavItem.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Check if audio is playing
+            const audioElement = document.querySelector('audio');
+            const isPlaying = audioElement ? !audioElement.paused : false;
+            
+            if (!isPlaying) {
+                // If audio is not playing, show the PowerShell widget first
+                const psWidget = document.querySelector('.ps-music-widget');
+                if (psWidget) {
+                    psWidget.style.display = 'block';
+                    psWidget.style.opacity = '1';
+                    psWidget.style.transform = 'translateY(0) scale(1)';
+                    psWidget.classList.add('ps-active');
+                }
+            } else {
+                // If audio is already playing, show the visualizer terminal directly
+                if (window.showVisualizerTerminal) {
+                    window.showVisualizerTerminal();
+                } else {
+                    // Fallback if the function isn't available
+                    const visualizerTerminal = document.querySelector('.visualizer-terminal');
+                    if (visualizerTerminal) {
+                        visualizerTerminal.style.display = 'block';
+                        visualizerTerminal.classList.add('active');
+                    }
+                }
+            }
+        });
+    }
 });
 
 // Smooth scrolling for navigation links
