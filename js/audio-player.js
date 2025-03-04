@@ -48,9 +48,9 @@ class AudioPlayer {
         // State
         this.isPlaying = false;
         this.audioContext = null;
-        this.source = null;
         this.analyser = null;
         this.dataArray = null;
+        this.source = null;
         
         // Playlist
         this.playlist = [
@@ -84,8 +84,8 @@ class AudioPlayer {
         // Initialize
         this.initBasic();
         
-        // Create PowerShell widget immediately - this is critical for autoplay handling
-        this.createPowerShellWidget();
+        // Create PowerShell widget
+        setTimeout(() => this.createPowerShellWidget(), 1000);
     }
     
     initBasic() {
@@ -125,7 +125,14 @@ class AudioPlayer {
             this.nextTrack();
         });
         
-        // Previous/next track buttons
+        // Next/prev track buttons
+        document.getElementById('next-track').addEventListener('click', () => {
+            if (!this.audioContext) {
+                this.initAudio();
+            }
+            this.nextTrack();
+        });
+        
         document.getElementById('prev-track').addEventListener('click', () => {
             if (!this.audioContext) {
                 this.initAudio();
@@ -133,11 +140,22 @@ class AudioPlayer {
             this.prevTrack();
         });
         
-        document.getElementById('next-track').addEventListener('click', () => {
-            if (!this.audioContext) {
-                this.initAudio();
+        // Add keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                this.rotateCarousel('prev');
+            } else if (e.key === 'ArrowRight') {
+                this.rotateCarousel('next');
+            } else if (e.key === 'Enter') {
+                // Play the currently focused track
+                if (this.currentCarouselIndex !== undefined) {
+                    if (!this.audioContext) {
+                        this.initAudio();
+                    }
+                    this.loadTrack(this.currentCarouselIndex);
+                    this.playAudio();
+                }
             }
-            this.nextTrack();
         });
     }
     
@@ -145,9 +163,17 @@ class AudioPlayer {
         if (this.audioContext) return; // Already initialized
         
         try {
-            console.log("Initializing Audio Context");
             // Create audio context
             this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // Resume AudioContext - may be in suspended state due to browser autoplay policies
+            if (this.audioContext.state === 'suspended') {
+                this.audioContext.resume().then(() => {
+                    console.log("AudioContext resumed successfully");
+                }).catch(err => {
+                    console.error("Failed to resume AudioContext:", err);
+                });
+            }
             
             // Check if audio is already connected to another node
             try {
@@ -173,22 +199,12 @@ class AudioPlayer {
                 this.analyser.connect(this.audioContext.destination);
             }
             
-            // Try to resume AudioContext if suspended
-            if (this.audioContext.state === 'suspended') {
-                this.audioContext.resume().then(() => {
-                    console.log("AudioContext resumed");
-                }).catch(err => {
-                    console.error("Failed to resume AudioContext:", err);
-                });
-            }
-            
             // Load the actual audio source
             this.loadTrack(this.currentTrack);
             
             console.log("Audio initialized successfully");
         } catch (error) {
             console.error("Error initializing audio:", error);
-            this.showAudioError("Error initializing audio system");
         }
     }
     
@@ -209,7 +225,24 @@ class AudioPlayer {
             this.loadTrack(this.currentTrack);
         }
         
-        console.log("Attempting to play:", this.audio.src);
+        // Ensure AudioContext is resumed before playing
+        if (this.audioContext && this.audioContext.state === 'suspended') {
+            this.audioContext.resume().then(() => {
+                console.log("AudioContext resumed before playback");
+                this.actuallyPlayAudio();
+            }).catch(err => {
+                console.error("Failed to resume AudioContext:", err);
+                // Try to play anyway
+                this.actuallyPlayAudio();
+            });
+        } else {
+            this.actuallyPlayAudio();
+        }
+    }
+    
+    actuallyPlayAudio() {
+        console.log("Attempting to play audio:", this.audio.src);
+        
         this.audio.play()
             .then(() => {
                 console.log("Playback started successfully");
@@ -221,9 +254,9 @@ class AudioPlayer {
                 
                 // Show a message to the user about autoplay restrictions
                 if (error.name === 'NotAllowedError') {
-                    this.showAudioError("Please use the PowerShell widget to enable audio.");
-                    // Re-show the PowerShell widget
-                    this.createPowerShellWidget();
+                    this.showAudioError("Browser blocked autoplay. Please click play again.");
+                    // Add the attention-grabbing animation to the play button
+                    this.playButton.classList.add('pulse-attention');
                 } else {
                     this.showAudioError("Playback error: " + error.message);
                 }
@@ -238,10 +271,10 @@ class AudioPlayer {
     
     updatePlayButton() {
         if (this.isPlaying) {
-            this.playButton.querySelector('i').className = 'fas fa-pause';
+            this.playButton.innerHTML = '<i class="fas fa-pause"></i>';
             this.playButton.classList.add('playing');
         } else {
-            this.playButton.querySelector('i').className = 'fas fa-play';
+            this.playButton.innerHTML = '<i class="fas fa-play"></i>';
             this.playButton.classList.remove('playing');
         }
     }
@@ -257,6 +290,23 @@ class AudioPlayer {
             const trackSrc = this.playlist[index].file;
             console.log(`Loading track: ${this.playlist[index].title} from ${trackSrc}`);
             
+            // Verify audio file exists by creating a temporary XMLHttpRequest
+            const xhr = new XMLHttpRequest();
+            xhr.open('HEAD', trackSrc, true);
+            xhr.onload = () => {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    console.log(`Track file verified: ${trackSrc}`);
+                } else {
+                    console.error(`Error loading track file: ${trackSrc}. Status: ${xhr.status}`);
+                    this.showAudioError(`Error loading audio file (${xhr.status})`);
+                }
+            };
+            xhr.onerror = () => {
+                console.error(`Network error loading track file: ${trackSrc}`);
+                this.showAudioError("Network error loading audio file");
+            };
+            xhr.send();
+            
             // Set the source and update UI
             this.audio.src = trackSrc;
             document.getElementById('track-title').textContent = this.playlist[index].title;
@@ -271,7 +321,7 @@ class AudioPlayer {
             }
         } catch (error) {
             console.error("Error in loadTrack:", error);
-            this.showAudioError("Error loading track");
+            this.showAudioError("Error loading track: " + error.message);
         }
     }
     
@@ -302,38 +352,33 @@ class AudioPlayer {
     }
     
     updateEqualizer() {
+        if (!this.analyser || !this.dataArray) return;
+        
+        // Get the active track card
+        const activeCard = document.querySelector('.ps-track-active');
+        if (!activeCard) return;
+        
+        // Get the equalizer bars
+        const eqBars = activeCard.querySelectorAll('.ps-eq-bar');
+        if (!eqBars.length) return;
+        
         try {
-            if (!this.analyser || !this.isPlaying) return;
-            
-            // Get the equalizer bars
-            const eqBars = document.querySelectorAll('.ps-eq-bar');
-            if (eqBars.length === 0) return; // No bars to animate
-            
             // Get frequency data
             this.analyser.getByteFrequencyData(this.dataArray);
             
-            // Frequency ranges for bars
-            const ranges = [
-                [0, 50],     // Bass
-                [50, 100],   // Low mids
-                [100, 200],  // Mids
-                [200, 300],  // High mids
-                [300, 400]   // Highs
-            ];
-            
             // Animate equalizer bars based on frequency data
-            eqBars.forEach((bar, i) => {
-                if (i < ranges.length) {
-                    const [start, end] = ranges[i];
-                    let sum = 0;
-                    for (let j = start; j < end; j++) {
-                        sum += this.dataArray[j];
-                    }
-                    const avg = sum / (end - start);
-                    const height = Math.max(5, Math.min(30, avg / 255 * 30));
-                    bar.style.height = `${height}px`;
+            const barCount = eqBars.length;
+            const step = Math.floor(this.dataArray.length / barCount);
+            
+            for (let i = 0; i < barCount; i++) {
+                const dataIndex = i * step;
+                if (dataIndex < this.dataArray.length) {
+                    const value = this.dataArray[dataIndex];
+                    const height = Math.max(4, value / 5); // Scale down the value
+                    
+                    eqBars[i].style.height = `${height}px`;
                 }
-            });
+            }
         } catch (error) {
             console.error('Error animating equalizer:', error);
         }
@@ -404,17 +449,29 @@ class AudioPlayer {
         widget.querySelector('.ps-widget-close').addEventListener('click', () => {
             this.closePowerShellWidget(widget);
         });
+        
+        widget.querySelector('.ps-widget-minimize').addEventListener('click', () => {
+            widget.classList.remove('ps-active');
+            // Show again after 30 seconds if no choice was made
+            setTimeout(() => {
+                if (document.body.contains(widget) && !widget.classList.contains('ps-active')) {
+                    widget.classList.add('ps-active');
+                }
+            }, 30000);
+        });
     }
     
     closePowerShellWidget(widget) {
+        widget.style.transition = 'all 0.5s cubic-bezier(0.7, 0, 0.84, 0)';
         widget.classList.remove('ps-active');
+        widget.style.opacity = '0';
+        widget.style.transform = 'translateY(20px) scale(0.95)';
         
-        // Remove after animation completes
         setTimeout(() => {
-            if (widget.parentNode) {
-                widget.parentNode.removeChild(widget);
+            if (document.body.contains(widget)) {
+                document.body.removeChild(widget);
             }
-        }, 700); // Match the CSS transition duration
+        }, 500);
     }
 
     createPlaylistCarousel() {
@@ -430,105 +487,123 @@ class AudioPlayer {
         const playlistContainer = document.createElement('div');
         playlistContainer.className = 'ps-playlist-container';
         
-        // Create playlist header
-        playlistContainer.innerHTML = `
-            <div class="ps-playlist-carousel">
-                ${this.playlist.map((track, index) => `
-                    <div class="ps-track-card" data-index="${index}">
-                        <div class="ps-card-glitch-effect"></div>
-                        <div class="ps-card-content">
-                            <div class="ps-track-number">${(index + 1).toString().padStart(2, '0')}</div>
-                            <div class="ps-track-title">${track.title}</div>
-                            <div class="ps-track-equalizer">
-                                ${Array(5).fill(0).map(() => '<div class="ps-eq-bar"></div>').join('')}
-                            </div>
-                        </div>
-                        <div class="ps-card-shine"></div>
+        // Create carousel wrapper
+        const carousel = document.createElement('div');
+        carousel.className = 'ps-playlist-carousel';
+        
+        // Add track cards
+        this.playlist.forEach((track, index) => {
+            const card = document.createElement('div');
+            card.className = 'ps-track-card';
+            card.dataset.index = index;
+            
+            // Add active class to current track
+            if (index === this.currentTrack) {
+                card.classList.add('ps-track-active');
+            }
+            
+            // Create card content
+            card.innerHTML = `
+                <div class="ps-card-glitch-effect"></div>
+                <div class="ps-card-content">
+                    <div class="ps-track-number">${(index + 1).toString().padStart(2, '0')}</div>
+                    <div class="ps-track-title">${track.title}</div>
+                    <div class="ps-track-equalizer">
+                        ${Array(5).fill(0).map(() => '<div class="ps-eq-bar"></div>').join('')}
                     </div>
-                `).join('')}
-            </div>
-            <button class="ps-playlist-nav ps-prev"><i class="fas fa-chevron-left"></i></button>
-            <button class="ps-playlist-nav ps-next"><i class="fas fa-chevron-right"></i></button>
-        `;
-        
-        // Add to audio container
-        audioContainer.appendChild(playlistContainer);
-        
-        // Setup carousel navigation
-        this.setupCarouselNavigation(playlistContainer);
-        
-        // Initial carousel position
-        this.currentCarouselIndex = 0;
-        this.updateCarouselPosition();
-        
-        // Add click events to cards
-        playlistContainer.querySelectorAll('.ps-track-card').forEach((card, index) => {
+                </div>
+                <div class="ps-card-shine"></div>
+            `;
+            
+            // Add click event to play track
             card.addEventListener('click', () => {
                 if (!this.audioContext) {
                     this.initAudio();
                 }
                 this.loadTrack(index);
                 this.playAudio();
+                this.updatePlaylistActiveTrack(index);
             });
+            
+            carousel.appendChild(card);
         });
-    }
-    
-    setupCarouselNavigation(container) {
-        const prevButton = container.querySelector('.ps-prev');
-        const nextButton = container.querySelector('.ps-next');
         
-        prevButton.addEventListener('click', () => {
+        // Add navigation buttons
+        const prevBtn = document.createElement('button');
+        prevBtn.className = 'ps-playlist-nav ps-prev';
+        prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+        prevBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
             this.rotateCarousel('prev');
         });
         
-        nextButton.addEventListener('click', () => {
+        const nextBtn = document.createElement('button');
+        nextBtn.className = 'ps-playlist-nav ps-next';
+        nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+        nextBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
             this.rotateCarousel('next');
         });
-    }
-    
-    rotateCarousel(direction) {
-        if (direction === 'prev') {
-            this.currentCarouselIndex = (this.currentCarouselIndex - 1 + this.playlist.length) % this.playlist.length;
-        } else {
-            this.currentCarouselIndex = (this.currentCarouselIndex + 1) % this.playlist.length;
-        }
+        
+        // Assemble components
+        playlistContainer.appendChild(prevBtn);
+        playlistContainer.appendChild(carousel);
+        playlistContainer.appendChild(nextBtn);
+        
+        // Add to audio container
+        audioContainer.appendChild(playlistContainer);
+        
+        // Initialize carousel position
+        this.currentCarouselIndex = this.currentTrack;
         this.updateCarouselPosition();
     }
-    
+
+    rotateCarousel(direction) {
+        const totalTracks = this.playlist.length;
+        
+        if (direction === 'next') {
+            this.currentCarouselIndex = (this.currentCarouselIndex + 1) % totalTracks;
+        } else {
+            this.currentCarouselIndex = (this.currentCarouselIndex - 1 + totalTracks) % totalTracks;
+        }
+        
+        this.updateCarouselPosition();
+    }
+
     updateCarouselPosition() {
         const carousel = document.querySelector('.ps-playlist-carousel');
-        if (!carousel) return;
+        if (!carousel) {
+            console.warn('Playlist carousel not found');
+            return;
+        }
         
-        const totalCards = this.playlist.length;
-        const angleIncrement = 360 / totalCards;
-        const radius = 300; // Adjust for desired carousel size
-        
-        // Position each card in a circle
         const cards = carousel.querySelectorAll('.ps-track-card');
+        const totalCards = cards.length;
+        if (totalCards === 0) return;
+        
         cards.forEach((card, index) => {
-            // Calculate the angle offset based on current index
-            const angleOffset = ((index - this.currentCarouselIndex) * angleIncrement) % 360;
+            let relativePos = (index - this.currentCarouselIndex + totalCards) % totalCards;
             
-            // Convert to radians
-            const angleRad = angleOffset * Math.PI / 180;
+            if (relativePos > totalCards / 2) {
+                relativePos -= totalCards;
+            }
             
-            // Calculate 3D position
-            const z = radius * Math.cos(angleRad);
-            const x = radius * Math.sin(angleRad);
+            // Adjusted positioning for better spread and depth
+            const rotation = relativePos * 25; // Reduced rotation for better readability
+            const zTranslation = Math.cos(Math.abs(relativePos) * 0.4) * 250 - 250; // More depth
+            const xTranslation = Math.sin(relativePos * 0.4) * 400; // Wider spread
+            const scale = Math.max(0.6, 1 - Math.abs(relativePos) * 0.2); // More dramatic scaling
+            const opacity = Math.max(0.2, 1 - Math.abs(relativePos) * 0.4); // More dramatic fade
             
-            // Calculate scale and opacity based on z position
-            const scale = this.mapRange(z, -radius, radius, 0.7, 1);
-            const opacity = this.mapRange(z, -radius, radius, 0.3, 1);
-            
-            // Apply transform
-            card.style.transform = `translateX(${x}px) translateZ(${z}px) scale(${scale})`;
+            card.style.transform = `
+                translateX(${xTranslation}px) 
+                translateZ(${zTranslation}px) 
+                rotateY(${rotation}deg) 
+                scale(${scale})
+            `;
             card.style.opacity = opacity;
-            card.style.zIndex = Math.round(z + radius); // Higher z = higher in stacking order
+            card.style.zIndex = 100 - Math.abs(relativePos);
         });
-    }
-    
-    mapRange(value, in_min, in_max, out_min, out_max) {
-        return ((value - in_min) * (out_max - out_min)) / (in_max - in_min) + out_min;
     }
 
     updatePlaylistActiveTrack(index) {
@@ -566,9 +641,7 @@ class AudioPlayer {
         setTimeout(() => {
             statusElement.style.opacity = '0';
             setTimeout(() => {
-                if (statusElement.parentNode) {
-                    statusElement.parentNode.removeChild(statusElement);
-                }
+                statusElement.remove();
             }, 500);
         }, 5000);
     }
