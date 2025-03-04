@@ -18,6 +18,11 @@ class ParticleVisualizer {
       document.body.appendChild(this.canvas);
     }
     
+    // Start hidden by default
+    this.canvas.style.display = 'block';
+    this.canvas.style.opacity = '0';
+    this.canvas.classList.remove('active');
+    
     // Create renderer first
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
@@ -179,36 +184,34 @@ class ParticleVisualizer {
   connectToAudioElement(audioElement, existingAnalyser) {
     console.log('[Visualizer] Reconnecting to new audio element');
     
-    // Ensure we're visible
-    this.show();
-    
     if (!audioElement) {
-      console.error('[Visualizer] No audio element provided to connectToAudioElement');
-      return false;
+        console.error('[Visualizer] No audio element provided to connectToAudioElement');
+        return false;
     }
     
     try {
-      if (existingAnalyser) {
-        // Use the existing analyser from the audio player
-        this.audioAnalyzer.useExternalAnalyser(existingAnalyser, audioElement);
-        console.log('[Visualizer] Using existing analyser from audio player');
-        this.isPlaying = true;
-        return true;
-      } else {
-        // Create new connection
-        const connected = this.audioAnalyzer.connect(audioElement);
-        if (connected) {
-          this.isPlaying = true;
-          console.log('[Visualizer] Created new connection to audio element');
-          return true;
+        if (existingAnalyser) {
+            // Use the existing analyser from the audio player
+            this.audioAnalyzer.useExternalAnalyser(existingAnalyser, audioElement);
+            console.log('[Visualizer] Using existing analyser from audio player');
+            this.isPlaying = true;
+            return true;
+        } else {
+            // Create new connection
+            const connected = this.audioAnalyzer.connect(audioElement);
+            if (connected) {
+                this.isPlaying = true;
+                this.show(); // Show visualizer after successful connection
+                console.log('[Visualizer] Created new connection to audio element');
+                return true;
+            }
         }
-      }
-      
-      console.error('[Visualizer] Failed to connect to new audio element');
-      return false;
+        
+        console.error('[Visualizer] Failed to connect to new audio element');
+        return false;
     } catch (error) {
-      console.error('[Visualizer] Error connecting to new audio element:', error);
-      return false;
+        console.error('[Visualizer] Error connecting to new audio element:', error);
+        return false;
     }
   }
 
@@ -226,8 +229,13 @@ class ParticleVisualizer {
     if (this.isPlaying) {
       const audioData = this.audioAnalyzer.update();
       
+      // Log audio data for debugging
+      console.log('[Visualizer] Audio data:', audioData);
+      
+      // Update beat detector with current time in milliseconds
       // Update beat detector
       const beatDetected = this.beatDetector.update(audioData, elapsedTime * 1000);
+
       
       // Update particle system with the updated interface
       if (this.particleSystem) {
@@ -280,14 +288,18 @@ class ParticleVisualizer {
   }
 
   show() {
+    console.log('[Visualizer] Showing visualizer');
     if (this.canvas) {
       this.canvas.style.display = 'block';
+      this.canvas.style.opacity = '1';
       this.canvas.classList.add('active');
     }
   }
 
   hide() {
+    console.log('[Visualizer] Hiding visualizer');
     if (this.canvas) {
+      this.canvas.style.opacity = '0';
       this.canvas.classList.remove('active');
     }
   }
