@@ -351,6 +351,12 @@ class AudioPlayer {
             return;
         }
         
+        // Remove any existing playlist
+        const existingPlaylist = document.querySelector('.ps-playlist-container');
+        if (existingPlaylist) {
+            existingPlaylist.remove();
+        }
+        
         // Create playlist container
         const playlistContainer = document.createElement('div');
         playlistContainer.className = 'ps-playlist-container';
@@ -358,6 +364,10 @@ class AudioPlayer {
         // Create carousel wrapper
         const carousel = document.createElement('div');
         carousel.className = 'ps-playlist-carousel';
+        
+        // Create carousel container for 3D effect
+        const carouselContainer = document.createElement('div');
+        carouselContainer.className = 'ps-carousel-container';
         
         // Add track cards
         this.playlist.forEach((track, index) => {
@@ -393,8 +403,11 @@ class AudioPlayer {
                 this.updatePlaylistActiveTrack(index);
             });
             
-            carousel.appendChild(card);
+            carouselContainer.appendChild(card);
         });
+        
+        // Add carousel container to carousel
+        carousel.appendChild(carouselContainer);
         
         // Add navigation buttons
         const prevBtn = document.createElement('button');
@@ -413,83 +426,106 @@ class AudioPlayer {
             this.rotateCarousel('next');
         });
         
-        // Assemble components
-        playlistContainer.appendChild(prevBtn);
-        playlistContainer.appendChild(carousel);
-        playlistContainer.appendChild(nextBtn);
+        carousel.appendChild(prevBtn);
+        carousel.appendChild(nextBtn);
         
-        // Add to audio container
+        // Add carousel to playlist container
+        playlistContainer.appendChild(carousel);
+        
+        // Add playlist container to audio container
         audioContainer.appendChild(playlistContainer);
         
-        // Initialize carousel position
-        this.currentCarouselIndex = this.currentTrack;
-        this.updateCarouselPosition();
+        // Position cards in 3D space
+        this.positionCarouselCards();
+        
+        // Store references
+        this.carouselContainer = carouselContainer;
+        this.carousel = carousel;
     }
 
-    rotateCarousel(direction) {
-        const totalTracks = this.playlist.length;
+    // Position cards in 3D space
+    positionCarouselCards() {
+        if (!this.carouselContainer) return;
         
-        if (direction === 'next') {
-            this.currentCarouselIndex = (this.currentCarouselIndex + 1) % totalTracks;
-        } else {
-            this.currentCarouselIndex = (this.currentCarouselIndex - 1 + totalTracks) % totalTracks;
-        }
-        
-        this.updateCarouselPosition();
-    }
-
-    updateCarouselPosition() {
-        const carousel = document.querySelector('.ps-playlist-carousel');
-        if (!carousel) {
-            console.warn('Playlist carousel not found');
-            return;
-        }
-        
-        const cards = carousel.querySelectorAll('.ps-track-card');
-        const totalCards = cards.length;
-        if (totalCards === 0) return;
+        const cards = this.carouselContainer.querySelectorAll('.ps-track-card');
+        const cardCount = cards.length;
+        const angleStep = (2 * Math.PI) / cardCount;
+        const radius = 300; // Adjust for desired carousel size
         
         cards.forEach((card, index) => {
-            let relativePos = (index - this.currentCarouselIndex + totalCards) % totalCards;
+            const angle = angleStep * index;
+            const x = Math.sin(angle) * radius;
+            const z = Math.cos(angle) * radius;
+            const rotY = (angle * 180) / Math.PI;
             
-            if (relativePos > totalCards / 2) {
-                relativePos -= totalCards;
-            }
+            card.style.transform = `rotateY(${rotY}deg) translateZ(${radius}px)`;
             
-            // Adjusted positioning for better spread and depth
-            const rotation = relativePos * 25; // Reduced rotation for better readability
-            const zTranslation = Math.cos(Math.abs(relativePos) * 0.4) * 250 - 250; // More depth
-            const xTranslation = Math.sin(relativePos * 0.4) * 400; // Wider spread
-            const scale = Math.max(0.6, 1 - Math.abs(relativePos) * 0.2); // More dramatic scaling
-            const opacity = Math.max(0.2, 1 - Math.abs(relativePos) * 0.4); // More dramatic fade
-            
-            card.style.transform = `
-                translateX(${xTranslation}px) 
-                translateZ(${zTranslation}px) 
-                rotateY(${rotation}deg) 
-                scale(${scale})
-            `;
-            card.style.opacity = opacity;
-            card.style.zIndex = 100 - Math.abs(relativePos);
+            // Adjust opacity based on position (front cards more visible)
+            const normalizedAngle = Math.abs((angle % (2 * Math.PI)) - Math.PI);
+            const opacity = 0.5 + (0.5 * (1 - normalizedAngle / Math.PI));
+            card.style.opacity = opacity.toFixed(2);
         });
+        
+        // Rotate to show current track
+        this.rotateToTrack(this.currentTrack);
     }
 
+    // Rotate carousel to show specific track
+    rotateToTrack(index) {
+        if (!this.carouselContainer || !this.playlist) return;
+        
+        const cardCount = this.playlist.length;
+        const angleStep = (2 * Math.PI) / cardCount;
+        const angle = -angleStep * index; // Negative to rotate in correct direction
+        const rotY = (angle * 180) / Math.PI;
+        
+        this.carouselContainer.style.transform = `rotateY(${rotY}deg)`;
+    }
+
+    // Handle carousel rotation
+    rotateCarousel(direction) {
+        if (!this.carouselContainer || !this.playlist) return;
+        
+        const cardCount = this.playlist.length;
+        let newTrack;
+        
+        if (direction === 'next') {
+            newTrack = (this.currentTrack + 1) % cardCount;
+        } else {
+            newTrack = (this.currentTrack - 1 + cardCount) % cardCount;
+        }
+        
+        // Load and play the new track
+        if (this.audioContext) {
+            this.loadTrack(newTrack);
+            this.playAudio();
+        } else {
+            this.loadTrackInfo(newTrack);
+        }
+        
+        // Update active track in playlist
+        this.updatePlaylistActiveTrack(newTrack);
+        
+        // Rotate carousel to show new track
+        this.rotateToTrack(newTrack);
+    }
+
+    // Update active track in playlist
     updatePlaylistActiveTrack(index) {
-        const cards = document.querySelectorAll('.ps-track-card');
-        if (cards.length === 0) return; // Safety check
+        if (!this.carouselContainer) return;
         
         // Remove active class from all cards
+        const cards = this.carouselContainer.querySelectorAll('.ps-track-card');
         cards.forEach(card => card.classList.remove('ps-track-active'));
         
         // Add active class to current track
-        const activeCard = document.querySelector(`.ps-track-card[data-index="${index}"]`);
+        const activeCard = this.carouselContainer.querySelector(`.ps-track-card[data-index="${index}"]`);
         if (activeCard) {
             activeCard.classList.add('ps-track-active');
-            
-            // Rotate carousel to show active track
-            this.currentCarouselIndex = index;
-            this.updateCarouselPosition();
         }
+        
+        // Rotate carousel to show active track
+        this.rotateToTrack(index);
     }
 }
 
