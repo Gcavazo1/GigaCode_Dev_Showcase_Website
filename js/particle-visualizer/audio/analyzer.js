@@ -131,9 +131,6 @@ class AudioAnalyzer {
     // Setup the data array
     this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
     
-    // Set connected flag
-    this.isConnected = true;
-    
     console.log('[AudioAnalyzer] Using external analyser, frequency bin count:', this.analyser.frequencyBinCount);
     
     return true;

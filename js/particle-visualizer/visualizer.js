@@ -184,40 +184,33 @@ class ParticleVisualizer {
   connectToAudioElement(audioElement, existingAnalyser) {
     console.log('[Visualizer] Reconnecting to new audio element');
     
-    // Show the visualizer immediately when connecting
-    this.show();
-    
     if (!audioElement) {
-      console.error('[Visualizer] No audio element provided to connectToAudioElement');
-      return false;
+        console.error('[Visualizer] No audio element provided to connectToAudioElement');
+        return false;
     }
     
     try {
-      if (existingAnalyser) {
-        // Use the existing analyser from the audio player
-        const success = this.audioAnalyzer.useExternalAnalyser(existingAnalyser, audioElement);
-        if (success) {
-          console.log('[Visualizer] Using existing analyser from audio player');
-          this.isPlaying = true;
-          this.isInitialized = true; // Make sure we're initialized
-          return true;
+        if (existingAnalyser) {
+            // Use the existing analyser from the audio player
+            this.audioAnalyzer.useExternalAnalyser(existingAnalyser, audioElement);
+            console.log('[Visualizer] Using existing analyser from audio player');
+            this.isPlaying = true;
+            return true;
+        } else {
+            // Create new connection
+            const connected = this.audioAnalyzer.connect(audioElement);
+            if (connected) {
+                this.isPlaying = true;
+                console.log('[Visualizer] Created new connection to audio element');
+                return true;
+            }
         }
-      } else {
-        // Create new connection
-        const connected = this.audioAnalyzer.connect(audioElement);
-        if (connected) {
-          this.isPlaying = true;
-          this.isInitialized = true; // Make sure we're initialized
-          console.log('[Visualizer] Created new connection to audio element');
-          return true;
-        }
-      }
-      
-      console.error('[Visualizer] Failed to connect to new audio element');
-      return false;
+        
+        console.error('[Visualizer] Failed to connect to new audio element');
+        return false;
     } catch (error) {
-      console.error('[Visualizer] Error connecting to new audio element:', error);
-      return false;
+        console.error('[Visualizer] Error connecting to new audio element:', error);
+        return false;
     }
   }
 
