@@ -263,9 +263,9 @@ class ParticleVisualizer {
         
         // Split into low, mid, high with emphasis on bass for better visuals
         audioData = {
-          low: normalized * 1.5,
-          mid: normalized * 0.8,
-          high: normalized * 0.5
+          low: normalized * 0.8,
+          mid: normalized * 0.5,
+          high: normalized * 0.3
         };
         
         if (normalized > 0.01) {
@@ -290,6 +290,13 @@ class ParticleVisualizer {
     // ALWAYS update particle system with whatever data we have
     if (this.particleSystem) {
       this.particleSystem.update(elapsedTime, audioData, beatDetected);
+    }
+    
+    // RESTORE AUTO-ROTATION - add this back
+    if (this.holder) {
+      // Slow constant rotation
+      this.holder.rotation.y += 0.002;
+      this.holder.rotation.x += 0.001;
     }
     
     // Render scene

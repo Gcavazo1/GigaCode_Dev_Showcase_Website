@@ -646,17 +646,17 @@ class ParticleSystem {
     // Get reactivity with default
     const reactivity = Math.max(0.5, this.reactivityMultiplier || 0.8);
     
-    // Apply DIRECT mapping with MORE DRAMATIC effects
-    // More extreme values to make visualization more obvious
-    this.uniforms.amplitude.value = 0.3 + (audio.low * 3.0 * reactivity);
-    this.uniforms.offsetGain.value = 0.1 + (audio.mid * 2.0 * reactivity); 
-    this.uniforms.frequency.value = 1.0 + (audio.high * 5.0 * reactivity);
+    // Apply DIRECT mapping with MORE SUBTLE effects
+    // Reduced intensity values for less overreaction
+    this.uniforms.amplitude.value = 0.3 + (audio.low * 1.5 * reactivity);  // Reduced from 3.0
+    this.uniforms.offsetGain.value = 0.1 + (audio.mid * 1.0 * reactivity);  // Reduced from 2.0
+    this.uniforms.frequency.value = 1.0 + (audio.high * 2.0 * reactivity);  // Reduced from 5.0
     
-    // Beat detection with more dramatic effect
+    // Beat detection with more subtle effect
     if (beatDetected) {
       console.log("[ParticleSystem] Beat detected!");
-      this.uniforms.size.value = 4.0 * reactivity;
-      this.uniforms.maxDistance.value = 2.0;
+      this.uniforms.size.value = 2.5 * reactivity;  // Reduced from 4.0
+      this.uniforms.maxDistance.value = 1.5;  // Reduced from 2.0
     } else {
       // Smoother falloff
       this.uniforms.size.value = Math.max(0.8, this.uniforms.size.value * 0.92);
