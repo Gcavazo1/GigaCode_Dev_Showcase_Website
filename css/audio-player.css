@@ -485,9 +485,9 @@
 .ps-playlist-carousel {
     position: relative;
     width: 100%;
-    height: 430px;
-    perspective: 2200px;
-    margin: 50px 0;
+    height: 500px;
+    perspective: 2800px;
+    margin: 60px 0;
     overflow: visible;
     user-select: none;
     touch-action: pan-y;
@@ -509,22 +509,26 @@
 
 .ps-track-card {
     position: absolute;
-    width: 260px;
-    height: 200px;
+    width: 400px;
+    height: 220px;
     left: 50%;
     top: 50%;
-    margin-left: -130px;
-    margin-top: -100px;
-    background: rgba(5, 15, 30, 0.95);
+    margin-left: -200px;
+    margin-top: -110px;
+    background: rgba(5, 15, 30, 0.92);
     border: 1px solid var(--audio-border-color);
-    border-radius: 10px;
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5), 0 0 10px rgba(0, 255, 255, 0.2);
+    box-shadow: 
+        0 0 25px rgba(0, 0, 0, 0.6),
+        0 0 15px rgba(0, 255, 255, 0.3),
+        0 0 5px rgba(255, 0, 255, 0.3);
     backface-visibility: hidden;
     cursor: grab;
     transform-style: preserve-3d;
     transform-origin: center center;
     transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+    background: linear-gradient(135deg, rgba(5, 15, 30, 0.95) 0%, rgba(10, 25, 45, 0.95) 100%);
 }
 
 .ps-track-card:active {
@@ -532,17 +536,25 @@
 }
 
 .ps-track-card:hover {
-    box-shadow: 0 0 25px var(--audio-glow-color);
+    box-shadow: 
+        0 0 30px rgba(0, 0, 0, 0.6),
+        0 0 20px rgba(0, 255, 255, 0.4),
+        0 0 10px rgba(255, 0, 255, 0.4);
     transform: scale(1.05);
+    border-color: rgba(0, 255, 255, 0.7);
 }
 
 .ps-track-card.ps-track-active {
     border: 2px solid var(--audio-primary-color);
-    box-shadow: 0 0 30px var(--audio-glow-color);
+    box-shadow: 
+        0 0 30px rgba(0, 0, 0, 0.7),
+        0 0 25px rgba(0, 255, 255, 0.5),
+        0 0 15px rgba(255, 0, 255, 0.5);
+    background: linear-gradient(135deg, rgba(10, 25, 45, 0.95) 0%, rgba(15, 35, 60, 0.95) 100%);
 }
 
 .ps-card-content {
-    padding: 15px;
+    padding: 20px;
     position: relative;
     z-index: 2;
     height: 100%;
@@ -553,56 +565,74 @@
 
 .ps-track-number {
     font-family: 'Orbitron', sans-serif;
-    font-size: 14px;
-    color: var(--audio-primary-color);
+    font-size: 16px;
+    color: #00FFFF;
     margin-bottom: 10px;
-    text-shadow: 0 0 5px var(--audio-glow-color);
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.8);
 }
 
 .ps-track-title {
     font-family: 'Rajdhani', sans-serif;
-    font-size: 18px;
+    font-size: 24px;
     font-weight: 600;
     color: #ffffff;
     margin-bottom: 15px;
-    text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+    text-shadow: 
+        0 0 5px rgba(0, 255, 255, 0.7),
+        0 0 10px rgba(0, 136, 255, 0.5);
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
+    letter-spacing: 1px;
 }
 
 .ps-track-equalizer {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    height: 40px;
+    height: 60px;
     margin-top: auto;
 }
 
 .ps-eq-bar {
-    width: 15%;
+    width: 14%;
     height: 4px;
-    background: var(--audio-primary-color);
+    background: linear-gradient(to top, #00FFFF, #FF00FF);
     border-radius: 2px;
     transition: height 0.2s ease;
-    box-shadow: 0 0 5px var(--audio-glow-color);
+    box-shadow: 0 0 8px rgba(0, 255, 255, 0.7);
 }
 
 .ps-track-active .ps-eq-bar {
     animation: eq-animation 1.2s ease-in-out infinite alternate;
 }
 
-.ps-eq-bar:nth-child(1) { animation-delay: 0.0s; }
-.ps-eq-bar:nth-child(2) { animation-delay: 0.2s; }
-.ps-eq-bar:nth-child(3) { animation-delay: 0.4s; }
-.ps-eq-bar:nth-child(4) { animation-delay: 0.6s; }
-.ps-eq-bar:nth-child(5) { animation-delay: 0.8s; }
+.ps-eq-bar:nth-child(1) { 
+    animation-delay: 0.0s; 
+    background: linear-gradient(to top, #00FFFF, #39FF14);
+}
+.ps-eq-bar:nth-child(2) { 
+    animation-delay: 0.2s;
+    background: linear-gradient(to top, #00FFFF, #0088FF); 
+}
+.ps-eq-bar:nth-child(3) { 
+    animation-delay: 0.4s;
+    background: linear-gradient(to top, #00FFFF, #FF00FF); 
+}
+.ps-eq-bar:nth-child(4) { 
+    animation-delay: 0.6s;
+    background: linear-gradient(to top, #00FFFF, #BC13FE); 
+}
+.ps-eq-bar:nth-child(5) { 
+    animation-delay: 0.8s;
+    background: linear-gradient(to top, #00FFFF, #39FF14); 
+}
 
 @keyframes eq-animation {
     0% { height: 4px; }
-    100% { height: 30px; }
+    100% { height: 50px; }
 }
 
 .ps-card-glitch-effect {
@@ -611,7 +641,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(45deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1));
+    background: linear-gradient(45deg, rgba(0, 255, 255, 0.15), rgba(255, 0, 255, 0.15));
     opacity: 0;
     transition: opacity 0.3s ease;
     z-index: 1;
@@ -623,39 +653,16 @@
     animation: glitch-effect 2s infinite alternate;
 }
 
-@keyframes glitch-effect {
-    0%, 100% { 
-        clip-path: inset(0 0 0 0);
-        transform: translate(0);
-    }
-    10% {
-        clip-path: inset(10% 0 80% 0);
-        transform: translate(-2px, 2px);
-    }
-    20% {
-        clip-path: inset(30% 0 50% 0);
-        transform: translate(2px, -2px);
-    }
-    30% {
-        clip-path: inset(50% 0 30% 0);
-        transform: translate(-2px, 2px);
-    }
-    40% {
-        clip-path: inset(70% 0 10% 0);
-        transform: translate(2px, -2px);
-    }
-}
-
 .ps-card-shine {
     position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
+    top: -150%;
+    left: -150%;
+    width: 400%;
+    height: 400%;
     background: linear-gradient(
         45deg,
         rgba(255, 255, 255, 0) 0%,
-        rgba(255, 255, 255, 0.05) 50%,
+        rgba(255, 255, 255, 0.08) 50%,
         rgba(255, 255, 255, 0) 100%
     );
     transform: rotate(45deg);
@@ -667,13 +674,20 @@
     animation: card-shine 1.5s ease-in-out infinite;
 }
 
-@keyframes card-shine {
-    0% { transform: rotate(45deg) translateX(-100%); }
-    100% { transform: rotate(45deg) translateX(100%); }
+.ps-track-active::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(45deg, #00FFFF, #0088FF, #FF00FF, #BC13FE, #39FF14);
+    border-radius: 14px;
+    z-index: -1;
+    animation: border-pulse 3s linear infinite;
+    opacity: 0.7;
 }
 
-.ps-playlist-nav {
-    display: none;
+@keyframes border-pulse {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 0.3; }
 }
 
 .ps-carousel-hint {
@@ -682,16 +696,19 @@
     left: 0;
     right: 0;
     text-align: center;
-    color: var(--audio-primary-color);
+    color: #00FFFF;
     font-family: 'Rajdhani', sans-serif;
-    font-size: 14px;
-    opacity: 0.7;
+    font-size: 16px;
+    font-weight: 500;
+    opacity: 0.8;
     animation: pulse 2s infinite;
+    text-shadow: 0 0 5px rgba(0, 255, 255, 0.7);
+    letter-spacing: 1px;
 }
 
 @keyframes pulse {
-    0%, 100% { opacity: 0.7; }
-    50% { opacity: 0.3; }
+    0%, 100% { opacity: 0.8; text-shadow: 0 0 5px rgba(0, 255, 255, 0.7); }
+    50% { opacity: 0.4; text-shadow: 0 0 10px rgba(0, 255, 255, 0.9); }
 }
 
 /* Responsive adjustments */

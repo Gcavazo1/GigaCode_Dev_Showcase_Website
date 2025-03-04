@@ -421,7 +421,7 @@ class AudioPlayer {
         const cards = this.carouselContainer.querySelectorAll('.ps-track-card');
         const cardCount = cards.length;
         const theta = (2 * Math.PI) / cardCount;
-        const radius = 350; // Increased radius for a wider carousel
+        const radius = 500; // Increased radius for a wider carousel
 
         cards.forEach((card, index) => {
             const angle = theta * index;
@@ -440,6 +440,14 @@ class AudioPlayer {
 
         // Initial rotation to show current track
         this.rotateToTrack(this.currentTrack);
+        
+        // Add a hint text about dragging if it doesn't exist
+        if (!document.querySelector('.ps-carousel-hint')) {
+            const hint = document.createElement('div');
+            hint.className = 'ps-carousel-hint';
+            hint.textContent = '< DRAG TO EXPLORE PLAYLIST >';
+            this.carousel.appendChild(hint);
+        }
     }
 
     rotateToTrack(index) {
