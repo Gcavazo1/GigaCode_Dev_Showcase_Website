@@ -306,7 +306,7 @@
 
 /* Add a simple fade-in effect */
 .ai-assistant.fade-in-effect {
-    animation: simpleFadeIn 1.5s ease-in-out forwards;
+    animation: simpleFadeIn .5s ease-in-out forwards;
 }
 
 @keyframes simpleFadeIn {
@@ -316,11 +316,6 @@
     100% {
         opacity: 1;
     }
-}
-
-/* Remove the tvOn animation */
-@keyframes tvOn {
-    /* Remove this animation completely */
 }
 
 /* Glitch In Effect for AI Assistant */
