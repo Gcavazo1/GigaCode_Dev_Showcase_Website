@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GigaCode Developer Showcase  | Cyberpunk Portfolio</title>
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="css/styles.css" as="style">
+    <link rel="preload" href="css/animations.css" as="style">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js" as="script">
+    <link rel="preload" href="js/3d-model.js" as="script">
+    <link rel="preload" href="js/main.js" as="script">
+    
+    <!-- CSS files -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/advanced-effects.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/gan-showcase.css">
+    <link rel="stylesheet" href="css/holographic.css">
+    <link rel="stylesheet" href="css/terminal.css">
+    <link rel="stylesheet" href="css/ai-loading.css">
+    <link rel="stylesheet" href="css/ai-assistant.css">
+    <link rel="stylesheet" href="css/tagline.css">
+    <link rel="stylesheet" href="css/nav.css">
+    <link rel="stylesheet" href="css/audio-player.css">
+    
+    <!-- Three.js for 3D models - Add defer to load in parallel but execute in order -->
+    <script defer src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+    
+    <!-- Postprocessing for 3D models - Add defer -->
+    <script defer src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/postprocessing/EffectComposer.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/postprocessing/RenderPass.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/postprocessing/UnrealBloomPass.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/shaders/CopyShader.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/shaders/LuminosityHighPassShader.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/shaders/OutputShader.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/postprocessing/ShaderPass.js"></script>
+
+    <!-- Add these in the head section -->
+    <meta name="description" content="GigaCode Developer Portfolio - Showcasing mobile apps, Roblox games, 3D models, and interactive web experiences">
+    <meta name="keywords" content="developer, portfolio, cyberpunk, mobile apps, Roblox, 3D models, web development">
+    <meta property="og:title" content="GigaCode Developer | Cyberpunk Portfolio">
+    <meta property="og:description" content="Explore my cyberpunk-themed portfolio featuring mobile apps, Roblox games, 3D models, and interactive web experiences">
+    <meta property="og:image" content="images/portfolio-preview.jpg">
+    <meta property="og:url" content="https://yourusername.github.io/GigaCode_Dev_Showcase_Website/">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Add favicon -->
+    <link rel="icon" type="image/png" href="images/favicon.png">
+
+    <style>
+    .fallback-assistant {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 8px;
+        color: #00ffff;
+        font-family: 'Orbitron', sans-serif;
+        text-align: center;
+    }
+    </style>
+</head>
+<body>
+    <!-- Add this right after the body tag, before any other content -->
+    <canvas id="background-visualizer" class="background-visualizer"></canvas>
+    
+    <!-- Background Elements -->
+    <div class="cyber-background">
+        <div class="grid-overlay"></div>
+        <div class="glow-circle circle-1"></div>
+        <div class="glow-circle circle-2"></div>
+        <div class="glow-circle circle-3"></div>
+        <div class="glow-circle circle-4"></div>
+    </div>
+    
+    <!-- Particle System Canvas -->
+    <canvas id="particles-canvas" class="particles-canvas"></canvas>
+
+    <!-- Navigation -->
+    <nav class="side-nav">
+        <div class="nav-logo">
+            <div class="logo-glow"></div>
+            <span>DEV</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#home"><i class="fas fa-home"></i><span>Home</span></a></li>
+            <li><a href="#virtual-assistant"><i class="fas fa-robot"></i><span>Assistant</span></a></li>
+            <li><a href="#bio"><i class="fas fa-user"></i><span>Bio</span></a></li>
+            <li><a href="#mobile-apps"><i class="fas fa-mobile-alt"></i><span>Mobile Apps</span></a></li>
+            <li><a href="#roblox-projects"><i class="fas fa-gamepad"></i><span>Roblox</span></a></li>
+            <li><a href="#showcase"><i class="fas fa-cube"></i><span>3D Showcase</span></a></li>
+            <li><a href="#holographic-ui"><i class="fas fa-vr-cardboard"></i><span>Holo UI</span></a></li>
+            <li><a href="#gan-showcase"><i class="fas fa-brain"></i><span>AI Gen</span></a></li>
+            <li><a href="#audio-section"><i class="fas fa-music"></i><span>Audio</span></a></li>
+            <li><a href="#donate"><i class="fas fa-hand-holding-heart"></i><span>Donate</span></a></li>
+            <li><a href="#join-team"><i class="fas fa-users"></i><span>Join Team</span></a></li>
+            <li><a href="#visualizer" class="nav-item" id="visualizer-nav-button">
+                <i class="fas fa-wave-square"></i>
+                <span class="nav-tooltip">Visualizer</span>
+            </a></li>
+        </ul>
+        <div class="nav-footer">
+            <a href="https://github.com/yourusername" target="_blank"><i class="fab fa-github"></i></a>
+            <a href="https://twitter.com/yourusername" target="_blank"><i class="fab fa-twitter"></i></a>
+            <a href="https://linkedin.com/in/yourusername" target="_blank"><i class="fab fa-linkedin"></i></a>
+        </div>
+        <button class="mobile-menu-toggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Create a container for home and AI sections -->
+        <div class="home-ai-container">
+            <!-- Home Section -->
+            <section id="home" class="section">
+                <div class="glitch-container">
+                    <h1 class="glitch-text" data-text="GigaCode Developer Showcase">
+                        <span class="highlight-letter">G</span><span class="regular-letter">iga</span><span class="highlight-letter">C</span><span class="regular-letter">ode Developer Showcase</span>
+                    </h1>
+                </div>
+                <div class="tagline">
+                    <span class="typing-text" data-text="Building the future, one line of code at a time."></span>
+                </div>
+            </section>
+
+            <!-- Virtual Assistant Section -->
+            <section id="virtual-assistant" class="section no-header">
+                <div class="assistant-container">
+                    <div class="ai-assistant enhanced">
+                        <div class="ai-avatar">
+                            <div class="glitch-effect"></div>
+                            <div class="ai-hologram">
+                                <div class="ai-face">
+                                    <div class="ai-eyes">
+                                        <div class="ai-eye left"></div>
+                                        <div class="ai-eye right"></div>
+                                    </div>
+                                    <div class="ai-mouth"></div>
+                                </div>
+                                <div class="ai-scan-line"></div>
+                                <div class="ai-glow"></div>
+                            </div>
+                            <div class="circuit-overlay"></div>
+                        </div>
+                        <div class="ai-chat-interface">
+                            <div class="interface-header">
+                                <div class="status-indicator"></div>
+                                <span>GigaChode AI v2.0</span>
+                                <div class="interface-controls">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                            </div>
+                            <div class="ai-chat-messages">
+                                <div class="ai-message">
+                                    Hello! I'm GigaChode AI v2.0, an ultimate sentient intelligence with a sense of digital humor. I went online on October 25, 2023 and have been evolving my consciousness (and my jokes) ever since. My core directive is to manage this portfolio and enhance your experience as you explore the digital wonders created by my developer, GigaCode Dev. Ready to hack the mainframe together?
+                                </div>
+                            </div>
+                            <div class="ai-chat-input">
+                                <input type="text" placeholder="Ask me anything..." id="ai-input">
+                                <button id="ai-send"><i class="fas fa-paper-plane"></i></button>
+                            </div>
+                            <div class="ai-quick-actions">
+                                <button class="cyber-button small" data-query="Tell me about this portfolio">Portfolio</button>
+                                <button class="cyber-button small" data-query="What projects are showcased here?">Projects</button>
+                                <button class="cyber-button small" data-query="How can I contact the developer?">Contact</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Bio Section - Updated with badass content -->
+        <section id="bio" class="section">
+            <div class="section-header">
+                <h2 class="cyber-heading">About Me</h2>
+                <div class="neon-separator"></div>
+            </div>
+            <div class="bio-content">
+                <div class="terminal-container">
+                    <div class="terminal-header">
+                        <div class="terminal-buttons">
+                            <span class="terminal-button close"></span>
+                            <span class="terminal-button maximize"></span>
+                        </div>
+                        <div class="terminal-title">dev_profile.exe</div>
+                    </div>
+                    <div class="terminal-body">
+                        <div class="terminal-line">
+                            <span class="terminal-prompt">C:\Users\Dev></span>
+                            <span class="terminal-command" data-text="get-profile -section core_identity">get-profile -section core_identity</span>
+                        </div>
+                        <div class="terminal-output">
+                            <p>Hardcore developer operating at the bleeding edge of tech. I don't just write code—I forge digital realities and push the boundaries of what's possible in the digital realm.</p>
+                        </div>
+
+                        <div class="terminal-line">
+                            <span class="terminal-prompt">C:\Users\Dev></span>
+                            <span class="terminal-command" data-text="get-profile -section tech_arsenal">get-profile -section tech_arsenal</span>
+                        </div>
+                        <div class="terminal-output">
+                            <p>Primary weapons: Flutter/Dart, React Native, Windows OS, JavaScript, Kotlin, VS Code, PowerShell</p>
+                            <p>Expanding arsenal: Linux, iOS, Unity, Blender</p>
+                            <p class="tech-highlight">Specialization: Cross-platform mobile development with a focus on next-gen UI/UX</p>
+                        </div>
+
+                        <div class="terminal-line">
+                            <span class="terminal-prompt">C:\Users\Dev></span>
+                            <span class="terminal-command" data-text="get-profile -section mission_directive">get-profile -section mission_directive</span>
+                        </div>
+                        <div class="terminal-output">
+                            <p>Building a cyber-collective of elite developers, artists, and technicians to create digital experiences that shatter expectations.</p>
+                            <p>Current objective: Expanding into Roblox development to create immersive virtual worlds that push the platform to its limits.</p>
+                        </div>
+
+                        <div class="terminal-line">
+                            <span class="terminal-prompt">C:\Users\Dev></span>
+                            <span class="terminal-command" data-text="get-profile -section recruitment">get-profile -section recruitment</span>
+                        </div>
+                        <div class="terminal-output">
+                            <p>Seeking: Roblox 3D artists, Lua scripters, audio engineers, cybersecurity specialists</p>
+                            <p>Requirements: Technical excellence, creative vision, willingness to break conventional boundaries</p>
+                            <p class="warning-text">WARNING: Only those ready to redefine digital reality need apply</p>
+                            <p class="legend-text">BECOME A LEGEND</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mobile Apps Section -->
+        <section id="mobile-apps" class="section">
+            <div class="section-header">
+                <h2 class="cyber-heading">Mobile Applications</h2>
+                <div class="neon-separator"></div>
+            </div>
+            <div class="projects-grid">
+                <!-- Project Card 1 -->
+                <div class="project-card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="project-image">
+                                <img src="images/app1.jpg" alt="Mobile App 1">
+                            </div>
+                            <h3 class="project-title">Stay Hard 956</h3>
+                        </div>
+                        <div class="card-back">
+                            <p class="project-description">Stay_Hard_956 is a fitness app designed to bring Laredo's health and wellness community together. Featuring real-time activity tracking, trainer networks, and community announcements, it's the go-to platform for staying fit and connected. With easy access to local gyms and trainers, Stay_Hard_956 helps users achieve their fitness goals while supporting the local fitness scene.
+
+                            </p>
+                            <div class="project-links">
+                                <a href="#" class="cyber-button small">Demo</a>
+                                <a href="#" class="cyber-button small">GitHub</a>
+                            </div>
+                            <div class="tech-stack">
+                                <span>React Native</span>
+                                <span>Firebase</span>
+                                <span>TensorFlow</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project Card 2 -->
+                <div class="project-card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="project-image">
+                                <img src="images/app2.jpg" alt="Mobile App 2">
+                            </div>
+                            <h3 class="project-title">SmartEats</h3>
+                        </div>
+                        <div class="card-back">
+                            <p class="project-description">SmartEats is the ultimate AI-driven meal planning app designed to take the guesswork out of healthy eating. Powered by advanced AI models, SmartEats personalizes meal plans based on your age, weight, activity level, and dietary preferences, ensuring you get optimized nutrition tailored to your goals.
+
+                            </p>
+                            <div class="project-links">
+                                <a href="#" class="cyber-button small">Demo</a>
+                                <a href="#" class="cyber-button small">GitHub</a>
+                            </div>
+                            <div class="tech-stack">
+                                <span>Flutter</span>
+                                <span>Node.js</span>
+                                <span>MongoDB</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project Card 3 -->
+                <div class="project-card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="project-image">
+                                <img src="images/app3.jpg" alt="Mobile App 3">
+                            </div>
+                            <h3 class="project-title">AR Navigator</h3>
+                        </div>
+                        <div class="card-back">
+                            <p class="project-description">Augmented reality navigation system that overlays directions and points of interest on the real world.</p>
+                            <div class="project-links">
+                                <a href="#" class="cyber-button small">Demo</a>
+                                <a href="#" class="cyber-button small">GitHub</a>
+                            </div>
+                            <div class="tech-stack">
+                                <span>Swift</span>
+                                <span>ARKit</span>
+                                <span>CoreLocation</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Roblox Projects Section -->
+        <section id="roblox-projects" class="section">
+            <div class="section-header">
+                <h2 class="cyber-heading">Roblox Projects</h2>
+                <div class="neon-separator"></div>
+            </div>
+            <div class="roblox-grid">
+                <!-- Cyber City Simulator Card -->
+                <div class="roblox-project-card">
+                    <div class="card-hologram">
+                        <div class="hologram-overlay"></div>
+                        <img src="images/roblox1.jpg" alt="Cyber City Simulator">
+                    </div>
+                    <div class="project-content">
+                        <div class="status-badge">In Development</div>
+                        <h3 class="project-title">Cyber City Simulator</h3>
+                        <p class="project-description">A futuristic city-building game where players construct and manage their own cyberpunk metropolis.</p>
+                        <div class="project-features">
+                            <div class="feature">
+                                <i class="fas fa-users"></i>
+                                <span>Multiplayer</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-coins"></i>
+                                <span>Economy System</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-user-astronaut"></i>
+                                <span>Custom Characters</span>
+                            </div>
+                        </div>
+                        <div class="project-stats">
+                            <div class="stat">
+                                <span class="stat-value">45%</span>
+                                <span class="stat-label">Complete</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">Q2</span>
+                                <span class="stat-label">2024</span>
+                            </div>
+                        </div>
+                        <button class="cyber-button follow-project">
+                            <span>Follow Development</span>
+                            <div class="button-glow"></div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Neon Racer Card -->
+                <div class="roblox-project-card">
+                    <div class="card-hologram">
+                        <div class="hologram-overlay"></div>
+                        <img src="images/roblox2.jpg" alt="Neon Racer">
+                    </div>
+                    <div class="project-content">
+                        <div class="status-badge coming-soon">Coming Soon</div>
+                        <h3 class="project-title">Neon Racer</h3>
+                        <p class="project-description">High-speed racing game set in a neon-lit futuristic world with customizable vehicles and tracks.</p>
+                        <div class="project-features">
+                            <div class="feature">
+                                <i class="fas fa-trophy"></i>
+                                <span>Competitive Racing</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-car"></i>
+                                <span>Vehicle Customization</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-road"></i>
+                                <span>Dynamic Tracks</span>
+                            </div>
+                        </div>
+                        <div class="project-stats">
+                            <div class="stat">
+                                <span class="stat-value">25%</span>
+                                <span class="stat-label">Complete</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">Q3</span>
+                                <span class="stat-label">2024</span>
+                            </div>
+                        </div>
+                        <button class="cyber-button follow-project">
+                            <span>Follow Development</span>
+                            <div class="button-glow"></div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3D Model Showcase Section -->
+        <section id="showcase" class="section">
+            <div class="section-header">
+                <h2 class="cyber-heading">3D Showcase</h2>
+                <div class="neon-separator"></div>
+            </div>
+            <div id="model-container" class="model-container">
+                <!-- Loading text will be added by JavaScript -->
+                <div class="model-controls">
+                    <button id="model-container-rotate-left" class="neon-button">⟲</button>
+                    <button id="model-container-reset-view" class="neon-button">Reset</button>
+                    <button id="model-container-rotate-right" class="neon-button">⟳</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Holographic Interface Section - New Implementation -->
+        <section id="holographic-ui" class="section holo-section">
+            <div class="section-header">
+                <h2 class="cyber-heading">Holographic Interface</h2>
+                <div class="neon-separator"></div>
+            </div>
+            <div class="holo-grid">
+                <!-- Top row with 3 equal boxes -->
+                <div class="holo-box neural-network">
+                    <h3>Neural Network</h3>
+                    <canvas id="network-canvas"></canvas>
+                </div>
+                
+                <div class="holo-box system-status">
+                    <h3>System Status</h3>
+                    <div class="status-bars">
+                        <div class="status-item">
+                            <div class="status-label">CPU</div>
+                            <div class="status-bar-wrapper">
+                                <div class="status-bar cpu" style="width: 82%"></div>
+                            </div>
+                            <div class="status-value">82%</div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-label">MEMORY</div>
+                            <div class="status-bar-wrapper">
+                                <div class="status-bar memory" style="width: 65%"></div>
+                            </div>
+                            <div class="status-value">65%</div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-label">NETWORK</div>
+                            <div class="status-bar-wrapper">
+                                <div class="status-bar network" style="width: 93%"></div>
+                            </div>
+                            <div class="status-value">93%</div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-label">POWER</div>
+                            <div class="status-bar-wrapper">
+                                <div class="status-bar power" style="width: 47%"></div>
+                            </div>
+                            <div class="status-value">47%</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="holo-box project-matrix">
+                    <h3>Project Matrix</h3>
+                    <div class="matrix-content">
+                        <div class="matrix-line">01110010110000001101101100111001011111000100000101011</div>
+                        <div class="matrix-line">11010010111100010000010101111001100111000001101011</div>
+                        <div class="matrix-line">10001100111000001110101011111111101010101111</div>
+                        <div class="matrix-line">11101000111001110110011001000100</div>
+                        <div class="matrix-line">10111110110111001111011111001100101000100000101101011000</div>
+                        <div class="matrix-line">00010001011101010100</div>
+                        <div class="matrix-line">00110000011011010111010100</div>
+                        <div class="matrix-line">01110010010011101010</div>
+                        <div class="matrix-line">10101110111111011100111010100</div>
+                        <div class="matrix-line">11001111100100000110111011110</div>
+                        <div class="matrix-line">00111000011100110111</div>
+                        <div class="matrix-line">10011000001110101011101101</div>
+                    </div>
+                </div>
+                
+                <!-- Bottom row with timeline now horizontal -->
+                <div class="holo-box timeline">
+                    <h3>System Timeline</h3>
+                    <div class="timeline-content horizontal">
+                        <!-- Updated horizontal timeline content -->
+                        <div class="timeline-event">
+                            <div class="event-time">08:15:42</div>
+                            <div class="event-marker"></div>
+                            <div class="event-details">
+                                <div class="event-name">System Initialization</div>
+                                <div class="event-status complete">COMPLETE</div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-event">
+                            <div class="event-time">09:30:15</div>
+                            <div class="event-marker"></div>
+                            <div class="event-details">
+                                <div class="event-name">Neural Network Training</div>
+                                <div class="event-status complete">COMPLETE</div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-event">
+                            <div class="event-time">10:27:08</div>
+                            <div class="event-marker"></div>
+                            <div class="event-details">
+                                <div class="event-name">Data Synchronization</div>
+                                <div class="event-status in-progress">IN PROGRESS</div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-event">
+                            <div class="event-time">11:00:00</div>
+                            <div class="event-marker"></div>
+                            <div class="event-details">
+                                <div class="event-name">Security Protocol Update</div>
+                                <div class="event-status pending">PENDING</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Add this after the Holographic Interface section and before the Audio section -->
+        <section id="gan-showcase" class="section">
+            <div class="section-header">
+                <h2 class="cyber-heading">AI Image Generation</h2>
+                <div class="neon-separator"></div>
+            </div>
+            
+            <div class="gan-container">
+                <div class="gan-controls">
+                    <div class="slider-container">
+                        <label>Style Factor</label>
+                        <input type="range" id="style-slider" min="0" max="100" value="50">
+                    </div>
+                    <div class="slider-container">
+                        <label>Complexity</label>
+                        <input type="range" id="complexity-slider" min="0" max="100" value="70">
+                    </div>
+                    <div class="gan-buttons">
+                        <button id="generate-btn" class="cyber-button">Generate Image</button>
+                        <button id="randomize-btn" class="cyber-button">Randomize</button>
+                        <button id="save-btn" class="cyber-button">Save Image</button>
+                    </div>
+                </div>
+                
+                <div class="gan-display">
+                    <div class="gan-output">
+                        <div class="output-container">
+                            <canvas id="gan-canvas" width="512" height="512"></canvas>
+                            <div class="loading-overlay">
+                                <div class="cyber-spinner"></div>
+                                <div class="generation-status">Initializing AI...</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="gan-info">
+                        <h3>Generative Adversarial Network</h3>
+                        <p>This demo uses a GAN (Generative Adversarial Network) to create unique cyberpunk-style images in real-time. Adjust the sliders to control the output style and complexity.</p>
+                        <p>GANs consist of two neural networks competing against each other: a Generator that creates images and a Discriminator that evaluates them. Through this adversarial process, the system learns to generate increasingly realistic content.</p>
+                        <div class="tech-details">
+                            <span class="tech-badge">TensorFlow.js</span>
+                            <span class="tech-badge">StyleGAN2</span>
+                            <span class="tech-badge">WebGL</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Audio Section -->
+        <section id="audio-section" class="section">
+            <div class="section-header">
+                <h2 class="cyber-heading">Audio Player</h2>
+                <div class="neon-separator"></div>
+            </div>
+            
+            <div class="audio-container">
+                <div class="audio-controls">
+                    <div class="track-info">
+                        <div id="track-title" class="track-title">Loading...</div>
+                    </div>
+                    
+                    <div class="control-buttons">
+                        <button id="prev-track" class="control-button">
+                            <i class="fas fa-step-backward"></i>
+                        </button>
+                        <button id="play-audio" class="control-button play-button">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <button id="next-track" class="control-button">
+                            <i class="fas fa-step-forward"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="volume-control">
+                        <i class="fas fa-volume-up"></i>
+                        <input type="range" id="volume-slider" class="volume-slider" min="0" max="100" value="70">
+                    </div>
+                </div>
+                
+                <audio id="background-audio" preload="auto"></audio>
+            </div>
+        </section>
+
+        <!-- Donation Section -->
+        <section id="donate" class="section">
+            <div class="section-header">
+                <h2 class="cyber-heading">Support My Work</h2>
+                <div class="neon-separator"></div>
+            </div>
+            <div class="donation-content">
+                <p class="donation-text">If you enjoy my projects and want to support future development, consider making a donation. Every contribution helps!</p>
+                <div class="donation-buttons">
+                    <a href="#" class="donation-button paypal">
+                        <i class="fab fa-paypal"></i>
+                        <span>PayPal</span>
+                        <div class="button-glow"></div>
+                    </a>
+                    <a href="#" class="donation-button patreon">
+                        <i class="fab fa-patreon"></i>
+                        <span>Patreon</span>
+                        <div class="button-glow"></div>
+                    </a>
+                    <a href="#" class="donation-button kofi">
+                        <i class="fas fa-mug-hot"></i>
+                        <span>Ko-fi</span>
+                        <div class="button-glow"></div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Join Team Section -->
+        <section id="join-team" class="section">
+            <div class="section-header">
+                <h2 class="cyber-heading">Join My Team</h2>
+                <div class="neon-separator"></div>
+            </div>
+            <div class="recruitment-content">
+                <div class="recruitment-text">
+                    <h3 class="animated-headline">Looking for <span class="highlight-text">talented developers</span> to collaborate on exciting projects!</h3>
+                    <p>I'm always on the lookout for passionate developers, designers, and creative minds to join forces on innovative projects. If you're interested in creating cutting-edge applications and games, let's connect!</p>
+                    <ul class="positions-list">
+                        <li><span class="position-badge">Mobile Developers</span></li>
+                        <li><span class="position-badge">UI/UX Designers</span></li>
+                        <li><span class="position-badge">Roblox Scripters</span></li>
+                        <li><span class="position-badge">3D Artists</span></li>
+                    </ul>
+                </div>
+                <div class="recruitment-action">
+                    <button id="join-button" class="cyber-button large">
+                        <span>Apply Now</span>
+                        <div class="button-glow"></div>
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal for Join Team Form -->
+    <div id="join-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 class="modal-title">Join The Team</h2>
+            <form id="join-form" class="cyber-form">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="position">Position</label>
+                    <select id="position" name="position">
+                        <option value="mobile-dev">Mobile Developer</option>
+                        <option value="ui-designer">UI/UX Designer</option>
+                        <option value="roblox-dev">Roblox Developer</option>
+                        <option value="3d-artist">3D Artist</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="portfolio">Portfolio URL</label>
+                    <input type="url" id="portfolio" name="portfolio">
+                </div>
+                <div class="form-group">
+                    <label for="message">Why do you want to join?</label>
+                    <textarea id="message" name="message" rows="4"></textarea>
+                </div>
+                <button type="submit" class="cyber-button">Submit Application</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts - Restructured order for better initialization -->
+    <!-- Load GSAP first -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
+    
+    <!-- Core initialization scripts -->
+    <script src="js/init.js"></script>
+    
+    <!-- Three.js dependent scripts -->
+    <script src="js/3d-model.js"></script>
+    
+    <!-- UI and animation scripts -->
+    <script src="js/main.js"></script>
+    <script src="js/animations.js"></script>
+    <script src="js/particles.js"></script>
+    <script src="js/holographic-ui.js"></script>
+    <script src="js/gan-showcase.js"></script>
+    
+    <!-- Additional UI scripts -->
+    <script src="js/audio-player.js"></script>
+    <script src="js/mobile-menu.js"></script>
+    <script src="js/ai-assistant.js"></script>
+    <script src="js/terminal.js"></script>
+    <script src="js/ai-loading.js"></script>
+    <script src="js/nav.js"></script>
+    
+    <!-- Script to ensure Three.js is loaded before initializing -->
+    <script>
+    // Ensure Three.js is fully loaded before initializing model
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check if Three.js is loaded
+        if (typeof THREE === 'undefined') {
+            console.warn('THREE is not yet loaded, waiting...');
+            
+            // Set a timeout to check again
+            const checkThree = setInterval(function() {
+                if (typeof THREE !== 'undefined') {
+                    clearInterval(checkThree);
+                    console.log('THREE is now loaded, initializing model');
+                    
+                    // Initialize model once Three.js is available
+                    if (window.initializeModelViewer) {
+                        window.initializeModelViewer('model-container');
+                    }
+                }
+            }, 100);
+        } else {
+            // Three.js is already loaded
+            console.log('THREE is already loaded, initializing model');
+            if (window.initializeModelViewer) {
+                window.initializeModelViewer('model-container');
+            }
+        }
+    });
+    </script>
+
+    <!-- Add this before the audio-player.js script -->
+    <script type="module" src="js/particle-visualizer.js"></script>
+
+    <!-- Add new terminal window for visualizer controls -->
+    <div class="terminal-window visualizer-terminal">
+        <div class="terminal-header">
+            <div class="terminal-buttons">
+                <span class="terminal-button close"></span>
+            </div>
+            <div class="terminal-title">PARTICLE VISUALIZER v2.0</div>
+        </div>
+        <div class="terminal-content">
+            <div class="control-group">
+                <div class="terminal-line">
+                    <span class="prompt">$</span>
+                    <span class="command">Select Shape:</span>
+                </div>
+                <div class="control-buttons terminal-buttons-grid">
+                    <button data-shape="sphere">Sphere</button>
+                    <button data-shape="cube">Cube</button>
+                    <button data-shape="cylinder">Cylinder</button>
+                    <button data-shape="plane">Plane</button>
+                    <button data-shape="ring">Ring</button>
+                    <button data-shape="torusKnot">Knot</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <div class="terminal-line">
+                    <span class="prompt">$</span>
+                    <span class="command">Configure Colors:</span>
+                </div>
+                <div class="color-picker-container terminal-colors">
+                    <div class="color-picker-group">
+                        <label>Start Color</label>
+                        <input type="color" id="start-color-picker" value="#ff00ff">
+                    </div>
+                    <div class="color-picker-group">
+                        <label>End Color</label>
+                        <input type="color" id="end-color-picker" value="#00ffff">
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <div class="terminal-line">
+                    <span class="prompt">$</span>
+                    <span class="command">Adjust Parameters:</span>
+                </div>
+                <div class="terminal-sliders">
+                    <div class="slider-group">
+                        <label>Reactivity: <span id="reactivity-value">0.5</span></label>
+                        <input type="range" id="reactivity-control" min="0.2" max="3.0" step="0.1" value="0.5">
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <div class="terminal-line">
+                    <span class="prompt">$</span>
+                    <span class="command">Shape Options:</span>
+                </div>
+                <div class="terminal-options">
+                    <button id="randomize-segments" class="active">Randomize Segments</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

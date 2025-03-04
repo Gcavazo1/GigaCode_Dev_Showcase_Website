@@ -1,0 +1,208 @@
+/* GAN Showcase Styles */
+#gan-showcase .gan-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+#gan-showcase .gan-controls {
+  display: flex;
+  gap: 1.5rem;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 1.5rem;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+}
+
+.slider-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.slider-container label {
+  font-family: 'Orbitron', sans-serif;
+  color: #00ffff;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+.slider-container input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 4px;
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  outline: none;
+}
+
+.slider-container input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  background: #00ffff;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+}
+
+.slider-container input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: #00ffff;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+  border: none;
+}
+
+#gan-showcase .gan-display {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.gan-output {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+  border: 1px solid rgba(0, 255, 255, 0.4);
+}
+
+.output-container {
+  position: relative;
+  width: 100%;
+  height: 0;
+  padding-bottom: 100%;
+}
+
+#gan-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+  border: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.cyber-spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid transparent;
+  border-top: 3px solid #00ffff;
+  border-right: 3px solid #ff00ff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+}
+
+.generation-status {
+  font-family: 'Orbitron', sans-serif;
+  color: #00ffff;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+}
+
+.gan-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.gan-info h3 {
+  font-family: 'Orbitron', sans-serif;
+  color: #00ffff;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+.gan-info p {
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.tech-details {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: auto;
+}
+
+.tech-badge {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(0, 255, 255, 0.4);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.9rem;
+  color: #00ffff;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  #gan-showcase .gan-display {
+    grid-template-columns: 1fr;
+  }
+  
+  #gan-showcase .gan-controls {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 768px) {
+  #gan-showcase .gan-container {
+    padding: 0 1rem;
+  }
+  
+  .output-container {
+    padding-bottom: 100%;
+  }
+}
+
+/* Add this to the gan-showcase.css file */
+.gan-buttons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.gan-buttons .cyber-button {
+  flex: 1;
+  min-width: 120px;
+}
+
+@media (max-width: 768px) {
+  .gan-buttons {
+    flex-direction: column;
+  }
+} 

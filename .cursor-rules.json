@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "patterns": ["*.glsl", "*.vert", "*.frag"],
+      "language": "glsl",
+      "autoFormatEnabled": true
+    },
+    {
+      "patterns": ["js/particle-visualizer/shaders/*.js"],
+      "language": "glsl",
+      "autoFormatEnabled": true
+    },
+    {
+      "patterns": ["js/particle-visualizer/**/*.js"],
+      "language": "javascript",
+      "autoFormatEnabled": true
+    },
+    {
+      "patterns": ["*.css"],
+      "language": "css",
+      "autoFormatEnabled": true
+    },
+    {
+      "patterns": ["*.html"],
+      "language": "html",
+      "autoFormatEnabled": true
+    }
+  ]
+}

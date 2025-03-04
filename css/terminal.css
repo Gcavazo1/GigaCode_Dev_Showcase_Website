@@ -1,0 +1,373 @@
+/* New dedicated CSS file for terminal styling */
+.terminal-container {
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2), 0 0 40px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    margin: 0 auto;
+    max-width: 900px;
+    position: relative;
+}
+
+.terminal-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.8), transparent);
+    animation: scanGlow 4s linear infinite;
+}
+
+@keyframes scanGlow {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.terminal-header {
+    background: rgba(20, 20, 30, 0.9);
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+.terminal-buttons {
+    display: flex;
+    gap: 8px;
+    margin-right: 1rem;
+}
+
+.terminal-button {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.terminal-button.close { background: #ff5f56; }
+.terminal-button.minimize { background: #ffbd2e; }
+.terminal-button.maximize { background: #27c93f; }
+
+.terminal-title {
+    color: #00ffff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.terminal-body {
+    padding: 1.5rem;
+    font-family: 'Rajdhani', monospace;
+    background: linear-gradient(180deg, rgba(0, 20, 40, 0.9) 0%, rgba(0, 10, 20, 0.95) 100%);
+    position: relative;
+    z-index: 2;
+}
+
+.terminal-line {
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.terminal-prompt {
+    color: #00ffff;
+    opacity: 0.8;
+}
+
+.terminal-command {
+    color: #ffff00;
+    position: relative;
+    min-height: 1.2em;
+}
+
+.terminal-command.typing {
+    border-right: 2px solid #ffff00;
+    animation: blink-caret 0.75s step-end infinite;
+}
+
+.terminal-output {
+    color: #e0e0e0;
+    margin: 1rem 0 2rem;
+    line-height: 1.6;
+    padding-left: 2rem;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+}
+
+.terminal-output p {
+    margin-bottom: 1rem;
+    opacity: 0.9;
+    text-shadow: 0 0 2px rgba(0, 255, 255, 0.3);
+}
+
+.tech-highlight {
+    color: #00ffaa;
+    border-left: 2px solid #00ffaa;
+    padding-left: 10px;
+    font-weight: 500;
+}
+
+.warning-text {
+    color: #ff5f56;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+@keyframes blink-caret {
+    from, to { border-color: transparent; }
+    50% { border-color: #ffff00; }
+}
+
+/* Bio content animation */
+.bio-content {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.bio-content.reveal-active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Add animation for section header */
+#bio .section-header {
+    opacity: 0;
+    transition: opacity 0.8s ease-in-out;
+}
+
+#bio .section-header.visible {
+    opacity: 1;
+}
+
+/* Matrix-like background effect */
+.terminal-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 20, 0, 0.15),
+        rgba(0, 20, 0, 0.15) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.3;
+}
+
+/* Add this to your terminal.css file */
+.legend-text {
+    color: #f9f900;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-align: center;
+    margin-top: 1.5rem;
+    text-shadow: 0 0 10px rgba(249, 249, 0, 0.7);
+    animation: pulseLegend 2s infinite alternate;
+}
+
+@keyframes pulseLegend {
+    from { text-shadow: 0 0 10px rgba(249, 249, 0, 0.7); }
+    to { text-shadow: 0 0 20px rgba(249, 249, 0, 0.9), 0 0 30px rgba(249, 249, 0, 0.5); }
+}
+
+/* Add to your terminal.css */
+.visualizer-terminal {
+    position: fixed;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 400px;
+    background: rgba(0, 10, 20, 0.85);
+    border: 1px solid var(--primary-color);
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+    display: none; /* Hidden by default */
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.visualizer-terminal.active {
+    display: block;
+    animation: terminalFadeIn 0.4s ease-out;
+}
+
+.visualizer-terminal.minimized {
+    height: auto;
+    max-height: 30px;
+    overflow: hidden;
+}
+
+.visualizer-terminal.minimized .terminal-content {
+    display: none;
+}
+
+.visualizer-terminal.minimized .terminal-header {
+    margin-bottom: 0;
+    border-radius: 8px;
+}
+
+.visualizer-terminal .terminal-header {
+    cursor: default;
+}
+
+.terminal-line .command {
+    position: relative;
+}
+
+.terminal-line .command.typing::after {
+    content: '|';
+    position: absolute;
+    animation: cursorBlink 0.8s infinite;
+}
+
+.terminal-content {
+    padding: 15px;
+}
+
+/* Add a subtle grid background for cyberpunk feel */
+.visualizer-terminal::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 20px 20px;
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* Enhance buttons with glow effect on hover */
+.terminal-buttons-grid button:hover {
+    box-shadow: 0 0 15px var(--primary-color);
+    text-shadow: 0 0 5px var(--primary-color);
+}
+
+/* Make all buttons glow by default - no need for active class */
+.terminal-buttons-grid button {
+    box-shadow: 0 0 15px var(--primary-color);
+    text-shadow: 0 0 5px var(--primary-color);
+    background: var(--primary-color);
+    color: #000;
+}
+
+/* Fancier range sliders with glow effect */
+.slider-group input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    cursor: pointer;
+    box-shadow: 0 0 10px var(--primary-color);
+}
+
+.slider-group input[type="range"]:focus {
+    outline: none;
+}
+
+.slider-group input[type="range"]::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    cursor: pointer;
+    box-shadow: 0 0 10px var(--primary-color);
+    border: none;
+}
+
+@keyframes cursorBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+.terminal-buttons-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.terminal-colors {
+    display: flex;
+    gap: 20px;
+    margin: 10px 0;
+}
+
+.terminal-sliders {
+    padding: 10px 0;
+}
+
+.slider-group {
+    margin: 10px 0;
+}
+
+.slider-group input[type="range"] {
+    width: 100%;
+    height: 4px;
+    background: rgba(0, 255, 255, 0.2);
+    border-radius: 2px;
+    outline: none;
+}
+
+@keyframes terminalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-48%) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(-50%) scale(1);
+    }
+}
+
+/* Update terminal styling for better close button */
+.visualizer-terminal .terminal-button.close {
+  background-color: #ff3344;
+  box-shadow: 0 0 5px rgba(255, 51, 68, 0.7);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.visualizer-terminal .terminal-button.close:hover {
+  background-color: #ff5566;
+  box-shadow: 0 0 10px rgba(255, 51, 68, 0.9);
+  transform: scale(1.1);
+}
+
+/* Remove these classes as they're no longer needed */
+.visualizer-terminal.minimized,
+.visualizer-terminal .terminal-button.minimize,
+.visualizer-terminal .terminal-button.maximize {
+  display: none;
+}
+
+/* Add reset button styling */
+.visualizer-terminal .terminal-button.reset {
+  background-color: #ffcc00;
+  box-shadow: 0 0 5px rgba(255, 204, 0, 0.7);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.visualizer-terminal .terminal-button.reset:hover {
+  background-color: #ffdd44;
+  box-shadow: 0 0 10px rgba(255, 204, 0, 0.9);
+  transform: scale(1.1);
+} 

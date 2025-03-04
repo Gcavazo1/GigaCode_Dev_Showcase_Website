@@ -1,0 +1,44 @@
+# Node modules
+node_modules/
+
+# Environment variables
+.env
+
+# IDE files
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Build files
+dist/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+*PROJECT_OUTLINE.txt
+
+# Large files that shouldn't be tracked
+*.zip
+*.rar
+*.7z
+*.jar
+models/character/character.glb
+Realistic_man_Glb.zip
+textures.zip
+
+# Backup files
+*~
+*.bak
+*my_website-backup
+

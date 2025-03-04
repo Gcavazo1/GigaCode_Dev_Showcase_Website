@@ -1,0 +1,451 @@
+/* Basic audio player styling */
+.audio-section {
+    background: rgba(10, 15, 25, 0.018);
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 2rem auto;
+    max-width: 1000px;
+}
+
+.audio-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.audio-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.track-info {
+    flex: 1;
+    color: #00ffff;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.track-title {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.control-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.control-button {
+    background: rgba(0, 20, 40, 0.8);
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    color: #00ffff;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.control-button:hover {
+    background: rgba(0, 255, 255, 0.2);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+}
+
+.play-button {
+    width: 50px;
+    height: 50px;
+}
+
+.play-button.playing {
+    background: rgba(0, 255, 255, 0.2);
+}
+
+.volume-control {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.volume-slider {
+    -webkit-appearance: none;
+    width: 100px;
+    height: 4px;
+    background: rgba(0, 255, 255, 0.2);
+    border-radius: 2px;
+    outline: none;
+}
+
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #00ffff;
+    cursor: pointer;
+}
+
+.volume-slider::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #00ffff;
+    cursor: pointer;
+    border: none;
+}
+
+/* PowerShell Terminal Music Widget - with unique class names */
+.ps-music-widget {
+    position: fixed;
+    bottom: -150px; /* Start off-screen */
+    right: 20px;
+    background: rgba(1, 10, 20, 0.9);
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    border-radius: 6px;
+    padding: 0;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+    z-index: 9999;
+    transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1); /* Smoother easing function */
+    width: 300px;
+    overflow: hidden;
+    font-family: 'Consolas', monospace;
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+}
+
+.ps-music-widget.ps-active {
+    bottom: 20px; /* Slide in from bottom */
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
+}
+
+.ps-widget-header {
+    background: rgba(0, 20, 40, 0.9);
+    padding: 5px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.4);
+}
+
+.ps-widget-title {
+    color: #00ffff;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.ps-widget-title i {
+    font-size: 14px;
+}
+
+.ps-widget-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.ps-widget-control {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.ps-widget-minimize {
+    background: #ffbd44;
+    border: 1px solid #dfb13a;
+}
+
+.ps-widget-close {
+    background: #ff605c;
+    border: 1px solid #e04c49;
+}
+
+.ps-widget-content {
+    padding: 15px;
+    color: #e0e0e0;
+    font-size: 14px;
+}
+
+.ps-terminal-prompt {
+    color: #0f0;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.ps-terminal-prompt::before {
+    content: 'PS C:\\Music>';
+    color: #00ffff;
+    font-weight: bold;
+}
+
+.ps-terminal-command {
+    color: #e0e0e0;
+    animation: ps-typing 1.5s steps(30, end);
+    white-space: nowrap;
+    overflow: hidden;
+    display: inline-block;
+}
+
+.ps-terminal-output {
+    margin: 10px 0;
+    padding-left: 15px;
+    border-left: 1px solid rgba(0, 255, 255, 0.3);
+}
+
+.ps-terminal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.ps-terminal-btn {
+    background: rgba(0, 20, 40, 0.8);
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    color: #00ffff;
+    padding: 5px 10px;
+    font-family: 'Consolas', monospace;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.ps-terminal-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.1), transparent);
+    transition: all 0.5s ease;
+}
+
+.ps-terminal-btn:hover {
+    background: rgba(0, 255, 255, 0.2);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+.ps-terminal-btn:hover::before {
+    left: 100%;
+}
+
+.ps-terminal-cursor {
+    display: inline-block;
+    width: 8px;
+    height: 15px;
+    background: #00ffff;
+    margin-left: 2px;
+    animation: ps-blink 1s infinite;
+    vertical-align: middle;
+}
+
+@keyframes ps-typing {
+    from { width: 0 }
+    to { width: 100% }
+}
+
+@keyframes ps-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+.ps-scan-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: rgba(0, 255, 255, 0.5);
+    opacity: 0.5;
+    z-index: 1;
+    animation: ps-scanline 6s linear infinite;
+}
+
+@keyframes ps-scanline {
+    0% { top: 0; }
+    100% { top: 100%; }
+}
+
+/* 3D Playlist Carousel */
+.ps-playlist-container {
+    position: relative;
+    height: 200px;
+    margin: 80px 0;
+    perspective: 2000px;
+    overflow: visible;
+}
+
+.ps-playlist-carousel {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.ps-track-card {
+    position: absolute;
+    width: 320px;
+    height: 120px;
+    left: calc(50% - 160px);
+    top: calc(50% - 60px);
+    background: rgba(1, 8, 16, 0.95);
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+    cursor: pointer;
+    transform-style: preserve-3d;
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5),
+                inset 0 0 30px rgba(0, 255, 255, 0.1);
+}
+
+.ps-track-card:hover {
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.5);
+}
+
+.ps-track-active {
+    border: 1px solid rgba(0, 255, 255, 0.8);
+    box-shadow: 0 0 40px rgba(0, 255, 255, 0.4),
+                inset 0 0 30px rgba(0, 255, 255, 0.2);
+    background: rgba(2, 12, 24, 0.95);
+}
+
+.ps-track-active::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #00ffff, transparent);
+    animation: ps-scan-active 2s linear infinite;
+}
+
+.ps-card-glitch-effect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), transparent 80%);
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.ps-card-content {
+    position: relative;
+    padding: 20px;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.ps-track-number {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 24px;
+    color: rgba(0, 255, 255, 0.7);
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+}
+
+.ps-track-title {
+    display: none;
+}
+
+.ps-track-equalizer {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    height: 30px;
+    align-items: flex-end;
+}
+
+.ps-eq-bar {
+    width: 5px;
+    background: rgba(0, 255, 255, 0.5);
+    height: 5px;
+    transition: height 0.2s ease;
+    border-radius: 2px;
+}
+
+.ps-track-active .ps-eq-bar {
+    animation: ps-eq-animation 1.2s infinite ease-in-out;
+}
+
+.ps-track-active .ps-eq-bar:nth-child(1) { animation-delay: 0.0s; }
+.ps-track-active .ps-eq-bar:nth-child(2) { animation-delay: 0.2s; }
+.ps-track-active .ps-eq-bar:nth-child(3) { animation-delay: 0.4s; }
+.ps-track-active .ps-eq-bar:nth-child(4) { animation-delay: 0.6s; }
+.ps-track-active .ps-eq-bar:nth-child(5) { animation-delay: 0.8s; }
+
+.ps-card-shine {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.03) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    transform: rotate(45deg);
+    pointer-events: none;
+}
+
+.ps-playlist-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 20, 40, 0.9);
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    color: #00ffff;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 200;
+    transition: all 0.3s ease;
+    font-size: 1.2em;
+}
+
+.ps-playlist-nav:hover {
+    background: rgba(0, 255, 255, 0.2);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+}
+
+.ps-prev {
+    left: 40px;
+}
+
+.ps-next {
+    right: 40px;
+}
+
+@keyframes ps-eq-animation {
+    0%, 100% { height: 5px; }
+    50% { height: 20px; }
+}
+
+@keyframes ps-scan-active {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+} 

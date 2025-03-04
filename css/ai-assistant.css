@@ -1,0 +1,437 @@
+/* New dedicated CSS file for AI Assistant */
+.assistant-container {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 1rem;
+    transition: all 0.8s ease-in-out;
+    position: relative;
+    z-index: 40;
+}
+
+.ai-assistant {
+    display: flex;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 12px;
+    overflow: hidden;
+    opacity: 0;
+    position: relative;
+    min-height: 400px;
+    transition: opacity 0.5s ease;
+}
+
+.ai-assistant.loaded {
+    opacity: 1 !important;
+}
+
+.ai-avatar {
+    width: 200px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    height: 100%;
+    background: url('../images/backgrounds/ai_avatar_background.jpg') center center;
+    background-size: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid rgba(0, 255, 255, 0.3);
+}
+
+.ai-avatar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 10, 20, 0.7);
+    z-index: 1;
+}
+
+.ai-avatar .circuit-overlay {
+    display: none;
+}
+
+.ai-hologram {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.5);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 
+        0 0 30px rgba(0, 255, 255, 0.5),
+        0 0 50px rgba(0, 255, 255, 0.3);
+    z-index: 3;
+}
+
+.ai-face {
+    width: 80px;
+    height: 80px;
+    position: relative;
+}
+
+.ai-eyes {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.ai-eye {
+    width: 20px;
+    height: 8px;
+    background: #00ffff;
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+}
+
+.ai-eye.blink {
+    height: 2px;
+}
+
+.ai-mouth {
+    width: 30px;
+    height: 2px;
+    background: #00ffff;
+    margin: 20px auto 0;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+}
+
+.ai-scan-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: rgba(0, 255, 255, 0.5);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+    animation: scanLine 2s linear infinite;
+}
+
+.ai-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 70%;
+    box-shadow: 
+        inset 0 0 20px #f900e4,
+        0 0 30px rgba(249, 0, 224, 0.5);
+    animation: pulse 2s ease-in-out infinite alternate;
+    z-index: 2;
+}
+
+.glitch-effect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 200%;
+    pointer-events: none;
+    z-index: 5;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.ai-chat-interface {
+    flex: 1;
+    margin-left: 200px;
+    display: flex;
+    flex-direction: column;
+    background: rgba(10, 10, 18, 0.8);
+    min-height: 100%;
+    border: 1px solid rgba(249, 249, 0, 0.3);
+    box-shadow: 0 0 30px rgba(249, 249, 0, 0.25);
+    border-radius: 0 12px 12px 0;
+}
+
+.interface-header {
+    display: flex;
+    align-items: center;
+    padding: 0.8rem 1rem;
+    background: rgba(0, 0, 0, 0.5);
+    border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+.status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #00ff00;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+    margin-right: 10px;
+    animation: blink 2s infinite alternate;
+}
+
+.interface-header span {
+    font-family: 'Orbitron', sans-serif;
+    color: #f9f900;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-shadow: 0 0 5px rgba(249, 249, 0, 0.5);
+    font-weight: bold;
+}
+
+.interface-controls {
+    margin-left: auto;
+    display: flex;
+    gap: 5px;
+}
+
+.interface-controls span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.ai-chat-messages {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-height: 300px;
+}
+
+.ai-message {
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    max-width: 80%;
+    line-height: 1.5;
+}
+
+.ai-message.ai-message {
+    background: rgba(249, 249, 0, 0.05);
+    border: 1px solid rgba(249, 249, 0, 0.3);
+    box-shadow: 0 0 10px rgba(249, 249, 0, 0.1);
+    align-self: flex-start;
+    position: relative;
+    font-family: 'Rajdhani', sans-serif;
+    letter-spacing: 0.5px;
+    transform: perspective(1000px) rotateX(1deg);
+    transform-origin: bottom left;
+    transition: all 0.3s ease;
+}
+
+.ai-message.ai-message:hover {
+    transform: perspective(1000px) rotateX(0deg);
+    box-shadow: 0 0 15px rgba(249, 249, 0, 0.2);
+}
+
+.ai-message.user-message {
+    background: rgba(255, 0, 255, 0.1);
+    border: 1px solid rgba(255, 0, 255, 0.3);
+    align-self: flex-end;
+}
+
+.ai-thinking {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.ai-thinking span {
+    width: 8px;
+    height: 8px;
+    background: #00ffff;
+    border-radius: 50%;
+    animation: thinking 1s infinite;
+}
+
+.ai-thinking span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.ai-thinking span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+.ai-chat-input {
+    display: flex;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-top: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+.ai-chat-input input {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 4px;
+    padding: 0.8rem 1rem;
+    color: #e0e0e0;
+    font-family: 'Rajdhani', sans-serif;
+    outline: none;
+}
+
+.ai-chat-input input:focus {
+    border-color: rgba(0, 255, 255, 0.6);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.ai-chat-input button {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 4px;
+    width: 40px;
+    height: 40px;
+    margin-left: 10px;
+    color: #00ffff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.ai-chat-input button:hover {
+    background: rgba(0, 255, 255, 0.2);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.ai-quick-actions {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0 1rem 1rem;
+    flex-wrap: wrap;
+}
+
+/* Animations */
+@keyframes scanLine {
+    0% { top: 0; }
+    100% { top: 100%; }
+}
+
+@keyframes pulse {
+    0% { box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.5); }
+    100% { box-shadow: inset 0 0 40px rgba(0, 255, 255, 0.8); }
+}
+
+@keyframes thinking {
+    0%, 100% { transform: translateY(0); opacity: 0.5; }
+    50% { transform: translateY(-5px); opacity: 1; }
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .ai-assistant {
+        flex-direction: column;
+        min-height: 450px;
+    }
+    
+    .ai-avatar {
+        position: relative;
+        width: 100%;
+        height: 200px;
+        margin-bottom: 0;
+        border-right: none;
+        border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+    }
+    
+    .ai-chat-interface {
+        margin-left: 0;
+        flex: 1;
+        border-radius: 0 0 12px 12px;
+    }
+    
+    .ai-chat-messages {
+        max-height: 250px;
+    }
+}
+
+/* Add a simple fade-in effect */
+.ai-assistant.fade-in-effect {
+    opacity: 1 !important;
+}
+
+@keyframes simpleFadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+/* Keep this pulse glow animation */
+@keyframes pulse-glow {
+    0% {
+        box-shadow: 0 0 20px rgba(249, 249, 0, 0.2);
+        border-color: rgba(249, 249, 0, 0.25);
+    }
+    50% {
+        box-shadow: 0 0 35px rgba(249, 249, 0, 0.35), 0 0 50px rgba(249, 249, 0, 0.15);
+        border-color: rgba(249, 249, 0, 0.4);
+    }
+    100% {
+        box-shadow: 0 0 25px rgba(249, 249, 0, 0.3);
+        border-color: rgba(249, 249, 0, 0.35);
+    }
+}
+
+/* Add fallback assistant styles */
+.fallback-assistant {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 8px;
+    color: #00ffff;
+    font-family: 'Orbitron', sans-serif;
+    text-align: center;
+}
+
+.fallback-content {
+    padding: 20px;
+    max-width: 80%;
+}
+
+.fallback-icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+    animation: pulse 2s infinite alternate;
+}
+
+.fallback-assistant h3 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.fallback-assistant p {
+    font-size: 16px;
+    opacity: 0.8;
+    margin-bottom: 20px;
+}
+
+.fallback-buttons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* Add a cool data transmission effect to AI messages */
+.ai-message.ai-message::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: #f9f900;
+    animation: dataPulse 2s infinite;
+}
+
+@keyframes dataPulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+} 

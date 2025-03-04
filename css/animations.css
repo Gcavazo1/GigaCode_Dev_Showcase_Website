@@ -1,0 +1,462 @@
+/* Animations CSS */
+
+/* Glitch Effect */
+.glitch-text {
+    position: relative;
+}
+
+.glitch-text:before,
+.glitch-text:after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.glitch-text:before {
+    left: 2px;
+    text-shadow: -2px 0 var(--primary-color);
+    clip: rect(0, 9999px, 9999px, 0);
+    animation: glitch-anim-1 3s infinite linear alternate-reverse;
+}
+
+.glitch-text:after {
+    left: -2px;
+    text-shadow: -2px 0 var(--secondary-color);
+    clip: rect(0, 9999px, 9999px, 0);
+    animation: glitch-anim-2 2.5s infinite linear alternate-reverse;
+}
+
+/* Ensure the highlighted letters maintain their color in the glitch effect */
+.glitch-text:before .highlight-letter,
+.glitch-text:after .highlight-letter {
+    color: var(--yellow-color);
+}
+
+/* Update the glitch animations to cover more of the text */
+@keyframes glitch-anim-1 {
+    0% {
+        clip: rect(24px, 9999px, 90px, 0);
+    }
+    20% {
+        clip: rect(62px, 9999px, 130px, 0);
+    }
+    40% {
+        clip: rect(58px, 9999px, 200px, 0);
+    }
+    60% {
+        clip: rect(91px, 9999px, 150px, 0);
+    }
+    80% {
+        clip: rect(37px, 9999px, 100px, 0);
+    }
+    100% {
+        clip: rect(68px, 9999px, 180px, 0);
+    }
+}
+
+@keyframes glitch-anim-2 {
+    0% {
+        clip: rect(9px, 9999px, 100px, 0);
+    }
+    20% {
+        clip: rect(96px, 9999px, 150px, 0);
+    }
+    40% {
+        clip: rect(72px, 9999px, 200px, 0);
+    }
+    60% {
+        clip: rect(88px, 9999px, 120px, 0);
+    }
+    80% {
+        clip: rect(12px, 9999px, 180px, 0);
+    }
+    100% {
+        clip: rect(54px, 9999px, 160px, 0);
+    }
+}
+
+/* Add yellow to the glitch effect */
+.glitch-text:nth-child(3n):after {
+    text-shadow: -2px 0 var(--yellow-color);
+    animation: glitch-anim-3 3.2s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim-3 {
+    0% {
+        clip: rect(15px, 550px, 40px, 0);
+    }
+    20% {
+        clip: rect(75px, 550px, 110px, 0);
+    }
+    40% {
+        clip: rect(45px, 550px, 25px, 0);
+    }
+    60% {
+        clip: rect(80px, 550px, 55px, 0);
+    }
+    80% {
+        clip: rect(25px, 550px, 10px, 0);
+    }
+    100% {
+        clip: rect(60px, 550px, 85px, 0);
+    }
+}
+
+/* Animated Text */
+.animated-text {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 1s ease forwards;
+    animation-delay: 0.3s;
+}
+
+.fade-in-text {
+    opacity: 0;
+    animation: fadeIn 1.5s ease forwards;
+    animation-delay: 0.8s;
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+/* Scroll Arrow Animation */
+.scroll-arrow {
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0) rotate(45deg);
+    }
+    40% {
+        transform: translateY(-10px) rotate(45deg);
+    }
+    60% {
+        transform: translateY(-5px) rotate(45deg);
+    }
+}
+
+/* Neon Pulse Animation */
+.neon-separator {
+    animation: neonPulse 2s infinite alternate;
+}
+
+@keyframes neonPulse {
+    from {
+        box-shadow: 0 0 10px var(--primary-color);
+    }
+    to {
+        box-shadow: 0 0 20px var(--primary-color), 0 0 30px var(--primary-color);
+    }
+}
+
+/* Card Hover Effects */
+.project-card .card-inner {
+    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.roblox-card {
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Button Ripple Effect */
+@keyframes ripple {
+    0% {
+        transform: scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(2.5);
+        opacity: 0;
+    }
+}
+
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.4);
+    transform: scale(0);
+    animation: ripple 0.6s linear;
+    pointer-events: none;
+}
+
+/* Scroll Reveal Animations */
+.reveal {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 0.8s ease;
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Glow Hover Effect */
+.glow-hover {
+    transition: all 0.3s ease;
+}
+
+.glow-hover:hover {
+    box-shadow: 0 0 15px var(--primary-color);
+}
+
+/* Animated Headline */
+.animated-headline .highlight-text {
+    position: relative;
+    display: inline-block;
+    animation: textGlow 2s infinite alternate;
+}
+
+@keyframes textGlow {
+    from {
+        text-shadow: 0 0 5px var(--accent-color), 0 0 10px var(--accent-color);
+    }
+    to {
+        text-shadow: 0 0 10px var(--accent-color), 0 0 20px var(--accent-color), 0 0 30px var(--accent-color);
+    }
+}
+
+/* Modal Animation */
+.modal-content {
+    transform: scale(0.8);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.modal.active .modal-content {
+    transform: scale(1);
+    opacity: 1;
+}
+
+/* Nav Link Hover Animation */
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 1px;
+    background-color: var(--primary-color);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.nav-links a:hover::after {
+    width: 70%;
+}
+
+/* Cyber Button Animation */
+.cyber-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.4), transparent);
+    transition: all 0.6s ease;
+}
+
+.cyber-button:hover::before {
+    left: 100%;
+}
+
+/* Add these classes to the end of your animations.css file */
+
+.delay-1 {
+    animation-delay: 0.6s !important;
+}
+
+.delay-2 {
+    animation-delay: 0.9s !important;
+}
+
+/* Bio text special animation */
+.bio-text p {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.bio-text p:after {
+    content: '';
+    position: absolute;
+    bottom: -0.75rem;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: linear-gradient(90deg, var(--primary-color), transparent);
+    transition: width 1s ease;
+}
+
+.bio-text p.animated-text.active:after {
+    width: 100%;
+}
+
+/* Update the terminal typing animation in animations.css */
+.delay-3 {
+    animation-delay: 1.2s !important;
+}
+
+.delay-4 {
+    animation-delay: 1.5s !important;
+}
+
+/* Terminal typing effect */
+.terminal-typing {
+    overflow: visible;
+    white-space: pre-wrap;
+    margin: 0;
+    border-right: 2px solid var(--primary-color);
+    display: block;
+    width: auto !important;
+    min-height: 1.5em;
+    color: var(--text-color);
+    opacity: 1 !important;
+}
+
+/* Remove any width constraints that might be hiding text */
+.terminal-output {
+    margin-bottom: 25px;
+    width: 100%;
+    overflow: visible;
+}
+
+/* Make sure text color is visible */
+.terminal-body {
+    padding: 20px;
+    font-family: 'Consolas', monospace;
+    color: var(--text-color);
+    line-height: 1.6;
+    background-color: rgba(10, 10, 18, 0.95);
+}
+
+/* Ensure the cursor blinks at the end of text */
+.terminal-cursor {
+    display: inline-block;
+    width: 10px;
+    height: 18px;
+    background-color: var(--primary-color);
+    animation: blink 1s step-end infinite;
+    vertical-align: middle;
+    margin-left: 2px;
+}
+
+/* Add yellow to some terminal commands */
+.terminal-command:nth-child(odd) {
+    color: var(--yellow-color);
+}
+
+/* Add yellow pulse to the join button */
+.cyber-button.large {
+    position: relative;
+    overflow: hidden;
+}
+
+.cyber-button.large:after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(249, 249, 0, 0.3) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.cyber-button.large:hover:after {
+    opacity: 1;
+    animation: pulse-yellow 2s infinite;
+}
+
+@keyframes pulse-yellow {
+    0% {
+        transform: scale(0.8);
+        opacity: 0.3;
+    }
+    50% {
+        transform: scale(1);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(0.8);
+        opacity: 0.3;
+    }
+}
+
+/* Enhance the glitch effect */
+.glitch-text.intensify:before {
+    left: 3px;
+    text-shadow: -3px 0 var(--primary-color);
+    clip: rect(24px, 9999px, 90px, 0);
+    animation: glitch-anim-1 2s infinite linear alternate-reverse;
+}
+
+.glitch-text.intensify:after {
+    left: -3px;
+    text-shadow: 3px 0 var(--secondary-color);
+    clip: rect(85px, 9999px, 140px, 0);
+    animation: glitch-anim-2 1.5s infinite linear alternate-reverse;
+}
+
+/* Make the glitch effect more visible */
+@keyframes glitch-anim-1 {
+    0% {
+        clip: rect(24px, 9999px, 90px, 0);
+    }
+    20% {
+        clip: rect(62px, 9999px, 130px, 0);
+    }
+    40% {
+        clip: rect(58px, 9999px, 200px, 0);
+    }
+    60% {
+        clip: rect(91px, 9999px, 150px, 0);
+    }
+    80% {
+        clip: rect(37px, 9999px, 100px, 0);
+    }
+    100% {
+        clip: rect(68px, 9999px, 180px, 0);
+    }
+}
+
+@keyframes glitch-anim-2 {
+    0% {
+        clip: rect(9px, 9999px, 100px, 0);
+    }
+    20% {
+        clip: rect(96px, 9999px, 150px, 0);
+    }
+    40% {
+        clip: rect(72px, 9999px, 200px, 0);
+    }
+    60% {
+        clip: rect(88px, 9999px, 120px, 0);
+    }
+    80% {
+        clip: rect(12px, 9999px, 180px, 0);
+    }
+    100% {
+        clip: rect(54px, 9999px, 160px, 0);
+    }
+}
+
+/* Look for and remove any AI Assistant animation styles */
+.ai-assistant, #virtual-assistant {
+    /* Check for animation properties here */
+} 
