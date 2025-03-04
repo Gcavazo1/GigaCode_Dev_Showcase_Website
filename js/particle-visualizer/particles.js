@@ -631,12 +631,24 @@ class ParticleSystem {
     this.time += 0.1;
     this.uniforms.time.value = this.time;
     
+    // Debug values to console to verify data flow
+    if (audioData && Math.random() < 0.01) {
+      console.log("[ParticleSystem] Received audio data:", {
+        low: audioData.low.toFixed(3),
+        mid: audioData.mid.toFixed(3),
+        high: audioData.high.toFixed(3)
+      });
+    }
+    
     // Apply audio data to uniforms with consistent reactivity
     if (audioData) {
+      // Get the reactivity multiplier with a fallback
+      const reactivity = this.reactivityMultiplier || 0.8;
+      
       // Standardized reactivity
-      this.uniforms.amplitude.value = 0.8 + (audioData.high * this.reactivityMultiplier);
-      this.uniforms.offsetGain.value = audioData.mid * this.reactivityMultiplier;
-      this.uniforms.frequency.value = 2.0 + (audioData.low * this.reactivityMultiplier);
+      this.uniforms.amplitude.value = 0.8 + (audioData.low * reactivity * 2.0);
+      this.uniforms.offsetGain.value = audioData.mid * reactivity;
+      this.uniforms.frequency.value = 2.0 + (audioData.high * reactivity);
     } else {
       // Default values when no audio
       this.uniforms.amplitude.value = 0.8;
@@ -646,7 +658,10 @@ class ParticleSystem {
     
     // Consistent beat detection for all shapes
     if (beatDetected) {
-      this.uniforms.size.value = 5 * this.reactivityMultiplier;
+      // Log to confirm we're receiving beat events
+      console.log("[ParticleSystem] Beat detected!");
+      
+      this.uniforms.size.value = 5 * (this.reactivityMultiplier || 0.8);
       this.uniforms.maxDistance.value = 1.5;
     } else {
       // Return to normal size
