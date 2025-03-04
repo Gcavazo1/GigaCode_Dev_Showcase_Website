@@ -6,9 +6,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Get elements from the existing PowerShell widget
     const psWidget = document.querySelector('.ps-music-widget');
     const enableAudioBtn = document.querySelector('.ps-enable-audio');
-    const toggleVisualizerBtn = document.querySelector('.ps-toggle-visualizer');
+    const disableAudioBtn = document.querySelector('.ps-disable-audio');
     const statusIndicator = document.querySelector('.ps-status');
-    const visualizerStatus = document.querySelector('.ps-visualizer-status');
     const eqContainer = document.querySelector('.ps-eq-container');
     
     // Check if we have the main audio player instance
@@ -31,12 +30,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const isPlaying = audioPlayer.isPlaying || false;
             eqContainer.classList.toggle('active', isPlaying);
         }
-        
-        // Update visualizer status
-        if (visualizerStatus && window.visualizerEnabled !== undefined) {
-            visualizerStatus.textContent = window.visualizerEnabled ? "Enabled" : "Disabled";
-            visualizerStatus.classList.toggle('enabled', window.visualizerEnabled);
-            visualizerStatus.classList.toggle('disabled', !window.visualizerEnabled);
+    }
+    
+    // Function to show the visualizer terminal after enabling audio
+    function showVisualizerTerminal() {
+        const visualizerTerminal = document.querySelector('.visualizer-terminal');
+        if (visualizerTerminal) {
+            visualizerTerminal.style.display = 'block';
+            visualizerTerminal.classList.add('active');
         }
     }
     
@@ -52,11 +53,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 audioPlayer.initAudio();
                 audioPlayer.playAudio();
                 
-                // Update button text
-                this.textContent = "AUDIO ENABLED";
-                
                 // Update widget state
                 updateWidgetState();
+                
+                // Show visualizer terminal
+                showVisualizerTerminal();
+                
+                // Hide PowerShell widget with animation
+                setTimeout(() => {
+                    psWidget.style.transition = 'all 0.5s cubic-bezier(0.7, 0, 0.84, 0)';
+                    psWidget.classList.remove('ps-active');
+                    psWidget.style.opacity = '0';
+                    psWidget.style.transform = 'translateY(20px) scale(0.95)';
+                    
+                    // Don't completely remove, just hide
+                    setTimeout(() => {
+                        psWidget.style.display = 'none';
+                    }, 500);
+                }, 1000);
             } else {
                 // Fallback if audioPlayer is not available
                 const audioElement = document.querySelector('audio');
@@ -75,8 +89,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         eqContainer.classList.add('active');
                     }
                     
-                    // Update button text
-                    this.textContent = "AUDIO ENABLED";
+                    // Show visualizer terminal
+                    showVisualizerTerminal();
+                    
+                    // Hide PowerShell widget
+                    setTimeout(() => {
+                        psWidget.style.display = 'none';
+                    }, 1000);
                 } else {
                     console.warn("No audio element found");
                 }
@@ -84,27 +103,29 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Connect visualizer toggle to existing functionality
-    if (toggleVisualizerBtn) {
-        toggleVisualizerBtn.addEventListener('click', function() {
+    // Connect disable button
+    if (disableAudioBtn) {
+        disableAudioBtn.addEventListener('click', function() {
             // Add click effect
             this.classList.add('clicked');
             setTimeout(() => this.classList.remove('clicked'), 800);
             
-            // Toggle visualizer state
-            const newState = visualizerStatus.textContent === "Disabled";
+            // Hide PowerShell widget
+            setTimeout(() => {
+                psWidget.style.transition = 'all 0.5s cubic-bezier(0.7, 0, 0.84, 0)';
+                psWidget.classList.remove('ps-active');
+                psWidget.style.opacity = '0';
+                psWidget.style.transform = 'translateY(20px) scale(0.95)';
+                
+                setTimeout(() => {
+                    psWidget.style.display = 'none';
+                }, 500);
+            }, 500);
             
-            // Update status
-            if (visualizerStatus) {
-                visualizerStatus.textContent = newState ? "Enabled" : "Disabled";
-                visualizerStatus.classList.toggle('enabled', newState);
-                visualizerStatus.classList.toggle('disabled', !newState);
-            }
-            
-            // Trigger visualizer if it exists
-            if (window.toggleBackgroundVisualizer) {
-                window.toggleBackgroundVisualizer(newState);
-                window.visualizerEnabled = newState;
+            // Hide visualizer terminal if it's visible
+            const visualizerTerminal = document.querySelector('.visualizer-terminal');
+            if (visualizerTerminal) {
+                visualizerTerminal.style.display = 'none';
             }
         });
     }
@@ -202,12 +223,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
     
-    window.psToggleVisualizer = function() {
-        if (toggleVisualizerBtn) {
-            toggleVisualizerBtn.click();
-        }
-    };
-    
     // Initial update
     updateWidgetState();
+    
+    // Add ps-active class to make the widget visible initially
+    if (psWidget && !psWidget.classList.contains('ps-active')) {
+        setTimeout(() => {
+            psWidget.classList.add('ps-active');
+        }, 1000);
+    }
 }); 

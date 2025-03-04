@@ -54,9 +54,6 @@ class AudioPlayer {
         
         // Initialize
         this.initBasic();
-        
-        // Create PowerShell widget
-        setTimeout(() => this.createPowerShellWidget(), 1000);
     }
     
     initBasic() {
@@ -345,96 +342,6 @@ class AudioPlayer {
         }
     }
     
-    createPowerShellWidget() {
-        // Remove any existing widgets
-        const existingWidgets = document.querySelectorAll('.ps-music-widget');
-        existingWidgets.forEach(widget => {
-            if (widget && widget.parentNode) {
-                widget.parentNode.removeChild(widget);
-            }
-        });
-        
-        // Create widget element
-        const widget = document.createElement('div');
-        widget.className = 'ps-music-widget';
-        widget.innerHTML = `
-            <div class="ps-scan-line"></div>
-            <div class="ps-widget-header">
-                <div class="ps-widget-title">
-                    <i class="fas fa-terminal"></i>
-                    PowerShell Music Module
-                </div>
-                <div class="ps-widget-controls">
-                    <div class="ps-widget-control ps-widget-minimize"></div>
-                    <div class="ps-widget-control ps-widget-close"></div>
-                </div>
-            </div>
-            <div class="ps-widget-content">
-                <div class="ps-terminal-prompt">
-                    <span class="ps-terminal-command">Get-MusicPreference</span>
-                    <span class="ps-terminal-cursor"></span>
-                </div>
-                <div class="ps-terminal-output">
-                    [INFO] This site features an immersive cyberpunk soundtrack.
-                    [QUERY] Would you like to enable background music?
-                </div>
-                <div class="ps-terminal-buttons">
-                    <button class="ps-terminal-btn ps-enable-btn">Enable-Music</button>
-                    <button class="ps-terminal-btn ps-disable-btn">Disable-Music</button>
-                </div>
-            </div>
-        `;
-        
-        // Add to body
-        document.body.appendChild(widget);
-        
-        // Force a reflow before adding the active class
-        widget.offsetHeight;
-        
-        // Animate in with a slight delay for smoother appearance
-        setTimeout(() => {
-            widget.classList.add('ps-active');
-        }, 100);
-        
-        // Add event listeners
-        widget.querySelector('.ps-enable-btn').addEventListener('click', () => {
-            this.initAudio();
-            this.playAudio();
-            this.closePowerShellWidget(widget);
-        });
-        
-        widget.querySelector('.ps-disable-btn').addEventListener('click', () => {
-            this.closePowerShellWidget(widget);
-        });
-        
-        widget.querySelector('.ps-widget-close').addEventListener('click', () => {
-            this.closePowerShellWidget(widget);
-        });
-        
-        widget.querySelector('.ps-widget-minimize').addEventListener('click', () => {
-            widget.classList.remove('ps-active');
-            // Show again after 30 seconds if no choice was made
-            setTimeout(() => {
-                if (document.body.contains(widget) && !widget.classList.contains('ps-active')) {
-                    widget.classList.add('ps-active');
-                }
-            }, 30000);
-        });
-    }
-    
-    closePowerShellWidget(widget) {
-        widget.style.transition = 'all 0.5s cubic-bezier(0.7, 0, 0.84, 0)';
-        widget.classList.remove('ps-active');
-        widget.style.opacity = '0';
-        widget.style.transform = 'translateY(20px) scale(0.95)';
-        
-        setTimeout(() => {
-            if (document.body.contains(widget)) {
-                document.body.removeChild(widget);
-            }
-        }, 500);
-    }
-
     createPlaylistCarousel() {
         // Check if audio container exists
         const audioContainer = document.querySelector('.audio-container');
