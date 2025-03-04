@@ -402,85 +402,63 @@
   text-shadow: 0 0 10px rgba(255, 255, 0, 0.7);
 }
 
-/* PowerShell Terminal Music Widget - with unique class names */
+/* ======================================
+   POWERSHELL TERMINAL MUSIC WIDGET
+   ====================================== */
+
 .ps-music-widget {
     position: fixed;
     bottom: 30px;
     right: 30px;
     width: 400px;
-    height: 120px;
-    background: rgba(10, 15, 25, 0.85);
-    border: 1px solid var(--audio-border-color);
+    height: auto;
+    background: rgba(10, 15, 25, 0.95);
+    border: 1px solid var(--audio-primary);
     border-radius: 8px;
     overflow: hidden;
-    z-index: 100;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-    font-family: 'Rajdhani', sans-serif;
-    transition: all 0.3s ease;
+    z-index: 1000;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.7), 0 0 15px rgba(0, 255, 255, 0.3);
+    font-family: 'Consolas', monospace;
+    transform: translateY(calc(100% + 30px));
+    transition: transform 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+    opacity: 0;
 }
 
-/* Rest of the PowerShell widget styles with more specific selectors */
-.ps-music-widget .ps-header {
+.ps-music-widget.active {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.ps-header {
     height: 30px;
     background: rgba(20, 30, 40, 0.9);
     display: flex;
     align-items: center;
+    justify-content: space-between;
     padding: 0 10px;
-    color: var(--audio-text-color);
+    color: var(--audio-primary);
     font-size: 14px;
     border-bottom: 1px solid rgba(0, 255, 255, 0.2);
 }
 
-.ps-widget-header {
-    background: rgba(0, 20, 40, 0.9);
-    padding: 5px 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid rgba(0, 255, 255, 0.4);
-}
-
-.ps-widget-title {
-    color: #00ffff;
-    font-size: 12px;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.ps-widget-title i {
-    font-size: 14px;
-}
-
-.ps-widget-controls {
-    display: flex;
-    gap: 8px;
-}
-
-.ps-widget-control {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
+.ps-close-btn {
     cursor: pointer;
+    font-size: 20px;
+    opacity: 0.8;
+    transition: all 0.3s ease;
 }
 
-.ps-widget-minimize {
-    background: #ffbd44;
-    border: 1px solid #dfb13a;
+.ps-close-btn:hover {
+    opacity: 1;
+    color: #ff5f5f;
 }
 
-.ps-widget-close {
-    background: #ff605c;
-    border: 1px solid #e04c49;
-}
-
-.ps-widget-content {
+.ps-terminal-content {
     padding: 15px;
     color: #e0e0e0;
     font-size: 14px;
+    position: relative;
+    min-height: 150px;
 }
 
 .ps-terminal-prompt {
@@ -493,7 +471,7 @@
 
 .ps-terminal-prompt::before {
     content: 'PS C:\\Music>';
-    color: #00ffff;
+    color: var(--audio-primary);
     font-weight: bold;
 }
 
@@ -503,6 +481,8 @@
     white-space: nowrap;
     overflow: hidden;
     display: inline-block;
+    width: 0;
+    transition: width 1.5s steps(30, end);
 }
 
 .ps-terminal-output {
@@ -520,7 +500,7 @@
 .ps-terminal-btn {
     background: rgba(0, 20, 40, 0.8);
     border: 1px solid rgba(0, 255, 255, 0.4);
-    color: #00ffff;
+    color: var(--audio-primary);
     padding: 5px 10px;
     font-family: 'Consolas', monospace;
     cursor: pointer;
@@ -553,7 +533,7 @@
     display: inline-block;
     width: 8px;
     height: 15px;
-    background: #00ffff;
+    background: var(--audio-primary);
     margin-left: 2px;
     animation: ps-blink 1s infinite;
     vertical-align: middle;
@@ -586,116 +566,102 @@
     100% { top: 100%; }
 }
 
-/* 3D Playlist Carousel */
+/* ======================================
+   3D PLAYLIST CAROUSEL
+   ====================================== */
+
 .ps-playlist-container {
     position: relative;
-    height: 400px;
-    margin: 240px 0;
-    perspective: 2000px;
-    overflow: visible;
+    height: 200px;
+    margin: 3rem auto;
+    perspective: 1000px;
+    max-width: 800px;
 }
 
 .ps-playlist-carousel {
-    position: relative;
+    position: absolute;
     width: 100%;
     height: 100%;
     transform-style: preserve-3d;
-    transition: transform 1.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: transform 1s ease;
 }
 
 .ps-track-card {
     position: absolute;
-    width: 320px;
-    height: 120px;
-    left: calc(50% - 160px);
-    top: calc(50% - 60px);
-    background: rgba(0, 106, 133, 0.95);
-    border: 1px solid rgba(255, 192, 0, 0.4);
-    border-radius: 8px;
-    overflow: hidden;
-    transition: all 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+    width: 250px;
+    height: 150px;
+    background: var(--audio-medium);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    backface-visibility: hidden;
+    transform-origin: center;
+    transition: all 0.5s ease;
     cursor: pointer;
-    transform-style: preserve-3d;
-    box-shadow: 0 5px 30px rgba(255, 255, 0, 0.5),
-                inset 0 0 30px rgba(0, 120, 147, 0.1);
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .ps-track-card:hover {
-    box-shadow: 0 0 25px rgba(255, 255, 0, 0.5);
+    border-color: var(--audio-primary);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
 }
 
-.ps-track-active {
-    border: 1px solid rgba(0, 255, 255, 0.8);
-    box-shadow: 0 0 40px rgba(0, 255, 255, 0.4),
-                inset 0 0 30px rgba(0, 255, 255, 0.2);
-    background: rgba(2, 12, 24, 0.95);
-}
-
-.ps-track-active::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, #00ffff, transparent);
-    animation: ps-scan-active 2s linear infinite;
-}
-
-.ps-card-glitch-effect {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), transparent 80%);
-    opacity: 0.5;
-    pointer-events: none;
-}
-
-.ps-card-content {
-    position: relative;
-    padding: 20px;
-    display: grid;
-    grid-template-rows: auto 1fr;
-    height: 100%;
-    box-sizing: border-box;
-}
-
-.ps-track-number {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 24px;
-    color: rgba(0, 255, 255, 0.7);
-    text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
-    letter-spacing: 2px;
-    margin-bottom: 15px;
+.ps-track-content {
+    text-align: center;
+    z-index: 2;
 }
 
 .ps-track-title {
-    display: none;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.2rem;
+    color: var(--audio-primary);
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
 }
 
-.ps-track-equalizer {
+.ps-track-artist {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 1rem;
+}
+
+.ps-eq-visualizer {
     display: flex;
-    gap: 4px;
+    gap: 3px;
     justify-content: center;
-    height: 30px;
+    height: 20px;
     align-items: flex-end;
 }
 
 .ps-eq-bar {
-    width: 5px;
-    background: rgba(0, 255, 255, 0.5);
+    width: 4px;
     height: 5px;
-    transition: height 0.2s ease;
-    border-radius: 2px;
+    background: var(--audio-primary);
+    border-radius: 1px;
+}
+
+.ps-track-active {
+    border-color: var(--audio-primary);
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.5);
+    z-index: 10;
+}
+
+.ps-track-active .ps-track-title {
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
 }
 
 .ps-track-active .ps-eq-bar {
-    animation: ps-eq-animation 1.2s infinite ease-in-out;
+    animation: ps-eq-animation 0.8s ease infinite;
 }
 
-.ps-track-active .ps-eq-bar:nth-child(1) { animation-delay: 0.0s; }
+.ps-track-active .ps-eq-bar:nth-child(1) { animation-delay: 0s; }
 .ps-track-active .ps-eq-bar:nth-child(2) { animation-delay: 0.2s; }
 .ps-track-active .ps-eq-bar:nth-child(3) { animation-delay: 0.4s; }
 .ps-track-active .ps-eq-bar:nth-child(4) { animation-delay: 0.6s; }
@@ -721,11 +687,11 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background: rgba(0, 20, 40, 0.9);
+    background: var(--audio-medium);
     border: 1px solid rgba(0, 255, 255, 0.4);
-    color: #00ffff;
-    width: 50px;
-    height: 50px;
+    color: var(--audio-primary);
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -733,7 +699,7 @@
     cursor: pointer;
     z-index: 200;
     transition: all 0.3s ease;
-    font-size: 1.2em;
+    font-size: 1rem;
 }
 
 .ps-playlist-nav:hover {
@@ -742,21 +708,16 @@
 }
 
 .ps-prev {
-    left: 40px;
+    left: 20px;
 }
 
 .ps-next {
-    right: 40px;
+    right: 20px;
 }
 
 @keyframes ps-eq-animation {
     0%, 100% { height: 5px; }
     50% { height: 20px; }
-}
-
-@keyframes ps-scan-active {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
 }
 
 /* Audio player theme variations */
