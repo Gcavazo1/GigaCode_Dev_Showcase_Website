@@ -1,10 +1,11 @@
 /* Basic audio player styling */
 .audio-section {
-    background: rgba(10, 15, 25, 0.9);
+    background: rgba(10, 15, 25, 0.7) !important;
     border-radius: 12px;
     padding: 2rem;
     margin: 2rem auto;
     max-width: 1000px;
+    backdrop-filter: blur(10px);
 }
 
 .audio-container {
@@ -17,11 +18,13 @@
     display: flex;
     align-items: center;
     gap: 1rem;
-    margin-top: 30px;
+    margin-top: 80px !important;
+    position: relative;
+    z-index: 5;
     padding: 15px;
-    background: rgba(0, 0, 0, 0.4);
-    border-radius: 8px;
-    border: 1px solid rgba(0, 255, 255, 0.2);
+    background: rgba(0, 10, 20, 0.8) !important;
+    border: 1px solid rgba(0, 255, 255, 0.3) !important;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4) !important;
 }
 
 .track-info {
@@ -283,12 +286,13 @@
 }
 
 /* 3D Playlist Carousel */
-.ps-playlist-container {
+.ps-playlist-container, 
+.playlist-container {
     position: relative;
-    height: 200px;
-    margin: 80px 0;
-    perspective: 2000px;
-    overflow: visible;
+    margin-top: 60px !important;
+    margin-bottom: 50px !important;
+    transform: translateY(-30px);
+    z-index: 10;
 }
 
 .ps-playlist-carousel {
@@ -305,19 +309,24 @@
     height: 120px;
     left: calc(50% - 160px);
     top: calc(50% - 60px);
-    background: rgba(1, 8, 16, 0.95);
+    background: rgba(1, 8, 16, 0.85) !important;
+    backdrop-filter: blur(5px);
     border: 1px solid rgba(0, 255, 255, 0.4);
     border-radius: 8px;
     overflow: hidden;
-    transition: all 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     cursor: pointer;
     transform-style: preserve-3d;
-    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5),
-                inset 0 0 30px rgba(0, 255, 255, 0.1);
+    box-shadow: 
+        0 10px 30px rgba(0, 0, 0, 0.7),
+        0 0 20px rgba(0, 255, 255, 0.2) !important;
 }
 
 .ps-track-card:hover {
-    box-shadow: 0 0 25px rgba(0, 255, 255, 0.5);
+    transform: translateY(-5px) !important;
+    box-shadow: 
+        0 15px 40px rgba(0, 0, 0, 0.8),
+        0 0 30px rgba(0, 255, 255, 0.3) !important;
 }
 
 .ps-track-active {
@@ -495,11 +504,33 @@
 
 /* Adjust the canvas opacity */
 #audio-canvas {
-    opacity: 0.8; /* Lower opacity for better floating effect */
-    transition: opacity 0.3s ease;
+    opacity: 0.6 !important;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
 }
 
 /* Optional: Add hover effect to canvas */
 #audio-canvas:hover {
     opacity: 0.9;
+}
+
+/* Add a floating animation to playlist cards */
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+    100% { transform: translateY(0px); }
+}
+
+.ps-track-card {
+    animation: float 6s ease-in-out infinite;
+}
+
+/* Stagger the floating animation for each card */
+.ps-track-card:nth-child(2n) {
+    animation-delay: 1s;
+}
+
+.ps-track-card:nth-child(3n) {
+    animation-delay: 2s;
 } 
