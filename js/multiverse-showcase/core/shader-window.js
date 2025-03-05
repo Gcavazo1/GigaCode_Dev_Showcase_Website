@@ -30,7 +30,7 @@ class ShaderWindow {
     };
     this.position = { x: 0, y: 0, z: 0 }; // Initialize position
     this.rotation = { x: 0, y: 0, z: 0 };
-    this.scale = 1.0;
+    this.scale = 2.0; // Default scale (increase this for larger windows)
     this.isExpanded = false;
     this.isReady = false;
     this.startTime = performance.now();
@@ -213,7 +213,7 @@ class ShaderWindow {
    */
   setHover(isHovered) {
     this.isHovered = isHovered;
-    this.targetScale = isHovered ? 1.2 : 1.0;
+    this.targetScale = isHovered ? 1.7 : 1.5;
   }
   
   /**
@@ -222,7 +222,15 @@ class ShaderWindow {
    */
   setExpanded(isExpanded) {
     this.isExpanded = isExpanded;
-    this.targetScale = isExpanded ? 2.0 : (this.isHovered ? 1.2 : 1.0);
+    this.targetScale = isExpanded ? 3.0 : (this.isHovered ? 1.7 : 1.5);
+    
+    // This might be overriding your CSS
+    const element = document.getElementById(this.id);
+    if (element) {
+      element.style.width = isExpanded ? '800px' : '400px';
+      element.style.height = isExpanded ? '600px' : '400px';
+      // ...
+    }
   }
   
   /**
