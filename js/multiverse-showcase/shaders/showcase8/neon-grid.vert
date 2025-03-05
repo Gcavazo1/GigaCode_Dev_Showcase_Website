@@ -1,4 +1,4 @@
-// Cosmic Wormhole vertex shader
+// Neon Grid vertex shader
 attribute vec4 aPosition;
 attribute vec2 aTexCoord;
 

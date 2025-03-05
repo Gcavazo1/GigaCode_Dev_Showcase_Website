@@ -1,101 +1,106 @@
+// Neon Grid shader - Retro synthwave style
+precision mediump float;
 
-// Smooth noise
-float noise(vec2 p) {
-  vec2 i = floor(p);
-  vec2 f = fract(p);
-  f = f * f * (3.0 - 2.0 * f);
-  
-  float n = i.x + i.y * 57.0;
-  float a = hash(n);
-  float b = hash(n + 1.0);
-  float c = hash(n + 57.0);
-  float d = hash(n + 58.0);
-  
-  return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+varying vec2 vTexCoord;
+varying float vTime;
+
+uniform vec2 uResolution;
+uniform float uIntensity;
+
+#define PI 3.14159265359
+
+// Line function with glow
+float line(vec2 p, float width, float edge) {
+    return smoothstep(width, edge, abs(p.y));
 }
 
-// 2D rotation matrix
-mat2 rotate2D(float angle) {
-  return mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
+// Grid function
+float grid(vec2 uv, float size) {
+    vec2 grid = fract(uv * size) - 0.5;
+    float horz = line(grid, 0.02, 0.05);
+    float vert = line(vec2(grid.y, grid.x), 0.02, 0.05);
+    return horz + vert;
 }
 
 void main() {
-  // Centered coordinates
-  vec2 uv = vTexCoord * 2.0 - 1.0;
-  uv.x *= uResolution.x / uResolution.y;
-  
-  // Time variables
-  float time = vTime * 0.3;
-  
-  // Store original uv for later
-  vec2 originalUV = uv;
-  
-  // Create spiral effect
-  float angle = atan(uv.y, uv.x);
-  float radius = length(uv);
-  float tunnelSpeed = time * 0.5;
-  
-  // Create wormhole distortion
-  float distortion = sin(angle * 3.0 + tunnelSpeed) * 0.1;
-  radius += distortion;
-  
-  // Create tunnel layers
-  float tunnel = 0.0;
-  float tunnelLayers = 5.0;
-  
-  for(float i = 0.0; i < tunnelLayers; i++) {
-    // Create ring pattern that moves toward viewer
-    float ringRadius = fract(radius * (3.0 - i * 0.2) - tunnelSpeed) * 2.0; 
-    ringRadius = abs(ringRadius - 1.0);
+    // Setup coordinates
+    vec2 uv = vTexCoord * 2.0 - 1.0;
+    uv.x *= uResolution.x / uResolution.y;
     
-    // Add glow to rings
-    float ringGlow = pow(1.0 - ringRadius, 5.0);
-    tunnel += ringGlow * (0.5 - i * 0.05);
-  }
-  
-  // Create stars in background
-  vec2 rotatedUV = originalUV * rotate2D(time * 0.1);
-  float stars = pow(noise(rotatedUV * 50.0), 20.0) * 2.0;
-  stars *= smoothstep(0.0, 0.3, radius); // Stars only in outer area
-  
-  // Create cosmic swirl
-  float swirl = noise(vec2(angle * 2.0 + time, radius * 3.0)) * 0.5 + 0.5;
-  
-  // Create color variations
-  float colorShift = sin(angle * 2.0 + time) * 0.5 + 0.5;
-  
-  // Define color palette
-  vec3 color1 = vec3(0.1, 0.0, 0.3); // Deep purple
-  vec3 color2 = vec3(0.8, 0.2, 0.8); // Magenta
-  vec3 color3 = vec3(0.0, 0.6, 1.0); // Cyan
-  
-  // Combine colors based on tunnel and swirl
-  vec3 color = mix(color1, color2, swirl);
-  color = mix(color, color3, colorShift);
-  
-  // Add tunnel
-  color += tunnel * vec3(0.8, 0.4, 1.0);
-  
-  // Add stars
-  color += stars * vec3(1.0, 0.95, 0.8);
-  
-  // Add glow at center
-  float centerGlow = 0.05 / (radius + 0.05);
-  color += centerGlow * vec3(0.8, 0.5, 1.0);
-  
-  // Add subtle pulsing
-  float pulse = sin(time) * 0.5 + 0.5;
-  color *= 0.8 + pulse * 0.2;
-  
-  // Add vignette
-  float vignette = 1.0 - smoothstep(0.0, 1.8, radius);
-  color *= vignette;
-  
-  // Enhance contrast
-  color = pow(color, vec3(0.8));
-  
-  // Apply intensity
-  color *= uIntensity;
-  
-  gl_FragColor = vec4(color, 1.0);
+    // Create perspective transform
+    float t = vTime * 0.5;
+    vec2 projectedUV = uv;
+    projectedUV.y = 0.1 / (projectedUV.y + 1.5);
+    projectedUV.x *= projectedUV.y;
+    
+    // Add movement
+    projectedUV.y += t;
+    
+    // Create multiple grid layers
+    float gridLayer1 = grid(projectedUV, 10.0);
+    float gridLayer2 = grid(projectedUV * 2.0, 20.0) * 0.5;
+    float gridLayer3 = grid(projectedUV * 4.0, 40.0) * 0.25;
+    
+    // Combine grid layers
+    float finalGrid = gridLayer1 + gridLayer2 + gridLayer3;
+    
+    // Create sun
+    float sun = 1.0 - length(uv - vec2(0.0, 0.4)) * 1.5;
+    sun = max(0.0, sun);
+    sun = pow(sun, 3.0);
+    
+    // Create horizon line
+    float horizon = smoothstep(0.1, 0.15, abs(uv.y + 0.1));
+    
+    // Create color gradient for sky
+    vec3 skyColor = mix(
+        vec3(0.8, 0.2, 0.8), // Purple
+        vec3(0.0, 0.4, 0.8), // Blue
+        uv.y + 0.5
+    );
+    
+    // Create color gradient for ground
+    vec3 groundColor = mix(
+        vec3(0.8, 0.0, 0.8), // Dark purple
+        vec3(0.2, 0.0, 0.4), // Darker purple
+        -uv.y
+    );
+    
+    // Combine colors
+    vec3 color = mix(groundColor, skyColor, horizon);
+    
+    // Add grid with glow
+    vec3 gridColor = vec3(0.0, 0.8, 0.9); // Cyan
+    color += finalGrid * gridColor * 1.5;
+    
+    // Add sun with glow
+    vec3 sunColor = mix(
+        vec3(1.0, 0.2, 0.8), // Pink
+        vec3(1.0, 0.8, 0.2), // Yellow
+        sun
+    );
+    color += sun * sunColor;
+    
+    // Add sun rays
+    float rays = sin(atan(uv.x, uv.y - 0.4) * 20.0 + t * 2.0) * 0.5 + 0.5;
+    rays *= smoothstep(0.3, 2.0, length(uv - vec2(0.0, 0.4)));
+    color += rays * sunColor * 0.3;
+    
+    // Add scanlines
+    float scanline = sin(uv.y * 200.0 + t * 10.0) * 0.05 + 0.95;
+    color *= scanline;
+    
+    // Add vignette
+    float vignette = length(uv * 0.8);
+    vignette = smoothstep(1.0, 0.2, vignette);
+    color *= vignette;
+    
+    // Add subtle noise
+    float noise = fract(sin(dot(uv, vec2(12.9898, 78.233)) + t) * 43758.5453);
+    color += noise * 0.02;
+    
+    // Apply intensity
+    color *= uIntensity;
+    
+    gl_FragColor = vec4(color, 1.0);
 } 
