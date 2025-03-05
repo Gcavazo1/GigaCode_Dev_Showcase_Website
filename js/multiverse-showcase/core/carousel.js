@@ -274,15 +274,9 @@ class Carousel {
         const normalizedX = (x / rect.width) * 2 - 1;
         const normalizedY = -((y / rect.height) * 2 - 1);
         
-        // Create ray from camera
-        const rayOrigin = { x: 0, y: 0, z: 18 }; // Match the camera position in render()
-        
-        // Apply carousel rotation to the ray
-        const rayDirection = { 
-            x: normalizedX * Math.cos(this.rotationAngle) - Math.sin(this.rotationAngle), 
-            y: normalizedY, 
-            z: -Math.cos(this.rotationAngle) - normalizedX * Math.sin(this.rotationAngle)
-        };
+        // Create ray from camera (in view space)
+        const rayOrigin = { x: 0, y: 0, z: 18 };
+        const rayDirection = { x: normalizedX, y: normalizedY, z: -1 };
         
         // Normalize ray direction
         const length = Math.sqrt(
@@ -297,27 +291,58 @@ class Carousel {
         
         // Check intersections
         let hoveredIndex = -1;
+        let closestDistance = Infinity;
         
         for (let i = 0; i < this.windows.length; i++) {
             const window = this.windows[i];
             
-            // Apply the inverse of carousel rotation to each window's position for hit testing
-            const windowPos = {
-                x: window.position.x * Math.cos(-this.rotationAngle) - window.position.z * Math.sin(-this.rotationAngle),
-                y: window.position.y,
-                z: window.position.x * Math.sin(-this.rotationAngle) + window.position.z * Math.cos(-this.rotationAngle)
+            // Create a copy of the window position
+            const windowPos = { ...window.position };
+            
+            // Transform window position from world space to view space
+            // This accounts for the carousel rotation
+            const rotatedX = windowPos.x * Math.cos(this.rotationAngle) - windowPos.z * Math.sin(this.rotationAngle);
+            const rotatedZ = windowPos.x * Math.sin(this.rotationAngle) + windowPos.z * Math.cos(this.rotationAngle);
+            
+            windowPos.x = rotatedX;
+            windowPos.z = rotatedZ;
+            
+            // Simple plane intersection test
+            const planeNormal = { 
+                x: Math.sin(this.rotationAngle - window.rotation.y), 
+                y: 0, 
+                z: Math.cos(this.rotationAngle - window.rotation.y) 
             };
             
-            const originalPos = { ...window.position };
-            window.position = windowPos;
+            const denom = rayDirection.x * planeNormal.x + 
+                          rayDirection.y * planeNormal.y + 
+                          rayDirection.z * planeNormal.z;
             
-            if (window.intersectsRay(rayOrigin, rayDirection)) {
-                hoveredIndex = i;
-                window.position = originalPos;
-                break;
+            if (Math.abs(denom) > 0.0001) {
+                const t = ((windowPos.x - rayOrigin.x) * planeNormal.x +
+                          (windowPos.y - rayOrigin.y) * planeNormal.y +
+                          (windowPos.z - rayOrigin.z) * planeNormal.z) / denom;
+                
+                if (t >= 0 && t < closestDistance) {
+                    const hitPoint = {
+                        x: rayOrigin.x + rayDirection.x * t,
+                        y: rayOrigin.y + rayDirection.y * t,
+                        z: rayOrigin.z + rayDirection.z * t
+                    };
+                    
+                    // Calculate local coordinates on the window plane
+                    const localX = (hitPoint.x - windowPos.x) * Math.cos(-window.rotation.y) - 
+                                  (hitPoint.z - windowPos.z) * Math.sin(-window.rotation.y);
+                    const localY = hitPoint.y - windowPos.y;
+                    
+                    // Check if hit point is within window bounds
+                    if (Math.abs(localX) <= window.width/2 * window.scale && 
+                        Math.abs(localY) <= window.height/2 * window.scale) {
+                        hoveredIndex = i;
+                        closestDistance = t;
+                    }
+                }
             }
-            
-            window.position = originalPos;
         }
         
         // Update hover states
@@ -344,15 +369,9 @@ class Carousel {
         const normalizedX = (x / rect.width) * 2 - 1;
         const normalizedY = -((y / rect.height) * 2 - 1);
         
-        // Create ray from camera
-        const rayOrigin = { x: 0, y: 0, z: 18 }; // Match the camera position in render()
-        
-        // Apply carousel rotation to the ray
-        const rayDirection = { 
-            x: normalizedX * Math.cos(this.rotationAngle) - Math.sin(this.rotationAngle), 
-            y: normalizedY, 
-            z: -Math.cos(this.rotationAngle) - normalizedX * Math.sin(this.rotationAngle)
-        };
+        // Create ray from camera (in view space)
+        const rayOrigin = { x: 0, y: 0, z: 18 };
+        const rayDirection = { x: normalizedX, y: normalizedY, z: -1 };
         
         // Normalize ray direction
         const length = Math.sqrt(
@@ -367,27 +386,58 @@ class Carousel {
         
         // Check intersections
         let clickedIndex = -1;
+        let closestDistance = Infinity;
         
         for (let i = 0; i < this.windows.length; i++) {
             const window = this.windows[i];
             
-            // Apply the inverse of carousel rotation to each window's position for hit testing
-            const windowPos = {
-                x: window.position.x * Math.cos(-this.rotationAngle) - window.position.z * Math.sin(-this.rotationAngle),
-                y: window.position.y,
-                z: window.position.x * Math.sin(-this.rotationAngle) + window.position.z * Math.cos(-this.rotationAngle)
+            // Create a copy of the window position
+            const windowPos = { ...window.position };
+            
+            // Transform window position from world space to view space
+            // This accounts for the carousel rotation
+            const rotatedX = windowPos.x * Math.cos(this.rotationAngle) - windowPos.z * Math.sin(this.rotationAngle);
+            const rotatedZ = windowPos.x * Math.sin(this.rotationAngle) + windowPos.z * Math.cos(this.rotationAngle);
+            
+            windowPos.x = rotatedX;
+            windowPos.z = rotatedZ;
+            
+            // Simple plane intersection test
+            const planeNormal = { 
+                x: Math.sin(this.rotationAngle - window.rotation.y), 
+                y: 0, 
+                z: Math.cos(this.rotationAngle - window.rotation.y) 
             };
             
-            const originalPos = { ...window.position };
-            window.position = windowPos;
+            const denom = rayDirection.x * planeNormal.x + 
+                          rayDirection.y * planeNormal.y + 
+                          rayDirection.z * planeNormal.z;
             
-            if (window.intersectsRay(rayOrigin, rayDirection)) {
-                clickedIndex = i;
-                window.position = originalPos;
-                break;
+            if (Math.abs(denom) > 0.0001) {
+                const t = ((windowPos.x - rayOrigin.x) * planeNormal.x +
+                          (windowPos.y - rayOrigin.y) * planeNormal.y +
+                          (windowPos.z - rayOrigin.z) * planeNormal.z) / denom;
+                
+                if (t >= 0 && t < closestDistance) {
+                    const hitPoint = {
+                        x: rayOrigin.x + rayDirection.x * t,
+                        y: rayOrigin.y + rayDirection.y * t,
+                        z: rayOrigin.z + rayDirection.z * t
+                    };
+                    
+                    // Calculate local coordinates on the window plane
+                    const localX = (hitPoint.x - windowPos.x) * Math.cos(-window.rotation.y) - 
+                                  (hitPoint.z - windowPos.z) * Math.sin(-window.rotation.y);
+                    const localY = hitPoint.y - windowPos.y;
+                    
+                    // Check if hit point is within window bounds
+                    if (Math.abs(localX) <= window.width/2 * window.scale && 
+                        Math.abs(localY) <= window.height/2 * window.scale) {
+                        clickedIndex = i;
+                        closestDistance = t;
+                    }
+                }
             }
-            
-            window.position = originalPos;
         }
         
         // Handle click
