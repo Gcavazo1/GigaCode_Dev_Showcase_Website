@@ -66,6 +66,18 @@ document.addEventListener('DOMContentLoaded', () => {
       description: 'Abstract geometric crystalline world with prismatic light',
       vertexShaderPath: 'js/multiverse-showcase/shaders/showcase9/crystal.vert',
       fragmentShaderPath: 'js/multiverse-showcase/shaders/showcase9/crystal.frag'
+    },
+    {
+      title: 'Kaleidoscopic Flow',
+      description: 'Dynamic kaleidoscope with organic motion patterns',
+      vertexShaderPath: 'js/multiverse-showcase/shaders/showcase10/kaleidoscope.vert',
+      fragmentShaderPath: 'js/multiverse-showcase/shaders/showcase10/kaleidoscope.frag'
+    },
+    {
+      title: 'Raymarched Tunnel',
+      description: 'Dynamic 3D tunnel with volumetric lighting',
+      vertexShaderPath: 'js/multiverse-showcase/shaders/showcase11/tunnel.vert',
+      fragmentShaderPath: 'js/multiverse-showcase/shaders/showcase11/tunnel.frag'
     }
   ];
   
