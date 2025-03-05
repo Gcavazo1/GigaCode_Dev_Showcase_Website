@@ -38,20 +38,30 @@ class GLSLHeader {
     }
     
     async loadShader(type) {
-        // Update path to match your shader file structure
-        const response = await fetch(`js/multiverse-showcase/shaders/showcase11/fractal.${type === 'vertex' ? 'vert' : 'frag'}`);
-        const source = await response.text();
+        const shaderPath = `js/multiverse-showcase/shaders/showcase11/fractal.${type === 'vertex' ? 'vert' : 'frag'}`;
+        console.log(`Loading shader from: ${shaderPath}`);
         
-        const shader = this.gl.createShader(type === 'vertex' ? this.gl.VERTEX_SHADER : this.gl.FRAGMENT_SHADER);
-        this.gl.shaderSource(shader, source);
-        this.gl.compileShader(shader);
-        
-        if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
-            console.error(`Shader compile error: ${this.gl.getShaderInfoLog(shader)}`);
+        try {
+            const response = await fetch(shaderPath);
+            if (!response.ok) {
+                throw new Error(`Failed to load shader: ${response.statusText}`);
+            }
+            const source = await response.text();
+            console.log(`Shader loaded successfully: ${type}`);
+            
+            const shader = this.gl.createShader(type === 'vertex' ? this.gl.VERTEX_SHADER : this.gl.FRAGMENT_SHADER);
+            this.gl.shaderSource(shader, source);
+            this.gl.compileShader(shader);
+            
+            if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
+                throw new Error(`Shader compile error: ${this.gl.getShaderInfoLog(shader)}`);
+            }
+            
+            return shader;
+        } catch (error) {
+            console.error('Shader loading error:', error);
             return null;
         }
-        
-        return shader;
     }
     
     createProgram(vertexShader, fragmentShader) {
