@@ -78,6 +78,12 @@ document.addEventListener('DOMContentLoaded', () => {
       description: 'Dynamic 3D tunnel with volumetric lighting',
       vertexShaderPath: 'js/multiverse-showcase/shaders/showcase11/tunnel.vert',
       fragmentShaderPath: 'js/multiverse-showcase/shaders/showcase11/tunnel.frag'
+    },
+    {
+      title: 'Raymarched Scene',
+      description: 'Advanced 3D scene with reflections and shadows',
+      vertexShaderPath: 'js/multiverse-showcase/shaders/showcase12/raymarching.vert',
+      fragmentShaderPath: 'js/multiverse-showcase/shaders/showcase12/raymarching.frag'
     }
   ];
   
