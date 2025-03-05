@@ -233,14 +233,16 @@
     background: rgba(0, 0, 0, 0.3);
 }
 
-#header-shader-canvas {
+/* Add the dark overlay with text cutout */
+.header-text::before {
+    content: '';
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    display: block;
-    background: #000;
+    background: rgba(0, 0, 0, 0.85); /* Semi-opaque black overlay */
+    z-index: 1;
 }
 
 .header-text {
@@ -256,8 +258,9 @@
 }
 
 .outline-text {
+    position: relative;
     font-family: 'Orbitron', sans-serif;
-    font-size: 4rem; /* Increased size */
+    font-size: 4rem;
     font-weight: 700;
     color: transparent;
     -webkit-text-stroke: 2px rgba(0, 255, 255, 0.8);
@@ -268,5 +271,30 @@
     text-transform: uppercase;
     margin: 0;
     padding: 0;
-    mix-blend-mode: overlay; /* This will help the text blend with the shader */
+    mix-blend-mode: screen; /* This will help the text blend with the shader */
+    z-index: 2;
+}
+
+/* Add text mask to create cutout effect */
+.outline-text::before {
+    content: attr(data-text);
+    position: absolute;
+    top: -4px; /* Offset for glow effect */
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    background: none;
+    -webkit-text-stroke: 6px black; /* Thicker stroke for mask */
+    z-index: -1;
+    mix-blend-mode: destination-out;
+}
+
+#header-shader-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    background: #000;
 } 
