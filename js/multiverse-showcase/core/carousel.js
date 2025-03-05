@@ -1,4 +1,5 @@
 import ShaderWindow from './shader-window.js';
+import ButtonShader from './button-shader.js';
 
 /**
  * Carousel class
@@ -70,26 +71,35 @@ class Carousel {
         const controlsContainer = document.createElement('div');
         controlsContainer.className = 'multiverse-controls';
         
+        // Create shader container with proper structure
+        const shaderContainer = document.createElement('div');
+        shaderContainer.className = 'button-shader-container';
+        
         // Add canvas for shader background
         const buttonBgCanvas = document.createElement('canvas');
         buttonBgCanvas.className = 'button-bg-canvas';
-        controlsContainer.appendChild(buttonBgCanvas);
+        shaderContainer.appendChild(buttonBgCanvas);
         
-        // Add button
-        controlsContainer.innerHTML += `
+        // Add button with overlay structure
+        const buttonOverlay = document.createElement('div');
+        buttonOverlay.className = 'button-overlay';
+        buttonOverlay.innerHTML = `
             <button class="showcase-button random-showcase">
                 <span class="button-text">Random Showcase</span>
                 <div class="button-glow"></div>
             </button>
         `;
         
+        // Assemble the components
+        shaderContainer.appendChild(buttonOverlay);
+        controlsContainer.appendChild(shaderContainer);
         this.container.appendChild(controlsContainer);
         
         // Initialize button background shader
-        this.initButtonShader(buttonBgCanvas);
+        const buttonShader = new ButtonShader(buttonBgCanvas);
         
         // Add click handler
-        const randomButton = controlsContainer.querySelector('.random-showcase');
+        const randomButton = buttonOverlay.querySelector('.random-showcase');
         randomButton.addEventListener('click', () => this.showRandomWindow());
     }
     
@@ -514,165 +524,6 @@ class Carousel {
         // Rotate carousel to center the window
         const angle = (randomIndex / this.windows.length) * Math.PI * 2;
         this.targetRotationAngle = -angle + Math.PI / 2;
-    }
-
-    // Add method to initialize button shader
-    initButtonShader(canvas) {
-        console.log('Initializing button shader');
-        const gl = canvas.getContext('webgl');
-        if (!gl) {
-            console.error('WebGL not supported for button shader');
-            return;
-        }
-
-        // Add debug size check
-        console.log('Button canvas size:', canvas.width, canvas.height);
-        
-        // Use the Crystal shader that we know works
-        const vertexShaderSource = `
-            attribute vec4 aPosition;
-            attribute vec2 aTexCoord;
-            uniform float uTime;
-            
-            varying vec2 v_uv;
-            varying float vTime;
-            
-            void main() {
-                gl_Position = aPosition;
-                v_uv = aTexCoord;
-                vTime = uTime;
-            }
-        `;
-
-        const fragmentShaderSource = `
-            precision mediump float;
-            
-            varying vec2 v_uv;
-            varying float vTime;
-            uniform vec2 uResolution;
-            
-            #define PI 3.14159265359
-            #define TAU 6.28318530718
-            
-            // Rotation matrix
-            mat2 rotate(float angle) {
-                float s = sin(angle), c = cos(angle);
-                return mat2(c, -s, s, c);
-            }
-            
-            // Prismatic color based on position
-            vec3 prismatic(float t) {
-                return 0.5 + 0.5 * cos(TAU * (t + vec3(0.0, 0.33, 0.67)));
-            }
-            
-            void main() {
-                vec2 uv = v_uv * 2.0 - 1.0;
-                uv.x *= uResolution.x/uResolution.y;
-                
-                float time = vTime * 0.5;
-                
-                // Kaleidoscopic repetition
-                float angle = atan(uv.y, uv.x);
-                float segments = 8.0 + 4.0 * sin(time * 0.2);
-                float segmentAngle = TAU / segments;
-                angle = mod(angle, segmentAngle) - segmentAngle * 0.5;
-                
-                // Rotate space
-                uv *= 1.0 + 0.4 * sin(time * 0.3);
-                uv *= rotate(time * 0.3);
-                
-                // Generate prismatic colors
-                float colorPos = length(uv) + time * 0.3;
-                colorPos += 0.2 * sin(angle * 12.0 + time * 1.5);
-                vec3 color = prismatic(colorPos);
-                
-                // Add glow
-                float glow = 0.03 / (0.01 + abs(length(uv) - 0.5));
-                color += glow * prismatic(time * 0.1);
-                
-                // Add shimmer
-                float shimmer = fract(sin(dot(uv, vec2(12.9898, 78.233)) + time * 2.0) * 43758.5453);
-                color += shimmer * 0.1;
-                
-                // Enhance contrast
-                color = pow(color, vec3(0.8)) * 1.2;
-                
-                gl_FragColor = vec4(color, 1.0);
-            }
-        `;
-
-        // Create and compile shaders
-        const vertexShader = gl.createShader(gl.VERTEX_SHADER);
-        gl.shaderSource(vertexShader, vertexShaderSource);
-        gl.compileShader(vertexShader);
-
-        const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-        gl.shaderSource(fragmentShader, fragmentShaderSource);
-        gl.compileShader(fragmentShader);
-
-        // Create program
-        const program = gl.createProgram();
-        gl.attachShader(program, vertexShader);
-        gl.attachShader(program, fragmentShader);
-        gl.linkProgram(program);
-
-        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-            console.error('Could not initialize button shader');
-            return;
-        }
-
-        // Set up geometry
-        const positions = new Float32Array([
-            -1, -1,
-             1, -1,
-            -1,  1,
-             1,  1
-        ]);
-
-        const buffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-        gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
-
-        // Get attribute locations
-        const positionLocation = gl.getAttribLocation(program, 'aPosition');
-        gl.enableVertexAttribArray(positionLocation);
-        gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
-
-        // Get uniform locations
-        const timeLocation = gl.getUniformLocation(program, 'uTime');
-        const resolutionLocation = gl.getUniformLocation(program, 'uResolution');
-
-        // Set up animation
-        const startTime = performance.now();
-        const animate = () => {
-            // Set canvas size
-            const width = canvas.clientWidth;
-            const height = canvas.clientHeight;
-            
-            // Debug size logging
-            if (width === 0 || height === 0) {
-                console.warn('Button canvas has zero dimension:', width, height);
-            }
-            
-            canvas.width = width;
-            canvas.height = height;
-            gl.viewport(0, 0, width, height);
-
-            // Use shader program
-            gl.useProgram(program);
-
-            // Update uniforms
-            const time = (performance.now() - startTime) * 0.001;
-            gl.uniform1f(timeLocation, time);
-            gl.uniform2f(resolutionLocation, width, height);
-
-            // Draw
-            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-
-            requestAnimationFrame(animate);
-        };
-
-        animate();
     }
 }
 
