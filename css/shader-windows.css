@@ -11,7 +11,9 @@
 }
 
 .shader-window:hover {
-  transform: scale(1.05);
+  transform: none;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5),
+              0 0 20px rgba(0, 150, 255, 0.1);
 }
 
 .shader-window.expanded {

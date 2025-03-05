@@ -272,11 +272,11 @@ class ShaderWindow {
    * @param {boolean} isHovered - Whether the window is hovered
    */
   setHover(isHovered) {
+    // Keep track of hover state but don't change appearance
     this.isHovered = isHovered;
-    this.targetWidth = isHovered ? 2.4 : 2.0;
-    this.targetHeight = isHovered ? 2.4 : 2.0;
-    // Update buffers with new dimensions
-    this.updateGeometry();
+    // Don't change size on hover
+    // this.targetWidth = isHovered && !this.isExpanded ? 2.4 : 2.0;
+    // this.targetHeight = isHovered && !this.isExpanded ? 2.4 : 2.0;
   }
   
   /**
