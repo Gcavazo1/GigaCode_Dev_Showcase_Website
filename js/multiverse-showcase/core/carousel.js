@@ -66,18 +66,29 @@ class Carousel {
             this.targetRotationAngle -= Math.PI / 4;
         });
 
-        // Add Random Showcase button
+        // Add Random Showcase button with shader background
         const controlsContainer = document.createElement('div');
         controlsContainer.className = 'multiverse-controls';
-        controlsContainer.innerHTML = `
+        
+        // Add canvas for shader background
+        const buttonBgCanvas = document.createElement('canvas');
+        buttonBgCanvas.className = 'button-bg-canvas';
+        controlsContainer.appendChild(buttonBgCanvas);
+        
+        // Add button
+        controlsContainer.innerHTML += `
             <button class="showcase-button random-showcase">
                 <span class="button-text">Random Showcase</span>
                 <div class="button-glow"></div>
             </button>
         `;
+        
         this.container.appendChild(controlsContainer);
-
-        // Add click handler for random showcase
+        
+        // Initialize button background shader
+        this.initButtonShader(buttonBgCanvas);
+        
+        // Add click handler
         const randomButton = controlsContainer.querySelector('.random-showcase');
         randomButton.addEventListener('click', () => this.showRandomWindow());
     }
@@ -503,6 +514,187 @@ class Carousel {
         // Rotate carousel to center the window
         const angle = (randomIndex / this.windows.length) * Math.PI * 2;
         this.targetRotationAngle = -angle + Math.PI / 2;
+    }
+
+    // Add method to initialize button shader
+    initButtonShader(canvas) {
+        const gl = canvas.getContext('webgl');
+        if (!gl) {
+            console.error('WebGL not supported for button shader');
+            return;
+        }
+
+        // Create shader program
+        const vertexShaderSource = `
+            attribute vec4 aPosition;
+            attribute vec2 aTexCoord;
+            uniform float uTime;
+            
+            varying vec2 v_uv;
+            varying float vTime;
+            
+            void main() {
+                gl_Position = aPosition;
+                v_uv = aTexCoord;
+                vTime = uTime;
+            }
+        `;
+
+        const fragmentShaderSource = `
+            precision mediump float;
+            
+            varying vec2 v_uv;
+            varying float vTime;
+            uniform vec2 uResolution;
+            
+            // Function to create a grid pattern
+            float grid(vec2 uv, float size) {
+                vec2 grid = fract(uv * size);
+                vec2 smoothGrid = smoothstep(0.02, 0.05, grid) * smoothstep(0.95, 0.98, grid);
+                return max(smoothGrid.x, smoothGrid.y);
+            }
+            
+            // Function to create a wave effect
+            float wave(vec2 uv, float freq, float amp, float speed) {
+                return sin(uv.x * freq + vTime * speed) * amp;
+            }
+            
+            // Function to create a pulse effect
+            float pulse(float val, float freq) {
+                return 0.5 + 0.5 * sin(val * freq + vTime * 3.0);
+            }
+            
+            // Function to create a glow effect
+            vec3 glow(vec3 color, float intensity, float size, vec2 uv, vec2 pos) {
+                float dist = length(uv - pos);
+                return color * intensity / (dist * size + 0.01);
+            }
+            
+            void main() {
+                vec2 uv = v_uv;
+                float aspect = uResolution.x/uResolution.y;
+                uv.x *= aspect;
+                
+                float gridSize = 10.0;
+                float baseGrid = grid(uv, gridSize);
+                
+                float waveEffect = 0.0;
+                for (int i = 0; i < 3; i++) {
+                    float i_f = float(i);
+                    float speed = 2.0 + i_f * 0.5;
+                    float freq = 5.0 + i_f * 2.0;
+                    float amp = 0.1 + i_f * 0.05;
+                    waveEffect += wave(uv + vec2(0.0, i_f * 0.1), freq, amp, speed);
+                    waveEffect += wave(vec2(uv.y, uv.x) + vec2(i_f * 0.4, 0.0), freq * 0.9, amp, speed * 0.8);
+                }
+                
+                vec2 distortedUV = uv;
+                distortedUV.y += waveEffect * 0.1;
+                distortedUV.x += waveEffect * 0.05;
+                
+                float distortedGrid = grid(distortedUV, gridSize * 0.8);
+                float finalGrid = max(baseGrid, distortedGrid * 0.4);
+                
+                float pulse1 = pulse(uv.x + uv.y, 0.5);
+                float pulse2 = pulse(uv.x - uv.y, 0.3);
+                float pulseFactor = mix(pulse1, pulse2, 0.5);
+                
+                vec3 neonPink = vec3(1.0, 0.0, 0.8);
+                vec3 neonBlue = vec3(0.0, 0.8, 1.0);
+                vec3 neonPurple = vec3(0.6, 0.0, 1.0);
+                vec3 darkBlue = vec3(0.0, 0.05, 0.2);
+                
+                vec3 bgColor = darkBlue + waveEffect * 0.05;
+                
+                vec3 gridColor = mix(
+                    mix(neonPink, neonBlue, sin(uv.x * 2.0 + vTime) * 0.5 + 0.5),
+                    neonPurple,
+                    sin(vTime * 0.2) * 0.5 + 0.5
+                );
+                
+                gridColor *= 0.4 + pulseFactor * 0.5;
+                
+                vec3 color = mix(bgColor, gridColor, finalGrid);
+                
+                vec2 glowPoint1 = vec2(sin(vTime * 1.2) * 0.5 + 0.5, cos(vTime * 0.3) * 0.3 + 0.5) * aspect;
+                vec2 glowPoint2 = vec2(cos(vTime * 0.8) * 0.4 + 0.6, sin(vTime * 0.6) * 0.4 + 0.5) * aspect;
+                
+                color += glow(neonPink, 0.05, 10.0, uv, glowPoint1);
+                color += glow(neonBlue, 0.05, 12.0, uv, glowPoint2);
+                
+                float scanLine = sin(uv.y * 100.0) * 0.03 + 0.97;
+                color *= scanLine;
+                
+                gl_FragColor = vec4(color, 1.0);
+            }
+        `;
+
+        // Create and compile shaders
+        const vertexShader = gl.createShader(gl.VERTEX_SHADER);
+        gl.shaderSource(vertexShader, vertexShaderSource);
+        gl.compileShader(vertexShader);
+
+        const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+        gl.shaderSource(fragmentShader, fragmentShaderSource);
+        gl.compileShader(fragmentShader);
+
+        // Create program
+        const program = gl.createProgram();
+        gl.attachShader(program, vertexShader);
+        gl.attachShader(program, fragmentShader);
+        gl.linkProgram(program);
+
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+            console.error('Could not initialize button shader');
+            return;
+        }
+
+        // Set up geometry
+        const positions = new Float32Array([
+            -1, -1,
+             1, -1,
+            -1,  1,
+             1,  1
+        ]);
+
+        const buffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+        gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+
+        // Get attribute locations
+        const positionLocation = gl.getAttribLocation(program, 'aPosition');
+        gl.enableVertexAttribArray(positionLocation);
+        gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+
+        // Get uniform locations
+        const timeLocation = gl.getUniformLocation(program, 'uTime');
+        const resolutionLocation = gl.getUniformLocation(program, 'uResolution');
+
+        // Set up animation
+        const startTime = performance.now();
+        const animate = () => {
+            // Set canvas size
+            const width = canvas.clientWidth;
+            const height = canvas.clientHeight;
+            canvas.width = width;
+            canvas.height = height;
+            gl.viewport(0, 0, width, height);
+
+            // Use shader program
+            gl.useProgram(program);
+
+            // Update uniforms
+            const time = (performance.now() - startTime) * 0.001;
+            gl.uniform1f(timeLocation, time);
+            gl.uniform2f(resolutionLocation, width, height);
+
+            // Draw
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+            requestAnimationFrame(animate);
+        };
+
+        animate();
     }
 }
 
