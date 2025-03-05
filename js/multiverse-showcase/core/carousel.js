@@ -349,11 +349,6 @@ class Carousel {
         for (let i = 0; i < this.windows.length; i++) {
             this.windows[i].setHover(i === hoveredIndex);
         }
-        
-        // Rotate carousel based on mouse position
-        if (hoveredIndex === -1) {
-            this.targetRotationAngle = normalizedX * 0.5;
-        }
     }
     
     /**
