@@ -86,11 +86,11 @@
     transition: transform 1.2s cubic-bezier(0.2, 0.9, 0.3, 1);
 }
 
-/* Enhanced shader window styling */
+/* Simplified shader window styling with fixed pixel dimensions */
 .shader-window {
     position: absolute;
-    width: 35vw;  /* Viewport-relative width */
-    height: 70vw; /* Viewport-relative height */
+    width: 400px;  /* Simple fixed width */
+    height: 600px; /* Simple fixed height */
     background: rgba(20, 20, 30, 0);
     border-radius: 8px;
     overflow: hidden;
@@ -125,9 +125,10 @@
     pointer-events: none;
 }
 
+/* Expanded state also uses fixed pixels */
 .shader-window.expanded {
-    width: 80vw;
-    height: 80vh;
+    width: 800px;
+    height: 600px;
     z-index: 100;
 }
 

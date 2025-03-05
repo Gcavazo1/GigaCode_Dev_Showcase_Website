@@ -75,9 +75,9 @@ class ShaderWindow {
   createBuffers() {
     const gl = this.gl;
     
-    // Use 1:1 base geometry and let transforms handle scaling
+    // Simple square geometry with 1:1 ratio
     const positions = [
-        // Front face
+        // Front face - simple square
         -1.0, -1.0, 0.0,
          1.0, -1.0, 0.0,
          1.0,  1.0, 0.0,
