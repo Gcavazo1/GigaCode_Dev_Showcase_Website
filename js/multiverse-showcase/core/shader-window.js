@@ -144,17 +144,18 @@ class ShaderWindow {
    * @param {number} deltaTime - Time since last update in seconds
    */
   update(deltaTime) {
-    // Smooth scale transition for hover effect
-    const scaleDelta = this.targetScale - this.scale;
-    if (Math.abs(scaleDelta) > 0.001) {
-      this.scale += scaleDelta * 5 * deltaTime;
-    } else {
-      this.scale = this.targetScale;
-    }
+    // Animate width and height
+    const ease = 0.1;
     
-    // Update rotation based on hover state
-    if (this.isHovered && !this.isExpanded) {
-      this.rotation.y += deltaTime * 0.2;
+    if (this.targetWidth !== undefined && this.targetHeight !== undefined) {
+      this.width += (this.targetWidth - this.width) * ease;
+      this.height += (this.targetHeight - this.height) * ease;
+      
+      // Update geometry if dimensions changed significantly
+      if (Math.abs(this.width - this.targetWidth) > 0.01 || 
+          Math.abs(this.height - this.targetHeight) > 0.01) {
+        this.updateGeometry();
+      }
     }
   }
   
@@ -273,11 +274,11 @@ class ShaderWindow {
           z: rayOrigin.z + rayDirection.z * t
         };
         
-        // Check if hit point is within window bounds
+        // Check if hit point is within window bounds using width and height
         const dx = hitPoint.x - this.position.x;
         const dy = hitPoint.y - this.position.y;
         
-        return Math.abs(dx) <= this.scale && Math.abs(dy) <= this.scale;
+        return Math.abs(dx) <= this.width/2 && Math.abs(dy) <= this.height/2;
       }
     }
     

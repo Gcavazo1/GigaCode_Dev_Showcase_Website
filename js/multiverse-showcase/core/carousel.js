@@ -99,6 +99,7 @@ class Carousel {
             // Add event listeners
             window.addEventListener('resize', this.resizeCanvas.bind(this));
             this.canvas.addEventListener('click', this.onClick.bind(this));
+            this.canvas.addEventListener('mousemove', this.onMouseMove.bind(this));
             
             // Mark as initialized
             this.isInitialized = true;
@@ -197,6 +198,11 @@ class Carousel {
         this.windows.forEach((window, i) => {
             const angle = (i / this.windows.length) * Math.PI * 2 + this.rotationAngle;
             window.position.y += (floatOffset - window.position.y) * 0.05;
+        });
+
+        // Update windows
+        this.windows.forEach(window => {
+            window.update(deltaTime);
         });
 
         this.render(timestamp);
