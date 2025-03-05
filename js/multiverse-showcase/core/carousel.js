@@ -42,7 +42,7 @@ class Carousel {
         this.cameraAngleX = -0.2; // Tilt down slightly by default
         this.cameraAngleY = 0.0;  // No side tilt
         this.cameraDistance = 18;  // Distance from center
-        this.cameraHeight = 2;    // Raise camera slightly
+        this.cameraHeight = 3.5;    // Raise camera slightly
         
         // Initialize
         this.init().then(() => {
@@ -157,8 +157,8 @@ class Carousel {
         this.windows = [];
         
         const totalWindows = this.shaderConfigs.length;
-        const radius = 8; // Increased radius to account for larger windows
-        const verticalOffset = 0.6; // Keep the same vertical offset
+        const radius = 9.0; // Increased radius to account for larger windows
+        const verticalOffset = 0.4; // Keep the same vertical offset
         
         for (let i = 0; i < totalWindows; i++) {
             const config = this.shaderConfigs[i];
