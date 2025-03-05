@@ -212,19 +212,20 @@
     transition: opacity 0.5s ease;
 }
 
-/* Drag-to-rotate bar */
+/* Improved drag-to-rotate bar styling */
 .multiverse-drag-bar {
     position: absolute;
-    bottom: 20px;
+    bottom: 30px;
     left: 50%;
     transform: translateX(-50%);
     width: 300px;
-    height: 40px;
+    height: 50px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     z-index: 20;
+    pointer-events: none; /* Allow clicks to pass through except for handle and track */
 }
 
 .drag-track {
@@ -233,6 +234,8 @@
     background: rgba(100, 200, 255, 0.2);
     border-radius: 2px;
     position: relative;
+    pointer-events: auto; /* Make track clickable */
+    cursor: pointer;
 }
 
 .drag-handle {
@@ -243,9 +246,10 @@
     position: absolute;
     top: 50%;
     transform: translate(-50%, -50%);
-    cursor: pointer;
+    cursor: grab;
     box-shadow: 0 0 10px rgba(100, 200, 255, 0.5);
     transition: background 0.2s;
+    pointer-events: auto; /* Make handle clickable */
 }
 
 .drag-handle:hover, .drag-handle.active {
@@ -253,8 +257,12 @@
     box-shadow: 0 0 15px rgba(100, 200, 255, 0.8);
 }
 
+.drag-handle.active {
+    cursor: grabbing;
+}
+
 .drag-label {
-    margin-top: 8px;
+    margin-top: 12px;
     font-size: 12px;
     color: rgba(255, 255, 255, 0.7);
     font-family: 'Arial', sans-serif;

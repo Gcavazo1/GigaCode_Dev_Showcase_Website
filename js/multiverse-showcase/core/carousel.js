@@ -70,42 +70,14 @@ class Carousel {
         const dragBar = document.createElement('div');
         dragBar.className = 'multiverse-drag-bar';
         dragBar.innerHTML = `
-            <div class="drag-handle"></div>
             <div class="drag-track"></div>
+            <div class="drag-handle"></div>
             <div class="drag-label">Drag to rotate</div>
         `;
         this.container.appendChild(dragBar);
-
-        // Add drag functionality
-        this.isDragging = false;
-        this.lastDragX = 0;
         
-        const dragHandle = dragBar.querySelector('.drag-handle');
-        
-        dragHandle.addEventListener('mousedown', (e) => {
-            this.isDragging = true;
-            this.lastDragX = e.clientX;
-            dragHandle.classList.add('active');
-        });
-        
-        document.addEventListener('mousemove', (e) => {
-            if (this.isDragging) {
-                const deltaX = e.clientX - this.lastDragX;
-                this.targetRotationAngle -= deltaX * 0.01;
-                this.lastDragX = e.clientX;
-                
-                // Update drag handle position
-                const trackWidth = dragBar.querySelector('.drag-track').offsetWidth;
-                const normalizedRotation = (this.targetRotationAngle % (Math.PI * 2)) / (Math.PI * 2);
-                const handlePosition = (normalizedRotation * trackWidth) % trackWidth;
-                dragHandle.style.left = `${handlePosition}px`;
-            }
-        });
-        
-        document.addEventListener('mouseup', () => {
-            this.isDragging = false;
-            dragHandle.classList.remove('active');
-        });
+        // Initialize drag bar
+        this.initDragBar();
     }
     
     /**
@@ -247,14 +219,7 @@ class Carousel {
         });
 
         // Update drag handle position
-        const dragBar = this.container.querySelector('.multiverse-drag-bar');
-        if (dragBar && !this.isDragging) {
-            const dragHandle = dragBar.querySelector('.drag-handle');
-            const trackWidth = dragBar.querySelector('.drag-track').offsetWidth;
-            const normalizedRotation = (this.rotationAngle % (Math.PI * 2)) / (Math.PI * 2);
-            const handlePosition = (normalizedRotation * trackWidth) % trackWidth;
-            dragHandle.style.left = `${handlePosition}px`;
-        }
+        this.updateDragHandlePosition();
 
         this.render(timestamp);
         requestAnimationFrame(this.animate.bind(this));
@@ -545,6 +510,106 @@ class Carousel {
             </div>
         `;
         this.container.appendChild(errorElement);
+    }
+
+    /**
+     * Initialize the drag-to-rotate bar
+     */
+    initDragBar() {
+        const dragBar = this.container.querySelector('.multiverse-drag-bar');
+        if (!dragBar) return;
+        
+        const dragHandle = dragBar.querySelector('.drag-handle');
+        const dragTrack = dragBar.querySelector('.drag-track');
+        
+        if (!dragHandle || !dragTrack) return;
+        
+        // Set initial handle position based on rotation
+        this.updateDragHandlePosition(false);
+        
+        // Add drag functionality
+        this.isDragging = false;
+        this.lastDragX = 0;
+        
+        dragHandle.addEventListener('mousedown', (e) => {
+            this.isDragging = true;
+            this.lastDragX = e.clientX;
+            dragHandle.classList.add('active');
+            e.preventDefault();
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+            if (this.isDragging) {
+                const deltaX = e.clientX - this.lastDragX;
+                this.targetRotationAngle -= deltaX * 0.01;
+                this.lastDragX = e.clientX;
+                
+                // Update drag handle position immediately
+                this.updateDragHandlePosition(true);
+            }
+        });
+        
+        document.addEventListener('mouseup', () => {
+            this.isDragging = false;
+            if (dragHandle) dragHandle.classList.remove('active');
+        });
+        
+        // Add touch support for mobile
+        dragHandle.addEventListener('touchstart', (e) => {
+            this.isDragging = true;
+            this.lastDragX = e.touches[0].clientX;
+            dragHandle.classList.add('active');
+            e.preventDefault();
+        });
+        
+        document.addEventListener('touchmove', (e) => {
+            if (this.isDragging) {
+                const deltaX = e.touches[0].clientX - this.lastDragX;
+                this.targetRotationAngle -= deltaX * 0.01;
+                this.lastDragX = e.touches[0].clientX;
+                
+                // Update drag handle position immediately
+                this.updateDragHandlePosition(true);
+            }
+        });
+        
+        document.addEventListener('touchend', () => {
+            this.isDragging = false;
+            if (dragHandle) dragHandle.classList.remove('active');
+        });
+    }
+
+    /**
+     * Update drag handle position based on carousel rotation
+     * @param {boolean} isDragging - Whether the update is during a drag operation
+     */
+    updateDragHandlePosition(isDragging = false) {
+        const dragBar = this.container.querySelector('.multiverse-drag-bar');
+        if (!dragBar) return;
+        
+        const dragHandle = dragBar.querySelector('.drag-handle');
+        const dragTrack = dragBar.querySelector('.drag-track');
+        
+        if (!dragHandle || !dragTrack) return;
+        
+        // Skip update if dragging (unless this update is called during a drag)
+        if (this.isDragging && !isDragging) return;
+        
+        const trackWidth = dragTrack.offsetWidth;
+        
+        // Use rotationAngle during normal operation and targetRotationAngle during drag
+        const angleToUse = isDragging ? this.targetRotationAngle : this.rotationAngle;
+        
+        // Normalize rotation to get value between 0 and 1
+        // We add 2π to ensure positive numbers before taking modulo
+        const normalizedRotation = ((angleToUse + Math.PI * 2) % (Math.PI * 2)) / (Math.PI * 2);
+        
+        // Calculate handle position - handle is at left=0 for rotation=0, 
+        // and left=trackWidth for rotation=2π
+        const handlePosition = normalizedRotation * trackWidth;
+        
+        // Set handle position with pixel value
+        dragHandle.style.left = `${handlePosition}px`;
     }
 }
 
