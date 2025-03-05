@@ -119,7 +119,7 @@ class Carousel {
         this.windows = [];
         
         const totalWindows = this.shaderConfigs.length;
-        const radius = 6.0; // Increased radius to account for larger windows
+        const radius = 5.5; // Increased radius to account for larger windows
         const verticalOffset = 0.5; // Keep the same vertical offset
         
         for (let i = 0; i < totalWindows; i++) {
