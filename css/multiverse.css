@@ -137,7 +137,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 90%; /* Reduced width to keep arrows closer */
+    width: 80%; /* Reduced width to keep arrows closer */
     max-width: 1200px;
     z-index: 10;
     display: flex;

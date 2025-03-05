@@ -1,4 +1,4 @@
-// Raymarched Grid fragment shader - Simplified version
+// Neon Grid shader - Isometric grid with glow
 precision mediump float;
 
 varying vec2 v_uv;
@@ -7,217 +7,90 @@ varying float vTime;
 uniform vec2 uResolution;
 uniform float uIntensity;
 
-#define MAX_STEPS 64  // Reduced from 100 for better performance
-#define MAX_DIST 50.0 // Reduced from 100.0
-#define SURF_DIST 0.001
-#define PI 3.14159265359
-
-// SDF functions
-float sdSphere(vec3 p, float r) {
-    return length(p) - r;
+// Rotation matrix
+mat2 rot2d(float a) {
+    float c = cos(a);
+    float s = sin(a);
+    return mat2(c, -s, s, c);
 }
 
-float sdBox(vec3 p, vec3 b) {
-    vec3 d = abs(p) - b;
-    return length(max(d, 0.0)) + min(max(d.x, max(d.y, d.z)), 0.0);
+// Signed distance function for a box
+float sdBox(vec2 p, vec2 b) {
+    vec2 d = abs(p) - b;
+    return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
 }
 
-// Simplified capsule function
-float sdCapsule(vec3 p, vec3 a, vec3 b, float r) {
-    vec3 pa = p - a, ba = b - a;
-    float h = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
-    return length(pa - ba * h) - r;
+// Simple hash function
+vec2 hash22(vec2 p) {
+    vec3 p3 = fract(vec3(p.xyx) * vec3(.1031, .1030, .0973));
+    p3 += dot(p3, p3.yzx+33.33);
+    return fract((p3.xx+p3.yz)*p3.zy);
 }
 
-// Domain operations
-vec3 opRep(vec3 p, vec3 c) {
-    return mod(p + 0.5 * c, c) - 0.5 * c;
-}
-
-vec3 opTwist(vec3 p, float k) {
-    float c = cos(k * p.y);
-    float s = sin(k * p.y);
-    mat2 m = mat2(c, -s, s, c);
-    return vec3(m * p.xz, p.y);
-}
-
-// Simplified noise function
-float hash(float n) {
-    return fract(sin(n) * 43758.5453);
-}
-
-float noise(vec3 x) {
-    vec3 p = floor(x);
-    vec3 f = fract(x);
+// Simple noise function
+float noise(vec2 p) {
+    vec2 i = floor(p);
+    vec2 f = fract(p);
     f = f * f * (3.0 - 2.0 * f);
     
-    float n = p.x + p.y * 57.0 + p.z * 113.0;
+    vec2 a = hash22(i);
+    vec2 b = hash22(i + vec2(1.0, 0.0));
+    vec2 c = hash22(i + vec2(0.0, 1.0));
+    vec2 d = hash22(i + vec2(1.0, 1.0));
+    
     return mix(
-        mix(
-            mix(hash(n), hash(n + 1.0), f.x),
-            mix(hash(n + 57.0), hash(n + 58.0), f.x),
-            f.y
-        ),
-        mix(
-            mix(hash(n + 113.0), hash(n + 114.0), f.x),
-            mix(hash(n + 170.0), hash(n + 171.0), f.x),
-            f.y
-        ),
-        f.z
+        mix(dot(a, f), dot(b, f - vec2(1.0, 0.0)), f.x),
+        mix(dot(c, f - vec2(0.0, 1.0)), dot(d, f - vec2(1.0, 1.0)), f.x),
+        f.y
     );
-}
-
-// Simplified fbm with fewer octaves
-float fbm(vec3 p) {
-    float sum = 0.0;
-    float amp = 0.5;
-    float freq = 1.0;
-    
-    for(int i = 0; i < 3; i++) { // Reduced from 5 to 3 octaves
-        sum += amp * noise(freq * p);
-        amp *= 0.5;
-        freq *= 2.0;
-    }
-    
-    return sum;
-}
-
-// Scene description
-float getDist(vec3 p) {
-    // Simulated mouse influence
-    float mouseInfluence = sin(vTime * 0.3) * 0.5 + 0.5;
-    
-    // Division effect
-    vec3 cellSize = vec3(1.5 + mouseInfluence);
-    vec3 cell = opRep(p, cellSize);
-    
-    // Apply twist based on time
-    cell = opTwist(cell, sin(vTime * 0.2) * 0.5);
-    
-    // Combine different shapes
-    float sphere = sdSphere(cell, 0.3 + 0.1 * sin(vTime + fbm(p * 0.1)));
-    float box = sdBox(cell, vec3(0.2 + 0.1 * cos(vTime * 0.5)));
-    
-    // Create paths between cells (simplified)
-    float path = sdCapsule(
-        p, 
-        vec3(cellSize.x * floor(p.x/cellSize.x), 0.0, 0.0),
-        vec3(cellSize.x * floor(p.x/cellSize.x), 0.0, cellSize.z * floor(p.z/cellSize.z)),
-        0.05
-    );
-    
-    // Combine shapes
-    float d = min(sphere, box);
-    
-    // Add subtle noise displacement
-    d += 0.03 * fbm(p * 2.0 + vTime * 0.1);
-    
-    return min(d, path);
-}
-
-// Raymarching
-float rayMarch(vec3 ro, vec3 rd) {
-    float dO = 0.0;
-    
-    for(int i = 0; i < MAX_STEPS; i++) {
-        vec3 p = ro + rd * dO;
-        float dS = getDist(p);
-        dO += dS;
-        if(dO > MAX_DIST || dS < SURF_DIST) break;
-    }
-    
-    return dO;
-}
-
-// Normal calculation
-vec3 getNormal(vec3 p) {
-    vec2 e = vec2(0.001, 0.0);
-    
-    vec3 n = vec3(
-        getDist(p + e.xyy) - getDist(p - e.xyy),
-        getDist(p + e.yxy) - getDist(p - e.yxy),
-        getDist(p + e.yyx) - getDist(p - e.yyx)
-    );
-    
-    return normalize(n);
-}
-
-// Lighting calculation
-vec3 getLight(vec3 p, vec3 rd) {
-    vec3 n = getNormal(p);
-    
-    // Base colors
-    vec3 baseColor1 = vec3(0.2, 0.4, 0.8); // Blue
-    vec3 baseColor2 = vec3(0.8, 0.2, 0.5); // Pink
-    vec3 baseColor3 = vec3(0.1, 0.8, 0.6); // Teal
-    
-    // Color based on position and time
-    vec3 col = mix(
-        mix(baseColor1, baseColor2, sin(p.x + vTime * 0.3) * 0.5 + 0.5),
-        baseColor3,
-        sin(length(p) * 0.5 + vTime * 0.2) * 0.5 + 0.5
-    );
-    
-    // Light direction
-    vec3 lightPos = vec3(5.0 * sin(vTime * 0.5), 5.0, 5.0 * cos(vTime * 0.5));
-    vec3 l = normalize(lightPos - p);
-    
-    // Diffuse
-    float diff = max(dot(n, l), 0.0);
-    diff = pow(diff, 2.0) * 0.8 + 0.2; // Soften diffuse
-    
-    // Specular
-    vec3 h = normalize(l - rd);
-    float spec = pow(max(dot(n, h), 0.0), 16.0);
-    
-    // Fresnel
-    float fresnel = pow(1.0 - max(dot(n, -rd), 0.0), 3.0);
-    
-    // Combine lighting
-    col = col * diff + vec3(1.0) * spec + baseColor2 * fresnel;
-    
-    // Fog based on distance
-    float fogAmount = 1.0 - exp(-length(p) * 0.15);
-    vec3 fogColor = vec3(0.05, 0.05, 0.1); // Dark blue fog
-    col = mix(col, fogColor, fogAmount);
-    
-    return col;
 }
 
 void main() {
-    // Adjust UV for aspect ratio
-    vec2 uv = v_uv - 0.5;
-    uv.x *= uResolution.x / uResolution.y;
+    vec2 uv = v_uv;
     
-    // Ray setup
-    vec3 ro = vec3(0.0, 2.0 + sin(vTime * 0.5), -5.0); // Ray origin (camera position)
-    vec3 rd = normalize(vec3(uv, 1.0)); // Ray direction
+    // Correct aspect ratio
+    uv = uv * 2.0 - 1.0;
+    uv.x *= uResolution.x/uResolution.y;
     
-    // Apply camera rotation
-    float camAngle = vTime * 0.2;
-    mat2 camRotation = mat2(cos(camAngle), -sin(camAngle), sin(camAngle), cos(camAngle));
-    rd.xz = camRotation * rd.xz;
-    ro.xz = camRotation * ro.xz;
+    // Simulated mouse position based on time
+    vec2 mouse = vec2(
+        sin(vTime * 0.3) * 0.5,
+        cos(vTime * 0.4) * 0.5
+    );
     
-    // Raymarching
-    float d = rayMarch(ro, rd);
-    vec3 col = vec3(0.05, 0.05, 0.1); // Background color
+    // Isometric transform
+    uv *= rot2d(radians(45.0));
+    uv.y *= 0.866025;
     
-    // Render if hit
-    if(d < MAX_DIST) {
-        vec3 p = ro + rd * d;
-        col = getLight(p, rd);
-    }
+    // Scale based on simulated mouse distance
+    float mouseDist = length(uv - mouse);
+    float scale = 8.0 + sin(mouseDist * 3.0 + vTime) * 2.0;
     
-    // Apply vignette
-    float vignette = 1.0 - length(v_uv - 0.5) * 0.8;
-    col *= vignette;
+    vec2 id = floor(uv * scale);
+    vec2 gv = fract(uv * scale) - 0.5;
     
-    // Apply gamma correction
-    col = pow(col, vec3(0.4545));
+    // Morphing animation
+    float t = vTime * 0.5;
+    float morph = sin(t + noise(id + t) * 5.0) * 0.5 + 0.5;
+    
+    float d = sdBox(gv, vec2(0.3 + morph * 0.2));
+    
+    // Color palette
+    vec3 col1 = vec3(0.2, 0.5, 0.8); // Blue
+    vec3 col2 = vec3(0.8, 0.2, 0.5); // Pink
+    vec3 col3 = vec3(0.3, 0.8, 0.3); // Green
+    
+    vec3 color = mix(col1, col2, morph);
+    color = mix(color, col3, smoothstep(0.0, 0.05, d));
+    
+    // Add glow
+    color += 0.1 / (0.1 + abs(d));
+    
+    // Fade edges
+    color *= 1.0 - length(uv) * 0.2;
     
     // Apply intensity
-    col *= uIntensity;
+    color *= uIntensity;
     
-    gl_FragColor = vec4(col, 1.0);
+    gl_FragColor = vec4(color, 1.0);
 } 
