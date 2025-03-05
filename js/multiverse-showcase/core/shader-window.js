@@ -36,8 +36,8 @@ class ShaderWindow {
     this.startTime = performance.now();
     
     // Add width and height properties
-    this.width = 1.6;  // Width in WebGL units
-    this.height = 3.2; // Height in WebGL units
+    this.width = 2.4;  // Width in WebGL units
+    this.height = 3.6; // Height in WebGL units
     
     // Initialize
     this.init();
