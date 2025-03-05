@@ -44,7 +44,7 @@ class ShaderWindow {
     this.initialRotation = { x: 0, y: 0, z: 0 };
     this.animationProgress = 0;
     this.isAnimating = false;
-    this.animationDuration = 2500; // ms
+    this.animationDuration = 3000; // ms
     this.animationStartTime = 0;
     
     // Initialize
@@ -203,7 +203,7 @@ class ShaderWindow {
       if (this.animationProgress >= 1.0) {
         this.isAnimating = false;
         this.rotation.y = this.initialRotation.y; // Reset to initial rotation
-        this.scale = this.isExpanded ? 2.0 : 1.0; // Set final scale
+        this.scale = this.isExpanded ? 2.8 : 1.0; // Set final scale
         this.position.z = this.initialPosition.z; // Reset position
       }
     }
