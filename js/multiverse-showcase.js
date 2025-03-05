@@ -56,10 +56,10 @@ document.addEventListener('DOMContentLoaded', () => {
       fragmentShaderPath: 'js/multiverse-showcase/shaders/showcase7/liquid-metal.frag'
     },
     {
-      title: 'Cosmic Wormhole',
-      description: 'Space tunnel effect with dynamic light patterns',
-      vertexShaderPath: 'js/multiverse-showcase/shaders/showcase8/neon-grid.vert',
-      fragmentShaderPath: 'js/multiverse-showcase/shaders/showcase8/neon-grid.frag'
+      title: 'Torus Rings',
+      description: 'Smooth blended torus rings with dynamic rotation',
+      vertexShaderPath: 'js/multiverse-showcase/shaders/showcase8/torus-rings.vert',
+      fragmentShaderPath: 'js/multiverse-showcase/shaders/showcase8/torus-rings.frag'
     },
     {
       title: 'Crystal Dimension',
