@@ -270,96 +270,55 @@ class Carousel {
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
         
-        // Add a small threshold to prevent hover jitter
-        if (Math.abs(x - this.lastMouseX) < 2 && Math.abs(y - this.lastMouseY) < 2) {
-            return;
-        }
-        
-        this.lastMouseX = x;
-        this.lastMouseY = y;
-        
         // Normalize coordinates
         const normalizedX = (x / rect.width) * 2 - 1;
         const normalizedY = -((y / rect.height) * 2 - 1);
         
-        // Create ray from camera (in view space)
-        const rayOrigin = { x: 0, y: 0, z: 18 };
-        const rayDirection = { x: normalizedX, y: normalizedY, z: -1 };
+        // Find the front-most windows (those closest to the viewer)
+        const frontAngle = this.rotationAngle;
+        const angleThreshold = Math.PI * 0.25; // 45 degrees visibility cone
         
-        // Normalize ray direction
-        const length = Math.sqrt(
-            rayDirection.x * rayDirection.x +
-            rayDirection.y * rayDirection.y +
-            rayDirection.z * rayDirection.z
-        );
-        
-        rayDirection.x /= length;
-        rayDirection.y /= length;
-        rayDirection.z /= length;
-        
-        // Check intersections
         let hoveredIndex = -1;
-        let closestDistance = Infinity;
+        let minAngleDiff = angleThreshold;
         
-        for (let i = 0; i < this.windows.length; i++) {
-            const window = this.windows[i];
+        this.windows.forEach((window, i) => {
+            // Calculate window's angle relative to front
+            const windowAngle = (i / this.windows.length) * Math.PI * 2 + this.rotationAngle;
+            const angleDiff = Math.abs(((windowAngle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2) - Math.PI);
             
-            // Create a copy of the window position
-            const windowPos = { ...window.position };
-            
-            // Transform window position from world space to view space
-            // This accounts for the carousel rotation
-            const rotatedX = windowPos.x * Math.cos(this.rotationAngle) - windowPos.z * Math.sin(this.rotationAngle);
-            const rotatedZ = windowPos.x * Math.sin(this.rotationAngle) + windowPos.z * Math.cos(this.rotationAngle);
-            
-            windowPos.x = rotatedX;
-            windowPos.z = rotatedZ;
-            
-            // Simple plane intersection test
-            const planeNormal = { 
-                x: Math.sin(this.rotationAngle - window.rotation.y), 
-                y: 0, 
-                z: Math.cos(this.rotationAngle - window.rotation.y) 
-            };
-            
-            const denom = rayDirection.x * planeNormal.x + 
-                          rayDirection.y * planeNormal.y + 
-                          rayDirection.z * planeNormal.z;
-            
-            if (Math.abs(denom) > 0.0001) {
-                const t = ((windowPos.x - rayOrigin.x) * planeNormal.x +
-                          (windowPos.y - rayOrigin.y) * planeNormal.y +
-                          (windowPos.z - rayOrigin.z) * planeNormal.z) / denom;
+            // Only consider windows within the front visibility cone
+            if (angleDiff < angleThreshold) {
+                // Simple rectangular hit test in screen space
+                const windowPos = this.getScreenPosition(window);
+                const halfWidth = window.width * 0.5;
+                const halfHeight = window.height * 0.5;
                 
-                if (t >= 0 && t < closestDistance) {
-                    const hitPoint = {
-                        x: rayOrigin.x + rayDirection.x * t,
-                        y: rayOrigin.y + rayDirection.y * t,
-                        z: rayOrigin.z + rayDirection.z * t
-                    };
+                if (normalizedX >= windowPos.x - halfWidth && 
+                    normalizedX <= windowPos.x + halfWidth && 
+                    normalizedY >= windowPos.y - halfHeight && 
+                    normalizedY <= windowPos.y + halfHeight) {
                     
-                    // Calculate local coordinates on the window plane
-                    const localX = (hitPoint.x - windowPos.x) * Math.cos(-window.rotation.y) - 
-                                  (hitPoint.z - windowPos.z) * Math.sin(-window.rotation.y);
-                    const localY = hitPoint.y - windowPos.y;
-                    
-                    // Check if hit point is within window bounds
-                    if (Math.abs(localX) <= window.width/2 * window.scale && 
-                        Math.abs(localY) <= window.height/2 * window.scale) {
+                    // Take the window closest to front
+                    if (angleDiff < minAngleDiff) {
+                        minAngleDiff = angleDiff;
                         hoveredIndex = i;
-                        closestDistance = t;
                     }
                 }
             }
-        }
+        });
         
-        // Update hover states with debounce
-        clearTimeout(this.hoverDebounceTimeout);
-        this.hoverDebounceTimeout = setTimeout(() => {
-            for (let i = 0; i < this.windows.length; i++) {
-                this.windows[i].setHover(i === hoveredIndex);
-            }
-        }, 16); // ~1 frame delay
+        // Update hover states
+        this.windows.forEach((window, i) => {
+            window.setHover(i === hoveredIndex);
+        });
+    }
+    
+    // Helper to get window's screen position
+    getScreenPosition(window) {
+        const angle = this.rotationAngle;
+        const x = window.position.x * Math.cos(angle) - window.position.z * Math.sin(angle);
+        const y = window.position.y;
+        return { x, y };
     }
     
     /**
