@@ -65,6 +65,47 @@ class Carousel {
         nextButton.addEventListener('click', () => {
             this.targetRotationAngle -= Math.PI / 4;
         });
+
+        // Add drag-to-rotate bar
+        const dragBar = document.createElement('div');
+        dragBar.className = 'multiverse-drag-bar';
+        dragBar.innerHTML = `
+            <div class="drag-handle"></div>
+            <div class="drag-track"></div>
+            <div class="drag-label">Drag to rotate</div>
+        `;
+        this.container.appendChild(dragBar);
+
+        // Add drag functionality
+        this.isDragging = false;
+        this.lastDragX = 0;
+        
+        const dragHandle = dragBar.querySelector('.drag-handle');
+        
+        dragHandle.addEventListener('mousedown', (e) => {
+            this.isDragging = true;
+            this.lastDragX = e.clientX;
+            dragHandle.classList.add('active');
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+            if (this.isDragging) {
+                const deltaX = e.clientX - this.lastDragX;
+                this.targetRotationAngle -= deltaX * 0.01;
+                this.lastDragX = e.clientX;
+                
+                // Update drag handle position
+                const trackWidth = dragBar.querySelector('.drag-track').offsetWidth;
+                const normalizedRotation = (this.targetRotationAngle % (Math.PI * 2)) / (Math.PI * 2);
+                const handlePosition = (normalizedRotation * trackWidth) % trackWidth;
+                dragHandle.style.left = `${handlePosition}px`;
+            }
+        });
+        
+        document.addEventListener('mouseup', () => {
+            this.isDragging = false;
+            dragHandle.classList.remove('active');
+        });
     }
     
     /**
@@ -205,6 +246,16 @@ class Carousel {
             window.update(deltaTime);
         });
 
+        // Update drag handle position
+        const dragBar = this.container.querySelector('.multiverse-drag-bar');
+        if (dragBar && !this.isDragging) {
+            const dragHandle = dragBar.querySelector('.drag-handle');
+            const trackWidth = dragBar.querySelector('.drag-track').offsetWidth;
+            const normalizedRotation = (this.rotationAngle % (Math.PI * 2)) / (Math.PI * 2);
+            const handlePosition = (normalizedRotation * trackWidth) % trackWidth;
+            dragHandle.style.left = `${handlePosition}px`;
+        }
+
         this.render(timestamp);
         requestAnimationFrame(this.animate.bind(this));
     }
@@ -251,7 +302,7 @@ class Carousel {
         const loading = this.container.querySelector('.multiverse-loading');
         if (loading) {
             loading.classList.add('fade-out');
-            setTimeout(() => {
+        setTimeout(() => {
                 loading.remove();
             }, 500);
         }
