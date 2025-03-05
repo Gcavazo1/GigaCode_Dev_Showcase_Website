@@ -1,16 +1,3 @@
-// Cosmic Wormhole shader - Space tunnel effect
-precision mediump float;
-
-varying vec2 vTexCoord;
-varying float vTime;
-
-uniform vec2 uResolution;
-uniform float uIntensity;
-
-#define PI 3.14159265359
-
-// Noise function
-float hash(float n) { return fract(sin(n) * 43758.5453123); }
 
 // Smooth noise
 float noise(vec2 p) {
