@@ -38,6 +38,12 @@ class Carousel {
         this.isLoading = true;
         this.loadingStartTime = performance.now();
         
+        // Add camera angle controls
+        this.cameraAngleX = -0.2; // Tilt down slightly by default
+        this.cameraAngleY = 0.0;  // No side tilt
+        this.cameraDistance = 18;  // Distance from center
+        this.cameraHeight = 2;    // Raise camera slightly
+        
         // Initialize
         this.init().then(() => {
             // Start animation loop only after initialization is complete
@@ -254,9 +260,19 @@ class Carousel {
         // Calculate time for shaders
         const time = (timestamp - this.loadingStartTime) / 1000.0;
         
-        // Update view matrix with adjusted camera position
+        // Update view matrix with camera angles
         mat4.identity(this.viewMatrix);
-        mat4.lookAt(this.viewMatrix, [0, 0, 18], [0, 0, 0], [0, 1, 0]); // Moved camera further back
+        
+        // First move back to viewing distance
+        mat4.translate(this.viewMatrix, this.viewMatrix, [0, -this.cameraHeight, -this.cameraDistance]);
+        
+        // Apply X rotation (tilt up/down)
+        mat4.rotateX(this.viewMatrix, this.viewMatrix, this.cameraAngleX);
+        
+        // Apply Y rotation (side to side)
+        mat4.rotateY(this.viewMatrix, this.viewMatrix, this.cameraAngleY);
+        
+        // Apply carousel rotation
         mat4.rotateY(this.viewMatrix, this.viewMatrix, this.rotationAngle);
         
         // Render all windows
