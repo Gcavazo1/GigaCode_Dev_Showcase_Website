@@ -211,7 +211,7 @@ class Carousel {
         const gl = this.gl;
         
         // Clear the canvas
-        gl.clearColor(0.00, 0.00, 0.00, 1.0);
+        gl.clearColor(0.00, 0.00, 0.00, 0.1);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         
         // Calculate time for shaders
