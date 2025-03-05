@@ -2,6 +2,70 @@
  * PowerShell Music Widget Controller
  * Connects to the existing audio player system
  */
+document.addEventListener('DOMContentLoaded', () => {
+    const psMusicWidget = document.querySelector('.ps-music-widget');
+    const commandLines = psMusicWidget.querySelectorAll('.ps-command-line');
+    const output = psMusicWidget.querySelector('.ps-output');
+    const buttons = psMusicWidget.querySelector('.ps-buttons');
+
+    // Initial state
+    psMusicWidget.style.display = 'block';
+    psMusicWidget.style.opacity = '0';
+    psMusicWidget.style.transform = 'translateY(20px)';
+    
+    // Boot sequence with delay
+    setTimeout(() => {
+        startBootSequence();
+    }, 6000);
+
+    function startBootSequence() {
+        // Show first command
+        commandLines[0].style.display = 'block';
+        typeCommand(commandLines[0].querySelector('.ps-command'), 'Get-AudioStatus', () => {
+            // Show output after first command
+            setTimeout(() => {
+                output.style.display = 'block';
+                output.style.opacity = '0';
+                output.style.opacity = '1';
+                
+                // Show second command
+                setTimeout(() => {
+                    commandLines[1].style.display = 'block';
+                    typeCommand(commandLines[1].querySelector('.ps-command'), 'Start-AudioSystem', () => {
+                        // Show buttons
+                        setTimeout(() => {
+                            buttons.style.display = 'block';
+                            buttons.style.opacity = '0';
+                            buttons.style.opacity = '1';
+                            
+                            // Finally show the whole widget
+                            psMusicWidget.style.opacity = '1';
+                            psMusicWidget.style.transform = 'translateY(0)';
+                        }, 500);
+                    });
+                }, 1000);
+            }, 800);
+        });
+    }
+
+    function typeCommand(element, text, callback) {
+        let index = 0;
+        element.textContent = '';
+        
+        function type() {
+            if (index < text.length) {
+                element.textContent += text.charAt(index);
+                index++;
+                setTimeout(type, 50);
+            } else if (callback) {
+                callback();
+            }
+        }
+        
+        type();
+    }
+});
+
 document.addEventListener('DOMContentLoaded', function() {
     // Get elements from the existing PowerShell widget
     const psWidget = document.querySelector('.ps-music-widget');

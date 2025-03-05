@@ -1,9 +1,9 @@
 /* New dedicated CSS file for holographic interface */
 .holo-section {
     background: linear-gradient(180deg, 
-        rgba(0, 0, 0, 0.9) 0%,
-        rgba(5, 15, 30, 0.85) 50%,
-        rgba(0, 0, 0, 0.9) 100%
+        rgba(0, 0, 0, 0.6) 0%,
+        rgba(5, 15, 30, 0.15) 50%,
+        rgba(0, 0, 0, 0.6) 100%
     );
     position: relative;
     overflow: hidden;
@@ -23,7 +23,7 @@
 
 /* Box styling */
 .holo-box {
-    background: rgba(2, 8, 12, 0.8);
+    background: rgba(30, 0, 57, 0.658);
     border: 1px solid rgba(0, 255, 255, 0.4);
     border-radius: 12px;
     padding: 1.5rem;

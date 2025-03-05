@@ -143,11 +143,8 @@
     margin-left: 200px;
     display: flex;
     flex-direction: column;
-    background: rgba(10, 10, 18, 0.8);
+    background: rgba(10, 10, 18, 0);
     min-height: 100%;
-    border: 1px solid rgba(249, 249, 0, 0.3);
-    box-shadow: 0 0 30px rgba(249, 249, 0, 0.25);
-    border-radius: 0 12px 12px 0;
 }
 
 .interface-header {
@@ -155,7 +152,7 @@
     align-items: center;
     padding: 0.8rem 1rem;
     background: rgba(0, 0, 0, 0.5);
-    border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 0, 0.2);
 }
 
 .status-indicator {
@@ -209,9 +206,9 @@
 }
 
 .ai-message.ai-message {
-    background: rgba(249, 249, 0, 0.05);
+    background: rgba(9, 129, 127, 0.306);
     border: 1px solid rgba(249, 249, 0, 0.3);
-    box-shadow: 0 0 10px rgba(249, 249, 0, 0.1);
+    box-shadow: 0 0 10px rgba(249, 249, 0, 0.74);
     align-self: flex-start;
     position: relative;
     font-family: 'Rajdhani', sans-serif;
@@ -228,7 +225,7 @@
 
 .ai-message.user-message {
     background: rgba(255, 0, 255, 0.1);
-    border: 1px solid rgba(255, 0, 255, 0.3);
+    border: 1px solid rgba(255, 0, 162, 0.324);
     align-self: flex-end;
 }
 
@@ -259,7 +256,7 @@
     display: flex;
     padding: 1rem;
     background: rgba(0, 0, 0, 0.3);
-    border-top: 1px solid rgba(0, 255, 255, 0.2);
+    border-top: 1px solid rgba(255, 234, 0, 0.2);
 }
 
 .ai-chat-input input {
@@ -274,13 +271,13 @@
 }
 
 .ai-chat-input input:focus {
-    border-color: rgba(0, 255, 255, 0.6);
-    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+    border-color: rgba(255, 238, 0, 0.6);
+    box-shadow: 0 0 10px rgba(255, 238, 0, 0.3);
 }
 
 .ai-chat-input button {
     background: rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(0, 255, 255, 0.3);
+    border: 1px solid rgba(0, 238, 255, 0.3);
     border-radius: 4px;
     width: 40px;
     height: 40px;
@@ -336,7 +333,7 @@
         height: 200px;
         margin-bottom: 0;
         border-right: none;
-        border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+        border-bottom: 1px solid rgba(198, 231, 7, 0.712);
     }
     
     .ai-chat-interface {
@@ -358,22 +355,6 @@
 @keyframes simpleFadeIn {
     0% { opacity: 0; }
     100% { opacity: 1; }
-}
-
-/* Keep this pulse glow animation */
-@keyframes pulse-glow {
-    0% {
-        box-shadow: 0 0 20px rgba(249, 249, 0, 0.2);
-        border-color: rgba(249, 249, 0, 0.25);
-    }
-    50% {
-        box-shadow: 0 0 35px rgba(249, 249, 0, 0.35), 0 0 50px rgba(249, 249, 0, 0.15);
-        border-color: rgba(249, 249, 0, 0.4);
-    }
-    100% {
-        box-shadow: 0 0 25px rgba(249, 249, 0, 0.3);
-        border-color: rgba(249, 249, 0, 0.35);
-    }
 }
 
 /* Add fallback assistant styles */

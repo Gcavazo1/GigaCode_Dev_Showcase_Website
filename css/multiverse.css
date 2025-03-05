@@ -85,53 +85,6 @@
     transform-style: preserve-3d;
     transition: transform 1.2s cubic-bezier(0.2, 0.9, 0.3, 1);
 }
-
-/* Simplified shader window styling with fixed pixel dimensions */
-.shader-window {
-    position: absolute;
-    width: 400px;  /* Simple fixed width */
-    height: 2000px; /* Simple fixed height */
-    background: rgba(20, 20, 30, 0);
-    border-radius: 8px;
-    overflow: hidden;
-    transition: all 0.6s cubic-bezier(0.2, 0.9, 0.3, 1);
-    transform-style: preserve-3d;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5),
-                0 0 20px rgba(0, 150, 255, 0.1);
-    border: 1px solid rgba(100, 200, 255, 0.1);
-}
-
-.shader-window::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 30px;
-    background: rgba(30, 30, 40, 0.95);
-    border-bottom: 1px solid rgba(100, 200, 255, 0.2);
-    z-index: 1;
-}
-
-.shader-window::after {
-    content: '';
-    position: absolute;
-    bottom: -100px;
-    left: -20%;
-    width: 140%;
-    height: 100px;
-    background: linear-gradient(rgba(0, 0, 0, 0.2), transparent);
-    transform: rotateX(45deg);
-    pointer-events: none;
-}
-
-/* Expanded state also uses fixed pixels */
-.shader-window.expanded {
-    width: 800px;
-    height: 600px;
-    z-index: 100;
-}
-
 /* Navigation arrows - Adjusted positioning */
 .multiverse-nav {
     position: absolute;
@@ -207,20 +160,6 @@
     margin: 5px 0;
 }
 
-.multiverse-loading.fade-out {
-    opacity: 0;
-    transition: opacity 0.5s ease;
-}
-
-/* Remove the entire drag-to-rotate bar styling section */
-.multiverse-drag-bar {
-    display: none; /* Hide the drag bar instead of removing it completely */
-}
-
-.drag-track, .drag-handle, .drag-label {
-    display: none;
-}
-
 /* GLSL Header styling */
 .glsl-header {
     position: relative;
@@ -230,6 +169,8 @@
     overflow: hidden;
     border-radius: 8px;
     border: 1px solid rgba(0, 255, 255, 0.2);
+    box-shadow: 0 0 10px rgba(0, 216, 249, 0.8),
+        0 0 20px rgba(249, 249, 0, 0.4);
     background: rgba(0, 0, 0, 0.192);
 }
 
@@ -271,7 +212,7 @@
     text-transform: uppercase;
     margin: 0;
     padding: 0;
-    mix-blend-mode: screen; /* This will help the text blend with the shader */
+    mix-blend-mode: screen;
     z-index: 2;
 }
 
@@ -513,4 +454,74 @@
     100% {
         transform: translate(2px, 2px);
     }
+}
+
+/* Audio playlist adjustments */
+.audio-container {
+    width: 95%; /* Instead of 100% */
+    max-width: 800px;
+    margin: 0 auto;
+    transform: scale(.9);/* Slightly reduce the overall size */
+    transform-origin: top center;
+}
+
+
+/* If you have a track title, adjust its size */
+.track-title {
+    font-size: clamp(0.9rem, 1.1vw, 1.1rem);
+}
+
+/* Adjust control buttons if needed */
+.control-buttons {
+    transform: scale(0.9);
+}
+
+/* Add these styles for the PowerShell widget */
+.ps-music-widget {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    display: block; /* Ensure it's initially displayed */
+    position: fixed; /* Make sure it's positioned properly */
+    right: 20px;
+    bottom: 20px;
+    z-index: 1000;
+}
+
+.ps-music-widget .ps-command-line,
+.ps-music-widget .ps-output,
+.ps-music-widget .ps-buttons {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.ps-music-widget .ps-command-line.show,
+.ps-music-widget .ps-output.show,
+.ps-music-widget .ps-buttons.show {
+    opacity: 1;
+}
+
+/* Add this near the top of your CSS, after the body styling */
+.visualizer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.0); /* Adjust this alpha value to control visibility */
+    pointer-events: none; /* Allows clicks to pass through */
+    z-index: 0; /* Places it above visualizer but under content */
+}
+
+/* Adjust the background-visualizer z-index to ensure proper layering */
+#background-visualizer {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: -1 !important;
+    opacity: 1 !important;
+    display: block !important;
+    pointer-events: none !important;
 } 

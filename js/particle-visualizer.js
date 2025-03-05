@@ -85,7 +85,7 @@ function setupVisualizerControls() {
   const reactivityValue = document.getElementById('reactivity-value');
   
   if (reactivitySlider && reactivityValue) {
-    const currentValue = window.particleVisualizer?.particleSystem?.reactivityMultiplier || 0.6;
+    const currentValue = window.particleVisualizer?.particleSystem?.reactivityMultiplier || 0.2;
     reactivitySlider.value = currentValue;
     reactivityValue.textContent = currentValue.toFixed(1);
     
@@ -111,8 +111,8 @@ function setupVisualizerControls() {
       }
     };
 
-    startColorPicker.value = '#FFFFFF';
-    endColorPicker.value = '#fdf901';
+    startColorPicker.value = '#910055';
+    endColorPicker.value = '#007918';
     
     startColorPicker.addEventListener('input', updateColors);
     endColorPicker.addEventListener('input', updateColors);

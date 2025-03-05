@@ -128,12 +128,12 @@ class ParticleVisualizer {
     window.addEventListener('resize', this.resize.bind(this));
     
     // Ensure default values are set
-    this.particleSystem.reactivityMultiplier = 0.6;
+    this.particleSystem.reactivityMultiplier = 0.2;
     
     // Initialize colors
     if (this.particleSystem.uniforms) {
-      this.particleSystem.uniforms.startColor.value.set('#ffffff');
-      this.particleSystem.uniforms.endColor.value.set('#fdf901');
+      this.particleSystem.uniforms.startColor.value.set('#000000');
+      this.particleSystem.uniforms.endColor.value.set('#000000');
     }
   }
 
@@ -145,15 +145,14 @@ class ParticleVisualizer {
       // Ensure the GUI is properly set up
       if (this.gui) {
         // Set up any common GUI controls if needed
-        this.gui.add(this.particleSystem, 'reactivityMultiplier', 0.1, 3.0)
+        this.gui.add(this.particleSystem, 'reactivityMultiplier', 0.1, 1.0)
           .name('Audio Reactivity')
           .onChange(() => {
             console.log("Reactivity changed via GUI:", this.particleSystem.reactivityMultiplier);
           });
       }
       
-      // Create particles with ring as default instead of torusKnot
-      const particleHolder = this.particleSystem.create('ring');
+      const particleHolder = this.particleSystem.create('torusKnot');
       if (particleHolder) {
         this.holder.add(particleHolder);
         console.log('[Visualizer] Particles added to holder');

@@ -19,14 +19,14 @@
     height: 400px;
     position: relative;
     background: linear-gradient(to bottom, 
-        rgba(2, 8, 15, 0.95),
-        rgba(5, 12, 25, 0.98)
+        rgba(2, 8, 15, 1.0),
+        rgba(0, 0, 0, 1.8)
     );
     border-radius: 12px;
     overflow: hidden;
     border: 1px solid rgba(0, 255, 255, 0.4);
     box-shadow: 
-        0 0 25px rgba(0, 255, 255, 0.15),
+        0 0 25px rgba(255, 0, 183, 0.15),
         inset 0 0 50px rgba(0, 255, 255, 0.05);
 }
 
@@ -202,45 +202,6 @@
     100% { transform: translateX(100%) rotate(45deg); }
 }
 
-/* ---- VIRTUAL ASSISTANT ---- */
-.assistant-container {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-around;
-    margin: 2rem auto;
-    flex-wrap: wrap;
-}
-
-#live2d-canvas {
-    width: 400px;
-    height: 600px;
-    background-color: rgba(10, 10, 18, 0.3);
-    border-radius: 8px;
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
-}
-
-.assistant-dialog {
-    width: 400px;
-    background-color: rgba(10, 10, 18, 0.7);
-    border: 1px solid rgba(0, 255, 255, 0.3);
-    border-radius: 8px;
-    padding: 2rem;
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
-}
-
-.assistant-text {
-    color: var(--text-color);
-    margin-bottom: 1.5rem;
-    font-size: 1.2rem;
-}
-
-.assistant-buttons {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
 /* ---- HOLOGRAPHIC INTERFACE ---- */
 .holo-container {
     display: grid;
@@ -250,6 +211,7 @@
     max-width: 1400px;
     margin: 0 auto;
     padding: 1rem;
+    background-color: rgba(0, 0, 0, 0.0);
 }
 
 /* Position each display in the grid */
@@ -279,7 +241,7 @@
 
 /* ---- TERMINAL STYLING ---- */
 .terminal-container {
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.9);
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
@@ -469,7 +431,7 @@
     margin: 0;
     background: rgba(0, 0, 0, 0.7);
     border: 1px solid #f9f900;
-    box-shadow: 0 0 20px rgba(249, 249, 0, 0.2);
+    box-shadow: 0 0 20px rgba(255, 234, 0, 0.963);
 }
 
 /* Fix header title responsiveness */
