@@ -180,4 +180,9 @@
 
 .error-message p {
     margin: 5px 0;
+}
+
+.multiverse-loading.fade-out {
+    opacity: 0;
+    transition: opacity 0.5s ease;
 } 

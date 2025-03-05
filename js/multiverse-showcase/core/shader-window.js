@@ -24,12 +24,15 @@ class ShaderWindow {
     // Initialize properties
     this.program = null;
     this.buffers = {};
-    this.uniforms = {};
+    this.uniforms = {
+      attributes: {},
+      uniforms: {}
+    };
     this.position = { x: 0, y: 0, z: 0 }; // Initialize position
     this.rotation = { x: 0, y: 0, z: 0 };
     this.scale = 1.0;
     this.isExpanded = false;
-    this.isInitialized = false;
+    this.isReady = false;
     this.startTime = performance.now();
     
     // Initialize
@@ -55,6 +58,9 @@ class ShaderWindow {
       
       // Get attribute and uniform locations
       this.getAttributeAndUniformLocations();
+      
+      // Mark as ready
+      this.isReady = true;
       
       console.log(`Shader window initialized: ${this.title}`);
     } catch (error) {
@@ -151,6 +157,11 @@ class ShaderWindow {
    * @param {number} time - Current time in seconds
    */
   render(viewMatrix, projectionMatrix, time) {
+    // Skip rendering if not ready
+    if (!this.isReady || !this.program) {
+      return;
+    }
+    
     const gl = this.gl;
     
     // Use shader program
@@ -171,11 +182,18 @@ class ShaderWindow {
     
     // Calculate model view matrix
     const modelViewMatrix = mat4.create();
-    mat4.translate(modelViewMatrix, viewMatrix, [this.position.x, this.position.y, this.position.z]);
-    mat4.rotateX(modelViewMatrix, modelViewMatrix, this.rotation.x);
-    mat4.rotateY(modelViewMatrix, modelViewMatrix, this.rotation.y);
-    mat4.rotateZ(modelViewMatrix, modelViewMatrix, this.rotation.z);
-    mat4.scale(modelViewMatrix, modelViewMatrix, [this.scale, this.scale, this.scale]);
+    
+    // Make sure position is defined before using it
+    if (viewMatrix && this.position) {
+      mat4.translate(modelViewMatrix, viewMatrix, [this.position.x, this.position.y, this.position.z]);
+      mat4.rotateX(modelViewMatrix, modelViewMatrix, this.rotation.x);
+      mat4.rotateY(modelViewMatrix, modelViewMatrix, this.rotation.y);
+      mat4.rotateZ(modelViewMatrix, modelViewMatrix, this.rotation.z);
+      mat4.scale(modelViewMatrix, modelViewMatrix, [this.scale, this.scale, this.scale]);
+    } else {
+      // Use identity matrix if position or viewMatrix is undefined
+      mat4.identity(modelViewMatrix);
+    }
     
     // Set uniforms
     gl.uniformMatrix4fv(this.uniforms.uniforms.projectionMatrix, false, projectionMatrix);

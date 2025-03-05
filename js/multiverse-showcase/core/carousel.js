@@ -33,19 +33,23 @@ class Carousel {
         this.currentTime = 0;
         this.lastFrameTime = 0;
         
-        // Initialize
-        this.init();
+        // Track loading state
+        this.isLoading = true;
+        this.loadingStartTime = performance.now();
         
-        // Start animation loop only after initialization is complete
-        if (this.isInitialized) {
-            this.animate();
-        }
+        // Initialize
+        this.init().then(() => {
+            // Start animation loop only after initialization is complete
+            if (this.isInitialized) {
+                this.animate();
+            }
+        });
     }
     
     /**
      * Initialize carousel
      */
-    init() {
+    async init() {
         try {
             // Create canvas
             this.canvas = document.createElement('canvas');
@@ -65,7 +69,7 @@ class Carousel {
             this.resizeCanvas();
             
             // Create shader windows
-            this.createWindows();
+            await this.createWindows();
             
             // Set up camera
             mat4.perspective(this.projectionMatrix, Math.PI / 4, this.canvas.width / this.canvas.height, 0.1, 100.0);
@@ -75,7 +79,11 @@ class Carousel {
             window.addEventListener('resize', this.resizeCanvas.bind(this));
             this.canvas.addEventListener('click', this.onClick.bind(this));
             
+            // Mark as initialized
             this.isInitialized = true;
+            
+            // Hide loading indicator
+            this.hideLoading();
         } catch (error) {
             console.error('Carousel initialization error:', error);
             this.showError(error.message);
@@ -85,11 +93,13 @@ class Carousel {
     /**
      * Create shader windows
      */
-    createWindows() {
+    async createWindows() {
         // Clear existing windows
         this.windows = [];
         
         // Create new windows
+        const windowPromises = [];
+        
         for (let i = 0; i < this.shaderConfigs.length; i++) {
             const config = this.shaderConfigs[i];
             
@@ -111,10 +121,28 @@ class Carousel {
                 };
                 
                 this.windows.push(window);
+                
+                // Add a promise to track when this window is ready
+                const windowPromise = new Promise(resolve => {
+                    const checkReady = () => {
+                        if (window.isReady) {
+                            resolve();
+                        } else {
+                            setTimeout(checkReady, 100);
+                        }
+                    };
+                    checkReady();
+                });
+                
+                windowPromises.push(windowPromise);
             } catch (error) {
                 console.error(`Error creating window ${i}:`, error);
             }
         }
+        
+        // Wait for all windows to be ready (but with a timeout)
+        const timeout = new Promise(resolve => setTimeout(resolve, 10000)); // 10-second timeout
+        await Promise.race([Promise.all(windowPromises), timeout]);
     }
     
     /**
@@ -141,31 +169,22 @@ class Carousel {
      * @param {number} timestamp - Current timestamp
      */
     animate(timestamp = 0) {
+        if (!this.isInitialized) {
+            // Don't animate if not initialized
+            setTimeout(() => this.animate(), 100);
+            return;
+        }
+
         // Calculate delta time
-        const deltaTime = (timestamp - this.lastFrameTime) / 1000;
+        const deltaTime = timestamp - this.lastFrameTime;
         this.lastFrameTime = timestamp;
-        this.currentTime = timestamp / 1000;
         
         // Update rotation
-        const rotationDelta = this.targetRotationAngle - this.rotationAngle;
-        if (Math.abs(rotationDelta) > 0.001) {
-            this.rotationAngle += rotationDelta * 3 * deltaTime;
-        } else {
-            this.rotationAngle = this.targetRotationAngle;
-        }
+        const rotationSpeed = 0.002;
+        this.rotationAngle += (this.targetRotationAngle - this.rotationAngle) * rotationSpeed * deltaTime;
         
-        // Update view matrix
-        mat4.identity(this.viewMatrix);
-        mat4.lookAt(this.viewMatrix, [0, 0, 10], [0, 0, 0], [0, 1, 0]);
-        mat4.rotateY(this.viewMatrix, this.viewMatrix, this.rotationAngle);
-        
-        // Update windows
-        for (const window of this.windows) {
-            window.update(deltaTime);
-        }
-        
-        // Render
-        this.render();
+        // Render scene
+        this.render(timestamp);
         
         // Request next frame
         requestAnimationFrame(this.animate.bind(this));
@@ -173,35 +192,51 @@ class Carousel {
     
     /**
      * Render the carousel
+     * @param {number} timestamp - Current timestamp
      */
-    render() {
+    render(timestamp) {
         const gl = this.gl;
         
-        // Clear canvas
+        // If still loading, update the loading screen
+        if (this.isLoading) {
+            // Just clear the background
+            gl.clearColor(0.05, 0.05, 0.1, 1.0);
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            return;
+        }
+        
+        // Clear the canvas
         gl.clearColor(0.05, 0.05, 0.1, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         
-        // Sort windows by distance (for proper transparency)
-        this.windows.sort((a, b) => {
-            // Simple distance calculation for sorting
-            const aPos = a.position;
-            const bPos = b.position;
-            
-            // Calculate positions after rotation
-            const aAngle = Math.atan2(aPos.x, aPos.z) - this.rotationAngle;
-            const bAngle = Math.atan2(bPos.x, bPos.z) - this.rotationAngle;
-            
-            // Use z-component after rotation for depth sorting
-            const aZ = Math.cos(aAngle) * Math.sqrt(aPos.x * aPos.x + aPos.z * aPos.z);
-            const bZ = Math.cos(bAngle) * Math.sqrt(bPos.x * bPos.x + bPos.z * bPos.z);
-            
-            return bZ - aZ; // Sort back-to-front
-        });
+        // Calculate time for shaders
+        const time = (timestamp - this.loadingStartTime) / 1000.0;
         
-        // Render windows
+        // Update view matrix
+        mat4.identity(this.viewMatrix);
+        mat4.lookAt(this.viewMatrix, [0, 0, 10], [0, 0, 0], [0, 1, 0]);
+        mat4.rotateY(this.viewMatrix, this.viewMatrix, this.rotationAngle);
+        
+        // Render all windows
         for (const window of this.windows) {
-            window.render(this.viewMatrix, this.projectionMatrix, this.currentTime);
+            window.render(this.viewMatrix, this.projectionMatrix, time);
         }
+    }
+    
+    /**
+     * Hide loading indicator
+     */
+    hideLoading() {
+        // Remove loading indicator
+        const loading = this.container.querySelector('.multiverse-loading');
+        if (loading) {
+            loading.classList.add('fade-out');
+            setTimeout(() => {
+                loading.remove();
+            }, 500);
+        }
+        
+        this.isLoading = false;
     }
     
     /**
