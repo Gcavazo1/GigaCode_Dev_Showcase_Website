@@ -119,8 +119,8 @@ class Carousel {
         this.windows = [];
         
         const totalWindows = this.shaderConfigs.length;
-        const radius = 5.0; // Reduced radius for tighter spacing
-        const verticalOffset = 0.5; // Reduced vertical offset
+        const radius = 6.0; // Increased radius to account for larger windows
+        const verticalOffset = 0.5; // Keep the same vertical offset
         
         for (let i = 0; i < totalWindows; i++) {
             const config = this.shaderConfigs[i];
@@ -219,12 +219,12 @@ class Carousel {
         
         // Update view matrix with adjusted camera position
         mat4.identity(this.viewMatrix);
-        mat4.lookAt(this.viewMatrix, [0, 0, 15], [0, 0, 0], [0, 1, 0]); // Moved camera back
+        mat4.lookAt(this.viewMatrix, [0, 0, 18], [0, 0, 0], [0, 1, 0]); // Moved camera further back
         mat4.rotateY(this.viewMatrix, this.viewMatrix, this.rotationAngle);
         
         // Render all windows
         console.log('Rendering carousel with', this.windows.length, 'windows');
-        console.log('Camera position:', [0, 0, 15]);
+        console.log('Camera position:', [0, 0, 18]);
         console.log('Rotation angle:', this.rotationAngle);
 
         // First window position
