@@ -56,8 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
       fragmentShaderPath: 'js/multiverse-showcase/shaders/showcase7/liquid-metal.frag'
     },
     {
-      title: 'Neon Grid',
-      description: 'Retrowave cyberpunk landscape with infinite grid',
+      title: 'Cosmic Wormhole',
+      description: 'Space tunnel effect with dynamic light patterns',
       vertexShaderPath: 'js/multiverse-showcase/shaders/showcase8/neon-grid.vert',
       fragmentShaderPath: 'js/multiverse-showcase/shaders/showcase8/neon-grid.frag'
     },
