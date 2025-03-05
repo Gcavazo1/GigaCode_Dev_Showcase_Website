@@ -25,6 +25,14 @@ class Carousel {
         this.expandedWindowIndex = -1;
         this.isInitialized = false;
         
+        // Initialize matrices
+        this.projectionMatrix = mat4.create();
+        this.viewMatrix = mat4.create();
+        
+        // Time tracking
+        this.currentTime = 0;
+        this.lastFrameTime = 0;
+        
         // Initialize
         this.init();
         
@@ -50,11 +58,18 @@ class Carousel {
                 throw new Error('WebGL not supported');
             }
             
+            // Enable depth testing
+            this.gl.enable(this.gl.DEPTH_TEST);
+            
             // Set canvas size
             this.resizeCanvas();
             
             // Create shader windows
             this.createWindows();
+            
+            // Set up camera
+            mat4.perspective(this.projectionMatrix, Math.PI / 4, this.canvas.width / this.canvas.height, 0.1, 100.0);
+            mat4.lookAt(this.viewMatrix, [0, 0, 10], [0, 0, 0], [0, 1, 0]);
             
             // Add event listeners
             window.addEventListener('resize', this.resizeCanvas.bind(this));
@@ -116,6 +131,9 @@ class Carousel {
         this.canvas.style.height = `${height}px`;
         
         this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Update projection matrix
+        mat4.perspective(this.projectionMatrix, Math.PI / 4, this.canvas.width / this.canvas.height, 0.1, 100.0);
     }
     
     /**
@@ -308,6 +326,31 @@ class Carousel {
             this.windows[this.expandedWindowIndex].setExpanded(false);
             this.expandedWindowIndex = -1;
         }
+    }
+    
+    /**
+     * Show error message
+     * @param {string} message - Error message
+     */
+    showError(message) {
+        // Remove loading indicator
+        const loading = this.container.querySelector('.multiverse-loading');
+        if (loading) {
+            loading.remove();
+        }
+        
+        // Create error message
+        const errorElement = document.createElement('div');
+        errorElement.className = 'multiverse-error';
+        errorElement.innerHTML = `
+            <div class="error-icon">⚠️</div>
+            <div class="error-message">
+                <h3>WebGL Error</h3>
+                <p>${message}</p>
+                <p>Try using a browser with better WebGL support.</p>
+            </div>
+        `;
+        this.container.appendChild(errorElement);
     }
 }
 

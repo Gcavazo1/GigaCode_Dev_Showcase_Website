@@ -152,4 +152,32 @@
     height: 25px;
     background: rgba(0, 0, 0, 0.8);
     border-bottom: 1px solid rgba(249, 249, 0, 0.3);
+}
+
+.multiverse-error {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(30, 30, 40, 0.9);
+    border: 1px solid #ff3366;
+    border-radius: 8px;
+    padding: 20px;
+    color: white;
+    text-align: center;
+    max-width: 80%;
+}
+
+.error-icon {
+    font-size: 48px;
+    margin-bottom: 10px;
+}
+
+.error-message h3 {
+    color: #ff3366;
+    margin: 0 0 10px 0;
+}
+
+.error-message p {
+    margin: 5px 0;
 } 
