@@ -60,6 +60,12 @@ document.addEventListener('DOMContentLoaded', () => {
       description: 'Retrowave cyberpunk landscape with infinite grid',
       vertexShaderPath: 'js/multiverse-showcase/shaders/showcase8/neon-grid.vert',
       fragmentShaderPath: 'js/multiverse-showcase/shaders/showcase8/neon-grid.frag'
+    },
+    {
+      title: 'Crystal Dimension',
+      description: 'Abstract geometric crystalline world with prismatic light',
+      vertexShaderPath: 'js/multiverse-showcase/shaders/showcase9/crystal.vert',
+      fragmentShaderPath: 'js/multiverse-showcase/shaders/showcase9/crystal.frag'
     }
   ];
   
