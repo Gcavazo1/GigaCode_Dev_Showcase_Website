@@ -75,13 +75,13 @@ class ShaderWindow {
   createBuffers() {
     const gl = this.gl;
     
-    // Create a plane geometry (adjusted for better visibility of all effects)
+    // Use 1:1 base geometry and let transforms handle scaling
     const positions = [
         // Front face
-        -0.95, -1.3, 0.0,  // Even wider and taller windows
-         0.95, -1.3, 0.0,
-         0.95,  1.3, 0.0,
-        -0.95,  1.3, 0.0,
+        -1.0, -1.0, 0.0,
+         1.0, -1.0, 0.0,
+         1.0,  1.0, 0.0,
+        -1.0,  1.0, 0.0,
     ];
     
     const texCoords = [

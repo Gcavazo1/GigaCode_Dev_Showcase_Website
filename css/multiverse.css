@@ -89,8 +89,8 @@
 /* Enhanced shader window styling */
 .shader-window {
     position: absolute;
-    width: 500px;  /* Wider width (was 300px) */
-    height: 1000px; /* Taller height (was 450px) */
+    width: 35vw;  /* Viewport-relative width */
+    height: 70vw; /* Viewport-relative height */
     background: rgba(20, 20, 30, 0);
     border-radius: 8px;
     overflow: hidden;
