@@ -1,4 +1,4 @@
-// Raymarched Grid fragment shader
+// Raymarched Grid fragment shader - Simplified version
 precision mediump float;
 
 varying vec2 v_uv;
@@ -7,8 +7,8 @@ varying float vTime;
 uniform vec2 uResolution;
 uniform float uIntensity;
 
-#define MAX_STEPS 100
-#define MAX_DIST 100.0
+#define MAX_STEPS 64  // Reduced from 100 for better performance
+#define MAX_DIST 50.0 // Reduced from 100.0
 #define SURF_DIST 0.001
 #define PI 3.14159265359
 
@@ -22,6 +22,7 @@ float sdBox(vec3 p, vec3 b) {
     return length(max(d, 0.0)) + min(max(d.x, max(d.y, d.z)), 0.0);
 }
 
+// Simplified capsule function
 float sdCapsule(vec3 p, vec3 a, vec3 b, float r) {
     vec3 pa = p - a, ba = b - a;
     float h = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
@@ -40,7 +41,7 @@ vec3 opTwist(vec3 p, float k) {
     return vec3(m * p.xz, p.y);
 }
 
-// Noise functions
+// Simplified noise function
 float hash(float n) {
     return fract(sin(n) * 43758.5453);
 }
@@ -51,19 +52,28 @@ float noise(vec3 x) {
     f = f * f * (3.0 - 2.0 * f);
     
     float n = p.x + p.y * 57.0 + p.z * 113.0;
-    float res = mix(mix(mix(hash(n), hash(n + 1.0), f.x),
-                      mix(hash(n + 57.0), hash(n + 58.0), f.x), f.y),
-                  mix(mix(hash(n + 113.0), hash(n + 114.0), f.x),
-                      mix(hash(n + 170.0), hash(n + 171.0), f.x), f.y), f.z);
-    return res;
+    return mix(
+        mix(
+            mix(hash(n), hash(n + 1.0), f.x),
+            mix(hash(n + 57.0), hash(n + 58.0), f.x),
+            f.y
+        ),
+        mix(
+            mix(hash(n + 113.0), hash(n + 114.0), f.x),
+            mix(hash(n + 170.0), hash(n + 171.0), f.x),
+            f.y
+        ),
+        f.z
+    );
 }
 
+// Simplified fbm with fewer octaves
 float fbm(vec3 p) {
     float sum = 0.0;
     float amp = 0.5;
     float freq = 1.0;
     
-    for(int i = 0; i < 5; i++) {
+    for(int i = 0; i < 3; i++) { // Reduced from 5 to 3 octaves
         sum += amp * noise(freq * p);
         amp *= 0.5;
         freq *= 2.0;
@@ -75,11 +85,7 @@ float fbm(vec3 p) {
 // Scene description
 float getDist(vec3 p) {
     // Simulated mouse influence
-    vec2 simulatedMouse = vec2(
-        sin(vTime * 0.3) * 0.25 + 0.5,
-        cos(vTime * 0.4) * 0.25 + 0.5
-    );
-    float mouseInfluence = length(simulatedMouse - 0.5) * 2.0;
+    float mouseInfluence = sin(vTime * 0.3) * 0.5 + 0.5;
     
     // Division effect
     vec3 cellSize = vec3(1.5 + mouseInfluence);
@@ -92,23 +98,19 @@ float getDist(vec3 p) {
     float sphere = sdSphere(cell, 0.3 + 0.1 * sin(vTime + fbm(p * 0.1)));
     float box = sdBox(cell, vec3(0.2 + 0.1 * cos(vTime * 0.5)));
     
-    // Create paths between cells
-    float path = sdCapsule(p, 
-                          vec3(cellSize.x * floor(p.x/cellSize.x), 0.0, 0.0),
-                          vec3(cellSize.x * floor(p.x/cellSize.x), 0.0, cellSize.z * floor(p.z/cellSize.z)),
-                          0.05);
+    // Create paths between cells (simplified)
+    float path = sdCapsule(
+        p, 
+        vec3(cellSize.x * floor(p.x/cellSize.x), 0.0, 0.0),
+        vec3(cellSize.x * floor(p.x/cellSize.x), 0.0, cellSize.z * floor(p.z/cellSize.z)),
+        0.05
+    );
     
-    path = min(path, sdCapsule(p, 
-                              vec3(0.0, 0.0, cellSize.z * floor(p.z/cellSize.z)),
-                              vec3(cellSize.x * floor(p.x/cellSize.x), 0.0, cellSize.z * floor(p.z/cellSize.z)),
-                              0.05));
-    
-    // Combine shapes with smooth min
-    float k = 0.2 + 0.1 * sin(vTime);
+    // Combine shapes
     float d = min(sphere, box);
     
-    // Add noise displacement
-    d += 0.05 * fbm(p * 2.0 + vTime * 0.1);
+    // Add subtle noise displacement
+    d += 0.03 * fbm(p * 2.0 + vTime * 0.1);
     
     return min(d, path);
 }
@@ -129,13 +131,12 @@ float rayMarch(vec3 ro, vec3 rd) {
 
 // Normal calculation
 vec3 getNormal(vec3 p) {
-    float d = getDist(p);
     vec2 e = vec2(0.001, 0.0);
     
-    vec3 n = d - vec3(
-        getDist(p - e.xyy),
-        getDist(p - e.yxy),
-        getDist(p - e.yyx)
+    vec3 n = vec3(
+        getDist(p + e.xyy) - getDist(p - e.xyy),
+        getDist(p + e.yxy) - getDist(p - e.yxy),
+        getDist(p + e.yyx) - getDist(p - e.yyx)
     );
     
     return normalize(n);
@@ -188,19 +189,9 @@ void main() {
     vec2 uv = v_uv - 0.5;
     uv.x *= uResolution.x / uResolution.y;
     
-    // Simulated mouse influence
-    vec2 simulatedMouse = vec2(
-        sin(vTime * 0.3) * 0.25 + 0.5,
-        cos(vTime * 0.4) * 0.25 + 0.5
-    );
-    vec2 mouseUV = simulatedMouse - 0.5;
-    mouseUV.x *= uResolution.x / uResolution.y;
-    float mouseDist = length(uv - mouseUV);
-    float mouseInfluence = smoothstep(0.5, 0.0, mouseDist);
-    
     // Ray setup
     vec3 ro = vec3(0.0, 2.0 + sin(vTime * 0.5), -5.0); // Ray origin (camera position)
-    vec3 rd = normalize(vec3(uv, 1.0 + 0.5 * mouseInfluence)); // Ray direction
+    vec3 rd = normalize(vec3(uv, 1.0)); // Ray direction
     
     // Apply camera rotation
     float camAngle = vTime * 0.2;
