@@ -98,8 +98,8 @@ class Carousel {
         this.windows = [];
         
         const totalWindows = this.shaderConfigs.length;
-        const radius = 800; // Increased radius for better spacing
-        const verticalOffset = 100; // Slight vertical offset
+        const radius = 8.0; // Reduced radius to fit in camera view
+        const verticalOffset = 1.0; // Reduced vertical offset
         
         for (let i = 0; i < totalWindows; i++) {
             const config = this.shaderConfigs[i];
@@ -163,13 +163,12 @@ class Carousel {
         this.lastFrameTime = timestamp;
 
         // Smoother rotation with easing
-        const rotationSpeed = 0.004;
         const ease = 0.08;
         const rotationDelta = this.targetRotationAngle - this.rotationAngle;
         this.rotationAngle += rotationDelta * ease;
 
         // Add subtle floating motion
-        const floatAmplitude = 20;
+        const floatAmplitude = 0.2; // Reduced amplitude
         const floatSpeed = 0.001;
         const floatOffset = Math.sin(timestamp * floatSpeed) * floatAmplitude;
 
@@ -190,14 +189,6 @@ class Carousel {
     render(timestamp) {
         const gl = this.gl;
         
-        // If still loading, update the loading screen
-        if (this.isLoading) {
-            // Just clear the background
-            gl.clearColor(0.05, 0.05, 0.1, 1.0);
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-            return;
-        }
-        
         // Clear the canvas
         gl.clearColor(0.05, 0.05, 0.1, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -205,12 +196,21 @@ class Carousel {
         // Calculate time for shaders
         const time = (timestamp - this.loadingStartTime) / 1000.0;
         
-        // Update view matrix
+        // Update view matrix with adjusted camera position
         mat4.identity(this.viewMatrix);
-        mat4.lookAt(this.viewMatrix, [0, 0, 10], [0, 0, 0], [0, 1, 0]);
+        mat4.lookAt(this.viewMatrix, [0, 0, 15], [0, 0, 0], [0, 1, 0]); // Moved camera back
         mat4.rotateY(this.viewMatrix, this.viewMatrix, this.rotationAngle);
         
         // Render all windows
+        console.log('Rendering carousel with', this.windows.length, 'windows');
+        console.log('Camera position:', [0, 0, 15]);
+        console.log('Rotation angle:', this.rotationAngle);
+
+        // First window position
+        if (this.windows.length > 0) {
+            console.log('First window position:', this.windows[0].position);
+        }
+
         for (const window of this.windows) {
             window.render(this.viewMatrix, this.projectionMatrix, time);
         }

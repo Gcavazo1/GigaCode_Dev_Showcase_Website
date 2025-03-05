@@ -75,25 +75,25 @@ class ShaderWindow {
   createBuffers() {
     const gl = this.gl;
     
-    // Create a plane geometry
+    // Create a plane geometry (larger size)
     const positions = [
-      // Front face
-      -1.0, -1.0,  0.0,
-       1.0, -1.0,  0.0,
-       1.0,  1.0,  0.0,
-      -1.0,  1.0,  0.0,
+        // Front face
+        -1.0, -0.75, 0.0,
+         1.0, -0.75, 0.0,
+         1.0,  0.75, 0.0,
+        -1.0,  0.75, 0.0,
     ];
     
     const texCoords = [
-      0.0, 0.0,
-      1.0, 0.0,
-      1.0, 1.0,
-      0.0, 1.0,
+        0.0, 0.0,
+        1.0, 0.0,
+        1.0, 1.0,
+        0.0, 1.0,
     ];
     
     const indices = [
-      0, 1, 2,
-      0, 2, 3,
+        0, 1, 2,
+        0, 2, 3,
     ];
     
     // Position buffer
