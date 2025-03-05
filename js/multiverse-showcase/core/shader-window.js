@@ -30,10 +30,14 @@ class ShaderWindow {
     };
     this.position = { x: 0, y: 0, z: 0 }; // Initialize position
     this.rotation = { x: 0, y: 0, z: 0 };
-    this.scale = 2.0; // Default scale (increase this for larger windows)
+    this.scale = 1.0;  // Keep scale for compatibility
     this.isExpanded = false;
     this.isReady = false;
     this.startTime = performance.now();
+    
+    // Add width and height properties
+    this.width = 1.6;  // Width in WebGL units
+    this.height = 3.2; // Height in WebGL units
     
     // Initialize
     this.init();
@@ -75,13 +79,16 @@ class ShaderWindow {
   createBuffers() {
     const gl = this.gl;
     
-    // Simple square geometry with 1:1 ratio
+    // Use width and height to create rectangle
+    const halfWidth = this.width / 2;
+    const halfHeight = this.height / 2;
+    
     const positions = [
-        // Front face - simple square
-        -1.0, -1.0, 0.0,
-         1.0, -1.0, 0.0,
-         1.0,  1.0, 0.0,
-        -1.0,  1.0, 0.0,
+      // Front face - rectangle with specified dimensions
+      -halfWidth, -halfHeight, 0.0,
+       halfWidth, -halfHeight, 0.0,
+       halfWidth,  halfHeight, 0.0,
+      -halfWidth,  halfHeight, 0.0,
     ];
     
     const texCoords = [
@@ -213,7 +220,10 @@ class ShaderWindow {
    */
   setHover(isHovered) {
     this.isHovered = isHovered;
-    this.targetScale = isHovered ? 1.7 : 1.5;
+    this.targetWidth = isHovered ? 2.4 : 2.0;
+    this.targetHeight = isHovered ? 2.4 : 2.0;
+    // Update buffers with new dimensions
+    this.updateGeometry();
   }
   
   /**
@@ -222,7 +232,10 @@ class ShaderWindow {
    */
   setExpanded(isExpanded) {
     this.isExpanded = isExpanded;
-    this.targetScale = isExpanded ? 3.0 : (this.isHovered ? 1.7 : 1.5);
+    this.targetWidth = isExpanded ? 4.0 : (this.isHovered ? 2.4 : 2.0);
+    this.targetHeight = isExpanded ? 3.0 : (this.isHovered ? 2.4 : 2.0);
+    // Update buffers with new dimensions
+    this.updateGeometry();
     
     // This might be overriding your CSS
     const element = document.getElementById(this.id);
@@ -269,6 +282,24 @@ class ShaderWindow {
     }
     
     return false;
+  }
+  
+  // Add a method to update geometry with new dimensions
+  updateGeometry() {
+    const gl = this.gl;
+    
+    const halfWidth = this.width / 2;
+    const halfHeight = this.height / 2;
+    
+    const positions = [
+      -halfWidth, -halfHeight, 0.0,
+       halfWidth, -halfHeight, 0.0,
+       halfWidth,  halfHeight, 0.0,
+      -halfWidth,  halfHeight, 0.0,
+    ];
+    
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.positionBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
   }
 }
 
