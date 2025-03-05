@@ -84,21 +84,32 @@ class ShaderLoader {
   }
   
   /**
-   * Load a pair of vertex and fragment shaders
+   * Load and compile a pair of vertex and fragment shaders
+   * @param {WebGLRenderingContext} gl - WebGL context
    * @param {string} vertexShaderPath - Path to vertex shader
    * @param {string} fragmentShaderPath - Path to fragment shader
-   * @returns {Promise<{vertexShader: string, fragmentShader: string}>} Shader sources
+   * @returns {Promise<{vertexShader: WebGLShader, fragmentShader: WebGLShader}>} Compiled shaders
    */
-  static async loadShaderPair(vertexShaderPath, fragmentShaderPath) {
-    const [vertexSource, fragmentSource] = await Promise.all([
-      this.loadShader(vertexShaderPath),
-      this.loadShader(fragmentShaderPath)
-    ]);
-    
-    return {
-      vertexShader: vertexSource,
-      fragmentShader: fragmentSource
-    };
+  static async loadAndCompileShaderPair(gl, vertexShaderPath, fragmentShaderPath) {
+    try {
+      // Load shader sources
+      const [vertexSource, fragmentSource] = await Promise.all([
+        this.loadShader(vertexShaderPath),
+        this.loadShader(fragmentShaderPath)
+      ]);
+      
+      // Compile shaders
+      const vertexShader = this.compileShader(gl, vertexSource, gl.VERTEX_SHADER);
+      const fragmentShader = this.compileShader(gl, fragmentSource, gl.FRAGMENT_SHADER);
+      
+      return {
+        vertexShader,
+        fragmentShader
+      };
+    } catch (error) {
+      console.error('Error loading and compiling shaders:', error);
+      throw error;
+    }
   }
 }
 

@@ -44,8 +44,9 @@ class ShaderWindow {
    */
   async init() {
     try {
-      // Load shaders
-      const { vertexShader, fragmentShader } = await ShaderLoader.loadShaderPair(
+      // Load and compile shaders
+      const { vertexShader, fragmentShader } = await ShaderLoader.loadAndCompileShaderPair(
+        this.gl,
         this.vertexShaderPath,
         this.fragmentShaderPath
       );
