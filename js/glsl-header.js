@@ -24,22 +24,85 @@ class GLSLHeader {
     async init() {
         console.log('Starting initialization');
         
-        // Let's use a simple test shader first
+        // Use the fractal shader from the multiverse showcase
         const vertexShaderSource = `
             attribute vec4 aPosition;
+            attribute vec2 aTexCoord;
+            
+            uniform mat4 uModelViewMatrix;
+            uniform mat4 uProjectionMatrix;
+            uniform float uTime;
+            
+            varying vec2 vTexCoord;
+            varying float vTime;
+            
             void main() {
                 gl_Position = aPosition;
+                vTexCoord = aTexCoord;
+                vTime = uTime;
             }
         `;
         
         const fragmentShaderSource = `
             precision mediump float;
-            uniform float uTime;
+            
+            varying vec2 vTexCoord;
+            varying float vTime;
+            
             uniform vec2 uResolution;
+            uniform float uIntensity;
+            
+            vec2 cmul(vec2 a, vec2 b) {
+                return vec2(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);
+            }
             
             void main() {
                 vec2 uv = gl_FragCoord.xy/uResolution.xy;
-                vec3 color = 0.5 + 0.5*cos(uTime+uv.xyx+vec3(0,2,4));
+                uv = uv * 2.0 - 1.0;
+                uv.x *= uResolution.x/uResolution.y;
+                
+                float zoom = 2.5 - sin(vTime * 0.1) * 0.5;
+                uv /= zoom;
+                
+                float time = vTime * 0.2;
+                vec2 c = vec2(0.7885 * cos(time), 0.7885 * sin(time));
+                
+                vec2 z = uv;
+                float iterations = 0.0;
+                const float maxIterations = 100.0;
+                
+                for (float i = 0.0; i < 100.0; i++) {
+                    z = cmul(z, z) + c;
+                    if (length(z) > 2.0) {
+                        break;
+                    }
+                    iterations = i;
+                }
+                
+                float normalized = iterations / maxIterations;
+                float smooth_value = normalized + 1.0 - log(log(length(z))) / log(2.0);
+                smooth_value = pow(smooth_value, 0.5);
+                
+                vec3 color1 = vec3(0.0, 0.0, 0.3);
+                vec3 color2 = vec3(0.5, 0.0, 0.5);
+                vec3 color3 = vec3(1.0, 0.4, 0.0);
+                vec3 color4 = vec3(1.0, 0.8, 0.0);
+                
+                vec3 color;
+                float t = fract(smooth_value * 3.0 + vTime * 0.2);
+                
+                if (t < 0.33) {
+                    color = mix(color1, color2, t * 3.0);
+                } else if (t < 0.66) {
+                    color = mix(color2, color3, (t - 0.33) * 3.0);
+                } else {
+                    color = mix(color3, color4, (t - 0.66) * 3.0);
+                }
+                
+                if (iterations >= maxIterations - 1.0) {
+                    color = vec3(0.0);
+                }
+                
                 gl_FragColor = vec4(color, 1.0);
             }
         `;
