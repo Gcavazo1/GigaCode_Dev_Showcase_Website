@@ -225,7 +225,7 @@
 .glsl-header {
     position: relative;
     width: 100%;
-    height: 150px; /* Increased height for better visibility */
+    height: 150px;
     margin-bottom: 3rem;
     overflow: hidden;
     border-radius: 8px;
@@ -239,6 +239,8 @@
     left: 0;
     width: 100%;
     height: 100%;
+    display: block;
+    background: #000;
 }
 
 .header-text {

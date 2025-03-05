@@ -1,24 +1,66 @@
 class GLSLHeader {
     constructor() {
+        console.log('Initializing GLSLHeader');
         this.canvas = document.getElementById('header-shader-canvas');
-        this.gl = this.canvas.getContext('webgl');
-        this.startTime = Date.now();
         
+        if (!this.canvas) {
+            console.error('Could not find header-shader-canvas');
+            return;
+        }
+        
+        this.gl = this.canvas.getContext('webgl');
         if (!this.gl) {
             console.error('WebGL not supported');
             return;
         }
         
+        this.startTime = Date.now();
+        console.log('WebGL context created successfully');
+        
+        // Initialize immediately
         this.init();
     }
     
     async init() {
-        // Initialize shaders
-        const vertexShader = await this.loadShader('vertex');
-        const fragmentShader = await this.loadShader('fragment');
+        console.log('Starting initialization');
         
-        // Create shader program
+        // Let's use a simple test shader first
+        const vertexShaderSource = `
+            attribute vec4 aPosition;
+            void main() {
+                gl_Position = aPosition;
+            }
+        `;
+        
+        const fragmentShaderSource = `
+            precision mediump float;
+            uniform float uTime;
+            uniform vec2 uResolution;
+            
+            void main() {
+                vec2 uv = gl_FragCoord.xy/uResolution.xy;
+                vec3 color = 0.5 + 0.5*cos(uTime+uv.xyx+vec3(0,2,4));
+                gl_FragColor = vec4(color, 1.0);
+            }
+        `;
+        
+        // Create shaders
+        const vertexShader = this.createShaderFromSource(vertexShaderSource, this.gl.VERTEX_SHADER);
+        const fragmentShader = this.createShaderFromSource(fragmentShaderSource, this.gl.FRAGMENT_SHADER);
+        
+        if (!vertexShader || !fragmentShader) {
+            console.error('Failed to create shaders');
+            return;
+        }
+        
+        // Create program
         this.program = this.createProgram(vertexShader, fragmentShader);
+        if (!this.program) {
+            console.error('Failed to create shader program');
+            return;
+        }
+        
+        console.log('Shader program created successfully');
         
         // Set up geometry
         this.setupGeometry();
@@ -35,33 +77,20 @@ class GLSLHeader {
         
         // Start animation
         this.animate();
+        console.log('Initialization complete');
     }
     
-    async loadShader(type) {
-        const shaderPath = `js/multiverse-showcase/shaders/showcase11/fractal.${type === 'vertex' ? 'vert' : 'frag'}`;
-        console.log(`Loading shader from: ${shaderPath}`);
+    createShaderFromSource(source, type) {
+        const shader = this.gl.createShader(type);
+        this.gl.shaderSource(shader, source);
+        this.gl.compileShader(shader);
         
-        try {
-            const response = await fetch(shaderPath);
-            if (!response.ok) {
-                throw new Error(`Failed to load shader: ${response.statusText}`);
-            }
-            const source = await response.text();
-            console.log(`Shader loaded successfully: ${type}`);
-            
-            const shader = this.gl.createShader(type === 'vertex' ? this.gl.VERTEX_SHADER : this.gl.FRAGMENT_SHADER);
-            this.gl.shaderSource(shader, source);
-            this.gl.compileShader(shader);
-            
-            if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
-                throw new Error(`Shader compile error: ${this.gl.getShaderInfoLog(shader)}`);
-            }
-            
-            return shader;
-        } catch (error) {
-            console.error('Shader loading error:', error);
+        if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
+            console.error(`Shader compile error: ${this.gl.getShaderInfoLog(shader)}`);
             return null;
         }
+        
+        return shader;
     }
     
     createProgram(vertexShader, fragmentShader) {
@@ -120,5 +149,6 @@ class GLSLHeader {
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, creating GLSLHeader');
     new GLSLHeader();
 }); 
