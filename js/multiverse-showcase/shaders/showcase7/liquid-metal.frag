@@ -1,4 +1,4 @@
-// Enhanced Liquid Metal
+// Plasma Wave shader - Colorful flowing plasma effect
 precision mediump float;
 
 varying vec2 vTexCoord;
@@ -7,90 +7,78 @@ varying float vTime;
 uniform vec2 uResolution;
 uniform float uIntensity;
 
-// Noise functions
-float hash(float n) { return fract(sin(n) * 43758.5453123); }
+// Adjustable parameters
+#define SPEED 0.5
+#define DENSITY 1.5
+#define COLOR_INTENSITY 1.2
 
-float noise(vec2 p) {
-  vec2 ip = floor(p);
-  vec2 u = fract(p);
-  u = u*u*(3.0-2.0*u);
-  
-  float res = mix(
-    mix(hash(dot(ip, vec2(1.0, 157.0))), hash(dot(ip + vec2(1.0, 0.0), vec2(1.0, 157.0))), u.x),
-    mix(hash(dot(ip + vec2(0.0, 1.0), vec2(1.0, 157.0))), hash(dot(ip + vec2(1.0, 1.0), vec2(1.0, 157.0))), u.x),
-    u.y);
-  return res*res; // Squared for sharper contrast
-}
-
-float fbm(vec2 p) {
-  float f = 0.0;
-  float w = 0.5;
-  float time = vTime * 0.2;
-  for (int i = 0; i < 6; i++) { // Increased octaves
-    f += w * noise(p + time);
-    p *= 2.1; // Slightly uneven frequency multiplier
-    w *= 0.5;
-  }
-  return f;
+// Noise function
+float hash(vec2 p) {
+  p = fract(p * vec2(123.34, 456.21));
+  p += dot(p, p + 45.32);
+  return fract(p.x * p.y);
 }
 
 void main() {
+  // Normalized coordinates
   vec2 uv = vTexCoord;
-  float ratio = uResolution.x / uResolution.y;
-  uv.x *= ratio;
+  uv = uv * 2.0 - 1.0;
+  uv.x *= uResolution.x / uResolution.y;
   
-  float time = vTime * 0.2;
+  // Time variable
+  float time = vTime * SPEED;
   
-  // Enhanced layered displacement
-  float displacement = 0.0;
+  // Create plasma effect by layering sine waves
+  float plasma = 0.0;
   
-  // Dynamic wave patterns
-  vec2 p1 = uv * 2.0 + vec2(sin(time * 0.5), cos(time * 0.3)) * 0.2;
-  displacement += fbm(p1) * 0.4;
+  // Layer 1: Circular waves
+  float d1 = length(uv);
+  plasma += sin(d1 * 10.0 - time * 1.5) * 0.5;
   
-  vec2 p2 = uv * 4.0 + vec2(cos(time * 0.4), sin(time * 0.6)) * 0.3;
-  displacement += fbm(p2) * 0.2;
+  // Layer 2: Diagonal waves
+  float d2 = length(uv + vec2(sin(time * 0.2), cos(time * 0.3)) * 0.5);
+  plasma += sin(d2 * 8.0 + time) * 0.5;
   
-  vec2 p3 = uv * 8.0 + displacement * 2.0;
-  displacement += fbm(p3) * 0.1;
+  // Layer 3: Horizontal wave
+  plasma += sin(uv.x * 6.0 + sin(time * 0.3 + uv.y * 3.0) * 0.5) * 0.5;
   
-  // Enhanced normal calculation
-  vec2 eps = vec2(0.01, 0.0);
-  float nx = fbm(vec2(uv.x + eps.x, uv.y)) - fbm(vec2(uv.x - eps.x, uv.y));
-  float ny = fbm(vec2(uv.x, uv.y + eps.x)) - fbm(vec2(uv.x, uv.y - eps.x));
-  vec3 normal = normalize(vec3(nx, ny, 0.3));
+  // Layer 4: Vertical wave
+  plasma += sin(uv.y * 5.0 + sin(time * 0.4 + uv.x * 2.5) * 0.6) * 0.5;
   
-  // Dynamic environment mapping
-  vec2 reflectionUV = uv + normal.xy * (0.2 + sin(time) * 0.1);
-  float reflection = fbm(reflectionUV * 3.0 + time * 0.1);
+  // Normalize to 0-1 range
+  plasma = plasma * 0.25 + 0.5;
   
-  // Enhanced metallic colors
-  vec3 baseColor = mix(
-    vec3(0.7, 0.8, 1.0), // Cool silver
-    vec3(0.9, 0.8, 0.6), // Warm gold
-    sin(displacement * 5.0 + time) * 0.5 + 0.5
-  );
+  // Color mapping using different phase shifts for RGB
+  vec3 color;
+  color.r = sin(plasma * 6.28 + 0.0) * 0.5 + 0.5;
+  color.g = sin(plasma * 6.28 + 2.09) * 0.5 + 0.5;
+  color.b = sin(plasma * 6.28 + 4.19) * 0.5 + 0.5;
   
-  vec3 reflectionColor = mix(
-    vec3(1.0, 0.9, 0.6), // Gold
-    vec3(0.6, 0.8, 1.0), // Blue
-    reflection
-  );
+  // Add glow
+  float glow = 0.6 - length(uv) * 0.5;
+  glow = max(0.0, glow);
   
-  // Combine with enhanced contrast
-  vec3 color = mix(baseColor, reflectionColor, reflection * 0.8);
-  color *= 0.8 + displacement * 0.7;
+  // Add movement to glow
+  glow *= 1.0 + 0.2 * sin(time * 0.5);
   
-  // Enhanced specular highlights
-  float specular = pow(max(0.0, normal.z), 8.0) * 2.0;
-  color += vec3(specular);
+  // Enhance colors
+  color = mix(color, vec3(1.0, 0.4, 0.1), glow * 0.5);
+  color = mix(color, vec3(0.2, 0.5, 1.0), (1.0 - glow) * 0.5);
   
-  // Add iridescence
-  float iridescence = sin(displacement * 10.0 + time) * 0.5 + 0.5;
-  color += vec3(0.2, 0.1, 0.3) * iridescence * 0.2;
+  // Add shimmer effect
+  float shimmer = hash(uv + time) * 0.03;
+  color += vec3(shimmer);
   
-  // Apply intensity with enhanced contrast
-  color = pow(color * uIntensity, vec3(0.9));
+  // Add vignette
+  float vignette = 1.0 - length(uv * 0.5) * 0.8;
+  vignette = smoothstep(0.0, 1.0, vignette);
+  color *= vignette;
+  
+  // Enhance contrast
+  color = pow(color, vec3(0.8)) * COLOR_INTENSITY;
+  
+  // Apply intensity
+  color *= uIntensity;
   
   gl_FragColor = vec4(color, 1.0);
 } 

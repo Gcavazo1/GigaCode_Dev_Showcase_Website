@@ -5,7 +5,7 @@
     height: 100vh;
     overflow: hidden;
     background-color: #050510;
-    perspective: 1500px; /* Enhanced 3D perspective */
+    perspective: 1000px; /* Reduced for more dramatic effect */
 }
 
 .multiverse-canvas {
@@ -89,10 +89,10 @@
 /* Enhanced shader window styling */
 .shader-window {
     position: absolute;
-    width: 400px;
-    height: 300px;
+    width: 300px;  /* Narrower width */
+    height: 450px; /* Taller height */
     background: rgba(20, 20, 30, 0.95);
-    border-radius: 12px;
+    border-radius: 8px;
     overflow: hidden;
     transition: all 0.6s cubic-bezier(0.2, 0.9, 0.3, 1);
     transform-style: preserve-3d;
@@ -131,22 +131,23 @@
     z-index: 100;
 }
 
-/* Navigation arrows */
+/* Navigation arrows - Adjusted positioning */
 .multiverse-nav {
     position: absolute;
     top: 50%;
-    width: 100%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%; /* Reduced width to keep arrows closer */
+    max-width: 1200px;
     z-index: 10;
     display: flex;
     justify-content: space-between;
-    padding: 0 40px;
-    transform: translateY(-50%);
     pointer-events: none;
 }
 
 .nav-arrow {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     background: rgba(20, 20, 30, 0.8);
     border: 1px solid rgba(100, 200, 255, 0.2);
     border-radius: 50%;
@@ -158,6 +159,16 @@
     transition: all 0.3s ease;
     pointer-events: auto;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    font-size: 20px;
+}
+
+/* Add arrow icons */
+.nav-arrow.prev::before {
+    content: '←';
+}
+
+.nav-arrow.next::before {
+    content: '→';
 }
 
 .nav-arrow:hover {

@@ -75,13 +75,13 @@ class ShaderWindow {
   createBuffers() {
     const gl = this.gl;
     
-    // Create a plane geometry (larger size)
+    // Create a plane geometry (taller aspect ratio)
     const positions = [
         // Front face
-        -1.0, -0.75, 0.0,
-         1.0, -0.75, 0.0,
-         1.0,  0.75, 0.0,
-        -1.0,  0.75, 0.0,
+        -0.75, -1.0, 0.0,  // Adjusted for taller windows
+         0.75, -1.0, 0.0,
+         0.75,  1.0, 0.0,
+        -0.75,  1.0, 0.0,
     ];
     
     const texCoords = [

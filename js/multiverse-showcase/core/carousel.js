@@ -44,6 +44,27 @@ class Carousel {
                 this.animate();
             }
         });
+
+        // Add navigation arrows
+        const nav = document.createElement('div');
+        nav.className = 'multiverse-nav';
+        nav.innerHTML = `
+            <button class="nav-arrow prev"></button>
+            <button class="nav-arrow next"></button>
+        `;
+        this.container.appendChild(nav);
+
+        // Add click handlers for arrows
+        const prevButton = nav.querySelector('.prev');
+        const nextButton = nav.querySelector('.next');
+        
+        prevButton.addEventListener('click', () => {
+            this.targetRotationAngle += Math.PI / 4;
+        });
+        
+        nextButton.addEventListener('click', () => {
+            this.targetRotationAngle -= Math.PI / 4;
+        });
     }
     
     /**
@@ -98,8 +119,8 @@ class Carousel {
         this.windows = [];
         
         const totalWindows = this.shaderConfigs.length;
-        const radius = 8.0; // Reduced radius to fit in camera view
-        const verticalOffset = 1.0; // Reduced vertical offset
+        const radius = 5.0; // Reduced radius for tighter spacing
+        const verticalOffset = 0.5; // Reduced vertical offset
         
         for (let i = 0; i < totalWindows; i++) {
             const config = this.shaderConfigs[i];
@@ -115,14 +136,14 @@ class Carousel {
             const angle = (i / totalWindows) * Math.PI * 2;
             const x = Math.cos(angle) * radius;
             const z = Math.sin(angle) * radius;
-            const y = Math.cos(angle * 2) * verticalOffset; // Add subtle wave pattern
+            const y = Math.cos(angle * 2) * verticalOffset;
             
             window.position = { x, y, z };
             
-            // Calculate rotation to face center
+            // Adjust rotation to face slightly upward
             window.rotation = {
-                x: 0,
-                y: -angle + Math.PI / 2, // Face center
+                x: -0.1, // Slight upward tilt
+                y: -angle + Math.PI / 2,
                 z: 0
             };
             
