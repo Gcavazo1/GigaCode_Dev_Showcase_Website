@@ -65,6 +65,21 @@ class Carousel {
         nextButton.addEventListener('click', () => {
             this.targetRotationAngle -= Math.PI / 4;
         });
+
+        // Add Random Showcase button
+        const controlsContainer = document.createElement('div');
+        controlsContainer.className = 'multiverse-controls';
+        controlsContainer.innerHTML = `
+            <button class="showcase-button random-showcase">
+                <span class="button-text">Random Showcase</span>
+                <div class="button-glow"></div>
+            </button>
+        `;
+        this.container.appendChild(controlsContainer);
+
+        // Add click handler for random showcase
+        const randomButton = controlsContainer.querySelector('.random-showcase');
+        randomButton.addEventListener('click', () => this.showRandomWindow());
     }
     
     /**
@@ -95,11 +110,6 @@ class Carousel {
             // Set up camera
             mat4.perspective(this.projectionMatrix, Math.PI / 4, this.canvas.width / this.canvas.height, 0.1, 100.0);
             mat4.lookAt(this.viewMatrix, [0, 0, 10], [0, 0, 0], [0, 1, 0]);
-            
-            // Add event listeners
-            window.addEventListener('resize', this.resizeCanvas.bind(this));
-            this.canvas.addEventListener('click', this.onClick.bind(this));
-            this.canvas.addEventListener('mousemove', this.onMouseMove.bind(this));
             
             // Mark as initialized
             this.isInitialized = true;
@@ -474,6 +484,25 @@ class Carousel {
      */
     updateDragHandlePosition() {
         // Do nothing - drag functionality disabled
+    }
+
+    // Add new method for random window selection
+    showRandomWindow() {
+        // If a window is already expanded, collapse it
+        if (this.expandedWindowIndex !== -1) {
+            this.windows[this.expandedWindowIndex].setExpanded(false);
+        }
+
+        // Select a random window
+        const randomIndex = Math.floor(Math.random() * this.windows.length);
+        
+        // Expand the selected window
+        this.windows[randomIndex].setExpanded(true);
+        this.expandedWindowIndex = randomIndex;
+        
+        // Rotate carousel to center the window
+        const angle = (randomIndex / this.windows.length) * Math.PI * 2;
+        this.targetRotationAngle = -angle + Math.PI / 2;
     }
 }
 

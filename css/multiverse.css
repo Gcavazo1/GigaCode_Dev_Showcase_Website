@@ -297,4 +297,67 @@
     height: 100%;
     display: block;
     background: #000;
+}
+
+.multiverse-controls {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+}
+
+.showcase-button {
+    position: relative;
+    padding: 0.8rem 1.5rem;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 4px;
+    color: rgba(0, 255, 255, 0.8);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.showcase-button:hover {
+    background: rgba(0, 20, 40, 0.8);
+    border-color: rgba(0, 255, 255, 0.6);
+    color: rgba(0, 255, 255, 1);
+}
+
+.showcase-button .button-text {
+    position: relative;
+    z-index: 1;
+}
+
+.showcase-button .button-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, 
+        rgba(0, 255, 255, 0.2) 0%,
+        transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.showcase-button:hover .button-glow {
+    opacity: 1;
+}
+
+/* Add pulse animation on hover */
+@keyframes buttonPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.showcase-button:hover {
+    animation: buttonPulse 2s infinite;
 } 
