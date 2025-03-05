@@ -48,6 +48,18 @@ document.addEventListener('DOMContentLoaded', () => {
       description: 'Northern lights dancing in the sky',
       vertexShaderPath: 'js/multiverse-showcase/shaders/showcase6/aurora.vert',
       fragmentShaderPath: 'js/multiverse-showcase/shaders/showcase6/aurora.frag'
+    },
+    {
+      title: 'Liquid Metal',
+      description: 'Dynamic liquid metal surface with realistic physics',
+      vertexShaderPath: 'js/multiverse-showcase/shaders/showcase7/liquid-metal.vert',
+      fragmentShaderPath: 'js/multiverse-showcase/shaders/showcase7/liquid-metal.frag'
+    },
+    {
+      title: 'Neon Grid',
+      description: 'Retrowave cyberpunk landscape with infinite grid',
+      vertexShaderPath: 'js/multiverse-showcase/shaders/showcase8/neon-grid.vert',
+      fragmentShaderPath: 'js/multiverse-showcase/shaders/showcase8/neon-grid.frag'
     }
   ];
   
