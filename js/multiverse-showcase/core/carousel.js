@@ -85,7 +85,7 @@ class Carousel {
         buttonOverlay.className = 'button-overlay';
         buttonOverlay.innerHTML = `
             <button class="showcase-button random-showcase">
-                <span class="button-text">Random Showcase</span>
+                <span class="button-text" data-text="Random Showcase">Random Showcase</span>
                 <div class="button-glow"></div>
             </button>
         `;

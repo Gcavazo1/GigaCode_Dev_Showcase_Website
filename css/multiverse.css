@@ -311,69 +311,206 @@
     height: 100px;
 }
 
+/* Button Shader Container and Overlay Styles */
+.button-shader-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(102, 0, 255, 0.5);
+}
+
 .button-bg-canvas {
     position: absolute;
     top: 0;
     left: 0;
-    transform: none;
     width: 100%;
     height: 100%;
-    z-index: -1;
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-.showcase-button {
-    position: relative;
-    padding: 0.8rem 1.5rem;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(0, 255, 255, 0.3);
-    border-radius: 4px;
-    color: rgba(0, 255, 255, 0.8);
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    overflow: hidden;
-    margin: auto;
     z-index: 1;
 }
 
-.showcase-button:hover {
-    background: rgba(0, 20, 40, 0.8);
-    border-color: rgba(0, 255, 255, 0.6);
-    color: rgba(0, 255, 255, 1);
-}
-
-.showcase-button .button-text {
-    position: relative;
-    z-index: 1;
-}
-
-.showcase-button .button-glow {
+.button-overlay {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle at center, 
-        rgba(0, 255, 255, 0.2) 0%,
-        transparent 70%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.3); /* Semi-transparent overlay */
 }
 
-.showcase-button:hover .button-glow {
-    opacity: 1;
+.showcase-button {
+    position: relative;
+    background: transparent;
+    border: 2px solid rgba(102, 0, 255, 0.8);
+    color: #fff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    padding: 12px 24px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    width: 90%;
+    height: 80%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-radius: 4px;
 }
 
-/* Add pulse animation on hover */
-@keyframes buttonPulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
+.button-text {
+    position: relative;
+    z-index: 2;
+    text-shadow: 0 0 10px rgba(102, 0, 255, 0.8), 0 0 20px rgba(102, 0, 255, 0.4);
+    animation: textPulse 3s infinite alternate;
+}
+
+.button-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(102, 0, 255, 0.1), rgba(0, 255, 255, 0.1));
+    filter: blur(10px);
+    opacity: 0.5;
+    z-index: 1;
+    animation: glowPulse 4s infinite alternate;
 }
 
 .showcase-button:hover {
-    animation: buttonPulse 2s infinite;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(102, 0, 255, 0.3);
+    border-color: rgba(0, 255, 255, 0.8);
+}
+
+.showcase-button:hover .button-glow {
+    opacity: 0.8;
+    animation: glowIntense 2s infinite alternate;
+}
+
+.showcase-button:active {
+    transform: translateY(1px);
+}
+
+/* Animations for the button */
+@keyframes textPulse {
+    0% {
+        opacity: 0.8;
+        text-shadow: 0 0 10px rgba(102, 0, 255, 0.8), 0 0 20px rgba(102, 0, 255, 0.4);
+    }
+    100% {
+        opacity: 1;
+        text-shadow: 0 0 15px rgba(0, 255, 255, 0.8), 0 0 30px rgba(0, 255, 255, 0.6);
+    }
+}
+
+@keyframes glowPulse {
+    0% {
+        opacity: 0.3;
+        filter: blur(10px);
+    }
+    100% {
+        opacity: 0.7;
+        filter: blur(15px);
+    }
+}
+
+@keyframes glowIntense {
+    0% {
+        opacity: 0.6;
+        filter: blur(10px);
+    }
+    50% {
+        opacity: 0.9;
+        filter: blur(20px);
+    }
+    100% {
+        opacity: 0.7;
+        filter: blur(15px);
+    }
+}
+
+/* Add a flowing effect similar to the header */
+.button-shader-container::before {
+    content: '';
+    position: absolute;
+    top: -10%;
+    left: -10%;
+    width: 120%;
+    height: 120%;
+    background: linear-gradient(45deg, 
+        rgba(102, 0, 255, 0) 0%,
+        rgba(102, 0, 255, 0.1) 25%, 
+        rgba(0, 255, 255, 0.2) 50%, 
+        rgba(102, 0, 255, 0.1) 75%,
+        rgba(102, 0, 255, 0) 100%);
+    z-index: 3;
+    pointer-events: none;
+    animation: flowEffect 8s linear infinite;
+}
+
+@keyframes flowEffect {
+    0% {
+        transform: rotate(0deg) translateX(-5%) translateY(5%);
+    }
+    50% {
+        transform: rotate(180deg) translateX(5%) translateY(-5%);
+    }
+    100% {
+        transform: rotate(360deg) translateX(-5%) translateY(5%);
+    }
+}
+
+/* Add offset text effect like in the header */
+.showcase-button .button-text {
+    position: relative;
+    display: inline-block;
+}
+
+.showcase-button .button-text::before,
+.showcase-button .button-text::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+.showcase-button .button-text::before {
+    color: rgba(255, 0, 255, 0.7);
+    animation: glitchOffset 3s infinite alternate;
+}
+
+.showcase-button .button-text::after {
+    color: rgba(0, 255, 255, 0.7);
+    animation: glitchOffset 2s infinite alternate-reverse;
+}
+
+@keyframes glitchOffset {
+    0% {
+        transform: translate(-2px, 2px);
+    }
+    25% {
+        transform: translate(2px, -2px);
+    }
+    50% {
+        transform: translate(-1px, 1px);
+    }
+    75% {
+        transform: translate(1px, -1px);
+    }
+    100% {
+        transform: translate(2px, 2px);
+    }
 } 
