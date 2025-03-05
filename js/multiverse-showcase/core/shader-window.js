@@ -289,9 +289,9 @@ class ShaderWindow {
     
     this.isExpanded = isExpanded;
     
-    // Set target dimensions
-    this.targetWidth = isExpanded ? 4.0 : (this.isHovered ? 2.4 : 2.0);
-    this.targetHeight = isExpanded ? 3.0 : (this.isHovered ? 2.4 : 2.0);
+    // Set target dimensions - always return to 2.4 when not expanded
+    this.targetWidth = isExpanded ? 4.0 : 2.4;  // Always return to 2.4 width
+    this.targetHeight = isExpanded ? 3.0 : 3.6; // Always return to 3.6 height
     
     // Start animation
     this.isAnimating = true;
@@ -313,35 +313,67 @@ class ShaderWindow {
    * @returns {boolean} - Whether the ray intersects with this window
    */
   intersectsRay(rayOrigin, rayDirection) {
-    // Simple plane intersection test
-    const planeNormal = { x: 0, y: 0, z: 1 };
-    const planePoint = this.position;
+    // Get the window's normal vector considering its rotation
+    const normal = {
+        x: Math.sin(this.rotation.y),
+        y: Math.sin(this.rotation.x),
+        z: Math.cos(this.rotation.y)
+    };
     
-    const denom = rayDirection.x * planeNormal.x + 
-                  rayDirection.y * planeNormal.y + 
-                  rayDirection.z * planeNormal.z;
+    // Normalize the normal vector
+    const normalLength = Math.sqrt(
+        normal.x * normal.x + 
+        normal.y * normal.y + 
+        normal.z * normal.z
+    );
+    normal.x /= normalLength;
+    normal.y /= normalLength;
+    normal.z /= normalLength;
     
-    if (Math.abs(denom) > 0.0001) {
-      const t = ((planePoint.x - rayOrigin.x) * planeNormal.x +
-                (planePoint.y - rayOrigin.y) * planeNormal.y +
-                (planePoint.z - rayOrigin.z) * planeNormal.z) / denom;
-      
-      if (t >= 0) {
-        const hitPoint = {
-          x: rayOrigin.x + rayDirection.x * t,
-          y: rayOrigin.y + rayDirection.y * t,
-          z: rayOrigin.z + rayDirection.z * t
-        };
-        
-        // Check if hit point is within window bounds using width and height
-        const dx = hitPoint.x - this.position.x;
-        const dy = hitPoint.y - this.position.y;
-        
-        return Math.abs(dx) <= this.width/2 && Math.abs(dy) <= this.height/2;
-      }
-    }
+    // Calculate intersection with window plane
+    const denom = (
+        rayDirection.x * normal.x +
+        rayDirection.y * normal.y +
+        rayDirection.z * normal.z
+    );
     
-    return false;
+    // Check if ray is parallel to plane
+    if (Math.abs(denom) < 0.001) return false;
+    
+    // Calculate distance to intersection
+    const t = (
+        (this.position.x - rayOrigin.x) * normal.x +
+        (this.position.y - rayOrigin.y) * normal.y +
+        (this.position.z - rayOrigin.z) * normal.z
+    ) / denom;
+    
+    // Check if intersection is behind the ray
+    if (t < 0) return false;
+    
+    // Calculate intersection point
+    const hitPoint = {
+        x: rayOrigin.x + rayDirection.x * t,
+        y: rayOrigin.y + rayDirection.y * t,
+        z: rayOrigin.z + rayDirection.z * t
+    };
+    
+    // Transform hit point to window's local space
+    const localX = (
+        (hitPoint.x - this.position.x) * Math.cos(-this.rotation.y) -
+        (hitPoint.z - this.position.z) * Math.sin(-this.rotation.y)
+    );
+    const localY = hitPoint.y - this.position.y;
+    
+    // Add a small margin to make selection easier (10% larger hit box)
+    const margin = 1.1;
+    const halfWidth = (this.width * this.scale * margin) / 2;
+    const halfHeight = (this.height * this.scale * margin) / 2;
+    
+    // Check if hit point is within window bounds
+    return (
+        Math.abs(localX) <= halfWidth &&
+        Math.abs(localY) <= halfHeight
+    );
   }
   
   // Add a method to update geometry with new dimensions

@@ -139,6 +139,17 @@
 
     <!-- Main Content -->
     <main class="main-content">
+        <!-- Replace the old header with this new GLSL header -->
+        <div class="glsl-header">
+            <canvas id="header-shader-canvas"></canvas>
+            <div class="header-text">
+                <h1 class="outline-text">GLSL MULTIVERSE</h1>
+            </div>
+        </div>
+
+        <!-- Add extra spacing for tagline -->
+        <div style="height: 2rem"></div>
+
         <!-- Create a container for home and AI sections -->
         <div class="home-ai-container">
             <!-- Home Section -->
@@ -647,11 +658,6 @@
 
         <!-- Move the multiverse section here with its original structure -->
         <section id="multiverse-section" class="section">
-            <div class="section-header">
-                <h2 class="cyber-heading">Multiverse Showcase</h2>
-                <p>Explore a collection of interactive GLSL shader effects</p>
-                <div class="neon-separator"></div>
-            </div>
             <div id="multiverse-container" class="multiverse-container">
                 <div class="multiverse-loading">
                     <div class="spinner"></div>
@@ -930,5 +936,8 @@
 
     <!-- Multiverse Showcase script (add this before your main.js) -->
     <script type="module" src="js/multiverse-showcase.js"></script>
+
+    <!-- Add this in your head section or before closing body -->
+    <script src="js/glsl-header.js"></script>
 </body>
 </html>

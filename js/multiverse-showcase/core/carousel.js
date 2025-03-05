@@ -270,6 +270,14 @@ class Carousel {
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
         
+        // Add a small threshold to prevent hover jitter
+        if (Math.abs(x - this.lastMouseX) < 2 && Math.abs(y - this.lastMouseY) < 2) {
+            return;
+        }
+        
+        this.lastMouseX = x;
+        this.lastMouseY = y;
+        
         // Normalize coordinates
         const normalizedX = (x / rect.width) * 2 - 1;
         const normalizedY = -((y / rect.height) * 2 - 1);
@@ -345,10 +353,13 @@ class Carousel {
             }
         }
         
-        // Update hover states
-        for (let i = 0; i < this.windows.length; i++) {
-            this.windows[i].setHover(i === hoveredIndex);
-        }
+        // Update hover states with debounce
+        clearTimeout(this.hoverDebounceTimeout);
+        this.hoverDebounceTimeout = setTimeout(() => {
+            for (let i = 0; i < this.windows.length; i++) {
+                this.windows[i].setHover(i === hoveredIndex);
+            }
+        }, 16); // ~1 frame delay
     }
     
     /**
