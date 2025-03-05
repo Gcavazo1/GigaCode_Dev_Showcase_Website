@@ -1,0 +1,117 @@
+/* Shader Windows Styles */
+
+.shader-window {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s ease;
+}
+
+.shader-window:hover {
+  transform: scale(1.05);
+}
+
+.shader-window.expanded {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1);
+  width: 80vw;
+  height: 80vh;
+  z-index: 100;
+}
+
+.shader-window-content {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.shader-window-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 20px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+  color: white;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.shader-window:hover .shader-window-overlay,
+.shader-window.expanded .shader-window-overlay {
+  opacity: 1;
+}
+
+.shader-window-title {
+  font-size: 18px;
+  margin: 0 0 5px 0;
+  font-weight: bold;
+}
+
+.shader-window-description {
+  font-size: 14px;
+  margin: 0;
+  opacity: 0.8;
+}
+
+.shader-window-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s ease, background-color 0.3s ease;
+}
+
+.shader-window.expanded .shader-window-close {
+  opacity: 1;
+}
+
+.shader-window-close:hover {
+  background-color: rgba(255, 0, 0, 0.5);
+}
+
+.shader-window-close::before,
+.shader-window-close::after {
+  content: '';
+  position: absolute;
+  width: 15px;
+  height: 2px;
+  background-color: white;
+}
+
+.shader-window-close::before {
+  transform: rotate(45deg);
+}
+
+.shader-window-close::after {
+  transform: rotate(-45deg);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .shader-window.expanded {
+    width: 90vw;
+    height: 70vh;
+  }
+  
+  .shader-window-title {
+    font-size: 16px;
+  }
+  
+  .shader-window-description {
+    font-size: 12px;
+  }
+} 

@@ -27,6 +27,8 @@
     <link rel="stylesheet" href="css/ai-assistant.css">
     <link rel="stylesheet" href="css/tagline.css">
     <link rel="stylesheet" href="css/nav.css">
+    <link rel="stylesheet" href="css/multiverse.css">
+    <link rel="stylesheet" href="css/shader-windows.css">
     
     <!-- Three.js for 3D models - Add defer to load in parallel but execute in order -->
     <script defer src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
@@ -53,6 +55,9 @@
 
     <!-- Add favicon -->
     <link rel="icon" type="image/png" href="images/favicon.png">
+
+    <!-- GL Matrix library for 3D transformations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"></script>
 
     <style>
     .fallback-assistant {
@@ -114,6 +119,7 @@
             <li><a href="#audio-section"><i class="fas fa-music"></i><span>Audio</span></a></li>
             <li><a href="#donate"><i class="fas fa-hand-holding-heart"></i><span>Donate</span></a></li>
             <li><a href="#join-team"><i class="fas fa-users"></i><span>Join Team</span></a></li>
+            <li><a href="#multiverse-section"><i class="fas fa-globe"></i><span>Multiverse</span></a></li>
             <li><a href="#visualizer" class="nav-item" id="visualizer-nav-button">
                 <i class="fas fa-wave-square"></i>
                 <span class="nav-tooltip">Visualizer</span>
@@ -692,6 +698,20 @@
                 </div>
             </div>
         </section>
+
+        <!-- Update the multiverse section -->
+        <section id="multiverse-section" class="section">
+            <div class="section-header">
+                <h2>Multiverse Showcase</h2>
+                <p>Explore a collection of interactive GLSL shader effects</p>
+            </div>
+            <div id="multiverse-container" class="multiverse-container">
+                <div class="multiverse-loading">
+                    <div class="spinner"></div>
+                    <p>Loading Multiverse...</p>
+                </div>
+            </div>
+        </section>
     </main>
 
     <!-- Modal for Join Team Form -->
@@ -906,5 +926,8 @@
 
     <!-- Add this before the closing body tag -->
     <script src="js/audio-powershell.js"></script>
+
+    <!-- Multiverse Showcase script (add this before your main.js) -->
+    <script type="module" src="js/multiverse-showcase.js"></script>
 </body>
 </html>

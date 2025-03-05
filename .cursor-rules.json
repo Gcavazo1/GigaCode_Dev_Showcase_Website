@@ -7,12 +7,19 @@
       "autoFormatEnabled": true
     },
     {
-      "patterns": ["js/particle-visualizer/shaders/*.js"],
+      "patterns": [
+        "js/particle-visualizer/shaders/*.js",
+        "js/multiverse-showcase/shaders/**/*.vert",
+        "js/multiverse-showcase/shaders/**/*.frag"
+      ],
       "language": "glsl",
       "autoFormatEnabled": true
     },
     {
-      "patterns": ["js/particle-visualizer/**/*.js"],
+      "patterns": [
+        "js/particle-visualizer/**/*.js",
+        "js/multiverse-showcase/**/*.js"
+      ],
       "language": "javascript",
       "autoFormatEnabled": true
     },
