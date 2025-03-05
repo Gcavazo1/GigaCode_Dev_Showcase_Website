@@ -42,7 +42,7 @@ class Carousel {
         this.cameraAngleX = -0.2; // Tilt down slightly by default
         this.cameraAngleY = 0.0;  // No side tilt
         this.cameraDistance = 18;  // Distance from center
-        this.cameraHeight = -0.5;    // Raise camera slightly
+        this.cameraHeight = -0.3;    // Raise camera slightly
         
         // Initialize
         this.init().then(() => {
