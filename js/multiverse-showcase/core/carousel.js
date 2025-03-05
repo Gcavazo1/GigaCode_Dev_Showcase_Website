@@ -13,98 +13,99 @@ class Carousel {
      */
     constructor(options) {
         this.container = options.container;
-        this.shaderConfigs = options.shaderConfigs;
+        this.shaderConfigs = options.shaderConfigs || [];
         
-        // Create canvas and get WebGL context
-        this.canvas = document.createElement('canvas');
-        this.container.appendChild(this.canvas);
-        this.gl = this.canvas.getContext('webgl') || this.canvas.getContext('experimental-webgl');
-        
-        if (!this.gl) {
-            console.error('WebGL not supported');
-            return;
-        }
-        
-        // State
+        // Initialize properties
+        this.canvas = null;
+        this.gl = null;
         this.windows = [];
-        this.currentTime = 0;
-        this.lastFrameTime = 0;
-        this.isAnimating = false;
         this.rotationAngle = 0;
         this.targetRotationAngle = 0;
+        this.radius = 5.0;
         this.expandedWindowIndex = -1;
-        
-        // Camera and matrices
-        this.projectionMatrix = mat4.create();
-        this.viewMatrix = mat4.create();
+        this.isInitialized = false;
         
         // Initialize
         this.init();
-        this.resize();
-        this.animate();
         
-        // Event listeners
-        window.addEventListener('resize', this.resize.bind(this));
-        this.canvas.addEventListener('mousemove', this.onMouseMove.bind(this));
-        this.canvas.addEventListener('click', this.onClick.bind(this));
+        // Start animation loop only after initialization is complete
+        if (this.isInitialized) {
+            this.animate();
+        }
     }
     
     /**
-     * Initialize the carousel
+     * Initialize carousel
      */
     init() {
-        // Enable depth testing
-        this.gl.enable(this.gl.DEPTH_TEST);
-        
-        // Create shader windows
-        this.createShaderWindows();
-        
-        // Set up camera
-        mat4.perspective(this.projectionMatrix, Math.PI / 4, this.canvas.width / this.canvas.height, 0.1, 100.0);
-        mat4.lookAt(this.viewMatrix, [0, 0, 10], [0, 0, 0], [0, 1, 0]);
+        try {
+            // Create canvas
+            this.canvas = document.createElement('canvas');
+            this.canvas.className = 'multiverse-canvas';
+            this.container.appendChild(this.canvas);
+            
+            // Get WebGL context
+            this.gl = this.canvas.getContext('webgl') || this.canvas.getContext('experimental-webgl');
+            if (!this.gl) {
+                throw new Error('WebGL not supported');
+            }
+            
+            // Set canvas size
+            this.resizeCanvas();
+            
+            // Create shader windows
+            this.createWindows();
+            
+            // Add event listeners
+            window.addEventListener('resize', this.resizeCanvas.bind(this));
+            this.canvas.addEventListener('click', this.onClick.bind(this));
+            
+            this.isInitialized = true;
+        } catch (error) {
+            console.error('Carousel initialization error:', error);
+            this.showError(error.message);
+        }
     }
     
     /**
-     * Create shader windows based on configurations
+     * Create shader windows
      */
-    createShaderWindows() {
-        const numWindows = this.shaderConfigs.length;
-        const radius = 5.0;
+    createWindows() {
+        // Clear existing windows
+        this.windows = [];
         
-        for (let i = 0; i < numWindows; i++) {
-            const angle = (i / numWindows) * Math.PI * 2;
+        // Create new windows
+        for (let i = 0; i < this.shaderConfigs.length; i++) {
             const config = this.shaderConfigs[i];
             
-            const position = {
-                x: Math.sin(angle) * radius,
-                y: 0,
-                z: Math.cos(angle) * radius
-            };
-            
-            const rotation = {
-                x: 0,
-                y: -angle + Math.PI / 2,
-                z: 0
-            };
-            
-            const window = new ShaderWindow({
-                gl: this.gl,
-                vertexShaderPath: config.vertexShaderPath,
-                fragmentShaderPath: config.fragmentShaderPath,
-                title: config.title,
-                description: config.description,
-                position: position,
-                rotation: rotation
-            });
-            
-            this.windows.push(window);
+            try {
+                const window = new ShaderWindow({
+                    gl: this.gl,
+                    vertexShaderPath: config.vertexShaderPath,
+                    fragmentShaderPath: config.fragmentShaderPath,
+                    title: config.title,
+                    description: config.description
+                });
+                
+                // Position window in a circle
+                const angle = (i / this.shaderConfigs.length) * Math.PI * 2;
+                window.position = {
+                    x: Math.cos(angle) * this.radius,
+                    y: 0,
+                    z: Math.sin(angle) * this.radius
+                };
+                
+                this.windows.push(window);
+            } catch (error) {
+                console.error(`Error creating window ${i}:`, error);
+            }
         }
     }
     
     /**
      * Handle window resize
      */
-    resize() {
+    resizeCanvas() {
         const devicePixelRatio = window.devicePixelRatio || 1;
         const width = this.container.clientWidth;
         const height = this.container.clientHeight;
@@ -115,9 +116,6 @@ class Carousel {
         this.canvas.style.height = `${height}px`;
         
         this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
-        
-        // Update projection matrix
-        mat4.perspective(this.projectionMatrix, Math.PI / 4, this.canvas.width / this.canvas.height, 0.1, 100.0);
     }
     
     /**

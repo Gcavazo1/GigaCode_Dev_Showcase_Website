@@ -11,29 +11,26 @@ class ShaderWindow {
    * @param {WebGLRenderingContext} options.gl - WebGL context
    * @param {string} options.vertexShaderPath - Path to vertex shader
    * @param {string} options.fragmentShaderPath - Path to fragment shader
-   * @param {string} options.title - Title of the shader effect
-   * @param {string} options.description - Description of the shader effect
+   * @param {string} options.title - Window title
+   * @param {string} options.description - Window description
    */
   constructor(options) {
     this.gl = options.gl;
     this.vertexShaderPath = options.vertexShaderPath;
     this.fragmentShaderPath = options.fragmentShaderPath;
-    this.title = options.title;
-    this.description = options.description;
+    this.title = options.title || 'Shader Effect';
+    this.description = options.description || 'A GLSL shader effect';
     
-    // State
+    // Initialize properties
     this.program = null;
-    this.isHovered = false;
-    this.isExpanded = false;
+    this.buffers = {};
+    this.uniforms = {};
+    this.position = { x: 0, y: 0, z: 0 }; // Initialize position
+    this.rotation = { x: 0, y: 0, z: 0 };
     this.scale = 1.0;
-    this.targetScale = 1.0;
-    this.position = options.position || { x: 0, y: 0, z: 0 };
-    this.rotation = options.rotation || { x: 0, y: 0, z: 0 };
-    
-    // Buffers
-    this.positionBuffer = null;
-    this.texCoordBuffer = null;
-    this.indexBuffer = null;
+    this.isExpanded = false;
+    this.isInitialized = false;
+    this.startTime = performance.now();
     
     // Initialize
     this.init();
@@ -93,18 +90,18 @@ class ShaderWindow {
     ];
     
     // Position buffer
-    this.positionBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
+    this.buffers.positionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.positionBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
     
     // Texture coordinate buffer
-    this.texCoordBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.texCoordBuffer);
+    this.buffers.texCoordBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.texCoordBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texCoords), gl.STATIC_DRAW);
     
     // Index buffer
-    this.indexBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+    this.buffers.indexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffers.indexBuffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
   }
   
@@ -114,12 +111,12 @@ class ShaderWindow {
   getAttributeAndUniformLocations() {
     const gl = this.gl;
     
-    this.attributes = {
+    this.uniforms.attributes = {
       position: gl.getAttribLocation(this.program, 'aPosition'),
       texCoord: gl.getAttribLocation(this.program, 'aTexCoord'),
     };
     
-    this.uniforms = {
+    this.uniforms.uniforms = {
       projectionMatrix: gl.getUniformLocation(this.program, 'uProjectionMatrix'),
       modelViewMatrix: gl.getUniformLocation(this.program, 'uModelViewMatrix'),
       time: gl.getUniformLocation(this.program, 'uTime'),
@@ -160,17 +157,17 @@ class ShaderWindow {
     gl.useProgram(this.program);
     
     // Bind position buffer
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
-    gl.vertexAttribPointer(this.attributes.position, 3, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(this.attributes.position);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.positionBuffer);
+    gl.vertexAttribPointer(this.uniforms.attributes.position, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(this.uniforms.attributes.position);
     
     // Bind texture coordinate buffer
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.texCoordBuffer);
-    gl.vertexAttribPointer(this.attributes.texCoord, 2, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(this.attributes.texCoord);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.texCoordBuffer);
+    gl.vertexAttribPointer(this.uniforms.attributes.texCoord, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(this.uniforms.attributes.texCoord);
     
     // Bind index buffer
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffers.indexBuffer);
     
     // Calculate model view matrix
     const modelViewMatrix = mat4.create();
@@ -181,11 +178,11 @@ class ShaderWindow {
     mat4.scale(modelViewMatrix, modelViewMatrix, [this.scale, this.scale, this.scale]);
     
     // Set uniforms
-    gl.uniformMatrix4fv(this.uniforms.projectionMatrix, false, projectionMatrix);
-    gl.uniformMatrix4fv(this.uniforms.modelViewMatrix, false, modelViewMatrix);
-    gl.uniform1f(this.uniforms.time, time);
-    gl.uniform2f(this.uniforms.resolution, gl.canvas.width, gl.canvas.height);
-    gl.uniform1f(this.uniforms.intensity, this.isHovered ? 1.0 : 0.5);
+    gl.uniformMatrix4fv(this.uniforms.uniforms.projectionMatrix, false, projectionMatrix);
+    gl.uniformMatrix4fv(this.uniforms.uniforms.modelViewMatrix, false, modelViewMatrix);
+    gl.uniform1f(this.uniforms.uniforms.time, time);
+    gl.uniform2f(this.uniforms.uniforms.resolution, gl.canvas.width, gl.canvas.height);
+    gl.uniform1f(this.uniforms.uniforms.intensity, this.isHovered ? 1.0 : 0.5);
     
     // Draw elements
     gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
