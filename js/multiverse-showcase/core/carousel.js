@@ -275,8 +275,14 @@ class Carousel {
         const normalizedY = -((y / rect.height) * 2 - 1);
         
         // Create ray from camera
-        const rayOrigin = { x: 0, y: 0, z: 10 };
-        const rayDirection = { x: normalizedX, y: normalizedY, z: -1 };
+        const rayOrigin = { x: 0, y: 0, z: 18 }; // Match the camera position in render()
+        
+        // Apply carousel rotation to the ray
+        const rayDirection = { 
+            x: normalizedX * Math.cos(this.rotationAngle) - Math.sin(this.rotationAngle), 
+            y: normalizedY, 
+            z: -Math.cos(this.rotationAngle) - normalizedX * Math.sin(this.rotationAngle)
+        };
         
         // Normalize ray direction
         const length = Math.sqrt(
@@ -295,10 +301,23 @@ class Carousel {
         for (let i = 0; i < this.windows.length; i++) {
             const window = this.windows[i];
             
+            // Apply the inverse of carousel rotation to each window's position for hit testing
+            const windowPos = {
+                x: window.position.x * Math.cos(-this.rotationAngle) - window.position.z * Math.sin(-this.rotationAngle),
+                y: window.position.y,
+                z: window.position.x * Math.sin(-this.rotationAngle) + window.position.z * Math.cos(-this.rotationAngle)
+            };
+            
+            const originalPos = { ...window.position };
+            window.position = windowPos;
+            
             if (window.intersectsRay(rayOrigin, rayDirection)) {
                 hoveredIndex = i;
+                window.position = originalPos;
                 break;
             }
+            
+            window.position = originalPos;
         }
         
         // Update hover states
@@ -326,8 +345,14 @@ class Carousel {
         const normalizedY = -((y / rect.height) * 2 - 1);
         
         // Create ray from camera
-        const rayOrigin = { x: 0, y: 0, z: 10 };
-        const rayDirection = { x: normalizedX, y: normalizedY, z: -1 };
+        const rayOrigin = { x: 0, y: 0, z: 18 }; // Match the camera position in render()
+        
+        // Apply carousel rotation to the ray
+        const rayDirection = { 
+            x: normalizedX * Math.cos(this.rotationAngle) - Math.sin(this.rotationAngle), 
+            y: normalizedY, 
+            z: -Math.cos(this.rotationAngle) - normalizedX * Math.sin(this.rotationAngle)
+        };
         
         // Normalize ray direction
         const length = Math.sqrt(
@@ -346,10 +371,23 @@ class Carousel {
         for (let i = 0; i < this.windows.length; i++) {
             const window = this.windows[i];
             
+            // Apply the inverse of carousel rotation to each window's position for hit testing
+            const windowPos = {
+                x: window.position.x * Math.cos(-this.rotationAngle) - window.position.z * Math.sin(-this.rotationAngle),
+                y: window.position.y,
+                z: window.position.x * Math.sin(-this.rotationAngle) + window.position.z * Math.cos(-this.rotationAngle)
+            };
+            
+            const originalPos = { ...window.position };
+            window.position = windowPos;
+            
             if (window.intersectsRay(rayOrigin, rayDirection)) {
                 clickedIndex = i;
+                window.position = originalPos;
                 break;
             }
+            
+            window.position = originalPos;
         }
         
         // Handle click
