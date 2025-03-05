@@ -39,6 +39,14 @@ class ShaderWindow {
     this.width = 2.4;  // Width in WebGL units
     this.height = 3.6; // Height in WebGL units
     
+    // Animation properties
+    this.targetRotation = { x: 0, y: 0, z: 0 };
+    this.initialRotation = { x: 0, y: 0, z: 0 };
+    this.animationProgress = 0;
+    this.isAnimating = false;
+    this.animationDuration = 1000; // ms
+    this.animationStartTime = 0;
+    
     // Initialize
     this.init();
   }
@@ -157,6 +165,48 @@ class ShaderWindow {
         this.updateGeometry();
       }
     }
+    
+    // Handle flip animation
+    if (this.isAnimating) {
+      const currentTime = performance.now();
+      const elapsed = currentTime - this.animationStartTime;
+      this.animationProgress = Math.min(elapsed / this.animationDuration, 1.0);
+      
+      // Use easing function for smoother animation
+      const easeProgress = this.easeInOutCubic(this.animationProgress);
+      
+      if (this.isExpanded) {
+        // Animating to expanded state
+        // Flip 360 degrees on Y axis
+        this.rotation.y = this.initialRotation.y + easeProgress * Math.PI * 2;
+        
+        // Zoom out then in effect
+        const zoomFactor = 1.0 + Math.sin(easeProgress * Math.PI) * 0.5;
+        this.scale = zoomFactor;
+        
+        // Move forward slightly
+        this.position.z = this.initialPosition.z + easeProgress * 2.0;
+      } else {
+        // Animating back to normal state
+        // Flip 360 degrees on Y axis in reverse
+        this.rotation.y = this.initialRotation.y + (1 - easeProgress) * Math.PI * 2;
+        
+        // Zoom in then out effect
+        const zoomFactor = 1.0 + Math.sin((1 - easeProgress) * Math.PI) * 0.5;
+        this.scale = zoomFactor;
+        
+        // Move back to original position
+        this.position.z = this.initialPosition.z + (1 - easeProgress) * 2.0;
+      }
+      
+      // Animation complete
+      if (this.animationProgress >= 1.0) {
+        this.isAnimating = false;
+        this.rotation.y = this.initialRotation.y; // Reset to initial rotation
+        this.scale = this.isExpanded ? 1.5 : 1.0; // Set final scale
+        this.position.z = this.initialPosition.z; // Reset position
+      }
+    }
   }
   
   /**
@@ -198,6 +248,8 @@ class ShaderWindow {
       mat4.rotateX(modelViewMatrix, modelViewMatrix, this.rotation.x);
       mat4.rotateY(modelViewMatrix, modelViewMatrix, this.rotation.y);
       mat4.rotateZ(modelViewMatrix, modelViewMatrix, this.rotation.z);
+      
+      // Apply scale - now using this.scale which is animated
       mat4.scale(modelViewMatrix, modelViewMatrix, [this.scale, this.scale, this.scale]);
     } else {
       // Use identity matrix if position or viewMatrix is undefined
@@ -232,19 +284,26 @@ class ShaderWindow {
    * @param {boolean} isExpanded - Whether the window is expanded
    */
   setExpanded(isExpanded) {
+    // Don't do anything if state hasn't changed
+    if (this.isExpanded === isExpanded) return;
+    
     this.isExpanded = isExpanded;
+    
+    // Set target dimensions
     this.targetWidth = isExpanded ? 4.0 : (this.isHovered ? 2.4 : 2.0);
     this.targetHeight = isExpanded ? 3.0 : (this.isHovered ? 2.4 : 2.0);
-    // Update buffers with new dimensions
-    this.updateGeometry();
     
-    // This might be overriding your CSS
-    const element = document.getElementById(this.id);
-    if (element) {
-      element.style.width = isExpanded ? '800px' : '400px';
-      element.style.height = isExpanded ? '600px' : '400px';
-      // ...
-    }
+    // Start animation
+    this.isAnimating = true;
+    this.animationStartTime = performance.now();
+    this.animationProgress = 0;
+    
+    // Store initial state
+    this.initialRotation = { ...this.rotation };
+    this.initialPosition = { ...this.position };
+    
+    // Update geometry
+    this.updateGeometry();
   }
   
   /**
@@ -301,6 +360,11 @@ class ShaderWindow {
     
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.positionBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+  }
+  
+  // Add easing function
+  easeInOutCubic(t) {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
   }
 }
 
