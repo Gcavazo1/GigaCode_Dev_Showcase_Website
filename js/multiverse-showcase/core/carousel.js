@@ -97,52 +97,37 @@ class Carousel {
         // Clear existing windows
         this.windows = [];
         
-        // Create new windows
-        const windowPromises = [];
+        const totalWindows = this.shaderConfigs.length;
+        const radius = 800; // Increased radius for better spacing
+        const verticalOffset = 100; // Slight vertical offset
         
-        for (let i = 0; i < this.shaderConfigs.length; i++) {
+        for (let i = 0; i < totalWindows; i++) {
             const config = this.shaderConfigs[i];
+            const window = new ShaderWindow({
+                gl: this.gl,
+                vertexShaderPath: config.vertexShaderPath,
+                fragmentShaderPath: config.fragmentShaderPath,
+                title: config.title,
+                description: config.description
+            });
             
-            try {
-                const window = new ShaderWindow({
-                    gl: this.gl,
-                    vertexShaderPath: config.vertexShaderPath,
-                    fragmentShaderPath: config.fragmentShaderPath,
-                    title: config.title,
-                    description: config.description
-                });
-                
-                // Position window in a circle
-                const angle = (i / this.shaderConfigs.length) * Math.PI * 2;
-                window.position = {
-                    x: Math.cos(angle) * this.radius,
-                    y: 0,
-                    z: Math.sin(angle) * this.radius
-                };
-                
-                this.windows.push(window);
-                
-                // Add a promise to track when this window is ready
-                const windowPromise = new Promise(resolve => {
-                    const checkReady = () => {
-                        if (window.isReady) {
-                            resolve();
-                        } else {
-                            setTimeout(checkReady, 100);
-                        }
-                    };
-                    checkReady();
-                });
-                
-                windowPromises.push(windowPromise);
-            } catch (error) {
-                console.error(`Error creating window ${i}:`, error);
-            }
+            // Calculate position on the circle
+            const angle = (i / totalWindows) * Math.PI * 2;
+            const x = Math.cos(angle) * radius;
+            const z = Math.sin(angle) * radius;
+            const y = Math.cos(angle * 2) * verticalOffset; // Add subtle wave pattern
+            
+            window.position = { x, y, z };
+            
+            // Calculate rotation to face center
+            window.rotation = {
+                x: 0,
+                y: -angle + Math.PI / 2, // Face center
+                z: 0
+            };
+            
+            this.windows.push(window);
         }
-        
-        // Wait for all windows to be ready (but with a timeout)
-        const timeout = new Promise(resolve => setTimeout(resolve, 10000)); // 10-second timeout
-        await Promise.race([Promise.all(windowPromises), timeout]);
     }
     
     /**
@@ -170,23 +155,31 @@ class Carousel {
      */
     animate(timestamp = 0) {
         if (!this.isInitialized) {
-            // Don't animate if not initialized
-            setTimeout(() => this.animate(), 100);
+            requestAnimationFrame(this.animate.bind(this));
             return;
         }
 
-        // Calculate delta time
         const deltaTime = timestamp - this.lastFrameTime;
         this.lastFrameTime = timestamp;
-        
-        // Update rotation
-        const rotationSpeed = 0.002;
-        this.rotationAngle += (this.targetRotationAngle - this.rotationAngle) * rotationSpeed * deltaTime;
-        
-        // Render scene
+
+        // Smoother rotation with easing
+        const rotationSpeed = 0.004;
+        const ease = 0.08;
+        const rotationDelta = this.targetRotationAngle - this.rotationAngle;
+        this.rotationAngle += rotationDelta * ease;
+
+        // Add subtle floating motion
+        const floatAmplitude = 20;
+        const floatSpeed = 0.001;
+        const floatOffset = Math.sin(timestamp * floatSpeed) * floatAmplitude;
+
+        // Update window positions
+        this.windows.forEach((window, i) => {
+            const angle = (i / this.windows.length) * Math.PI * 2 + this.rotationAngle;
+            window.position.y += (floatOffset - window.position.y) * 0.05;
+        });
+
         this.render(timestamp);
-        
-        // Request next frame
         requestAnimationFrame(this.animate.bind(this));
     }
     
