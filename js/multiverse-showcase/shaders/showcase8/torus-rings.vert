@@ -6,11 +6,11 @@ uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
 uniform float uTime;
 
-varying vec2 vUv;
+varying vec2 v_uv;
 varying float vTime;
 
 void main() {
   gl_Position = uProjectionMatrix * uModelViewMatrix * aPosition;
-  vUv = aTexCoord;
+  v_uv = aTexCoord;
   vTime = uTime;
 } 
