@@ -84,6 +84,12 @@ document.addEventListener('DOMContentLoaded', () => {
       description: 'Advanced 3D scene with reflections and shadows',
       vertexShaderPath: 'js/multiverse-showcase/shaders/showcase12/raymarching.vert',
       fragmentShaderPath: 'js/multiverse-showcase/shaders/showcase12/raymarching.frag'
+    },
+    {
+      vertexShaderPath: 'js/multiverse-showcase/shaders/showcase12/neon-grid.vert',
+      fragmentShaderPath: 'js/multiverse-showcase/shaders/showcase12/neon-grid.frag',
+      title: 'Neon Grid',
+      description: 'Raymarched neon cubes with ultraviolet glow'
     }
   ];
   
