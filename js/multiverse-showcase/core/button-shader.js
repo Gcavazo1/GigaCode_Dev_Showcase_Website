@@ -36,105 +36,132 @@ class ButtonShader {
             varying float vTime;
             uniform vec2 uResolution;
             
-            // Function to create a grid pattern
-            float grid(vec2 uv, float size) {
-                vec2 grid = fract(uv * size);
-                vec2 smoothGrid = smoothstep(0.02, 0.05, grid) * smoothstep(0.95, 0.98, grid);
-                return max(smoothGrid.x, smoothGrid.y);
+            #define MAX_STEPS 100
+            #define MAX_DIST 100.0
+            #define SURF_DIST 0.001
+            #define PI 3.1415926535
+            
+            // SDF for a cube
+            float sdBox(vec3 p, vec3 b) {
+                vec3 q = abs(p) - b;
+                return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
             }
             
-            // Function to create a wave effect
-            float wave(vec2 uv, float freq, float amp, float speed) {
-                return sin(uv.x * freq + vTime * speed) * amp;
+            // Rotation matrix
+            mat2 rot2D(float angle) {
+                float s = sin(angle);
+                float c = cos(angle);
+                return mat2(c, -s, s, c);
             }
             
-            // Function to create a pulse effect
-            float pulse(float val, float freq) {
-                return 0.5 + 0.5 * sin(val * freq + vTime * 3.0);
+            // Random function
+            float hash21(vec2 p) {
+                p = fract(p * vec2(123.34, 456.21));
+                p += dot(p, p + 45.32);
+                return fract(p.x * p.y);
             }
             
-            // Function to create a glow effect
-            vec3 glow(vec3 color, float intensity, float size, vec2 uv, vec2 pos) {
-                float dist = length(uv - pos);
-                return color * intensity / (dist * size + 0.01);
+            // Noise function
+            float noise(vec2 p) {
+                vec2 i = floor(p);
+                vec2 f = fract(p);
+                f = f * f * (3.0 - 2.0 * f);
+                
+                float a = hash21(i);
+                float b = hash21(i + vec2(1.0, 0.0));
+                float c = hash21(i + vec2(0.0, 1.0));
+                float d = hash21(i + vec2(1.0, 1.0));
+                
+                return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+            }
+            
+            // Scene SDF
+            float map(vec3 p) {
+                float mouseInfluence = (sin(vTime * 0.5) * 0.5 + 0.5) * 2.0;
+                
+                p.xz *= rot2D(vTime * 0.3);
+                p.xy *= rot2D(vTime * 0.2);
+                
+                vec3 modP = mod(p + 2.0, 4.0) - 2.0;
+                
+                float scale = 0.5 + 0.3 * noise(p.xz * 0.5 + vTime * 0.2);
+                scale *= (1.0 + 0.2 * mouseInfluence);
+                
+                float dist = sdBox(modP, vec3(scale));
+                dist += 0.05 * sin(p.x + vTime) * sin(p.z + vTime);
+                
+                return dist;
+            }
+            
+            // Normal calculation
+            vec3 getNormal(vec3 p) {
+                vec2 e = vec2(0.001, 0.0);
+                return normalize(vec3(
+                    map(p + e.xyy) - map(p - e.xyy),
+                    map(p + e.yxy) - map(p - e.yxy),
+                    map(p + e.yyx) - map(p - e.yyx)
+                ));
+            }
+            
+            // Raymarching
+            float rayMarch(vec3 ro, vec3 rd) {
+                float d = 0.0;
+                
+                for(int i = 0; i < MAX_STEPS; i++) {
+                    vec3 p = ro + rd * d;
+                    float dS = map(p);
+                    d += dS;
+                    if(d > MAX_DIST || dS < SURF_DIST) break;
+                }
+                
+                return d;
             }
             
             void main() {
-                // Adjust for aspect ratio
-                vec2 uv = v_uv;
-                float aspect = uResolution.x / uResolution.y;
-                uv.x *= aspect;
+                vec2 uv = v_uv * 2.0 - 1.0;
+                uv.x *= uResolution.x/uResolution.y;
                 
-                // Base grid
-                float gridSize = 10.0;
-                float baseGrid = grid(uv, gridSize);
+                vec2 m = vec2(sin(vTime * 0.4), cos(vTime * 0.3)) * 0.3;
+                float mouseIntensity = clamp(length(m) * 2.0, 0.0, 1.0);
                 
-                // Cyberpunk waves
-                float waveEffect = 0.0;
-                for (int i = 0; i < 3; i++) {
-                    float i_f = float(i);
-                    float speed = 2.0 + i_f * 0.5;
-                    float freq = 5.0 + i_f * 2.0;
-                    float amp = 0.1 + i_f * 0.05;
+                vec3 ro = vec3(0.0, 0.0, -5.0 + sin(vTime * 0.2) * 2.0);
+                vec3 rd = normalize(vec3(uv, 1.0));
+                
+                rd.xz *= rot2D(m.x * PI * 0.5);
+                rd.yz *= rot2D(m.y * PI * 0.5);
+                
+                float d = rayMarch(ro, rd);
+                
+                vec3 col = vec3(0.0);
+                
+                if(d < MAX_DIST) {
+                    vec3 p = ro + rd * d;
+                    vec3 n = getNormal(p);
                     
-                    // Vertical waves
-                    waveEffect += wave(uv + vec2(0.0, i_f * 0.1), freq, amp, speed);
+                    vec3 lightDir = normalize(vec3(1.0, 1.0, -1.0));
+                    float diff = max(dot(n, lightDir), 0.0);
                     
-                    // Horizontal waves
-                    waveEffect += wave(vec2(uv.y, uv.x) + vec2(i_f * 0.4, 0.0), freq * 0.9, amp, speed * 0.8);
+                    vec3 baseColor = vec3(0.0, 0.9, 0.9);
+                    vec3 rimColor = vec3(0.6, 0.0, 1.0);
+                    
+                    float edge = 1.0 - max(dot(n, -rd), 0.0);
+                    edge = pow(edge, 3.0);
+                    
+                    col = baseColor * diff;
+                    col += rimColor * edge * 1.5;
+                    
+                    float pulse = 0.5 + 0.5 * sin(vTime * 2.0 + noise(p.xz * 0.5) * 5.0);
+                    col += rimColor * pulse * 0.3;
+                    
+                    col *= 1.0 - smoothstep(5.0, 15.0, d);
                 }
                 
-                // Apply wave distortion to UV coordinates
-                vec2 distortedUV = uv;
-                distortedUV.y += waveEffect * 0.1;
-                distortedUV.x += waveEffect * 0.05;
+                float vignette = 1.0 - smoothstep(0.3, 1.5, length(v_uv - 0.5));
+                col *= vignette;
                 
-                // Create distorted grid
-                float distortedGrid = grid(distortedUV, gridSize * 0.8);
+                col += vec3(0.6, 0.0, 1.0) * mouseIntensity * 0.2;
                 
-                // Combine grids
-                float finalGrid = max(baseGrid, distortedGrid * 0.4);
-                
-                // Pulsing effect
-                float pulse1 = pulse(uv.x + uv.y, 0.5);
-                float pulse2 = pulse(uv.x - uv.y, 0.3);
-                float pulseFactor = mix(pulse1, pulse2, 0.5);
-                
-                // Define cyberpunk colors
-                vec3 neonPink = vec3(1.0, 0.0, 0.8);
-                vec3 neonBlue = vec3(0.0, 0.8, 1.0);
-                vec3 neonPurple = vec3(0.6, 0.0, 1.0);
-                vec3 neonYellow = vec3(1.0, 0.9, 0.0);
-                vec3 darkBlue = vec3(0.0, 0.05, 0.2);
-                
-                // Background color with subtle wave effect
-                vec3 bgColor = darkBlue + waveEffect * 0.05;
-                
-                // Grid color based on position and time
-                vec3 gridColor = mix(
-                    mix(neonPink, neonBlue, sin(uv.x * 2.0 + vTime) * 0.5 + 0.5),
-                    mix(neonPurple, neonYellow, sin(uv.y * 3.0 - vTime * 0.7) * 0.5 + 0.5),
-                    sin(vTime * 0.2) * 0.5 + 0.5
-                );
-                
-                // Apply pulsing to grid color
-                gridColor *= 0.4 + pulseFactor * 0.5;
-                
-                // Combine background and grid
-                vec3 color = mix(bgColor, gridColor, finalGrid);
-                
-                // Add glow effects at certain points
-                vec2 glowPoint1 = vec2(sin(vTime * 1.2) * 0.5 + 0.5, cos(vTime * 0.3) * 0.3 + 0.5) * aspect;
-                vec2 glowPoint2 = vec2(cos(vTime * 0.8) * 0.4 + 0.6, sin(vTime * 0.6) * 0.4 + 0.5) * aspect;
-                
-                color += glow(neonPink, 0.05, 10.0, uv, glowPoint1);
-                color += glow(neonBlue, 0.05, 12.0, uv, glowPoint2);
-                
-                // Add horizontal scan lines
-                float scanLine = sin(uv.y * 100.0) * 0.03 + 0.97;
-                color *= scanLine;
-                
-                gl_FragColor = vec4(color, 1.0);
+                gl_FragColor = vec4(col, 1.0);
             }
         `;
 
