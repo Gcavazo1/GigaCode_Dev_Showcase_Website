@@ -518,12 +518,16 @@ class Carousel {
 
     // Add method to initialize button shader
     initButtonShader(canvas) {
+        console.log('Initializing button shader');
         const gl = canvas.getContext('webgl');
         if (!gl) {
             console.error('WebGL not supported for button shader');
             return;
         }
 
+        // Add debug size check
+        console.log('Button canvas size:', canvas.width, canvas.height);
+        
         // Create shader program
         const vertexShaderSource = `
             attribute vec4 aPosition;
@@ -676,6 +680,12 @@ class Carousel {
             // Set canvas size
             const width = canvas.clientWidth;
             const height = canvas.clientHeight;
+            
+            // Debug size logging
+            if (width === 0 || height === 0) {
+                console.warn('Button canvas has zero dimension:', width, height);
+            }
+            
             canvas.width = width;
             canvas.height = height;
             gl.viewport(0, 0, width, height);
