@@ -1,4 +1,4 @@
-// Matrix fragment shader - Digital rain effect
+// Enhanced Matrix Digital Rain
 precision mediump float;
 
 varying vec2 vTexCoord;
@@ -18,62 +18,58 @@ float random(vec2 p) {
 }
 
 // Character function - simulates a random character
-float character(vec2 p, float time) {
-  p = floor(p * vec2(10.0, 16.0));
-  float n = p.x + p.y * 10.0;
-  float a = hash(n);
-  float b = hash(n + 1.0);
-  return mix(a, b, fract(time));
+float character(vec2 p, float n) {
+  // More varied character patterns
+  p = floor(p * vec2(12.0, 16.0));
+  float c = hash(p.x + p.y * 64.0 + n * 137.0);
+  c = step(0.5 + sin(n) * 0.2, c); // Vary character density
+  return c;
 }
 
 void main() {
   // Scale and adjust coordinates
   vec2 uv = vTexCoord;
   
-  // Create grid for characters
-  float charSize = 0.02;
+  // Improved character grid
+  float charSize = 0.02 - sin(vTime * 0.2) * 0.005; // Pulsing size
   vec2 charPos = mod(uv, charSize) / charSize;
   vec2 charId = floor(uv / charSize);
   
-  // Create falling effect
-  float speed = 0.5;
-  float columnSpeed = hash(charId.x) * 0.5 + 0.5; // Different speeds for each column
+  // Enhanced falling effect
+  float speed = 0.8;
+  float columnSpeed = hash(charId.x) * 0.8 + 0.4; // More varied speeds
   float time = vTime * speed * columnSpeed;
   
-  // Offset each column
-  float yOffset = hash(charId.x) * 100.0;
-  float y = mod(charId.y + time + yOffset, 50.0);
+  // Multiple layers of characters
+  float y = mod(charId.y - time * 2.0 + hash(charId.x) * 100.0, 50.0);
   
-  // Character brightness based on y position
-  float brightness = max(0.0, 1.0 - y * 0.06);
+  // Brighter head glow
+  float headGlow = exp(-y * 0.2) * 2.0;
   
-  // Generate random character
-  float char = character(charPos, time * 10.0 + charId.y);
+  // Multiple character layers
+  float char1 = character(charPos, time + charId.y);
+  float char2 = character(charPos, time * 1.3 + charId.y);
+  float finalChar = mix(char1, char2, 0.5);
   
-  // Determine if this position should show a character
-  float threshold = 0.3 + 0.3 * sin(charId.x * 0.2 + vTime * 0.5);
-  float showChar = step(threshold, hash(charId.y + charId.x * 100.0 + floor(time * 10.0)));
+  // Enhanced trail effect
+  float trail = exp(-y * 0.15);
   
-  // Create head glow effect
-  float headGlow = max(0.0, 1.0 - abs(y - 0.5) * 5.0);
+  // Combine effects with improved colors
+  float brightness = finalChar * trail * (0.7 + headGlow);
+  vec3 color = vec3(0.0, 1.0, 0.3) * brightness; // Brighter green
   
-  // Create trail effect
-  float trail = max(0.0, 1.0 - y * 0.15);
+  // Add subtle color variations
+  color += vec3(0.0, 0.8, 0.2) * headGlow * 0.5;
   
-  // Combine effects
-  float finalChar = char * showChar * brightness * trail;
+  // Add bloom effect
+  float bloom = exp(-y * 0.1) * 0.5;
+  color += vec3(0.0, 0.6, 0.2) * bloom;
   
-  // Add head glow
-  finalChar += headGlow * 0.8;
+  // Add screen glow
+  color += vec3(0.0, 0.05, 0.02);
   
-  // Create color
-  vec3 color = vec3(0.0, finalChar * 0.8, finalChar * 0.3); // Green-blue tint
-  
-  // Add intensity
-  color *= uIntensity;
-  
-  // Add subtle background
-  color += vec3(0.0, 0.02, 0.01);
+  // Apply intensity with gamma correction
+  color = pow(color * uIntensity, vec3(0.8));
   
   // Output final color
   gl_FragColor = vec4(color, 1.0);

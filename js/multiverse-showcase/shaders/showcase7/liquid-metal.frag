@@ -1,4 +1,4 @@
-// Liquid Metal fragment shader - Realistic liquid metal simulation
+// Enhanced Liquid Metal
 precision mediump float;
 
 varying vec2 vTexCoord;
@@ -19,80 +19,78 @@ float noise(vec2 p) {
     mix(hash(dot(ip, vec2(1.0, 157.0))), hash(dot(ip + vec2(1.0, 0.0), vec2(1.0, 157.0))), u.x),
     mix(hash(dot(ip + vec2(0.0, 1.0), vec2(1.0, 157.0))), hash(dot(ip + vec2(1.0, 1.0), vec2(1.0, 157.0))), u.x),
     u.y);
-  return res;
+  return res*res; // Squared for sharper contrast
 }
 
 float fbm(vec2 p) {
   float f = 0.0;
   float w = 0.5;
-  for (int i = 0; i < 5; i++) {
-    f += w * noise(p);
-    p *= 2.0;
+  float time = vTime * 0.2;
+  for (int i = 0; i < 6; i++) { // Increased octaves
+    f += w * noise(p + time);
+    p *= 2.1; // Slightly uneven frequency multiplier
     w *= 0.5;
   }
   return f;
 }
 
 void main() {
-  // Adjust coordinates
   vec2 uv = vTexCoord;
   float ratio = uResolution.x / uResolution.y;
   uv.x *= ratio;
   
-  // Time variables
   float time = vTime * 0.2;
   
-  // Create liquid surface displacement
+  // Enhanced layered displacement
   float displacement = 0.0;
   
-  // Layer 1: Slow large waves
-  vec2 p1 = uv * 2.0;
-  p1.y += time * 0.05;
-  p1.x += sin(time * 0.1) * 0.5;
-  displacement += fbm(p1) * 0.3;
+  // Dynamic wave patterns
+  vec2 p1 = uv * 2.0 + vec2(sin(time * 0.5), cos(time * 0.3)) * 0.2;
+  displacement += fbm(p1) * 0.4;
   
-  // Layer 2: Medium ripples
-  vec2 p2 = uv * 5.0;
-  p2.x += time * 0.06;
-  p2.y += sin(time * 0.12) * 0.5;
+  vec2 p2 = uv * 4.0 + vec2(cos(time * 0.4), sin(time * 0.6)) * 0.3;
   displacement += fbm(p2) * 0.2;
   
-  // Layer 3: Small detailed ripples
-  vec2 p3 = uv * 10.0;
-  p3.x += time * 0.1;
-  p3.y -= time * 0.05;
+  vec2 p3 = uv * 8.0 + displacement * 2.0;
   displacement += fbm(p3) * 0.1;
   
-  // Calculate normals for reflection
+  // Enhanced normal calculation
   vec2 eps = vec2(0.01, 0.0);
   float nx = fbm(vec2(uv.x + eps.x, uv.y)) - fbm(vec2(uv.x - eps.x, uv.y));
   float ny = fbm(vec2(uv.x, uv.y + eps.x)) - fbm(vec2(uv.x, uv.y - eps.x));
-  vec3 normal = normalize(vec3(nx, ny, 0.5));
+  vec3 normal = normalize(vec3(nx, ny, 0.3));
   
-  // Reflection and environment mapping
-  vec2 reflectionUV = uv + normal.xy * 0.2;
-  float reflection = fbm(reflectionUV * 3.0 + time * 0.1) * 0.8 + 0.2;
+  // Dynamic environment mapping
+  vec2 reflectionUV = uv + normal.xy * (0.2 + sin(time) * 0.1);
+  float reflection = fbm(reflectionUV * 3.0 + time * 0.1);
   
-  // Metallic color with reflection
-  vec3 baseColor = vec3(0.7, 0.8, 0.9); // Silvery blue
-  vec3 reflectionColor = vec3(1.0, 0.8, 0.6); // Gold-ish reflection
+  // Enhanced metallic colors
+  vec3 baseColor = mix(
+    vec3(0.7, 0.8, 1.0), // Cool silver
+    vec3(0.9, 0.8, 0.6), // Warm gold
+    sin(displacement * 5.0 + time) * 0.5 + 0.5
+  );
   
-  // Combine base color and reflection
-  vec3 color = mix(baseColor, reflectionColor, reflection);
+  vec3 reflectionColor = mix(
+    vec3(1.0, 0.9, 0.6), // Gold
+    vec3(0.6, 0.8, 1.0), // Blue
+    reflection
+  );
   
-  // Add surface displacement effect to color
-  color *= 0.8 + displacement * 0.5;
+  // Combine with enhanced contrast
+  vec3 color = mix(baseColor, reflectionColor, reflection * 0.8);
+  color *= 0.8 + displacement * 0.7;
   
-  // Add highlights
-  float highlight = pow(max(0.0, normal.z), 4.0);
-  color += vec3(highlight) * 0.5;
+  // Enhanced specular highlights
+  float specular = pow(max(0.0, normal.z), 8.0) * 2.0;
+  color += vec3(specular);
   
-  // Add ripple patterns
-  float ripples = sin((uv.x + uv.y) * 40.0 + displacement * 20.0 + time * 2.0) * 0.5 + 0.5;
-  color += vec3(ripples * 0.05);
+  // Add iridescence
+  float iridescence = sin(displacement * 10.0 + time) * 0.5 + 0.5;
+  color += vec3(0.2, 0.1, 0.3) * iridescence * 0.2;
   
-  // Apply intensity
-  color *= uIntensity;
+  // Apply intensity with enhanced contrast
+  color = pow(color * uIntensity, vec3(0.9));
   
   gl_FragColor = vec4(color, 1.0);
 } 
