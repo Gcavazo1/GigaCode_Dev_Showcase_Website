@@ -1,4 +1,4 @@
-// Torus Rings vertex shader
+// Raymarching Scene vertex shader
 attribute vec4 aPosition;
 attribute vec2 aTexCoord;
 
@@ -10,7 +10,7 @@ varying vec2 v_uv;
 varying float vTime;
 
 void main() {
-  gl_Position = uProjectionMatrix * uModelViewMatrix * aPosition;
-  v_uv = aTexCoord;
-  vTime = uTime;
+    gl_Position = uProjectionMatrix * uModelViewMatrix * aPosition;
+    v_uv = aTexCoord;
+    vTime = uTime;
 } 

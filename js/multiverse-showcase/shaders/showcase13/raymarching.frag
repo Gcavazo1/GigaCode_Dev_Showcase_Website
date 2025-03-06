@@ -48,8 +48,8 @@ float map(vec3 p) {
     );
     
     // Rotate scene based on time and simulated mouse
-    p.xz *= rot(vTime * 0.3 + mouseOffset.x);
-    p.yz *= rot(vTime * 0.2 + mouseOffset.y);
+    p.xz *= rot(vTime * 0.2 + mouseOffset.x);
+    p.yz *= rot(vTime * 0.6 + mouseOffset.y);
     
     // Ground plane with wave effect
     float ground = p.y + 1.5 + 0.1 * sin(p.x * 3.0 + vTime) * cos(p.z * 3.0 + vTime);

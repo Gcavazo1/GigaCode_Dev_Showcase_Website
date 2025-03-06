@@ -80,16 +80,22 @@ document.addEventListener('DOMContentLoaded', () => {
       fragmentShaderPath: 'js/multiverse-showcase/shaders/showcase11/tunnel.frag'
     },
     {
-      title: 'Raymarched Scene',
-      description: 'Advanced 3D scene with reflections and shadows',
-      vertexShaderPath: 'js/multiverse-showcase/shaders/showcase12/raymarching.vert',
-      fragmentShaderPath: 'js/multiverse-showcase/shaders/showcase12/raymarching.frag'
+      title: 'Raymarching',
+      description: 'Advanced raymarching scene with dynamic lighting',
+      vertexShaderPath: 'js/multiverse-showcase/shaders/showcase13/raymarching.vert',
+      fragmentShaderPath: 'js/multiverse-showcase/shaders/showcase13/raymarching.frag'
     },
     {
       vertexShaderPath: 'js/multiverse-showcase/shaders/showcase12/neon-grid.vert',
       fragmentShaderPath: 'js/multiverse-showcase/shaders/showcase12/neon-grid.frag',
       title: 'Neon Grid',
       description: 'Raymarched neon cubes with ultraviolet glow'
+    },
+    {
+      title: 'Slime',
+      description: 'Interactive raymarched slime simulation with dynamic deformation and lighting',
+      vertexShaderPath: 'js/multiverse-showcase/shaders/showcase14/slime.vert',
+      fragmentShaderPath: 'js/multiverse-showcase/shaders/showcase14/slime.frag'
     }
   ];
   

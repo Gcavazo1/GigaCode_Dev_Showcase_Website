@@ -37,12 +37,12 @@ class ParticleSystem {
     
     // Shader uniforms setup
     this.uniforms = {
-      time: { value: 2 },
+      time: { value: 3 },
       offsetSize: { value: 1.5 },
-      size: { value: 2},
-      frequency: { value: 2.0 },
-      amplitude: { value: 1.0 },
-      offsetGain: { value: 0.8 },
+      size: { value: 1.5 },
+      frequency: { value: 3.0 },
+      amplitude: { value: 1.5 },
+      offsetGain: { value: 0.6 },
       maxDistance: { value: 1.5 },
       startColor: { value: new THREE.Color(0x910055) },
       endColor: { value: new THREE.Color(0x007918) },
@@ -371,8 +371,8 @@ class ParticleSystem {
       radial: radialSeg,
     };
     
-    this.segmentsFolder.add(this.guiProperties.segments, "height", 32, 420);
-    this.segmentsFolder.add(this.guiProperties.segments, "radial", 32, 620);
+    this.segmentsFolder.add(this.guiProperties.segments, "height", 32, 620);
+    this.segmentsFolder.add(this.guiProperties.segments, "radial", 232, 920);
     this.segmentsFolder
       .add(this.guiProperties, "randomizeSegments")
       .name("Randomize Segments");
@@ -417,8 +417,8 @@ class ParticleSystem {
       height: heightSeg
     };
     
-    this.segmentsFolder.add(this.guiProperties.segments, "width", 20, 620);
-    this.segmentsFolder.add(this.guiProperties.segments, "height", 100,620);
+    this.segmentsFolder.add(this.guiProperties.segments, "width",200, 800);
+    this.segmentsFolder.add(this.guiProperties.segments, "height", 100,800);
     this.segmentsFolder
       .add(this.guiProperties, "randomizeSegments")
       .name("Randomize Segments");
@@ -460,8 +460,8 @@ class ParticleSystem {
       height: heightSeg
     };
     
-    this.segmentsFolder.add(this.guiProperties.segments, "width", 20,250);
-    this.segmentsFolder.add(this.guiProperties.segments, "height", 120, 250);
+    this.segmentsFolder.add(this.guiProperties.segments, "width", 20,450);
+    this.segmentsFolder.add(this.guiProperties.segments, "height", 120, 900);
     this.segmentsFolder
       .add(this.guiProperties, "randomizeSegments")
       .name("Randomize Segments");
@@ -505,7 +505,7 @@ class ParticleSystem {
     };
     
     this.segmentsFolder.add(this.guiProperties.segments, "tube",95,480);
-    this.segmentsFolder.add(this.guiProperties.segments, "radial",140,560);
+    this.segmentsFolder.add(this.guiProperties.segments, "radial",140,960);
     this.segmentsFolder
       .add(this.guiProperties, "randomizeSegments")
       .name("Randomize Segments");
@@ -555,7 +555,7 @@ class ParticleSystem {
     };
     
     this.segmentsFolder.add(this.guiProperties.segments, "tube", 20, 200);
-    this.segmentsFolder.add(this.guiProperties.segments, "radial", 300, 450);
+    this.segmentsFolder.add(this.guiProperties.segments, "radial", 400, 750);
     this.segmentsFolder.add(this.guiProperties.segments, "p", 4, 2, 5);
     this.segmentsFolder.add(this.guiProperties.segments, "q", 3, 7, 2);
     this.segmentsFolder
