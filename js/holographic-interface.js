@@ -1,4 +1,3 @@
-// New dedicated JS file for holographic interface
 document.addEventListener('DOMContentLoaded', function() {
     initializeHolographicInterface();
 });
@@ -10,8 +9,8 @@ function initializeHolographicInterface() {
     // Initialize Matrix content
     initializeMatrix();
     
-    // Initialize status bars - Make sure this is being called
-    initializeStatusBars();
+    // Initialize status bars
+    animateStatusBars();
 
     // Initialize timeline
     initializeTimeline();
@@ -329,89 +328,48 @@ function initializeMatrix() {
     const matrixContent = document.querySelector('.matrix-content');
     if (!matrixContent) return;
     
-    matrixContent.innerHTML = ''; // Clear existing content
-    
-    // More authentic Matrix characters
-    const matrixChars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
-    
-    // Create columns of falling characters
-    const columns = Math.floor(matrixContent.clientWidth / 20); // Adjust spacing
-
-    // Create matrix columns
-    for (let i = 0; i < columns; i++) {
-        createMatrixColumn(i);
-    }
-    
-    function createMatrixColumn(index) {
-        const column = document.createElement('div');
-        column.className = 'matrix-line';
-        column.style.left = `${index * 20}px`; // Position horizontally
-        
-        // Random speed and delay for more natural effect
-        const speed = Math.random() * 5 + 3; // 3-8 seconds
-        const delay = Math.random() * 5; // 0-5 second delay
-        
-        column.style.animationDuration = `${speed}s`;
-        column.style.animationDelay = `-${delay}s`;
+    // Create matrix lines dynamically
+    function createMatrixLine() {
+        const line = document.createElement('div');
+        line.className = 'matrix-line';
         
         // Generate random matrix text
-        const length = Math.floor(Math.random() * 10) + 10;
+        let text = '';
+        const chars = '01';
+        const length = Math.floor(Math.random() * 20) + 20;
         
-        for (let j = 0; j < length; j++) {
-            const charSpan = document.createElement('span');
-            charSpan.className = 'matrix-character';
-            charSpan.textContent = matrixChars[Math.floor(Math.random() * matrixChars.length)];
-            
-            // First character is brighter (leading character effect)
-            if (j === 0) {
-                charSpan.style.color = '#ffffff';
-                charSpan.style.textShadow = '0 0 8px #00ffff';
-                charSpan.style.opacity = '1';
-            }
-            
-            column.appendChild(charSpan);
-            charSpan.style.display = 'block'; // Stack vertically
+        for (let i = 0; i < length; i++) {
+            text += chars[Math.floor(Math.random() * chars.length)];
         }
         
-        matrixContent.appendChild(column);
-        
-        // Remove and recreate column after animation completes
-        column.addEventListener('animationiteration', () => {
-            matrixContent.removeChild(column);
-            createMatrixColumn(index);
-        });
+        line.textContent = text;
+        return line;
     }
-    
-    // Character change effect
+
+    // Initialize with multiple lines
+    for (let i = 0; i < 20; i++) {
+        matrixContent.appendChild(createMatrixLine());
+    }
+
+    // Continuously update matrix
     setInterval(() => {
-        // Randomly select some characters to change
-        const characters = document.querySelectorAll('.matrix-character');
-        if (characters.length > 0) {
-            const numToChange = Math.ceil(characters.length * 0.05); // Change ~5% at a time
-            
-            for (let i = 0; i < numToChange; i++) {
-                const randomChar = characters[Math.floor(Math.random() * characters.length)];
-                if (randomChar) {
-                    // Change to a new random character
-                    randomChar.textContent = matrixChars[Math.floor(Math.random() * matrixChars.length)];
-                    
-                    // Add brief highlight effect
-                    randomChar.style.color = '#ffffff';
-                    randomChar.style.textShadow = '0 0 8px #00ffff';
-                    randomChar.style.opacity = '1';
-                    
-                    setTimeout(() => {
-                        if (randomChar.parentNode && randomChar.parentNode.firstChild === randomChar) {
-                            // Keep first character bright
-                            return;
-                        }
-                        randomChar.style.color = '';
-                        randomChar.style.textShadow = '';
-                        randomChar.style.opacity = '';
-                    }, 100);
-                }
-            }
+        // Remove first line and add new line
+        if (matrixContent.children.length > 20) {
+            matrixContent.removeChild(matrixContent.children[0]);
         }
+        matrixContent.appendChild(createMatrixLine());
+
+        // Random highlight effect
+        const randomLine = matrixContent.children[
+            Math.floor(Math.random() * matrixContent.children.length)
+        ];
+        randomLine.style.color = '#00ffff';
+        randomLine.style.textShadow = '0 0 5px #00ffff';
+        
+        setTimeout(() => {
+            randomLine.style.color = '';
+            randomLine.style.textShadow = '';
+        }, 100);
     }, 100);
 }
 
@@ -419,61 +377,49 @@ function initializeMatrix() {
 document.addEventListener('DOMContentLoaded', initializeMatrix);
 
 function animateStatusBars() {
-    const bars = document.querySelectorAll('.status-bar');
+    const statusBars = document.querySelectorAll('.status-bar-wrapper .status-bar');
     
-    // Create unique oscillators for each bar if they don't exist
-    if (!window.statusBarOscillators) {
-        window.statusBarOscillators = new Map();
-        bars.forEach((bar, index) => {
-            window.statusBarOscillators.set(bar, {
-                speed: 0.5 + Math.random() * 0.5,  // Random speed between 0.5 and 1
-                offset: Math.random() * Math.PI * 2,  // Random phase offset
-                amplitude: 3 + Math.random() * 4,     // Random amplitude between 3 and 7
-                secondarySpeed: 0.2 + Math.random() * 0.3  // Slower secondary oscillation
-            });
-        });
+    function updateBar(bar) {
+        // Get current width or set initial width if not set
+        const currentWidth = parseFloat(bar.style.width) || 50;
+        
+        // Calculate new width with smooth transition
+        const randomChange = (Math.random() - 0.5) * 10; // -5% to +5%
+        let newWidth = currentWidth + randomChange;
+        
+        // Keep within bounds (30% to 95%)
+        newWidth = Math.max(30, Math.min(95, newWidth));
+        
+        // Apply new width with transition
+        bar.style.width = `${newWidth}%`;
+        
+        // Update the value text
+        const container = bar.closest('.status-item');
+        if (container) {
+            const valueElement = container.querySelector('.status-value');
+            if (valueElement) {
+                valueElement.textContent = `${Math.round(newWidth)}%`;
+                
+                // Add flash effect on change
+                valueElement.style.color = '#00ffff';
+                setTimeout(() => {
+                    valueElement.style.color = '#e0e0e0';
+                }, 300);
+            }
+        }
     }
 
-    bars.forEach(bar => {
-        const osc = window.statusBarOscillators.get(bar);
-        const baseValue = parseFloat(bar.getAttribute('data-value') || 50);
-        const time = Date.now() / 1000;
-        
-        // Combine two sine waves for more natural movement
-        const primaryWave = Math.sin(time * osc.speed + osc.offset) * osc.amplitude;
-        const secondaryWave = Math.sin(time * osc.secondarySpeed) * (osc.amplitude * 0.5);
-        
-        // Combine waves and ensure value stays within bounds
-        let value = baseValue + primaryWave + secondaryWave;
-        value = Math.min(100, Math.max(0, value));
-        
-        // Add subtle random noise
-        value += (Math.random() - 0.5) * 0.5;
-        
-        // Update bar width
-        bar.style.width = `${value}%`;
-        
-        // Update value display with smoother animation
-        const valueDisplay = bar.parentElement.nextElementSibling;
-        if (valueDisplay) {
-            // Round to 1 decimal place for smoother display
-            valueDisplay.textContent = `${Math.round(value)}%`;
-        }
-        
-        // Dynamically adjust bar color based on value
-        const hue = value < 30 ? 120 : // Green
-                   value < 70 ? 60 :  // Yellow
-                   value < 90 ? 30 :  // Orange
-                   0;                 // Red
-        
-        // Update gradient based on value
-        bar.style.background = `linear-gradient(90deg, 
-            hsl(${hue}, 100%, 50%), 
-            hsl(${hue}, 100%, 40%)
-        )`;
+    // Set initial values
+    statusBars.forEach(bar => {
+        // Set initial width
+        bar.style.width = `${Math.random() * 65 + 30}%`;
+        updateBar(bar);
     });
-    
-    requestAnimationFrame(animateStatusBars);
+
+    // Continuous updates
+    setInterval(() => {
+        statusBars.forEach(bar => updateBar(bar));
+    }, 2000);
 }
 
 // Initialize with random starting values
