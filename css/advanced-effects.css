@@ -202,43 +202,6 @@
     100% { transform: translateX(100%) rotate(45deg); }
 }
 
-/* ---- HOLOGRAPHIC INTERFACE ---- */
-.holo-container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: 400px 200px; /* Taller top row, shorter bottom row */
-    gap: 2rem;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 1rem;
-    background-color: rgba(0, 0, 0, 0.0);
-}
-
-/* Position each display in the grid */
-.neural-network {
-    grid-column: 1;
-    grid-row: 1;
-    height: 100%;
-}
-
-.system-status {
-    grid-column: 2;
-    grid-row: 1;
-    height: 100%;
-}
-
-.holo-timeline {
-    grid-column: 3;
-    grid-row: 1;
-    height: 100%;
-}
-
-.project-matrix {
-    grid-column: 1 / 4; /* Span all three columns */
-    grid-row: 2;
-    height: 100%;
-}
-
 /* ---- TERMINAL STYLING ---- */
 .terminal-container {
     background: rgba(0, 0, 0, 0.9);
@@ -317,68 +280,6 @@
 .terminal-output p {
     margin-bottom: 1rem;
     opacity: 0.9;
-}
-
-/* ---- RESPONSIVE ADJUSTMENTS ---- */
-@media (max-width: 1200px) {
-    .holo-container {
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: 350px 350px 200px;
-        gap: 1.5rem;
-    }
-
-    .neural-network {
-        grid-column: 1;
-        grid-row: 1;
-    }
-
-    .system-status {
-        grid-column: 2;
-        grid-row: 1;
-    }
-
-    .holo-timeline {
-        grid-column: 1 / 3;
-        grid-row: 2;
-    }
-
-    .project-matrix {
-        grid-column: 1 / 3;
-        grid-row: 3;
-    }
-    
-    .glitch-text {
-        font-size: clamp(1.8rem, 3.5vw, 2.5rem);
-    }
-}
-
-@media (max-width: 768px) {
-    .holo-container {
-        grid-template-columns: 1fr;
-        grid-template-rows: repeat(3, 350px) 200px;
-        gap: 1.5rem;
-    }
-
-    .neural-network,
-    .system-status,
-    .holo-timeline,
-    .project-matrix {
-        grid-column: 1;
-        grid-row: auto;
-    }
-    
-    .glitch-text {
-        font-size: clamp(1.5rem, 3vw, 2rem);
-        letter-spacing: 1px;
-    }
-
-    .loading-sequence {
-        margin: 1rem auto 1.5rem;
-    }
-
-    #virtual-assistant.section.no-header {
-        margin-top: -0.5rem;
-    }
 }
 
 /* ---- SECTION SPACING ---- */

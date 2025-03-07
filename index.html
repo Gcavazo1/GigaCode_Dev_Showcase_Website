@@ -517,30 +517,30 @@
                         <div class="status-item">
                             <div class="status-label">CPU</div>
                             <div class="status-bar-wrapper">
-                                <div class="status-bar cpu" style="width: 82%"></div>
+                                <div class="status-bar cpu"></div>
                             </div>
-                            <div class="status-value">82%</div>
+                            <div class="status-value">0%</div>
                         </div>
                         <div class="status-item">
-                            <div class="status-label">MEMORY</div>
+                            <div class="status-label">Memory</div>
                             <div class="status-bar-wrapper">
-                                <div class="status-bar memory" style="width: 65%"></div>
+                                <div class="status-bar memory"></div>
                             </div>
-                            <div class="status-value">65%</div>
+                            <div class="status-value">0%</div>
                         </div>
                         <div class="status-item">
-                            <div class="status-label">NETWORK</div>
+                            <div class="status-label">Network</div>
                             <div class="status-bar-wrapper">
-                                <div class="status-bar network" style="width: 93%"></div>
+                                <div class="status-bar network"></div>
                             </div>
-                            <div class="status-value">93%</div>
+                            <div class="status-value">0%</div>
                         </div>
                         <div class="status-item">
-                            <div class="status-label">POWER</div>
+                            <div class="status-label">Power</div>
                             <div class="status-bar-wrapper">
-                                <div class="status-bar power" style="width: 47%"></div>
+                                <div class="status-bar power"></div>
                             </div>
-                            <div class="status-value">47%</div>
+                            <div class="status-value">0%</div>
                         </div>
                     </div>
                 </div>
@@ -566,42 +566,19 @@
                 <!-- Bottom row with timeline now horizontal -->
                 <div class="holo-box timeline">
                     <h3>System Timeline</h3>
-                    <div class="timeline-content horizontal">
-                        <!-- Updated horizontal timeline content -->
-                        <div class="timeline-event">
-                            <div class="event-time">08:15:42</div>
-                            <div class="event-marker"></div>
-                            <div class="event-details">
-                                <div class="event-name">System Initialization</div>
-                                <div class="event-status complete">COMPLETE</div>
-                            </div>
+                    <div class="timeline-container">
+                        <div class="timeline-track"></div>
+                        <div class="timeline-content">
+                            <!-- Timeline events will be added dynamically by JS -->
                         </div>
                         
-                        <div class="timeline-event">
-                            <div class="event-time">09:30:15</div>
-                            <div class="event-marker"></div>
-                            <div class="event-details">
-                                <div class="event-name">Neural Network Training</div>
-                                <div class="event-status complete">COMPLETE</div>
-                            </div>
+                        <div class="timeline-nav">
+                            <button class="nav-button prev-btn">◀ Prev</button>
+                            <button class="nav-button next-btn">Next ▶</button>
                         </div>
                         
-                        <div class="timeline-event">
-                            <div class="event-time">10:27:08</div>
-                            <div class="event-marker"></div>
-                            <div class="event-details">
-                                <div class="event-name">Data Synchronization</div>
-                                <div class="event-status in-progress">IN PROGRESS</div>
-                            </div>
-                        </div>
-                        
-                        <div class="timeline-event">
-                            <div class="event-time">11:00:00</div>
-                            <div class="event-marker"></div>
-                            <div class="event-details">
-                                <div class="event-name">Security Protocol Update</div>
-                                <div class="event-status pending">PENDING</div>
-                            </div>
+                        <div class="nav-dots">
+                            <!-- Dots will be added dynamically by JS -->
                         </div>
                     </div>
                 </div>
@@ -982,5 +959,8 @@
 
     <!-- Add this in your head section or before closing body -->
     <script src="js/glsl-header.js"></script>
+
+    <!-- Add this before closing body -->
+    <script src="js/holographic-interface.js"></script>
 </body>
 </html>
