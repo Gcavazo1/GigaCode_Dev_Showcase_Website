@@ -328,48 +328,89 @@ function initializeMatrix() {
     const matrixContent = document.querySelector('.matrix-content');
     if (!matrixContent) return;
     
-    // Create matrix lines dynamically
-    function createMatrixLine() {
-        const line = document.createElement('div');
-        line.className = 'matrix-line';
+    matrixContent.innerHTML = ''; // Clear existing content
+    
+    // More authentic Matrix characters
+    const matrixChars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+    
+    // Create columns of falling characters
+    const columns = Math.floor(matrixContent.clientWidth / 20); // Adjust spacing
+
+    // Create matrix columns
+    for (let i = 0; i < columns; i++) {
+        createMatrixColumn(i);
+    }
+    
+    function createMatrixColumn(index) {
+        const column = document.createElement('div');
+        column.className = 'matrix-line';
+        column.style.left = `${index * 20}px`; // Position horizontally
+        
+        // Random speed and delay for more natural effect
+        const speed = Math.random() * 5 + 3; // 3-8 seconds
+        const delay = Math.random() * 5; // 0-5 second delay
+        
+        column.style.animationDuration = `${speed}s`;
+        column.style.animationDelay = `-${delay}s`;
         
         // Generate random matrix text
-        let text = '';
-        const chars = '01';
-        const length = Math.floor(Math.random() * 20) + 20;
+        const length = Math.floor(Math.random() * 10) + 10;
         
-        for (let i = 0; i < length; i++) {
-            text += chars[Math.floor(Math.random() * chars.length)];
+        for (let j = 0; j < length; j++) {
+            const charSpan = document.createElement('span');
+            charSpan.className = 'matrix-character';
+            charSpan.textContent = matrixChars[Math.floor(Math.random() * matrixChars.length)];
+            
+            // First character is brighter (leading character effect)
+            if (j === 0) {
+                charSpan.style.color = '#ffffff';
+                charSpan.style.textShadow = '0 0 8px #00ffff';
+                charSpan.style.opacity = '1';
+            }
+            
+            column.appendChild(charSpan);
+            charSpan.style.display = 'block'; // Stack vertically
         }
         
-        line.textContent = text;
-        return line;
+        matrixContent.appendChild(column);
+        
+        // Remove and recreate column after animation completes
+        column.addEventListener('animationiteration', () => {
+            matrixContent.removeChild(column);
+            createMatrixColumn(index);
+        });
     }
-
-    // Initialize with multiple lines
-    for (let i = 0; i < 20; i++) {
-        matrixContent.appendChild(createMatrixLine());
-    }
-
-    // Continuously update matrix
+    
+    // Character change effect
     setInterval(() => {
-        // Remove first line and add new line
-        if (matrixContent.children.length > 20) {
-            matrixContent.removeChild(matrixContent.children[0]);
+        // Randomly select some characters to change
+        const characters = document.querySelectorAll('.matrix-character');
+        if (characters.length > 0) {
+            const numToChange = Math.ceil(characters.length * 0.05); // Change ~5% at a time
+            
+            for (let i = 0; i < numToChange; i++) {
+                const randomChar = characters[Math.floor(Math.random() * characters.length)];
+                if (randomChar) {
+                    // Change to a new random character
+                    randomChar.textContent = matrixChars[Math.floor(Math.random() * matrixChars.length)];
+                    
+                    // Add brief highlight effect
+                    randomChar.style.color = '#ffffff';
+                    randomChar.style.textShadow = '0 0 8px #00ffff';
+                    randomChar.style.opacity = '1';
+                    
+                    setTimeout(() => {
+                        if (randomChar.parentNode && randomChar.parentNode.firstChild === randomChar) {
+                            // Keep first character bright
+                            return;
+                        }
+                        randomChar.style.color = '';
+                        randomChar.style.textShadow = '';
+                        randomChar.style.opacity = '';
+                    }, 100);
+                }
+            }
         }
-        matrixContent.appendChild(createMatrixLine());
-
-        // Random highlight effect
-        const randomLine = matrixContent.children[
-            Math.floor(Math.random() * matrixContent.children.length)
-        ];
-        randomLine.style.color = '#00ffff';
-        randomLine.style.textShadow = '0 0 5px #00ffff';
-        
-        setTimeout(() => {
-            randomLine.style.color = '';
-            randomLine.style.textShadow = '';
-        }, 100);
     }, 100);
 }
 
@@ -378,6 +419,26 @@ document.addEventListener('DOMContentLoaded', initializeMatrix);
 
 function animateStatusBars() {
     const statusBars = document.querySelectorAll('.status-bar-wrapper .status-bar');
+    
+    function getStatusColor(percentage) {
+        // Dynamic color based on percentage
+        if (percentage < 40) {
+            return {
+                color: `linear-gradient(90deg, #00ff00, #00aa00)`,
+                glow: 'rgba(0, 255, 0, 0.7)'
+            };
+        } else if (percentage < 75) {
+            return {
+                color: `linear-gradient(90deg, #ffff00, #aaaa00)`,
+                glow: 'rgba(255, 255, 0, 0.7)'
+            };
+        } else {
+            return {
+                color: `linear-gradient(90deg, #ff0000, #aa0000)`,
+                glow: 'rgba(255, 0, 0, 0.7)'
+            };
+        }
+    }
     
     function updateBar(bar) {
         // Get current width or set initial width if not set
@@ -390,36 +451,47 @@ function animateStatusBars() {
         // Keep within bounds (30% to 95%)
         newWidth = Math.max(30, Math.min(95, newWidth));
         
-        // Apply new width with transition
-        bar.style.width = `${newWidth}%`;
+        // Get colors based on the new percentage
+        const colors = getStatusColor(newWidth);
         
-        // Update the value text
+        // Apply new width and colors
+        bar.style.width = `${newWidth}%`;
+        bar.style.background = colors.color;
+        bar.style.boxShadow = `0 0 10px ${colors.glow}`;
+        
+        // Update percentage display
         const container = bar.closest('.status-item');
         if (container) {
-            const valueElement = container.querySelector('.status-value');
-            if (valueElement) {
-                valueElement.textContent = `${Math.round(newWidth)}%`;
+            const valueDisplay = container.querySelector('.status-value');
+            if (valueDisplay) {
+                valueDisplay.textContent = `${Math.round(newWidth)}%`;
                 
-                // Add flash effect on change
-                valueElement.style.color = '#00ffff';
-                setTimeout(() => {
-                    valueElement.style.color = '#e0e0e0';
-                }, 300);
+                // Add warning effect for high values
+                if (newWidth > 85) {
+                    valueDisplay.style.color = '#ff0000';
+                    valueDisplay.style.textShadow = '0 0 5px rgba(255, 0, 0, 0.7)';
+                } else if (newWidth > 70) {
+                    valueDisplay.style.color = '#ffff00';
+                    valueDisplay.style.textShadow = '0 0 5px rgba(255, 255, 0, 0.7)';
+                } else {
+                    valueDisplay.style.color = '#00ff00';
+                    valueDisplay.style.textShadow = '0 0 5px rgba(0, 255, 0, 0.7)';
+                }
             }
         }
     }
-
-    // Set initial values
+    
+    // Initialize bars with random starting values
     statusBars.forEach(bar => {
-        // Set initial width
-        bar.style.width = `${Math.random() * 65 + 30}%`;
+        bar.style.width = `${Math.random() * 65 + 30}%`; // Random between 30-95%
+        bar.style.transition = 'all 0.3s ease-in-out';
         updateBar(bar);
     });
-
-    // Continuous updates
-    setInterval(() => {
-        statusBars.forEach(bar => updateBar(bar));
-    }, 2000);
+    
+    // Update each bar at random intervals
+    statusBars.forEach(bar => {
+        setInterval(() => updateBar(bar), Math.random() * 500 + 500); // Random interval 500-1000ms
+    });
 }
 
 // Initialize with random starting values

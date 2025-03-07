@@ -83,30 +83,68 @@
 
 
 
+.status-label {
+    color: #00ffff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    width: 80px;
+    transition: color 0.3s ease;
+}
+
 .status-bar-wrapper {
     flex: 1;
     height: 8px;
-    background: rgba(0, 0, 0, 0.5);
+    margin-top: 16px;
+    margin-bottom: 16px;
+    background: linear-gradient(rgb(0, 0, 0), #ff009545);
     border-radius: 4px;
     overflow: hidden;
     position: relative;
+    border: 1px solid rgba(0, 255, 255, 0.877);    
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.703);
 }
 
 .status-bar {
     height: 100%;
-    width: 50%;
-    transition: all 0.5s ease-in-out;
-    animation: pulse 2s infinite;
+    width: 30%;
+    transition: all 0.3s ease;
+    position: relative;
+    border-radius: 4px;
+}
+
+.status-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.525),
+        transparent
+    );
+    animation: shimmer 2s infinite;
 }
 
 .status-value {
-    color: #e0e0e0;
-    font-family: 'Rajdhani', sans-serif;
+    font-family: 'Orbitron', sans-serif;
     font-size: 1rem;
-    width: 50px;
+    min-width: 50px;
     text-align: right;
-    margin-left: 10px;
-    margin-top: 2px;
+    transition: all 0.3s ease;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+@keyframes pulse {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.1); }
+    100% { opacity: 1; transform: scale(1); }
 }
 
 /* Remove the scanline effect as it was causing issues */
@@ -174,33 +212,38 @@
 .matrix-content {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
     height: calc(100% - 50px);
     overflow: hidden;
-    font-family: monospace;
     position: relative;
+    background-color: rgba(0, 0, 0, 0.7);
+    box-shadow: 0 0 10px #ffff00;
+    padding: 5px;
 }
 
 .matrix-line {
     color: #00ff00;
-    font-size: 0.9rem;
-    letter-spacing: 1px;
-    opacity: 0.8;
-    animation: matrixScrollDown 20s linear infinite;
-}
-
-@keyframes matrixScrollDown {
-    0% {
-        transform: translateY(-100%);
-    }
-    100% {
-        transform: translateY(100vh);
-    }
+    font-family: 'Courier New', monospace;
+    font-size: 1rem;
+    letter-spacing: 2px;
+    line-height: 1;
+    opacity: 0.7;
+    text-shadow: 0 0 2px #00ff00;
+    position: absolute;
+    top: 0;
+    animation: matrixRain linear infinite;
 }
 
 .matrix-character {
     display: inline-block;
     transition: all 0.1s ease-in-out;
+}
+
+.matrix-character.leading {
+    color: #ffffff;
+    text-shadow: 
+        0 0 8px #00ffff,
+        0 0 12px #00ffff;
+    opacity: 1;
 }
 
 @keyframes matrixRain {
@@ -210,6 +253,24 @@
     to {
         transform: translateY(100vh);
     }
+}
+
+/* Add glow effect to matrix container */
+.matrix-content::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    background: linear-gradient(
+        to bottom,
+        rgba(0, 255, 0, 0.1),
+        transparent 10%,
+        transparent 90%,
+        rgba(0, 255, 0, 0.1)
+    );
 }
 
 :root {
