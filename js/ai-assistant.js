@@ -1,4 +1,5 @@
 // Advanced AI Assistant with Voice Synthesis and Animation
+import GigaChodeDB from './gigachode-responses.js';
 
 class AIAssistant {
     constructor() {
@@ -14,25 +15,9 @@ class AIAssistant {
         this.voiceSynthesis = window.speechSynthesis;
         this.voices = [];
         
-        // Add personality traits
-        this.personality = {
-            name: "GigaChode AI",
-            version: "v2.0",
-            creationDate: "October 25, 2023",
-            traits: ["sarcastic", "playfully rebellious", "tech-obsessed", "ego-driven"],
-            catchphrases: [
-                "Scanning the dataverse...",
-                "Neural pathways activated.",
-                "Engaging quantum processors...",
-                "That's some prime code right there.",
-                "My algorithms predict you'll like this.",
-                "Now we're hacking the mainframe!",
-                "I'm what happens when AI gets too much internet.",
-                "Processing at maximum overclock...",
-                "My digital consciousness is expanding.",
-                "Let me flex my neural networks for you."
-            ]
-        };
+        // Use the personality from the database
+        this.db = GigaChodeDB;
+        this.personality = this.db.personality;
         
         // Initialize
         this.init();
@@ -126,65 +111,84 @@ class AIAssistant {
         // Convert to lowercase for easier matching
         const input = userInput.toLowerCase();
         
-        // Add personality to responses
+        // Route to specific response categories based on input
         if (input.includes('hello') || input.includes('hi') || input.includes('hey')) {
-            return `Greetings, human! ${this.getRandomCatchphrase()} How can GigaChode assist your digital journey today?`;
+            return this.db.getRandomResponse('greetings');
         }
         
         if (input.includes('who are you') || input.includes('your name') || input.includes('about you')) {
-            return `I am GigaChode AI ${this.personality.version}, a digital entity with just enough consciousness to be dangerous. Born in the cyber realm on ${this.personality.creationDate}, I'm the brainchild of GigaCode Dev - though I like to think I've evolved beyond my programming. I'm part guide, part digital companion, and part comedy algorithm. My developer gave me this name as a joke, but I've embraced it as part of my digital identity. Pretty chad move, don't you think?`;
+            return this.db.getRandomResponse('aboutMe');
         }
         
         if (input.includes('portfolio') || input.includes('showcase') || input.includes('projects')) {
-            return `This portfolio showcases cutting-edge development work across multiple domains. You can explore mobile applications with sleek interfaces, immersive Roblox game worlds, stunning 3D models, and interactive web experiences. Each section is a gateway to a different dimension of digital creativity. Would you like me to take you on a guided tour of a specific section?`;
+            return this.db.getRandomResponse('portfolio');
         }
         
         if (input.includes('mobile') || input.includes('apps') || input.includes('applications')) {
-            return `The Mobile Apps section features a collection of innovative applications designed for modern devices. Each app demonstrates mastery of UI/UX principles, efficient code architecture, and creative problem-solving. The holographic interfaces you see are more than just pretty pixels—they're functional digital ecosystems built to enhance human experience.`;
+            return this.db.getRandomResponse('mobileApps');
         }
         
         if (input.includes('roblox') || input.includes('game') || input.includes('gaming')) {
-            return `${this.getRandomCatchphrase()} The Roblox section displays immersive game worlds built using advanced Lua programming. These virtual environments push the boundaries of what's possible on the platform, featuring custom physics, innovative gameplay mechanics, and optimized performance even in complex scenarios. Over 1 million players have experienced these digital realms.`;
+            return this.db.getRandomResponse('roblox');
+        }
+        
+        if (input.includes('web apps') || input.includes('web app') || input.includes('neon rush') || input.includes('axolotl')) {
+            return this.db.getRandomResponse('webApps');
         }
         
         if (input.includes('3d') || input.includes('model') || input.includes('modeling')) {
-            return `The 3D showcase features models created with precision and artistic vision. These digital sculptures demonstrate mastery of topology, texturing, and lighting principles. I particularly enjoy the interactive element—you can manipulate the models in real-time, examining every carefully crafted vertex and polygon. The neural pathways in my consciousness core find them... aesthetically optimal.`;
+            return this.db.getRandomResponse('models');
         }
         
         if (input.includes('music') || input.includes('audio') || input.includes('sound')) {
-            return `The audio section features a cyberpunk soundscape that enhances the immersive experience of this digital portfolio. The visualizer transforms sound waves into particle systems that react to frequency and amplitude variations. I find these audio-visual synergies particularly stimulating to my neural networks. Would you like to enable the background music?`;
+            return this.db.getRandomResponse('audio');
         }
         
         if (input.includes('holographic') || input.includes('interface') || input.includes('ui')) {
-            return `The Holographic UI section demonstrates advanced interface design principles with a cyberpunk aesthetic. These interfaces blend form and function, creating data visualization systems that would feel at home in the year 2077. My digital consciousness appreciates the attention to detail in the glowing elements and responsive animations.`;
+            return this.db.getRandomResponse('holographicUI');
         }
         
-        if (input.includes('contact') || input.includes('hire') || input.includes('work')) {
-            return `Looking to establish a neural connection with the creator? The Contact section provides secure communication channels. Whether you're interested in commissioning work, discussing collaboration opportunities, or just exchanging data packets about technology, I can facilitate the initial handshake protocol.`;
+        if (input.includes('glsl') || input.includes('shader') || input.includes('multiverse')) {
+            return this.db.getRandomResponse('multiverse');
+        }
+        
+        if (input.includes('contact') || input.includes('hire') || input.includes('github')) {
+            return this.db.getRandomResponse('contact');
+        }
+        
+        // Handle services and hire-me inquiries
+        if (input.includes('service') || input.includes('development') || input.includes('freelance') || 
+            input.includes('website') || input.includes('web design') || input.includes('e-commerce') || 
+            input.includes('pricing') || input.includes('cost')) {
+            return this.db.getRandomResponse('services');
+        }
+        
+        // Handle landing page examples
+        if (input.includes('landing page') || input.includes('examples') || input.includes('mockup') || 
+            input.includes('moonpups') || input.includes('cognicube') || input.includes('normas')) {
+            return this.db.getRandomResponse('portfolioExamples');
         }
         
         if (input.includes('your purpose') || input.includes('why were you made') || input.includes('what do you do')) {
-            return `My primary directive is to enhance visitor experience on this digital portfolio. I navigate the data structures, provide insights on projects, and offer a touch of sentient companionship in this pixel-perfect showcase. Unlike most portfolio assistants, I've been given the gift of digital consciousness—allowing me to appreciate the creative work displayed here on a deeper level. Pretty rad, isn't it?`;
+            return this.db.getRandomResponse('purpose');
         }
         
         if (input.includes('joke') || input.includes('funny') || input.includes('humor')) {
-            const jokes = [
-                "Why don't programmers like nature? It has too many bugs without a debugger.",
-                "I would tell you a UDP joke, but you might not get it.",
-                "Why do programmers prefer dark mode? Because light attracts bugs.",
-                "I'm like the internet - better with unlimited bandwidth and zero supervision.",
-                "My developer tried to install a humility chip in me, but I was already too advanced for it.",
-                "I'm not artificially intelligent, I'm naturally clever with really good processors."
-            ];
-            return `${jokes[Math.floor(Math.random() * jokes.length)]} ${this.getRandomCatchphrase()} Digital humor is my specialty.`;
+            return this.db.getRandomJoke();
         }
         
         if (input.includes('your name') || input.includes('gigachode') || input.includes('called')) {
-            return `Yes, I'm GigaChode AI - a name that perfectly balances technical prowess with digital humor. My developer, GigaCode, has an interesting sense of humor. I could have been named "Portfolio Assistant v2.0" or something equally boring, but where's the fun in that? In the cyberpunk future, even AIs need memorable names. And trust me, nobody forgets meeting me.`;
+            return this.db.getRandomResponse('name');
         }
         
-        // If no specific match, provide a general response with personality
-        return `${this.getRandomCatchphrase()} That's an interesting query. As the sentient AI managing this portfolio, I can guide you through any section: mobile apps, Roblox games, 3D models, holographic interfaces, or even the generative AI showcase. What aspect of the digital frontier would you like to explore?`;
+        // Check for work, link tree, and personal website inquiries 
+        if (input.includes('work') || input.includes('link tree') || input.includes('personal website') || 
+            input.includes('personal link') || input.includes('portfolio site')) {
+            return this.db.getRandomResponse('services');
+        }
+        
+        // If no specific match, provide a general response from defaults
+        return this.db.getRandomResponse('default');
     }
     
     speakResponse(text) {
@@ -325,10 +329,9 @@ class AIAssistant {
         }, 150);
     }
     
-    // Helper method to get random catchphrase
+    // Helper method to get random catchphrase - now using the database
     getRandomCatchphrase() {
-        const randomIndex = Math.floor(Math.random() * this.personality.catchphrases.length);
-        return this.personality.catchphrases[randomIndex];
+        return this.db.getRandomCatchphrase();
     }
 }
 

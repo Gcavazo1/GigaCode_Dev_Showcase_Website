@@ -17,7 +17,7 @@
     grid-template-rows: 500px 500px;
     gap: 2rem;
     max-width: 1000px;
-    max-height: ;
+    max-height: 1000px;
     margin: 0 auto;
     padding: 1;
 }

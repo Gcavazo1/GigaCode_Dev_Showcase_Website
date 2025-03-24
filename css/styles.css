@@ -466,9 +466,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .project-links {
+    margin: 0.5rem 0;
     display: flex;
-    gap: 1rem;
-    margin-top: auto;
+    gap: 0.5rem;
+}
+
+.project-links .cyber-button.small {
+    padding: 0.3rem 0.8rem;
+    font-size: 0.8rem;
 }
 
 .tech-stack {
@@ -1293,14 +1298,207 @@ h1, h2, h3, h4, h5, h6 {
     border-radius: 3px;
 }
 
-/* Project Links Adjustment */
-.project-links {
-    margin: 0.5rem 0;
-    display: flex;
-    gap: 0.5rem;
+/* Web Apps Section */
+.web-apps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 2.5rem;
+    margin-top: 2rem;
 }
 
-.project-links .cyber-button.small {
+.web-app-card .card-front,
+.web-app-card .card-back {
+    background: linear-gradient(145deg, rgba(10, 10, 18, 0.8), rgba(15, 15, 30, 0.9));
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
+}
+
+.web-app-card:hover .card-inner {
+    transform: rotateY(180deg);
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.3);
+}
+
+.web-app-card .project-image {
+    position: relative;
+    overflow: hidden;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+}
+
+.web-app-card .project-image::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0, 255, 255, 0) 70%, rgba(0, 255, 255, 0.2));
+    z-index: 1;
+    opacity: 0.3;
+    transition: opacity 0.3s ease;
+}
+
+.web-app-card:hover .project-image::before {
+    opacity: 0.6;
+}
+
+.web-app-card .project-title {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 0.5rem;
+}
+
+.web-app-card .project-title::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 30%;
+    height: 2px;
+    background: var(--primary-color);
+    box-shadow: 0 0 8px var(--primary-color);
+    transition: width 0.3s ease;
+}
+
+.web-app-card:hover .project-title::after {
+    width: 100%;
+}
+
+.project-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.project-tags span {
     padding: 0.3rem 0.8rem;
+    background-color: rgba(0, 255, 255, 0.1);
+    border-radius: 20px;
     font-size: 0.8rem;
+    color: var(--primary-color);
+    transition: all 0.3s ease;
+}
+
+.web-app-card:hover .project-tags span {
+    background-color: rgba(0, 255, 255, 0.2);
+    box-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+}
+
+.web-app-card .card-back {
+    display: flex;
+    flex-direction: column;
+}
+
+.web-app-card .project-links {
+    margin-top: auto;
+    display: flex;
+    gap: 0.8rem;
+    justify-content: flex-start;
+}
+
+.web-app-card .project-links .cyber-button.small {
+    position: relative;
+    overflow: hidden;
+}
+
+.web-app-card .project-links .cyber-button.small::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(0, 255, 255, 0.2) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.web-app-card .project-links .cyber-button.small:hover::before {
+    opacity: 1;
+}
+
+/* Different styling for the second web app card (Axolotl) */
+.web-app-card:nth-child(2) .card-front,
+.web-app-card:nth-child(2) .card-back {
+    background: linear-gradient(145deg, rgba(10, 10, 28, 0.8), rgba(15, 15, 40, 0.9));
+    border: 1px solid rgba(240, 0, 255, 0.2);
+}
+
+.web-app-card:nth-child(2):hover .card-inner {
+    box-shadow: 0 0 25px rgba(240, 0, 255, 0.3);
+}
+
+.web-app-card:nth-child(2) .project-title {
+    color: var(--secondary-color);
+}
+
+.web-app-card:nth-child(2) .project-title::after {
+    background: var(--secondary-color);
+    box-shadow: 0 0 8px var(--secondary-color);
+}
+
+.web-app-card:nth-child(2) .project-tags span {
+    background-color: rgba(240, 0, 255, 0.1);
+    color: var(--secondary-color);
+}
+
+.web-app-card:nth-child(2):hover .project-tags span {
+    background-color: rgba(240, 0, 255, 0.2);
+    box-shadow: 0 0 8px rgba(240, 0, 255, 0.3);
+}
+
+.web-app-card:nth-child(2) .tech-stack span {
+    border-color: var(--secondary-color);
+    color: var(--secondary-color);
+}
+
+.web-app-card:nth-child(2) .project-links .cyber-button.small {
+    border-color: var(--secondary-color);
+    color: var(--secondary-color);
+}
+
+.web-app-card:nth-child(2) .project-links .cyber-button.small:hover {
+    background-color: rgba(240, 0, 255, 0.1);
+    box-shadow: 0 0 15px rgba(240, 0, 255, 0.3);
+}
+
+/* Responsive styles for Web Apps section */
+@media (max-width: 768px) {
+    .web-apps-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .web-app-card .project-title {
+        font-size: 1.3rem;
+    }
+    
+    .web-app-card .project-description {
+        font-size: 0.85rem;
+    }
+    
+    .project-tags span {
+        padding: 0.2rem 0.6rem;
+        font-size: 0.75rem;
+    }
+    
+    .tech-stack span {
+        font-size: 0.75rem;
+        padding: 0.15rem 0.4rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .web-apps-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .project-card {
+        height: 380px;
+    }
+    
+    .web-app-card .project-image {
+        height: 55%;
+    }
 } 

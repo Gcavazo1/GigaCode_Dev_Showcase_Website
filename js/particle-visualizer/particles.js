@@ -4,8 +4,8 @@ class ParticleSystem {
   constructor(gui) {
     this.name = 'ParticleSystem';
     this.time = 0;
-    this.reactivityMultiplier = 0.2;
-    this.currentShape = 'torusKnot';
+    this.reactivityMultiplier = 0.3;
+    this.currentShape = 'ring';
     
     // Add counter for randomization
     this.randomizeCounter = 0;
@@ -44,9 +44,9 @@ class ParticleSystem {
       amplitude: { value: 1.5 },
       offsetGain: { value: 0.6 },
       maxDistance: { value: 1.5 },
-      startColor: { value: new THREE.Color(0x910055) },
-      endColor: { value: new THREE.Color(0x007918) },
-      reactivityMultiplier: { value: 0.2 }  // Set default reactivity
+      startColor: { value: new THREE.Color(0x5B03B3) },
+      endColor: { value: new THREE.Color(0x999b01) },
+      reactivityMultiplier: { value: 0.3 }  // Set default reactivity
     };
     
     // Reference shader implementations
@@ -633,15 +633,15 @@ class ParticleSystem {
     this.uniforms.time.value = this.time;
     
     // Set audio data defaults if not provided
-    const audio = audioData || { low: 0, mid: 0, high: 0 };
+    const audio = audioData || { low: 0, mid: 0, high: 0, };
     
     // Get reactivity with default
     const reactivity = Math.max(0.5, this.reactivityMultiplier || 0.4);
     
     // Apply audio data to uniforms
-    this.uniforms.amplitude.value = 0.3 + (audio.low * 1.5 * reactivity);
+    this.uniforms.amplitude.value = 0.2 + (audio.low * 1.5 * reactivity);
     this.uniforms.offsetGain.value = 0.1 + (audio.mid * 1.0 * reactivity);
-    this.uniforms.frequency.value = 1.0 + (audio.high * 2.0 * reactivity);
+    this.uniforms.frequency.value = 0.8 + (audio.high * 2.0 * reactivity);
     
     // Beat detection
     if (beatDetected) {

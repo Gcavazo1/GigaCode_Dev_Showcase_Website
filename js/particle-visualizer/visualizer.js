@@ -116,7 +116,7 @@ class ParticleVisualizer {
     
     // Add rotation properties - slower rotation speed
     this.autoRotate = true;
-    this.rotationSpeed = 0.004; // Reduced from 0.01 to make rotation more subtle
+    this.rotationSpeed = 0.005; // Reduced from 0.01 to make rotation more subtle
     
     // Initialize
     this.init();
@@ -128,7 +128,7 @@ class ParticleVisualizer {
     window.addEventListener('resize', this.resize.bind(this));
     
     // Ensure default values are set
-    this.particleSystem.reactivityMultiplier = 0.2;
+    this.particleSystem.reactivityMultiplier = 0.3;
     
     // Initialize colors
     if (this.particleSystem.uniforms) {
@@ -152,7 +152,7 @@ class ParticleVisualizer {
           });
       }
       
-      const particleHolder = this.particleSystem.create('torusKnot');
+      const particleHolder = this.particleSystem.create('ring');
       if (particleHolder) {
         this.holder.add(particleHolder);
         console.log('[Visualizer] Particles added to holder');
